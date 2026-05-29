@@ -1,16 +1,49 @@
 {
-    "title":"luliy6 blog",
-    "subTitle":"hhhh",
-    "avatarUrl":"https://github.githubassets.com/favicons/favicon.svg",
-    "GMEEK_VERSION":"last",
-    
+    "title": "Luliy",
+    "subTitle": "我将无限进步！",
+    "avatarUrl": "https://github.githubassets.com/favicons/favicon.svg",
+    "GMEEK_VERSION": "last",
+
+    "displayTitle": "Luliy's Blog",
+    "homeUrl": "https://luliy6.github.io",
+    "faviconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+    "email": "luliy6@gmail.com",
+
     "startSite": "05/30/2026",
-    "perPage": 15,
-    "themeMode": "fix",
+    "onePageListNum": 7,
+
     "singlePage": ["about", "link"],
-    "menu": {
-        "home": "🏠 首頁",
-        "about": "👨‍💻 關於我",
-        "link": "🤝 友情連結"
-    }
+    "iconList": {},
+    "exlink": {},
+
+    "i18n": "CN",
+    "UTC": 8,
+    "urlMode": "pinyin",
+
+    "themeMode": "manual",
+    "dayTheme": "light",
+    "nightTheme": "dark_colorblind",
+
+    "yearColorList": ["#bc4c00", "#0969da", "#1f883d", "#A333D0"],
+    "commentLabelColor": "#006b75",
+
+    "showPostSource": 1,
+    "needComment": 1,
+    "rssSplit": "sentence",
+    "bottomText": "转载请注明出处",
+
+    "ogImage": "https://github.githubassets.com/favicons/favicon.svg",
+    "primerCSS": "<link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />",
+
+    "allHead": "<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script>",
+
+    "script": "<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>",
+
+    "style": "<style>#postBody{font-size:18px;line-height:1.9;max-width:860px}#postBody h1,#postBody h2,#postBody h3,#postBody h4{color:#0969da}#postBody a{color:#8250df;text-decoration:none}#postBody a:hover{text-decoration:underline}#postBody img{display:block;margin:0 auto;max-width:100%;border-radius:8px}#postBody pre{background:#f6f8fa;border-radius:10px;padding:16px;overflow-x:auto}#postBody code{background:#f0f0f0;border-radius:4px;padding:2px 6px;font-size:0.9em}#postBody pre code{background:none;padding:0}</style>",
+
+    "indexStyle": "<style>.post-item{transition:box-shadow 0.2s,transform 0.2s;border-radius:10px;padding:10px 14px}.post-item:hover{box-shadow:0 4px 18px rgba(0,0,0,0.10);transform:translateY(-2px)}.footer{text-align:center;font-size:13px;color:#888;margin-top:2rem;padding-top:1rem;border-top:1px solid #eee}@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}.post-item{animation:fadeInUp 0.5s ease both}canvas#petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}</style>",
+
+    "head": "",
+
+    "indexScript": "<script>document.addEventListener('DOMContentLoaded',function(){var items=document.querySelectorAll('.post-item');items.forEach(function(el,i){el.style.animationDelay=(i*0.07)+'s'});var el=document.querySelector('.blogTitle p')||document.querySelector('p.f4');if(el){var txt=el.textContent;el.textContent='';var i=0;(function type(){if(i<txt.length){el.textContent+=txt[i++];setTimeout(type,60)}})()}var canvas=document.createElement('canvas');canvas.id='petals-canvas';document.body.appendChild(canvas);var ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;window.addEventListener('resize',function(){canvas.width=window.innerWidth;canvas.height=window.innerHeight});var petals=[];for(var p=0;p<38;p++){petals.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*7+4,speed:Math.random()*1.2+0.4,drift:Math.random()*0.8-0.4,opacity:Math.random()*0.5+0.3,color:Math.random()>0.5?'#ffb7c5':'#fff'})}function drawPetal(p){ctx.save();ctx.globalAlpha=p.opacity;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill();ctx.restore()}function animatePetals(){ctx.clearRect(0,0,canvas.width,canvas.height);petals.forEach(function(p){drawPetal(p);p.y+=p.speed;p.x+=p.drift;if(p.y>canvas.height+10){p.y=-10;p.x=Math.random()*canvas.width}});requestAnimationFrame(animatePetals)}animatePetals();document.addEventListener('click',function(e){for(var b=0;b<18;b++){var spark=document.createElement('div');var angle=Math.random()*360;var dist=Math.random()*60+20;var colors=['#ff6b9d','#ffcd3c','#6bceff','#a78bfa','#34d399'];spark.style.cssText='position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;width:7px;height:7px;border-radius:50%;background:'+colors[Math.floor(Math.random()*colors.length)]+';pointer-events:none;z-index:9999;transition:transform 0.6s ease,opacity 0.6s ease;transform:translate(-50%,-50%)';document.body.appendChild(spark);setTimeout(function(s,a,d){s.style.transform='translate(calc(-50% + '+Math.cos(a*Math.PI/180)*d+'px),calc(-50% + '+Math.sin(a*Math.PI/180)*d+'px))';s.style.opacity='0'})(spark,angle,dist,0);setTimeout(function(s){s.remove()}(spark),700)}})});</script>"
 }
