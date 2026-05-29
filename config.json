@@ -2,5 +2,15 @@
     "title":"luliy6 blog",
     "subTitle":"hhhh",
     "avatarUrl":"https://github.githubassets.com/favicons/favicon.svg",
-    "GMEEK_VERSION":"last"
+    "GMEEK_VERSION":"last",
+    
+    "startSite": "05/30/2026",
+    "perPage": 15,
+    "themeMode": "fix",
+    "singlePage": ["about", "link"],
+    "menu": {
+        "home": "🏠 首頁",
+        "about": "👨‍💻 關於我",
+        "link": "🤝 友情連結"
+    }
 }
