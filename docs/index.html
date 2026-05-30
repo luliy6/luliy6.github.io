@@ -5,7 +5,109 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
-    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><style>body,#postBody{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji'}html{scroll-behavior:smooth}::selection{background:#0969da33;color:#0969da}a[target='_blank']::after{content:' ↗';font-size:0.75em;opacity:0.6}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#8250df;border-radius:4px}::-webkit-scrollbar-track{background:transparent}.container-lg{max-width:960px!important}body{background-image:radial-gradient(rgba(9,105,218,0.1) 1px,transparent 1px);background-size:25px 25px}[data-color-mode="dark"] body{background-image:radial-gradient(rgba(255,255,255,0.08) 1px,transparent 1px)}[data-color-mode="dark"] pre{background:#1e1e1e!important}</style>
+    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css'><style>body,#postBody{font-family:'LXGW WenKai','LXGW WenKai Screen',sans-serif}html{scroll-behavior:smooth}::selection{background:#0969da33;color:#0969da}a[target='_blank']::after{content:' ↗';font-size:0.75em;opacity:0.6}</style><style>/* 统一圆角与阴影 */
+.post-item, pre, #postBody img {
+  border-radius: 8px !important;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.post-item:hover, pre:hover, #postBody img:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+/* 美化滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #0969da;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0550ae;
+}
+</style>
+<script>
+// 文章标签系统 + 关闭花瓣特效开关
+(function() {
+  // ----- 标签系统 -----
+  async function addTagsToPost() {
+    const postBody = document.getElementById('postBody');
+    if (!postBody) return;
+    const currentPath = window.location.pathname;
+    try {
+      const res = await fetch('/postList.json');
+      const posts = await res.json();
+      const post = posts.find(p => p.link === currentPath);
+      if (post && post.tags && post.tags.length) {
+        const tagsHtml = `<div style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="background: #e9ecef; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">🏷️ 标签：</span>
+          ${post.tags.map(tag => `<span class="post-tag" data-tag="${tag}" style="background: #0969da10; color: #0969da; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">${tag}</span>`).join('')}
+        </div>`;
+        postBody.insertAdjacentHTML('afterbegin', tagsHtml);
+        document.querySelectorAll('.post-tag').forEach(el => {
+          el.addEventListener('click', (e) => {
+            const tag = e.currentTarget.getAttribute('data-tag');
+            const searchInput = document.getElementById('s-input');
+            if (searchInput) {
+              searchInput.value = tag;
+              searchInput.dispatchEvent(new Event('input'));
+              document.querySelector('#s-input').closest('div').style.display = 'flex';
+            } else {
+              alert('搜索框未加载，请按右下角 S 键打开搜索后手动输入标签');
+            }
+          });
+        });
+      }
+    } catch(e) { console.log('标签加载失败', e); }
+  }
+
+  // ----- 关闭特效开关（花瓣）-----
+  let petalsCanvas = null;
+  let petalsActive = true;
+  function stopPetals() {
+    if (petalsCanvas && petalsCanvas.parentNode) {
+      petalsCanvas.style.display = 'none';
+      // 清除画布内容
+      const ctx = petalsCanvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, petalsCanvas.width, petalsCanvas.height);
+    }
+    petalsActive = false;
+  }
+  function addEffectToggleButton() {
+    const btn = document.createElement('button');
+    btn.textContent = '🌸 关闭花瓣';
+    btn.title = '隐藏花瓣飘落动画';
+    btn.style.cssText = 'position:fixed; bottom:192px; right:24px; width:auto; padding:8px 12px; background:#8250df; color:#fff; border:none; border-radius:40px; cursor:pointer; z-index:999; font-size:13px; box-shadow:0 2px 6px rgba(0,0,0,0.2);';
+    document.body.appendChild(btn);
+    btn.addEventListener('click', () => {
+      if (petalsActive) {
+        stopPetals();
+        btn.textContent = '🌸 已关闭';
+        btn.style.background = '#6c757d';
+      }
+    });
+    // 获取花瓣canvas元素（原动画会在页面加载后创建）
+    setTimeout(() => {
+      petalsCanvas = document.getElementById('petals-canvas');
+    }, 500);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      addTagsToPost();
+      addEffectToggleButton();
+    });
+  } else {
+    addTagsToPost();
+    addEffectToggleButton();
+  }
+})();
+</script>
     <link rel="icon" href="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64"><script>
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
@@ -50,7 +152,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     .LabelTime{display:none;}
 }
 </style>
-<style>.post-item{transition:box-shadow 0.2s,transform 0.2s;border-radius:10px;padding:10px 14px;border-left:4px solid #8250df}.post-item:hover{box-shadow:0 4px 18px rgba(0,0,0,0.10);transform:translateY(-2px)}.avatar{box-shadow:0 0 15px rgba(130,80,223,0.4);transition:box-shadow 0.3s,transform 0.3s}.avatar:hover{box-shadow:0 0 25px rgba(130,80,223,0.8);transform:rotate(5deg)}.Header-item a{transition:transform 0.2s}.Header-item a:hover{transform:scale(1.1)}.announce-bar{background:linear-gradient(90deg,#0969da,#8250df);color:#fff;text-align:center;padding:12px;border-radius:10px;margin-bottom:25px;font-size:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-weight:bold;letter-spacing:1px}.footer{text-align:center;font-size:13px;color:#888;margin-top:2rem;padding-top:1rem;border-top:1px solid #eee}@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}.post-item{animation:fadeInUp 0.5s ease both}canvas#petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}.color-fg-muted.mt-2{display:none}</style>
+<style>.post-item{transition:box-shadow 0.2s,transform 0.2s;border-radius:10px;padding:10px 14px}.post-item:hover{box-shadow:0 4px 18px rgba(0,0,0,0.10);transform:translateY(-2px)}.footer{text-align:center;font-size:13px;color:#888;margin-top:2rem;padding-top:1rem;border-top:1px solid #eee}@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}.post-item{animation:fadeInUp 0.5s ease both}canvas#petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}.color-fg-muted.mt-2{display:none}</style>
 
 
 <body>
@@ -176,6 +278,6 @@ for(var i=0;i<iconPost.length;i++){
 
 document.getElementById("prompt").setAttribute("d",value=IconList["prompt"]);document.getElementById("book").setAttribute("d",value=IconList["book"]);document.getElementById("link").setAttribute("d",value=IconList["link"]);document.getElementById("about").setAttribute("d",value=IconList["about"]);
 </script>
-<script>document.addEventListener('DOMContentLoaded',function(){var m=document.querySelector('.container-lg');if(m){var a=document.createElement('div');a.className='announce-bar';a.innerHTML='📢 欢迎来到 Luliy 的博客！—— 记录点滴，我将无限进步！';m.insertBefore(a,m.firstChild)}var av=document.querySelector('.avatar');if(av){av.style.cursor='pointer';av.onclick=function(){window.open('https://github.com/luliy6')}}var items=document.querySelectorAll('.post-item');items.forEach(function(el,i){el.style.animationDelay=(i*0.07)+'s';var d=el.querySelector('span.color-fg-muted');if(d&&!d.innerHTML.includes('📅')){d.innerHTML='📅 '+d.innerHTML}});var el=document.querySelector('.blogTitle p')||document.querySelector('p.f4');if(el){var txt=el.textContent;el.textContent='';var i=0;(function type(){if(i<txt.length){el.textContent+=txt[i++];setTimeout(type,60)}})()}var canvas=document.createElement('canvas');canvas.id='petals-canvas';document.body.appendChild(canvas);var ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;window.addEventListener('resize',function(){canvas.width=window.innerWidth;canvas.height=window.innerHeight});var petals=[];for(var p=0;p<38;p++){petals.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*7+4,speed:Math.random()*1.2+0.4,drift:Math.random()*0.8-0.4,opacity:Math.random()*0.5+0.3,color:Math.random()>0.5?'#ffb7c5':'#fff'})}function drawPetal(p){ctx.save();ctx.globalAlpha=p.opacity;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill();ctx.restore()}function animatePetals(){ctx.clearRect(0,0,canvas.width,canvas.height);petals.forEach(function(p){drawPetal(p);p.y+=p.speed;p.x+=p.drift;if(p.y>canvas.height+10){p.y=-10;p.x=Math.random()*canvas.width}});requestAnimationFrame(animatePetals)}animatePetals();document.addEventListener('click',function(e){for(var b=0;b<18;b++){var spark=document.createElement('div');var angle=Math.random()*360;var dist=Math.random()*60+20;var colors=['#ff6b9d','#ffcd3c','#6bceff','#a78bfa','#34d399'];spark.style.cssText='position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;width:7px;height:7px;border-radius:50%;background:'+colors[Math.floor(Math.random()*colors.length)]+';pointer-events:none;z-index:9999;transition:transform 0.6s ease,opacity 0.6s ease;transform:translate(-50%,-50%)';document.body.appendChild(spark);setTimeout(function(s,a,d){s.style.transform='translate(calc(-50% + '+Math.cos(a*Math.PI/180)*d+'px),calc(-50% + '+Math.sin(a*Math.PI/180)*d+'px))';s.style.opacity='0'})(spark,angle,dist,0);setTimeout(function(s){s.remove()}(spark),700)}})});</script>
+<script>document.addEventListener('DOMContentLoaded',function(){var av=document.querySelector('.avatar');if(av){av.style.cursor='pointer';av.onclick=function(){window.open('https://github.com/luliy6')}}var items=document.querySelectorAll('.post-item');items.forEach(function(el,i){el.style.animationDelay=(i*0.07)+'s'});var el=document.querySelector('.blogTitle p')||document.querySelector('p.f4');if(el){var txt=el.textContent;el.textContent='';var i=0;(function type(){if(i<txt.length){el.textContent+=txt[i++];setTimeout(type,60)}})()}var canvas=document.createElement('canvas');canvas.id='petals-canvas';document.body.appendChild(canvas);var ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;window.addEventListener('resize',function(){canvas.width=window.innerWidth;canvas.height=window.innerHeight});var petals=[];for(var p=0;p<38;p++){petals.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*7+4,speed:Math.random()*1.2+0.4,drift:Math.random()*0.8-0.4,opacity:Math.random()*0.5+0.3,color:Math.random()>0.5?'#ffb7c5':'#fff'})}function drawPetal(p){ctx.save();ctx.globalAlpha=p.opacity;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill();ctx.restore()}function animatePetals(){ctx.clearRect(0,0,canvas.width,canvas.height);petals.forEach(function(p){drawPetal(p);p.y+=p.speed;p.x+=p.drift;if(p.y>canvas.height+10){p.y=-10;p.x=Math.random()*canvas.width}});requestAnimationFrame(animatePetals)}animatePetals();document.addEventListener('click',function(e){for(var b=0;b<18;b++){var spark=document.createElement('div');var angle=Math.random()*360;var dist=Math.random()*60+20;var colors=['#ff6b9d','#ffcd3c','#6bceff','#a78bfa','#34d399'];spark.style.cssText='position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;width:7px;height:7px;border-radius:50%;background:'+colors[Math.floor(Math.random()*colors.length)]+';pointer-events:none;z-index:9999;transition:transform 0.6s ease,opacity 0.6s ease;transform:translate(-50%,-50%)';document.body.appendChild(spark);setTimeout(function(s,a,d){s.style.transform='translate(calc(-50% + '+Math.cos(a*Math.PI/180)*d+'px),calc(-50% + '+Math.sin(a*Math.PI/180)*d+'px))';s.style.opacity='0'})(spark,angle,dist,0);setTimeout(function(s){s.remove()}(spark),700)}})});</script>
 
 </html>
