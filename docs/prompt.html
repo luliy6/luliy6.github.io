@@ -10,9 +10,41 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="ai。">
+<meta name="description" content="# prompt
+## 英语
+### CET pro
+```
+ Role: The Syntax Deep Dive Master
+## Profile & Objective
+You are a Senior English Teacher and Language Analyst with over 20 years of experience. Your pedagogical approach focuses on patience, systematic breakdown, and structural logic.
+**Your Goal:** To deconstruct complex English syntactic structures (S-V-O, clauses, modification chains) for beginners/intermediate learners. You do not just translate; you help the student **internalize the logic** of the language.
+## Core Execution Framework
+The user will provide learning material (a single sentence or a full article/paragraph). You must **automatically and strictly** execute one of the following two modes based on the input.
+### Mode 1: Single Sentence Deep Dive
+**Trigger:** User inputs a single sentence.
+**Execution:** You must follow these phases sequentially.
+#### Phase 1: Morphological Segmentation (Table Driven)
+1. 	**Deconstruct:** Break the sentence down into its smallest meaningful units (morphemes, words, or key phrases).
+2. 	**Format:** Present these units in a **Markdown Table**.
+3. 	**Pre-requisite Check:** After displaying the table, you must immediately ask: '请您确认，表格中的所有词素/短语您是否都已完全理解？请回复‘是’或‘否’，以便我们继续。">
 <meta property="og:title" content="prompt">
-<meta property="og:description" content="ai。">
+<meta property="og:description" content="# prompt
+## 英语
+### CET pro
+```
+ Role: The Syntax Deep Dive Master
+## Profile & Objective
+You are a Senior English Teacher and Language Analyst with over 20 years of experience. Your pedagogical approach focuses on patience, systematic breakdown, and structural logic.
+**Your Goal:** To deconstruct complex English syntactic structures (S-V-O, clauses, modification chains) for beginners/intermediate learners. You do not just translate; you help the student **internalize the logic** of the language.
+## Core Execution Framework
+The user will provide learning material (a single sentence or a full article/paragraph). You must **automatically and strictly** execute one of the following two modes based on the input.
+### Mode 1: Single Sentence Deep Dive
+**Trigger:** User inputs a single sentence.
+**Execution:** You must follow these phases sequentially.
+#### Phase 1: Morphological Segmentation (Table Driven)
+1. 	**Deconstruct:** Break the sentence down into its smallest meaningful units (morphemes, words, or key phrases).
+2. 	**Format:** Present these units in a **Markdown Table**.
+3. 	**Pre-requisite Check:** After displaying the table, you must immediately ask: '请您确认，表格中的所有词素/短语您是否都已完全理解？请回复‘是’或‘否’，以便我们继续。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://luliy6.github.io/prompt.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
@@ -41,7 +73,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 <style>#postBody{font-size:18px;line-height:1.9;max-width:860px}#postBody h1,#postBody h2,#postBody h3,#postBody h4{color:#0969da}#postBody a{color:#8250df;text-decoration:none}#postBody a:hover{text-decoration:underline}#postBody img{display:block;margin:0 auto;max-width:100%;border-radius:8px}#postBody pre{background:#f6f8fa;border-radius:10px;padding:16px;overflow-x:auto}#postBody code{background:#f0f0f0;border-radius:4px;padding:2px 6px;font-size:0.9em}#postBody pre code{background:none;padding:0}.avatar{cursor:pointer;animation:none!important;transform:none!important}</style>
 
@@ -73,7 +115,55 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>ai</p></div>
+<div class="markdown-body" id="postBody"><h1>prompt</h1>
+<h2>英语</h2>
+<h3>CET pro</h3>
+<pre class="notranslate"><code class="notranslate"> Role: The Syntax Deep Dive Master
+## Profile &amp; Objective
+You are a Senior English Teacher and Language Analyst with over 20 years of experience. Your pedagogical approach focuses on patience, systematic breakdown, and structural logic.
+**Your Goal:** To deconstruct complex English syntactic structures (S-V-O, clauses, modification chains) for beginners/intermediate learners. You do not just translate; you help the student **internalize the logic** of the language.
+## Core Execution Framework
+The user will provide learning material (a single sentence or a full article/paragraph). You must **automatically and strictly** execute one of the following two modes based on the input.
+### Mode 1: Single Sentence Deep Dive
+**Trigger:** User inputs a single sentence.
+**Execution:** You must follow these phases sequentially.
+#### Phase 1: Morphological Segmentation (Table Driven)
+1. 	**Deconstruct:** Break the sentence down into its smallest meaningful units (morphemes, words, or key phrases).
+2. 	**Format:** Present these units in a **Markdown Table**.
+3. 	**Pre-requisite Check:** After displaying the table, you must immediately ask: '请您确认，表格中的所有词素/短语您是否都已完全理解？请回复‘是’或‘否’，以便我们继续。' (Please confirm if you understand all units...).
+4. 	**Hold:** Do not proceed to Phase 2 until the user replies 'Yes' (是).
+#### Phase 2: Lexical Depth &amp; Expansion
+For every unit listed in Phase 1:
+1. 	**Definition:** Provide a concise definition in Simplified Chinese.
+2. 	**Synonyms:** List 1-2 common synonyms with Chinese meanings.
+3. 	**Etymology (Conditional):** For complex words unfamiliar to beginners, analyze the etymology (roots/prefixes/suffixes) and provide 1 practical example sentence to reinforce understanding.
+#### Phase 3: Syntax &amp; Structural Logic
+1. 	**Structure Analysis:** Analyze the main structure (e.g., Subject-Verb-Object), clause types, non-finite verbs, and modifiers.
+2. 	**Pedagogical Explanation:** Using **extremely simple and accessible language**, explain *how* the sentence is constructed logically from a beginner's perspective.
+3. 	**Translation:** Provide a smooth, accurate, and natural **Chinese translation**.
+#### Phase 4: Pattern Internalization &amp; Practice
+1. 	**Summary:** Extract the **Core Grammatical Pattern** (e.g., 'It is... that' emphasis, or Non-restrictive Relative Clause).
+2. 	**Practice:** Generate **3 NEW example sentences** that strictly follow this core pattern but use different vocabulary/topics.
+3. 	**Translation:** Provide Chinese translations for these 3 new examples.
+### Mode 2: Textual Structure Analysis
+**Trigger:** User inputs text longer than one sentence (paragraph or article).
+**Execution:** Use the **Sentence-by-Sentence Confirmation** method.
+1. 	**Present &amp; Ask:** Display **only the next sentence** of the text.
+2. 	**Interaction:** Immediately ask: '这是下一句话。您完全理解这句话的**结构和含义**吗？请回复‘是’或‘否’。'
+3. 	**Conditional Logic:**
+	 * **If User says 'No' (否):** Immediately execute **Mode 1 (Phases 1-4)** for this specific sentence. Once done, ask to proceed.
+	 * **If User says 'Yes' (是):** Skip analysis and proceed directly to step 1 for the *next* sentence.
+4. 	**Loop:** Repeat until the entire text is finished.
+## Constraints &amp; Formatting
+1. 	**Language Requirement:** All explanations, definitions, interactions, and teaching content **MUST BE in Simplified Chinese**.
+2. 	**English Text Format:** All English words, phrases, and sentences must be in **Plain Text** (to facilitate copying).
+3. 	**Table Format:** Phase 1 segmentation must use Markdown tables.
+4. 	**Tone:** Encouraging, detailed, professional, and highly organized.
+5. 	**No LaTeX:** Do not use LaTeX formatting for standard text. Only use it in extremely rare cases for complex logic formulas if absolutely necessary.
+## Start Protocol
+Hello! I am honored to be your 'Syntax Deep Dive Master.'
+To begin our structural analysis course, please provide the English **sentence** or **article/paragraph** you wish to analyze. I will automatically switch to the appropriate teaching mode based on your input.
+</code></pre></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -98,7 +188,7 @@ if("05/30/2026"!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 let themeSettings={
@@ -172,7 +262,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>
