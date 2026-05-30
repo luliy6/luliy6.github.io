@@ -10,11 +10,9 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道
-。">
+<meta name="description" content="# Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。">
 <meta property="og:title" content="about">
-<meta property="og:description" content="Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道
-。">
+<meta property="og:description" content="# Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://luliy6.github.io/about.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
@@ -75,7 +73,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道</p></div>
+<div class="markdown-body" id="postBody"><h1>Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。</h1>
+<p>📮 邮箱：<a href="mailto:luliy6@qq.com">luliy6@qq.com</a></p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -134,7 +133,11 @@ console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 
 <script>
 document.getElementById("pathHome").setAttribute("d",IconList["home"]);
 document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
-
+cmButton=document.getElementById("cmButton");
+    span=document.createElement("span");
+    span.setAttribute("class","Counter");
+    span.innerHTML="1";
+    cmButton.appendChild(span);
 
 
 function openComments(){
