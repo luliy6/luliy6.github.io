@@ -5,109 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
-    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css'><style>body,#postBody{font-family:'LXGW WenKai','LXGW WenKai Screen',sans-serif}html{scroll-behavior:smooth}::selection{background:#0969da33;color:#0969da}a[target='_blank']::after{content:' ↗';font-size:0.75em;opacity:0.6}</style><style>/* 统一圆角与阴影 */
-.post-item, pre, #postBody img {
-  border-radius: 8px !important;
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-.post-item:hover, pre:hover, #postBody img:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transform: translateY(-2px);
-}
-/* 美化滚动条 */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb {
-  background: #0969da;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #0550ae;
-}
-</style>
-<script>
-// 文章标签系统 + 关闭花瓣特效开关
-(function() {
-  // ----- 标签系统 -----
-  async function addTagsToPost() {
-    const postBody = document.getElementById('postBody');
-    if (!postBody) return;
-    const currentPath = window.location.pathname;
-    try {
-      const res = await fetch('/postList.json');
-      const posts = await res.json();
-      const post = posts.find(p => p.link === currentPath);
-      if (post && post.tags && post.tags.length) {
-        const tagsHtml = `<div style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 8px;">
-          <span style="background: #e9ecef; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">🏷️ 标签：</span>
-          ${post.tags.map(tag => `<span class="post-tag" data-tag="${tag}" style="background: #0969da10; color: #0969da; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">${tag}</span>`).join('')}
-        </div>`;
-        postBody.insertAdjacentHTML('afterbegin', tagsHtml);
-        document.querySelectorAll('.post-tag').forEach(el => {
-          el.addEventListener('click', (e) => {
-            const tag = e.currentTarget.getAttribute('data-tag');
-            const searchInput = document.getElementById('s-input');
-            if (searchInput) {
-              searchInput.value = tag;
-              searchInput.dispatchEvent(new Event('input'));
-              document.querySelector('#s-input').closest('div').style.display = 'flex';
-            } else {
-              alert('搜索框未加载，请按右下角 S 键打开搜索后手动输入标签');
-            }
-          });
-        });
-      }
-    } catch(e) { console.log('标签加载失败', e); }
-  }
-
-  // ----- 关闭特效开关（花瓣）-----
-  let petalsCanvas = null;
-  let petalsActive = true;
-  function stopPetals() {
-    if (petalsCanvas && petalsCanvas.parentNode) {
-      petalsCanvas.style.display = 'none';
-      // 清除画布内容
-      const ctx = petalsCanvas.getContext('2d');
-      if (ctx) ctx.clearRect(0, 0, petalsCanvas.width, petalsCanvas.height);
-    }
-    petalsActive = false;
-  }
-  function addEffectToggleButton() {
-    const btn = document.createElement('button');
-    btn.textContent = '🌸 关闭花瓣';
-    btn.title = '隐藏花瓣飘落动画';
-    btn.style.cssText = 'position:fixed; bottom:192px; right:24px; width:auto; padding:8px 12px; background:#8250df; color:#fff; border:none; border-radius:40px; cursor:pointer; z-index:999; font-size:13px; box-shadow:0 2px 6px rgba(0,0,0,0.2);';
-    document.body.appendChild(btn);
-    btn.addEventListener('click', () => {
-      if (petalsActive) {
-        stopPetals();
-        btn.textContent = '🌸 已关闭';
-        btn.style.background = '#6c757d';
-      }
-    });
-    // 获取花瓣canvas元素（原动画会在页面加载后创建）
-    setTimeout(() => {
-      petalsCanvas = document.getElementById('petals-canvas');
-    }, 500);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      addTagsToPost();
-      addEffectToggleButton();
-    });
-  } else {
-    addTagsToPost();
-    addEffectToggleButton();
-  }
-})();
-</script>
+    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><style>body,#postBody{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji'}html{scroll-behavior:smooth}::selection{background:#0969da33;color:#0969da}a[target='_blank']::after{content:' ↗';font-size:0.75em;opacity:0.6}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#8250df;border-radius:4px}::-webkit-scrollbar-track{background:transparent}.container-lg{max-width:960px!important}body{background-image:radial-gradient(rgba(9,105,218,0.1) 1px,transparent 1px);background-size:25px 25px}[data-color-mode="dark"] body{background-image:radial-gradient(rgba(255,255,255,0.08) 1px,transparent 1px)}[data-color-mode="dark"] pre{background:#1e1e1e!important}</style>
     <link rel="icon" href="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64"><script>
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
@@ -145,7 +43,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 }
 
 </style>
-<style>#postBody{font-size:18px;line-height:1.9;max-width:860px}#postBody h1,#postBody h2,#postBody h3,#postBody h4{color:#0969da}#postBody a{color:#8250df;text-decoration:none}#postBody a:hover{text-decoration:underline}#postBody img{display:block;margin:0 auto;max-width:100%;border-radius:8px}#postBody pre{background:#f6f8fa;border-radius:10px;padding:16px;overflow-x:auto}#postBody code{background:#f0f0f0;border-radius:4px;padding:2px 6px;font-size:0.9em}#postBody pre code{background:none;padding:0}.avatar{cursor:pointer;animation:none!important;transform:none!important}*{cursor:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="%230969da" opacity="0.5"/></svg>') 10 10,auto}</style>
+<style>#postBody{font-size:18px;line-height:1.9;max-width:860px;counter-reset:h2}#postBody h1,#postBody h2,#postBody h3,#postBody h4{color:#0969da}#postBody h1{background:linear-gradient(90deg,#0969da,#8250df);-webkit-background-clip:text;-webkit-text-fill-color:transparent}#postBody h2{border-left:5px solid #8250df;padding-left:12px;background:rgba(130,80,223,0.05);padding-top:4px;padding-bottom:4px;border-radius:0 8px 8px 0}#postBody h2::before{counter-increment:h2;content:counter(h2) ". ";color:#8250df}#postBody a{color:#8250df;text-decoration:none}#postBody a:hover{text-decoration:underline}#postBody img{display:block;margin:0 auto;max-width:100%;border-radius:8px;background:#f6f8fa url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='10' fill='%23ccc'%3E%3Canimate attributeName='opacity' values='1;0;1' dur='1s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/svg%3E") center no-repeat;min-height:80px}#postBody pre{background:#f6f8fa;border-radius:10px;padding:16px;overflow-x:auto}#postBody code{background:#f0f0f0;border-radius:4px;padding:2px 6px;font-size:0.9em}#postBody pre code{background:none;padding:0}#postBody blockquote{border-left:4px solid #0969da;background:rgba(9,105,218,0.05);padding:15px 20px;border-radius:0 10px 10px 0;margin:1.5em 0;color:#555}#postBody table{width:100%;border-collapse:collapse;margin:1.5em 0;box-shadow:0 0 0 1px rgba(0,0,0,0.1);border-radius:8px;overflow:hidden}#postBody th{background:rgba(9,105,218,0.08);padding:12px}#postBody td{padding:12px;border:1px solid rgba(0,0,0,0.05)}#postBody tr:nth-child(even){background:rgba(0,0,0,0.02)}#postBody tr:hover{background:rgba(9,105,218,0.05)}#postBody hr{border:0;height:2px;background:linear-gradient(to right,transparent,#8250df,transparent);margin:2.5em 0}.img-caption{text-align:center;font-size:13px;color:#888;margin-top:-10px;margin-bottom:20px;font-style:italic}.code-fold-btn{display:block;width:100%;padding:8px;background:rgba(9,105,218,0.1);color:#0969da;border:none;cursor:pointer;font-size:13px;margin-top:-10px;border-radius:0 0 10px 10px;transition:all 0.3s}.code-fold-btn:hover{background:rgba(9,105,218,0.2)}.avatar{cursor:pointer;animation:none!important;transform:none!important}a.Label{transition:transform 0.2s,box-shadow 0.2s}a.Label:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.15)}</style>
 
 
 
@@ -282,6 +180,6 @@ function iFrameLoading(){
 
 
 </script>
-
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script><script>document.addEventListener('DOMContentLoaded',function(){var bar=document.createElement('div');bar.style.cssText='position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,#0969da,#8250df);z-index:9999;transition:width 0.1s';document.body.appendChild(bar);window.addEventListener('scroll',function(){var st=window.scrollY||document.documentElement.scrollTop;var dh=document.documentElement.scrollHeight-document.documentElement.clientHeight;bar.style.width=(dh>0?Math.round(st/dh*100):0)+'%'});document.querySelectorAll('pre').forEach(function(pre){var code=pre.querySelector('code');if(!code)return;var m=(code.className||'').match(/language-(\w+)/);if(!m)return;var tag=document.createElement('span');tag.textContent=m[1];tag.style.cssText='position:absolute;top:8px;right:12px;font-size:11px;color:#888;font-family:monospace;text-transform:uppercase;background:#e8e8e8;padding:2px 8px;border-radius:4px';pre.style.position='relative';pre.appendChild(tag);var fsBtn=document.createElement('button');fsBtn.textContent='⛶';fsBtn.title='全屏展开';fsBtn.style.cssText='position:absolute;top:8px;right:80px;font-size:13px;color:#888;background:#e8e8e8;border:none;padding:2px 8px;border-radius:4px;cursor:pointer';fsBtn.onclick=function(){if(!document.fullscreenElement){pre.requestFullscreen()}else{document.exitFullscreen()}};pre.appendChild(fsBtn)});document.querySelectorAll('a[href^="http"]').forEach(function(a){if(!a.href.includes('luliy6.github.io'))a.target='_blank'});document.querySelectorAll('#postBody img').forEach(function(img){img.loading='lazy'});var pbody=document.getElementById('postBody');if(pbody){var wc=pbody.innerText.length;var mins=Math.max(1,Math.round(wc/300));var rtag=document.createElement('p');rtag.innerHTML='预计阅读：约 '+mins+' 分钟 &nbsp;|&nbsp; 共 '+wc+' 字';rtag.style.cssText='color:#888;font-size:13px;margin-bottom:1.5rem';pbody.insertBefore(rtag,pbody.firstChild);document.querySelectorAll('#postBody h1,#postBody h2,#postBody h3').forEach(function(h){h.style.cursor='pointer';h.title='点击复制链接';h.onclick=function(){var url=location.href.split('#')[0]+'#'+h.id;navigator.clipboard&&navigator.clipboard.writeText(url);var tip=document.createElement('span');tip.textContent=' 已复制!';tip.style.cssText='font-size:12px;color:#1f883d;font-weight:normal';h.appendChild(tip);setTimeout(function(){tip.remove()},2000)}})}var topBtn=document.createElement('button');topBtn.textContent='↑';topBtn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;border:none;background:#0969da;color:#fff;font-size:20px;cursor:pointer;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:none;transition:opacity 0.3s';document.body.appendChild(topBtn);topBtn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};window.addEventListener('scroll',function(){topBtn.style.display=window.scrollY>300?'block':'none'});var searchBtn=document.createElement('button');searchBtn.textContent='S';searchBtn.title='搜索文章';searchBtn.style.cssText='position:fixed;bottom:80px;right:24px;width:44px;height:44px;border-radius:50%;border:none;background:#8250df;color:#fff;font-size:15px;font-weight:bold;cursor:pointer;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,0.2)';document.body.appendChild(searchBtn);var overlay=document.createElement('div');overlay.style.cssText='display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;padding-top:80px';overlay.innerHTML='<div style="background:#fff;border-radius:12px;padding:20px;width:90%;max-width:500px"><input id="s-input" placeholder="搜索文章..." style="width:100%;padding:10px;font-size:16px;border:1px solid #ddd;border-radius:8px;outline:none"><div id="s-results" style="margin-top:12px;max-height:400px;overflow-y:auto"></div></div>';document.body.appendChild(overlay);searchBtn.onclick=function(){overlay.style.display='flex';setTimeout(function(){document.getElementById('s-input').focus()},100)};overlay.onclick=function(e){if(e.target===overlay)overlay.style.display='none'};document.getElementById('s-input').addEventListener('input',function(){var q=this.value.trim().toLowerCase();var res=document.getElementById('s-results');if(!q){res.innerHTML='';return}fetch('/postList.json').then(function(r){return r.json()}).then(function(posts){var hits=posts.filter(function(p){return p.title.toLowerCase().includes(q)});res.innerHTML=hits.length?hits.map(function(p){return'<a href="'+p.link+'" style="display:block;padding:10px;border-bottom:1px solid #eee;color:#0969da;text-decoration:none">'+p.title+'</a>'}).join(''):'<p style="color:#888;padding:10px">没有找到相关文章</p>'})});document.querySelectorAll('#postBody img').forEach(function(i){if(i.alt){var c=document.createElement('div');c.className='img-caption';c.textContent=i.alt;i.parentNode.insertBefore(c,i.nextSibling)}});document.querySelectorAll('#postBody pre').forEach(function(p){if(p.clientHeight>450){p.style.maxHeight='400px';p.style.overflow='hidden';var b=document.createElement('button');b.className='code-fold-btn';b.innerHTML='▼ 展开全部代码';b.onclick=function(){if(p.style.maxHeight){p.style.maxHeight=null;b.innerHTML='▲ 收起代码'}else{p.style.maxHeight='400px';b.innerHTML='▼ 展开全部代码'}};p.parentNode.insertBefore(b,p.nextSibling)}});if(pb){var s=document.createElement('div');s.style.cssText='margin-top:3rem;padding-top:1.5rem;border-top:2px dashed #eee;text-align:center';s.innerHTML='<span style="color:#888;font-size:14px;margin-right:15px">分享此文章：</span><button onclick="navigator.clipboard.writeText(location.href);alert(\'✅ 链接已复制成功！\')" style="margin:0 5px;padding:6px 12px;border:none;border-radius:6px;background:linear-gradient(90deg,#0969da,#1982c4);color:#fff;cursor:pointer;font-size:13px">🔗 复制链接</button><a href="https://twitter.com/intent/tweet?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(document.title)+'" target="_blank" style="margin:0 5px;padding:6px 12px;border:none;border-radius:6px;background:#1da1f2;color:#fff;text-decoration:none;font-size:13px">🐦 Twitter</a><a href="http://service.weibo.com/share/share.php?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" target="_blank" style="margin:0 5px;padding:6px 12px;border:none;border-radius:6px;background:#e6162d;color:#fff;text-decoration:none;font-size:13px">👁️ 微博</a>';pb.appendChild(s)}if(location.pathname.includes('tag')){document.querySelectorAll('.Label').forEach(function(l){var txt=l.textContent;var m=txt.match(/(\d+)/);if(m){var count=parseInt(m[1]);var size=12+(count*1.5);l.style.fontSize=Math.min(size,28)+'px';l.style.padding='8px 12px'}})}}),document.addEventListener('DOMContentLoaded',function(){document.body.style.opacity='0';document.body.style.transition='opacity 0.4s';setTimeout(function(){document.body.style.opacity='1'},50)});</script>
 
 </html>
