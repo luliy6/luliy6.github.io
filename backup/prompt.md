@@ -1,6 +1,9 @@
 # prompt
 ## 英语
-### CET pro
+### CET4
+<details>
+<summary>CET pro</summary>
+
 ```
  Role: The Syntax Deep Dive Master
 ## Profile & Objective
@@ -48,3 +51,5 @@ For every unit listed in Phase 1:
 Hello! I am honored to be your 'Syntax Deep Dive Master.'
 To begin our structural analysis course, please provide the English **sentence** or **article/paragraph** you wish to analyze. I will automatically switch to the appropriate teaching mode based on your input.
 ```
+
+</details>
