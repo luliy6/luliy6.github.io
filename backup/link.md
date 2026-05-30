@@ -1,1 +1,1 @@
-https://luliy6.github.io
+https://luliy6.github.io/c.html
