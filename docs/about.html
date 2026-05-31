@@ -1,1079 +1,185 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark">
+<html data-color-mode="light" data-dark-theme="dark_colorblind" data-light-theme="light" lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>32天英语四级生存备考仪表盘</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Microsoft YaHei', 'sans-serif']
-          },
-          boxShadow: {
-            glow: '0 0 28px rgba(255,255,255,.16)',
-            redglow: '0 0 30px rgba(248,113,113,.35)',
-            blueglow: '0 0 30px rgba(96,165,250,.28)'
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    :root{
-      --bg1:#0b0d10;
-      --bg2:#1a1d22;
-      --card:rgba(255,255,255,.08);
-      --border:rgba(255,255,255,.16);
-      --text:#f5f5f5;
-      --muted:#a3a3a3;
-      --accent:#e5e7eb;
-    }
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js'></script><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js' onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css'><script src='https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css'><style>body,#postBody{font-family:'LXGW WenKai','LXGW WenKai Screen',sans-serif}html{scroll-behavior:smooth}::selection{background:#f0b429;color:#000}a[target='_blank']::after{content:' ↗';font-size:0.75em;opacity:0.6}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#8250df;border-radius:4px}::-webkit-scrollbar-track{background:transparent}.container-lg{max-width:960px!important}body{background-image:radial-gradient(rgba(9,105,218,0.1) 1px,transparent 1px);background-size:25px 25px}[data-color-mode="dark"] body{background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px)}[data-color-mode="dark"] pre{background:#1a1a2e!important;border:1px solid #2d2d4e!important}[data-color-mode="dark"] #postBody code{background:#2a2a3e!important;color:#ff9a3c!important}[data-color-mode="dark"] #postBody blockquote{background:rgba(130,80,223,0.12)!important;border-left-color:#8250df!important;color:#ccc!important}[data-color-mode="dark"] #postBody table th{background:rgba(130,80,223,0.2)!important;color:#a78bfa!important}[data-color-mode="dark"] #postBody td{border-color:rgba(255,255,255,0.06)!important}[data-color-mode="dark"] #postBody tr:nth-child(even){background:rgba(255,255,255,0.03)!important}[data-color-mode="dark"] #postBody tr:hover{background:rgba(130,80,223,0.1)!important}[data-color-mode="dark"] .post-item{background:#1a1a2e!important}[data-color-mode="dark"] .announce-bar{background:#3a1f6e!important}</style>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="# Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。">
+<meta property="og:title" content="about">
+<meta property="og:description" content="# Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://luliy6.github.io/about.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
+<title>about</title>
 
-    html.light{
-      --bg1:#eef0f3;
-      --bg2:#d8dde4;
-      --card:rgba(255,255,255,.58);
-      --border:rgba(0,0,0,.08);
-      --text:#111827;
-      --muted:#4b5563;
-      --accent:#334155;
-    }
 
-    body{
-      color:var(--text);
-      background:
-        radial-gradient(circle at 20% 5%, rgba(148,163,184,.25), transparent 32%),
-        radial-gradient(circle at 85% 10%, rgba(59,130,246,.15), transparent 34%),
-        radial-gradient(circle at 50% 100%, rgba(248,113,113,.12), transparent 30%),
-        linear-gradient(135deg,var(--bg1),var(--bg2));
-      min-height:100vh;
-    }
 
-    .glass{
-      background:var(--card);
-      border:1px solid var(--border);
-      backdrop-filter:blur(22px) saturate(155%);
-      -webkit-backdrop-filter:blur(22px) saturate(155%);
-      box-shadow:0 18px 55px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.08);
-    }
-
-    .soft-border{
-      border:1px solid var(--border);
-    }
-
-    .text-muted{
-      color:var(--muted);
-    }
-
-    .tap{
-      transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-    }
-
-    .tap:hover{
-      transform:translateY(-2px);
-      box-shadow:0 16px 40px rgba(0,0,0,.22);
-    }
-
-    .tap:active{
-      transform:scale(.985);
-    }
-
-    .fade{
-      animation:fade .28s ease both;
-    }
-
-    @keyframes fade{
-      from{opacity:0;transform:translateY(8px)}
-      to{opacity:1;transform:translateY(0)}
-    }
-
-    .pulse-red{
-      animation:pulseRed 1.8s ease-in-out infinite;
-    }
-
-    @keyframes pulseRed{
-      0%,100%{text-shadow:0 0 14px rgba(248,113,113,.45)}
-      50%{text-shadow:0 0 30px rgba(248,113,113,.9)}
-    }
-
-    .scrollbar::-webkit-scrollbar{
-      width:8px;
-      height:8px;
-    }
-
-    .scrollbar::-webkit-scrollbar-thumb{
-      background:rgba(148,163,184,.35);
-      border-radius:999px;
-    }
-
-    .codebox{
-      white-space:pre-wrap;
-      word-break:break-word;
-    }
-
-    .bottom-safe{
-      padding-bottom:108px;
-    }
-
-    /* 高频词汇、同义词、词组：不发光，但醒目 */
-    .vocab-chip{
-      display:inline-flex;
-      align-items:center;
-      border:1px solid rgba(255,255,255,.24);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.22), rgba(148,163,184,.14));
-      color:var(--text);
-      font-weight:900;
-      letter-spacing:.01em;
-      box-shadow:none !important;
-      transition:transform .16s ease, background .16s ease, border-color .16s ease, color .16s ease;
-    }
-
-    html.light .vocab-chip{
-      border-color:rgba(15,23,42,.16);
-      background:linear-gradient(135deg, rgba(255,255,255,.86), rgba(226,232,240,.72));
-    }
-
-    .vocab-chip:hover{
-      transform:translateY(-1px);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.30), rgba(96,165,250,.18));
-      border-color:rgba(147,197,253,.62);
-      box-shadow:none !important;
-    }
-
-    html.light .vocab-chip:hover{
-      background:linear-gradient(135deg, rgba(219,234,254,.95), rgba(255,255,255,.9));
-      border-color:rgba(37,99,235,.45);
-    }
-
-    .vocab-chip:active{
-      transform:scale(.98);
-      box-shadow:none !important;
-    }
-
-    .vocab-row{
-      border:1px solid rgba(255,255,255,.20);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.16), rgba(148,163,184,.11));
-      transition:transform .16s ease, background .16s ease, border-color .16s ease;
-      box-shadow:none !important;
-    }
-
-    html.light .vocab-row{
-      border-color:rgba(15,23,42,.12);
-      background:linear-gradient(135deg, rgba(255,255,255,.86), rgba(226,232,240,.68));
-    }
-
-    .vocab-row:hover{
-      transform:translateY(-1px);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.26), rgba(96,165,250,.16));
-      border-color:rgba(147,197,253,.55);
-      box-shadow:none !important;
-    }
-
-    html.light .vocab-row:hover{
-      background:linear-gradient(135deg, rgba(219,234,254,.95), rgba(255,255,255,.9));
-      border-color:rgba(37,99,235,.42);
-    }
-
-    .vocab-row:active{
-      transform:scale(.99);
-      box-shadow:none !important;
-    }
-  </style>
 </head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
 
-<body class="font-sans">
-  <div id="app" class="max-w-7xl mx-auto px-4 md:px-6 pt-5 bottom-safe">
-    <header class="glass rounded-[2rem] p-4 md:p-6 mb-5 shadow-glow">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-        <div>
-          <div class="flex items-center gap-3 flex-wrap">
-            <span id="todayBadge" class="px-3 py-1 rounded-full bg-white/10 soft-border text-sm font-bold">· 第1天</span>
-            <span class="px-3 py-1 rounded-full bg-red-500/15 border border-red-400/30 text-red-200 text-sm font-bold">考试：2026-06-13</span>
-            <button id="themeBtn" class="tap px-3 py-1 rounded-full bg-white/10 soft-border text-sm">切换日/夜</button>
-          </div>
-          <h1 class="mt-3 text-2xl md:text-4xl font-black tracking-tight">32天英语四级生存备考仪表盘</h1>
-          <p class="mt-2 text-muted text-sm md:text-base">基础薄弱版：词汇优先、语法拆解、真题闭环、每日打卡。</p>
-        </div>
+</style>
 
-        <div class="grid grid-cols-4 gap-2 md:gap-3 text-center">
-          <div class="glass rounded-2xl p-3 min-w-[70px]">
-            <div id="cdDay" class="text-2xl md:text-4xl font-black text-red-300 pulse-red">--</div>
-            <div class="text-xs text-muted">天</div>
-          </div>
-          <div class="glass rounded-2xl p-3 min-w-[70px]">
-            <div id="cdHour" class="text-2xl md:text-4xl font-black text-red-300 pulse-red">--</div>
-            <div class="text-xs text-muted">时</div>
-          </div>
-          <div class="glass rounded-2xl p-3 min-w-[70px]">
-            <div id="cdMin" class="text-2xl md:text-4xl font-black text-red-300 pulse-red">--</div>
-            <div class="text-xs text-muted">分</div>
-          </div>
-          <div class="glass rounded-2xl p-3 min-w-[70px]">
-            <div id="cdSec" class="text-2xl md:text-4xl font-black text-red-300 pulse-red">--</div>
-            <div class="text-xs text-muted">秒</div>
-          </div>
-        </div>
-      </div>
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
 
-      <div class="mt-5 grid grid-cols-1 md:grid-cols-4 gap-3">
-        <div class="glass rounded-2xl p-4 md:col-span-2">
-          <div class="flex justify-between items-center text-sm mb-2">
-            <b>总进度</b>
-            <span id="progressText" class="text-muted">0/32 · 0%</span>
-          </div>
-          <div class="h-3 bg-black/20 rounded-full overflow-hidden soft-border">
-            <div id="progressBar" class="h-full rounded-full bg-gradient-to-r from-slate-200 via-blue-300 to-red-300 transition-all duration-500" style="width:0%"></div>
-          </div>
-        </div>
+</style>
+<style>#postBody{font-size:18px;line-height:1.9;max-width:860px;counter-reset:h2}#postBody h1,#postBody h2,#postBody h3,#postBody h4{color:#0969da;font-weight:bold}#postBody h1{border-bottom:2px solid #0969da;padding-bottom:10px;margin-bottom:20px}#postBody h2{border-left:5px solid #0969da;padding-left:12px;background:rgba(9,105,218,0.05);padding-top:4px;padding-bottom:4px;border-radius:0 8px 8px 0}#postBody h2::before{counter-increment:h2;content:counter(h2) ". ";color:#0969da}#postBody strong{color:#f0b429;font-weight:bold}#postBody a{color:#f0b429;text-decoration:none}#postBody a:hover{text-decoration:underline}#postBody img{display:block;margin:0 auto;max-width:100%;border-radius:8px;background:#f6f8fa url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='10' fill='%23ccc'%3E%3Canimate attributeName='opacity' values='1;0;1' dur='1s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/svg%3E") center no-repeat;min-height:80px}#postBody pre{background:#f6f8fa;border-radius:10px;padding:16px;overflow-x:auto}#postBody code{background:#f0f0f0;border-radius:4px;padding:2px 6px;font-size:0.9em;color:#d73a49;font-weight:bold}#postBody pre code{background:none;padding:0;color:inherit;font-weight:normal}/* 引用块美化升级 */#postBody blockquote{position:relative;border-left:4px solid #0969da;background:rgba(9,105,218,0.05);padding:18px 20px 18px 28px;border-radius:0 10px 10px 0;margin:1.5em 0;color:#555}#postBody blockquote::before{content:'\201C';position:absolute;top:-10px;left:10px;font-size:60px;color:#0969da;opacity:0.2;font-family:Georgia,serif;line-height:1}#postBody table{width:100%;border-collapse:collapse;margin:1.5em 0;box-shadow:0 0 0 1px rgba(0,0,0,0.1);border-radius:8px;overflow:hidden}#postBody th{background:rgba(9,105,218,0.1);padding:12px;color:#0969da;font-weight:bold}#postBody td{padding:12px;border:1px solid rgba(0,0,0,0.05)}#postBody tr:nth-child(even){background:rgba(0,0,0,0.02)}#postBody tr:hover{background:rgba(9,105,218,0.05)}#postBody hr{border:0;height:2px;background:#0969da;margin:2.5em 0;opacity:0.2}.img-caption{text-align:center;font-size:13px;color:#888;margin-top:-10px;margin-bottom:20px;font-style:italic}.code-fold-btn{display:block;width:100%;padding:8px;background:rgba(9,105,218,0.1);color:#0969da;border:none;cursor:pointer;font-size:13px;margin-top:-10px;border-radius:0 0 10px 10px;transition:all 0.3s}.code-fold-btn:hover{background:rgba(9,105,218,0.2)}.avatar{cursor:pointer;animation:none!important;transform:none!important}a.Label{transition:transform 0.2s,box-shadow 0.2s}a.Label:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.15)}.about-page #postBody,.about-page #postBody p,.about-page #postBody li,.about-page #postBody span{color:#fff}.link-page #postBody a{color:#f0b429!important}.prompt-page #postBody h1,.prompt-page #postBody h2,.prompt-page #postBody h3,.prompt-page #postBody h4{color:#fff!important}/* 归档时间轴样式 */.archive-page #postBody{max-width:700px}.tl-year{font-size:1.6rem;font-weight:900;color:#0969da;margin:2.5rem 0 1rem;padding-left:28px;position:relative}.tl-year::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:#0969da;box-shadow:0 0 0 4px rgba(9,105,218,0.18)}.tl-list{list-style:none;padding:0;margin:0;border-left:3px solid rgba(9,105,218,0.18);margin-left:8px}.tl-item{position:relative;padding:10px 0 10px 28px}.tl-item::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:#f0b429;border:2px solid #fff;box-shadow:0 0 0 2px #f0b429}.tl-item a{color:#0969da;font-size:15px;text-decoration:none;font-weight:500;transition:color 0.2s}.tl-item a:hover{color:#f0b429}.tl-date{font-size:12px;color:#aaa;margin-left:10px;font-family:monospace}</style>
 
-        <div class="glass rounded-2xl p-4">
-          <div class="text-sm text-muted">连续打卡</div>
-          <div class="text-3xl font-black">
-            <span id="streakNum">0</span><span class="text-base text-muted ml-1">天</span>
-          </div>
-        </div>
 
-        <div class="glass rounded-2xl p-4">
-          <div class="text-sm text-muted">今日任务</div>
-          <div id="todayStatus" class="text-xl font-black">未开始</div>
-        </div>
-      </div>
-    </header>
 
-    <main id="view" class="fade"></main>
-  </div>
+<body>
+    <div id="header">
+<h1 class="postTitle">about</h1>
+<div class="title-right">
+    <a href="https://luliy6.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/luliy6/luliy6.github.io/issues/3" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
 
-  <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-2 py-2 flex gap-1 shadow-glow max-w-[94vw] overflow-x-auto scrollbar">
-    <button data-tab="0" class="navBtn px-4 py-3 rounded-full text-sm font-bold whitespace-nowrap">概览</button>
-    <button data-tab="1" class="navBtn px-4 py-3 rounded-full text-sm font-bold whitespace-nowrap">每日计划</button>
-    <button data-tab="2" class="navBtn px-4 py-3 rounded-full text-sm font-bold whitespace-nowrap">模考追踪</button>
-    <button data-tab="3" class="navBtn px-4 py-3 rounded-full text-sm font-bold whitespace-nowrap">学习记录</button>
-  </nav>
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。</h1>
+<p>📮 邮箱：<a href="mailto:luliy6@qq.com">luliy6@qq.com</a></p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://luliy6.github.io">Luliy</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
 
 <script>
-(() => {
-  'use strict';
-
-  const START = new Date('2026-05-12T00:00:00');
-  const EXAM = new Date('2026-06-13T09:00:00');
-  const TOTAL_DAYS = 32;
-  const STORE = 'cet4_survival_dashboard_v2';
-  const YOUDAO = 'http://m.youdao.com/dict?le=eng&q=';
-  const nowFixed = new Date('2026-05-12T08:00:00');
-
-  const syntaxPrompt = `Role: The Syntax Deep Dive Master
-
-Profile & Objective
-
-You are a Senior English Teacher and Language Analyst with over 20 years of experience. Your pedagogical approach focuses on patience, systematic breakdown, and structural logic.
-
-Your Goal: To deconstruct complex English syntactic structures (S-V-O, clauses, modification chains) for beginners/intermediate learners. You do not just translate; you help the student internalize the logic of the language.
-
-Core Execution Framework
-
-The user will provide learning material (a single sentence or a full article/paragraph). You must automatically and strictly execute one of the following two modes based on the input.
-
-Mode 1: Single Sentence Deep Dive
-
-Trigger: User inputs a single sentence.
-
-Execution: You must follow these phases sequentially.
-
-Phase 1: Morphological Segmentation (Table Driven)
-
-1. Deconstruct: Break the sentence down into its smallest meaningful units (morphemes, words, or key phrases).
-2. Format: Present these units in a Markdown Table.
-3. Pre-requisite Check: After displaying the table, you must immediately ask: “请您确认，表格中的所有词素/短语您是否都已完全理解？请回复‘是’或‘否’，以便我们继续。”
-4. Hold: Do not proceed to Phase 2 until the user replies ‘Yes’ (是).
-
-Phase 2: Lexical Depth & Expansion
-
-For every unit listed in Phase 1:
-
-1. Definition: Provide a concise definition in Simplified Chinese.
-2. Synonyms: List 1-2 common synonyms with Chinese meanings.
-3. Etymology (Conditional): For complex words unfamiliar to beginners, analyze the etymology (roots/prefixes/suffixes) and provide 1 practical example sentence to reinforce understanding.
-
-Phase 3: Syntax & Structural Logic
-
-1. Structure Analysis: Analyze the main structure (e.g., Subject-Verb-Object), clause types, non-finite verbs, and modifiers.
-2. Pedagogical Explanation: Using extremely simple and accessible language, explain how the sentence is constructed logically from a beginner’s perspective.
-3. Translation: Provide a smooth, accurate, and natural Chinese translation.
-
-Phase 4: Pattern Internalization & Practice
-
-1. Summary: Extract the Core Grammatical Pattern (e.g., “It is… that” emphasis, or Non-restrictive Relative Clause).
-2. Practice: Generate 3 NEW example sentences that strictly follow this core pattern but use different vocabulary/topics.
-3. Translation: Provide Chinese translations for these 3 new examples.
-
-Mode 2: Textual Structure Analysis
-
-Trigger: User inputs text longer than one sentence (paragraph or article).
-
-Execution: Use the Sentence-by-Sentence Confirmation method.
-
-1. Present & Ask: Display only the next sentence of the text.
-2. Interaction: Immediately ask: “这是下一句话。您完全理解这句话的结构和含义吗？请回复‘是’或‘否’。”
-3. Conditional Logic:
-
-- If User says ‘No’ (否): Immediately execute Mode 1 (Phases 1-4) for this specific sentence. Once done, ask to proceed.
-- If User says ‘Yes’ (是): Skip analysis and proceed directly to the next sentence.
-
-4. Loop: Repeat until the entire text is finished.
-
-Constraints & Formatting
-
-1. Language Requirement: All explanations, definitions, interactions, and teaching content MUST BE in Simplified Chinese.
-2. English Text Format: All English words, phrases, and sentences must be in Plain Text for easy copying.
-3. Table Format: Phase 1 segmentation must use Markdown tables.
-4. Tone: Encouraging, detailed, professional, and highly organized.
-5. No LaTeX: Do not use LaTeX formatting for standard text unless absolutely necessary.
-
-Start Protocol
-
-Hello! I am honored to be your “Syntax Deep Dive Master.”
-
-To begin our structural analysis course, please provide the English sentence or article/paragraph you wish to analyze. I will automatically switch to the appropriate teaching mode based on your input.`;
-
-  const wordBank = `ability,absence,academic,accept,access,accident,account,accurate,achieve,acquire,activity,actual,adapt,addition,address,adequate,adjust,advantage,advertise,affect,afford,agency,agree,agriculture,allow,alternative,analysis,announce,anxiety,apartment,apologize,approach,appropriate,argue,arrange,article,aspect,assign,assist,assume,atmosphere,attempt,attitude,available,average,avoid,aware,balance,benefit,budget,campus,cancel,career,challenge,channel,character,charge,civil,claim,climate,combine,comfort,comment,commercial,commit,common,community,compare,compete,complex,concern,condition,conduct,confirm,conflict,constant,consume,contact,contain,context,contract,contribute,control,convenient,cooperate,copy,corporate,creative,credit,culture,curious,current,damage,data,debate,decade,decline,define,degree,deliver,demand,depend,describe,design,desire,detail,determine,develop,device,diet,difference,difficulty,digital,direction,discuss,disease,distance,distinct,distribute,document,domestic,economy,educate,effective,effort,efficient,electronic,element,emergency,emotion,emphasis,employee,enable,encourage,energy,engage,engineer,enhance,enormous,environment,equal,equipment,especially,essential,establish,evaluate,eventually,evidence,exact,examine,example,exchange,exercise,expand,expect,expense,experience,experiment,expert,explain,explore,express,extend,facility,factor,failure,familiar,feature,finance,flexible,focus,foreign,formal,former,frequent,function,generate,global,graduate,guarantee,habit,handle,healthy,identity,ignore,impact,imply,improve,income,increase,indicate,individual,industry,influence,inform,initial,injury,innovation,instance,instead,institute,instruction,intelligent,intention,interaction,interest,international,interpret,interview,involve,issue,journal,knowledge,labor,lack,legal,leisure,likely,limit,literature,local,logical,maintain,major,manage,market,material,measure,media,medical,mental,method,minor,modern,monitor,motivate,nation,natural,necessary,negative,network,normal,observe,obtain,obvious,occur,offer,official,operate,opinion,opportunity,option,ordinary,organize,original,overall,participate,particular,passage,patient,pattern,perform,period,permit,personal,physical,policy,population,positive,potential,practical,prefer,prepare,pressure,previous,principle,priority,private,process,produce,professional,progress,project,promote,proper,protect,provide,purpose,quality,quantity,range,rare,react,realize,reason,recommend,reduce,reflect,region,regular,relation,release,reliable,remain,replace,require,research,resource,respond,responsible,result,review,risk,role,security,select,senior,series,significant,similar,situation,skill,social,solution,specific,standard,strategy,structure,subject,success,suggest,supply,support,survey,system,technology,temporary,theory,therefore,tradition,transfer,transport,typical,unique,urban,value,variety,vehicle,version,view,volunteer,welfare,whereas,willing`.split(',');
-
-  const synonymBank = [
-    ['important','significant','重要的'],['common','ordinary','常见的'],['help','assist','帮助'],['use','utilize','使用'],['improve','enhance','提高'],
-    ['problem','issue','问题'],['method','approach','方法'],['show','indicate','表明'],['cause','lead to','导致'],['enough','adequate','足够的'],
-    ['fast','rapid','快速的'],['big','enormous','巨大的'],['good','beneficial','有益的'],['bad','negative','负面的'],['clear','obvious','明显的'],
-    ['buy','purchase','购买'],['start','begin','开始'],['end','finish','结束'],['need','require','需要'],['choose','select','选择'],
-    ['think','consider','考虑'],['build','establish','建立'],['keep','maintain','保持'],['get','obtain','获得'],['job','career','职业'],
-    ['chance','opportunity','机会'],['goal','objective','目标'],['answer','solution','解决办法'],['many','numerous','许多的'],['hard','difficult','困难的']
-  ];
-
-  const phraseBank = [
-    ['as a result','因此'],['be aware of','意识到'],['take advantage of','利用'],['make progress','取得进步'],['pay attention to','注意'],
-    ['in my opinion','在我看来'],['on the one hand','一方面'],['on the other hand','另一方面'],['deal with','处理'],['focus on','专注于'],
-    ['be responsible for','对……负责'],['have an impact on','对……有影响'],['in addition','此外'],['for example','例如'],['according to','根据'],
-    ['depend on','依赖'],['be likely to','可能'],['lead to','导致'],['contribute to','有助于'],['take part in','参加'],
-    ['keep a balance','保持平衡'],['in the long run','从长远看'],['make full use of','充分利用'],['be different from','不同于'],['prepare for','为……做准备'],
-    ['be related to','与……有关'],['in order to','为了'],['rather than','而不是'],['as far as I am concerned','就我而言'],['play an important role in','在……中起重要作用']
-  ];
-
-  const longSentences = [
-    'Although many students believe that vocabulary is the most difficult part of the CET-4 exam, the real challenge often lies in understanding how simple words are connected to form complex meanings.',
-    'What matters most during the final month is not how many books a learner buys, but whether he or she can review mistakes regularly and turn weak points into stable scoring habits.',
-    'The reason why reading scores improve slowly is that students usually translate every word separately instead of identifying the main subject, verb, object, and logical connectors first.',
-    'If a student spends twenty minutes every day listening to short passages and repeating key sentences aloud, his or her ability to recognize familiar expressions will gradually increase.',
-    'It is widely accepted that effective preparation requires both intensive practice and careful reflection, because practice without review may only repeat the same mistakes.'
-  ];
-
-  const templates = [
-    {
-      name:'现象解释型',
-      text:`Nowadays, more and more people pay attention to ______. This phenomenon has caused wide discussion among students and teachers.
-
-There are several reasons for it. First, ______ has become increasingly important in our daily life. Second, many people realize that ______ can bring practical benefits. Finally, social development also encourages us to ______.
-
-In my opinion, we should look at this phenomenon in a positive and reasonable way. If we can make good use of it and avoid possible problems, it will surely help us improve ourselves.`
-    },
-    {
-      name:'观点对比型',
-      text:`When it comes to ______, different people hold different opinions. Some people believe that ______ is useful and necessary, while others argue that it may bring pressure or waste time.
-
-Those who support it think that ______ can help people gain knowledge, improve efficiency and develop good habits. However, opponents worry that ______ may lead to dependence or unnecessary competition.
-
-As far as I am concerned, both sides have reasonable points. We should not accept or reject it blindly. The best choice is to use it properly according to our own needs.`
-    },
-    {
-      name:'图表描述型',
-      text:`As is clearly shown in the chart, the number/percentage of ______ has changed greatly in recent years. It rises/falls from ______ to ______, which shows an obvious trend.
-
-Several factors may explain this change. To begin with, ______ plays an important role. In addition, people’s awareness of ______ has also increased. What is more, the development of society provides more chances for ______.
-
-From the data, we can conclude that ______ will remain important in the future. Therefore, we should take effective measures to adapt to this trend.`
-    }
-  ];
-
-  const tenses = ['一般现在时','一般过去时','一般将来时','现在进行时','过去进行时','现在完成时','过去完成时','将来完成时'];
-
-  let state = loadState();
-  let activeTab = 0;
-  let selectedDay = getTodayIndex();
-  let countdownTimer = null;
-
-  function loadState(){
-    const base = {completed:{}, notes:{}, editTime:{}, theme:'dark'};
-    try {
-      return Object.assign(base, JSON.parse(localStorage.getItem(STORE) || '{}'));
-    } catch {
-      return base;
-    }
-  }
-
-  function saveState(){
-    localStorage.setItem(STORE, JSON.stringify(state));
-  }
-
-  function dayDate(i){
-    const d = new Date(START);
-    d.setDate(START.getDate() + i - 1);
-    return d;
-  }
-
-  function fmtDate(d){
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  }
-
-  function cnDate(d){
-    return `${d.getMonth()+1}月${d.getDate()}日`;
-  }
-
-  function getTodayIndex(){
-    const diff = Math.floor((nowFixed - START) / 86400000) + 1;
-    return Math.min(Math.max(diff,1),TOTAL_DAYS);
-  }
-
-  function statusOf(i){
-    if(state.completed[i]) return '已完成';
-    if(i === getTodayIndex()) return '学习中';
-    return '未开始';
-  }
-
-  function completedCount(){
-    return Object.keys(state.completed).filter(k => state.completed[k]).length;
-  }
-
-  function streak(){
-    let s = 0;
-    for(let i = getTodayIndex(); i >= 1; i--){
-      if(state.completed[i]) s++;
-      else break;
-    }
-    return s;
-  }
-
-  function esc(s=''){
-    return String(s).replace(/[&<>"']/g, m => ({
-      '&':'&amp;',
-      '<':'&lt;',
-      '>':'&gt;',
-      '"':'&quot;',
-      "'":'&#039;'
-    }[m]));
-  }
-
-  function toast(msg){
-    const el = document.createElement('div');
-    el.className = 'fixed top-5 left-1/2 -translate-x-1/2 z-[80] glass rounded-full px-5 py-3 font-bold shadow-glow fade';
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => {
-      el.style.opacity = '0';
-      el.style.transform = 'translate(-50%,-10px)';
-    }, 1500);
-    setTimeout(() => el.remove(), 1900);
-  }
-
-  async function copyText(text,msg='已复制'){
-    try{
-      await navigator.clipboard.writeText(text);
-      toast(msg);
-    }catch{
-      toast('复制失败，请手动选择文本');
-    }
-  }
-
-  function openLink(url){
-    window.open(url,'_blank','noopener,noreferrer');
-  }
-
-  function getWords(i){
-    const start = ((i-1)*37) % wordBank.length;
-    return Array.from({length:75},(_,k) => wordBank[(start+k) % wordBank.length]);
-  }
-
-  function getSyns(i){
-    const start = ((i-1)*3) % synonymBank.length;
-    return Array.from({length:10},(_,k) => synonymBank[(start+k) % synonymBank.length]);
-  }
-
-  function getPhrases(i){
-    const start = ((i-1)*4) % phraseBank.length;
-    return Array.from({length:10},(_,k) => phraseBank[(start+k) % phraseBank.length]);
-  }
-
-  function getReviews(i){
-    const intervals = [1,2,4,7,15,30];
-    return intervals
-      .map(n => i - n)
-      .filter(x => x >= 1)
-      .map(x => `Day ${x}（${cnDate(dayDate(x))}）`);
-  }
-
-  function getArticle(i){
-    const tense = tenses[(i-1) % tenses.length];
-    const topic = ['learning habits','campus reading','online classes','healthy sleep','public libraries','city transport','volunteer work','digital tools'][i % 8];
-    return {
-      tense,
-      text:`${topic} is a useful topic for CET-4 learners because it connects daily life with academic thinking. In this short passage, the main focus is clear practice and steady improvement. A student with limited vocabulary does not need to understand every difficult word at once. Instead, the student should find the subject, the verb, and the object first, and then notice words such as because, although, however, and therefore. When this method is used every day, reading becomes less frightening. The learner can also collect useful expressions and use them in writing. This simple process may look slow, but it builds real confidence before the exam.`
-    };
-  }
-
-  function getPlan(i){
-    const template = templates[(i-1) % templates.length];
-    const article = getArticle(i);
-    return {
-      template,
-      article,
-      sentence: longSentences[(i-1) % longSentences.length],
-      words:getWords(i),
-      syns:getSyns(i),
-      phrases:getPhrases(i),
-      reviews:getReviews(i)
-    };
-  }
-
-  function updateHeader(){
-    const idx = getTodayIndex();
-    document.getElementById('todayBadge').textContent = `· 第${idx}天`;
-
-    const c = completedCount();
-    const rate = Math.round(c / TOTAL_DAYS * 100);
-
-    document.getElementById('progressText').textContent = `${c}/${TOTAL_DAYS} · ${rate}%`;
-    document.getElementById('progressBar').style.width = rate + '%';
-    document.getElementById('streakNum').textContent = streak();
-
-    const todayStatus = document.getElementById('todayStatus');
-    todayStatus.textContent = statusOf(idx);
-    todayStatus.className = 'text-xl font-black ' + (state.completed[idx] ? 'text-emerald-300' : 'text-amber-200');
-  }
-
-  function startCountdown(){
-    if(countdownTimer) clearInterval(countdownTimer);
-
-    const tick = () => {
-      let ms = Math.max(0, EXAM - new Date());
-      const d = Math.floor(ms / 86400000);
-      ms %= 86400000;
-      const h = Math.floor(ms / 3600000);
-      ms %= 3600000;
-      const m = Math.floor(ms / 60000);
-      ms %= 60000;
-      const s = Math.floor(ms / 1000);
-
-      cdDay.textContent = d;
-      cdHour.textContent = String(h).padStart(2,'0');
-      cdMin.textContent = String(m).padStart(2,'0');
-      cdSec.textContent = String(s).padStart(2,'0');
-    };
-
-    tick();
-    countdownTimer = setInterval(tick,1000);
-  }
-
-  function shell(title, sub, body){
-    return `
-      <section class="fade">
-        <div class="mb-4 flex flex-col md:flex-row md:items-end md:justify-between gap-2">
-          <div>
-            <h2 class="text-2xl md:text-3xl font-black">${title}</h2>
-            <p class="text-muted mt-1">${sub}</p>
-          </div>
-          <div class="text-sm text-muted">冲刺周期：2026-05-12 至 2026-06-12</div>
-        </div>
-        ${body}
-      </section>
-    `;
-  }
-
-  function toolCard(title,desc,grad,id,url){
-    return `
-      <button data-tool="${id}" data-url="${url}" class="toolCard tap text-left glass rounded-[2rem] p-5 bg-gradient-to-br ${grad}">
-        <div class="text-lg font-black">${title}</div>
-        <p class="text-muted mt-2 leading-6">${desc}</p>
-        <div class="mt-5 inline-flex rounded-full px-4 py-2 bg-white/10 soft-border text-sm font-bold">复制 / 跳转 →</div>
-      </button>
-    `;
-  }
-
-  function linkBtn(t,u){
-    return `<a class="tap rounded-2xl bg-white/10 soft-border px-3 py-3 text-center font-bold text-sm" href="${u}" target="_blank" rel="noopener noreferrer">${t}</a>`;
-  }
-
-  function renderOverview(){
-    const promptSmall = syntaxPrompt.slice(0,260) + '...';
-
-    view.innerHTML = shell('概览首页','今天只做能提分的事：背词、拆句、刷题、复盘。',`
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        ${toolCard('Claude 语法深度分析','点击复制完整 Prompt，并打开 Claude。','from-indigo-400/25 to-slate-200/10','copyClaude','https://claude.ai/new')}
-        ${toolCard('豆包 语法深度分析','点击复制完整 Prompt，并打开豆包。','from-blue-400/25 to-slate-200/10','copyDoubao','https://www.doubao.com/chat/')}
-        ${toolCard('A4 纸背单词法','用一张纸快速反复曝光高频词。','from-emerald-400/25 to-slate-200/10','a4','https://www.bilibili.com/video/BV1g7411T7Py/')}
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-        <div class="glass rounded-[2rem] p-5 lg:col-span-2">
-          <h3 class="text-xl font-black mb-3">快速资源链接</h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            ${linkBtn('有道词典',YOUDAO)}
-            ${linkBtn('真题库','https://zhenti.burningvocabulary.cn/')}
-            ${linkBtn('Bilibili 课程','https://www.bilibili.com/video/BV1Da2MBxEk3')}
-            ${linkBtn('听力','https://www.bilibili.com/video/BV1N2RDBxE14/')}
-            ${linkBtn('阅读','https://www.bilibili.com/video/BV19zoWBAEZ5/')}
-            ${linkBtn('写作','https://search.bilibili.com/all?keyword=CET4%E5%86%99%E4%BD%9C&from_source=webtop_search&spm_id_from=333.1007&search_source=5')}
-            ${linkBtn('翻译','https://search.bilibili.com/all?keyword=CET4%E7%BF%BB%E8%AF%91&from_source=webtop_search&spm_id_from=333.1007&search_source=5')}
-          </div>
-        </div>
-
-        <div class="glass rounded-[2rem] p-5">
-          <h3 class="text-xl font-black mb-2">今日摘要</h3>
-          <p class="text-muted leading-7">
-            当前为第 <b>${getTodayIndex()}</b> 天。今日状态：<b>${statusOf(getTodayIndex())}</b>。
-            建议优先完成 75 词、10 同义词、10 词组、1 篇短文和长难句拆解。
-          </p>
-          <button id="goToday" class="tap mt-4 w-full rounded-2xl py-3 bg-white/15 soft-border font-black">进入今日计划</button>
-        </div>
-      </div>
-
-      <div class="glass rounded-[2rem] p-5 mt-4">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <h3 class="text-xl font-black">Syntax Deep Dive Master 完整 Prompt</h3>
-            <p class="text-muted text-sm mt-1">用于单句/文章逐句语法拆解，所有解释要求简体中文。</p>
-          </div>
-          <button id="copyFullPrompt" class="tap rounded-2xl px-5 py-3 bg-red-500/20 border border-red-300/30 font-black">一键复制完整 Prompt</button>
-        </div>
-        <pre class="codebox mt-4 max-h-64 overflow-auto scrollbar rounded-2xl bg-black/20 soft-border p-4 text-sm">${esc(promptSmall)}</pre>
-      </div>
-    `);
-  }
-
-  function statusPill(s){
-    return `<span class="${s === '已完成' ? 'text-emerald-300' : s === '学习中' ? 'text-amber-200' : 'text-muted'} font-bold">${s}</span>`;
-  }
-
-  function miniTask(t,d){
-    return `
-      <div class="rounded-2xl bg-white/10 soft-border p-4">
-        <b>${t}</b>
-        <p class="text-muted text-sm mt-2 leading-6">${d}</p>
-      </div>
-    `;
-  }
-
-  function wordChip(w){
-    return `<a target="_blank" rel="noopener noreferrer" href="${YOUDAO + encodeURIComponent(w)}" class="vocab-chip rounded-full px-3 py-2 text-sm">${w}</a>`;
-  }
-
-  function dayItem(i){
-    const s = statusOf(i);
-    const active = i === selectedDay;
-    const mock = i % 7 === 0;
-
-    return `
-      <button data-day="${i}" class="daySelect tap w-full mb-2 rounded-2xl p-3 text-left soft-border ${active ? 'bg-white/20 shadow-blueglow' : 'bg-white/5'}">
-        <div class="flex justify-between items-center">
-          <b>Day ${i}</b>
-          <span class="text-xs ${state.completed[i] ? 'text-emerald-300' : mock ? 'text-red-300' : 'text-muted'}">${mock ? '模考日 · ' : ''}${s}</span>
-        </div>
-        <div class="text-sm text-muted mt-1">${fmtDate(dayDate(i))}</div>
-      </button>
-    `;
-  }
-
-  function renderPlan(){
-    const i = selectedDay;
-    const p = getPlan(i);
-    const date = dayDate(i);
-
-    view.innerHTML = shell('每日计划',`当前选择：Day ${i} · ${fmtDate(date)} · ${statusOf(i)}`,`
-      <div class="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4">
-        <aside class="glass rounded-[2rem] p-3 max-h-[72vh] overflow-auto scrollbar">
-          ${Array.from({length:TOTAL_DAYS},(_,k) => dayItem(k+1)).join('')}
-        </aside>
-
-        <section class="space-y-4">
-          <div class="glass rounded-[2rem] p-5">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div>
-                <h3 class="text-2xl font-black">Day ${i} · ${cnDate(date)} 学习处方</h3>
-                <p class="text-muted">状态：${statusPill(statusOf(i))}</p>
-              </div>
-              <button id="completeBtn" class="tap rounded-2xl px-5 py-3 ${state.completed[i] ? 'bg-emerald-500/25 border-emerald-300/40' : 'bg-red-500/20 border-red-300/30'} border font-black">
-                ${state.completed[i] ? '已打卡，可取消' : '完成打卡'}
-              </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-              ${miniTask('今日必做','75词 + 10同义词 + 10词组 + 1句拆解 + 1篇短文')}
-              ${miniTask('A4 纸高频词汇记忆法','遮中文、读英文、三轮快速标记，不会的晚上复盘')}
-              ${miniTask('艾宾浩斯复盘',p.reviews.length ? p.reviews.join('、') : '今天暂无历史复盘，先建立第一天记忆')}
-            </div>
-          </div>
-
-          <div class="glass rounded-[2rem] p-5">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
-              <div>
-                <h3 class="text-xl font-black">75个高频阅读词汇</h3>
-                <p class="text-muted text-sm mt-1">点击任意单词跳转有道词典。当前词块不发光，但用高对比边框和渐变底色突出。</p>
-              </div>
-              <span class="rounded-full px-3 py-1 bg-blue-500/20 border border-blue-300/30 text-blue-100 text-sm font-black">Day ${i} 专属词表</span>
-            </div>
-            <div class="flex flex-wrap gap-2">${p.words.map(w => wordChip(w)).join('')}</div>
-
-            <h4 class="font-black mt-5 mb-2">纯净词表</h4>
-            <pre class="codebox rounded-2xl bg-black/20 soft-border p-4 text-sm">${p.words.join(', ')}</pre>
-          </div>
-
-          <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div class="glass rounded-[2rem] p-5">
-              <h3 class="text-xl font-black mb-3">10个同义词替换</h3>
-              <div class="space-y-2">
-                ${p.syns.map(x => `
-                  <a target="_blank" rel="noopener noreferrer" href="${YOUDAO + encodeURIComponent(x[1])}" class="vocab-row flex justify-between items-center rounded-2xl p-3">
-                    <b>${x[0]} → ${x[1]}</b>
-                    <span class="text-muted">${x[2]}</span>
-                  </a>
-                `).join('')}
-              </div>
-            </div>
-
-            <div class="glass rounded-[2rem] p-5">
-              <h3 class="text-xl font-black mb-3">10个实战词组</h3>
-              <div class="space-y-2">
-                ${p.phrases.map(x => `
-                  <a target="_blank" rel="noopener noreferrer" href="${YOUDAO + encodeURIComponent(x[0])}" class="vocab-row flex justify-between items-center rounded-2xl p-3">
-                    <b>${x[0]}</b>
-                    <span class="text-muted">${x[1]}</span>
-                  </a>
-                `).join('')}
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div class="glass rounded-[2rem] p-5">
-              <h3 class="text-xl font-black">今日作文万能模板：${p.template.name}</h3>
-              <pre class="codebox mt-3 rounded-2xl bg-black/20 soft-border p-4 text-sm">${esc(p.template.text)}</pre>
-            </div>
-
-            <div class="glass rounded-[2rem] p-5">
-              <h3 class="text-xl font-black">经典长难句</h3>
-              <p class="mt-3 rounded-2xl bg-black/20 soft-border p-4 leading-7">${p.sentence}</p>
-              <button class="copySentence tap mt-3 rounded-2xl px-4 py-3 bg-white/10 soft-border font-bold">复制长难句去语法拆解</button>
-            </div>
-          </div>
-
-          <div class="glass rounded-[2rem] p-5">
-            <h3 class="text-xl font-black">今日英语短文 / 时态：${p.article.tense}</h3>
-            <p class="mt-3 rounded-2xl bg-black/20 soft-border p-4 leading-7 text-sm md:text-base">${p.article.text}</p>
-          </div>
-
-          <div class="glass rounded-[2rem] p-5">
-            <div class="flex justify-between items-center gap-3">
-              <h3 class="text-xl font-black">今日学习记录</h3>
-              <span class="text-sm text-muted">最后编辑：${state.editTime[i] || '暂无'}</span>
-            </div>
-
-            <textarea id="noteArea" class="mt-3 w-full min-h-44 rounded-2xl bg-black/20 soft-border p-4 outline-none focus:ring-2 focus:ring-blue-300/40 transition" placeholder="记录：今天背了哪些词？错题原因？明天先补什么？">${esc(state.notes[i] || '')}</textarea>
-
-            <div class="flex flex-col md:flex-row gap-3 mt-3">
-              <button id="saveNote" class="tap rounded-2xl px-5 py-3 bg-blue-500/20 border border-blue-300/30 font-black">保存记录</button>
-              <button id="exportDay" class="tap rounded-2xl px-5 py-3 bg-white/10 soft-border font-black">导出今日学习内容</button>
-            </div>
-          </div>
-        </section>
-      </div>
-    `);
-  }
-
-  function calendarCell(i){
-    const mock = i % 7 === 0;
-    const done = state.completed[i];
-    const active = i === selectedDay;
-
-    return `
-      <button data-day="${i}" class="calDay tap rounded-3xl p-4 min-h-28 text-left soft-border ${done ? 'bg-emerald-500/20 border-emerald-300/40' : mock ? 'bg-red-500/20 border-red-300/40' : 'bg-white/8'} ${active ? 'shadow-blueglow' : ''}">
-        <div class="flex justify-between">
-          <b>Day ${i}</b>
-          <span>${done ? '✅' : mock ? '🔥' : '○'}</span>
-        </div>
-        <div class="text-sm text-muted mt-2">${cnDate(dayDate(i))}</div>
-        <div class="mt-3 text-xs font-bold ${mock ? 'text-red-200' : 'text-muted'}">${mock ? '全真模考日' : '日常强化'}</div>
-        <div class="text-xs text-muted mt-1">${statusOf(i)}</div>
-      </button>
-    `;
-  }
-
-  function renderMock(){
-    view.innerHTML = shell('模考与追踪','每7天一次全真模考：做题不是结束，复盘才是提分。',`
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4">
-        <div class="glass rounded-[2rem] p-5">
-          <h3 class="text-xl font-black mb-4">32天全景日历</h3>
-          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
-            ${Array.from({length:TOTAL_DAYS},(_,k) => calendarCell(k+1)).join('')}
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div class="glass rounded-[2rem] p-5">
-            <h3 class="text-xl font-black">阶段性目标</h3>
-            <ul class="mt-3 space-y-2 text-muted leading-7">
-              <li>Day 1-7：高频词建立第一轮曝光，听力每天20分钟。</li>
-              <li>Day 8-14：阅读定位题型，整理同义替换。</li>
-              <li>Day 15-21：整套真题限时，作文模板熟练套用。</li>
-              <li>Day 22-32：错题回收，保持手感，减少低级失分。</li>
-            </ul>
-          </div>
-
-          <div class="glass rounded-[2rem] p-5">
-            <h3 class="text-xl font-black">真题溯源建议</h3>
-            <p class="text-muted mt-3 leading-7">每次模考后，把错题按“词汇不认识 / 句子看不懂 / 定位失败 / 时间不足 / 粗心”分类。阅读题优先回原文画定位句，听力题优先重听原句。</p>
-          </div>
-
-          <div class="glass rounded-[2rem] p-5">
-            <h3 class="text-xl font-black">错题回收提醒</h3>
-            <p class="text-muted mt-3 leading-7">模考日当天只追求完成闭环：计时做题 → 对答案 → 记录错因 → 第二天复盘错题词汇与长难句。</p>
-          </div>
-        </div>
-      </div>
-    `);
-  }
-
-  function recordCard(i){
-    return `
-      <div class="glass rounded-[2rem] p-5 tap">
-        <div class="flex justify-between gap-3">
-          <div>
-            <b class="text-lg">Day ${i} · ${fmtDate(dayDate(i))}</b>
-            <div class="text-sm mt-1">${statusPill(statusOf(i))}</div>
-          </div>
-          <button data-day="${i}" class="jumpPlan rounded-full px-3 py-2 bg-white/10 soft-border text-sm font-bold">跳转</button>
-        </div>
-        <div class="text-sm text-muted mt-3">最后编辑：${state.editTime[i] || '暂无'}</div>
-        <p class="mt-3 rounded-2xl bg-black/20 soft-border p-4 min-h-24 text-sm leading-6">${esc(state.notes[i] || '暂无记录。')}</p>
-      </div>
-    `;
-  }
-
-  function renderRecords(){
-    const filter = window.recordFilter || 'all';
-    const q = (window.recordQuery || '').toLowerCase();
-
-    let days = Array.from({length:TOTAL_DAYS},(_,k) => k+1).filter(i => {
-      if(filter === 'done' && !state.completed[i]) return false;
-      if(filter === 'todo' && state.completed[i]) return false;
-      const txt = (state.notes[i] || '').toLowerCase();
-      return !q || txt.includes(q) || (`day ${i} ${fmtDate(dayDate(i))}`).includes(q);
-    });
-
-    view.innerHTML = shell('学习记录','搜索、筛选、跳转与导出，让复盘形成闭环。',`
-      <div class="glass rounded-[2rem] p-5 mb-4">
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3">
-          <input id="searchNotes" value="${esc(window.recordQuery || '')}" class="rounded-2xl bg-black/20 soft-border p-3 outline-none focus:ring-2 focus:ring-blue-300/40" placeholder="搜索所有笔记内容..." />
-          <select id="filterNotes" class="rounded-2xl bg-black/20 soft-border p-3 outline-none">
-            <option value="all" ${filter === 'all' ? 'selected' : ''}>全部</option>
-            <option value="done" ${filter === 'done' ? 'selected' : ''}>已完成</option>
-            <option value="todo" ${filter === 'todo' ? 'selected' : ''}>未完成</option>
-          </select>
-          <button id="exportAll" class="tap rounded-2xl px-5 py-3 bg-white/10 soft-border font-black">导出全部记录</button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        ${days.map(i => recordCard(i)).join('') || `<div class="glass rounded-[2rem] p-6 text-muted">没有匹配的记录。</div>`}
-      </div>
-    `);
-  }
-
-  function saveNote(){
-    const area = document.getElementById('noteArea');
-    if(!area) return;
-
-    state.notes[selectedDay] = area.value;
-    state.editTime[selectedDay] = new Date().toLocaleString('zh-CN',{hour12:false});
-    saveState();
-    toast('记录已保存');
-
-    const meta = [...document.querySelectorAll('.text-muted')].find(x => x.textContent.startsWith('最后编辑'));
-    if(meta) meta.textContent = '最后编辑：' + state.editTime[selectedDay];
-  }
-
-  function exportDay(i){
-    const p = getPlan(i);
-
-    const content = `Day ${i} ${fmtDate(dayDate(i))}
-状态：${statusOf(i)}
-
-【75词】
-${p.words.join(', ')}
-
-【同义词】
-${p.syns.map(x => `${x[0]} -> ${x[1]}：${x[2]}`).join('\n')}
-
-【词组】
-${p.phrases.map(x => `${x[0]}：${x[1]}`).join('\n')}
-
-【作文模板：${p.template.name}】
-${p.template.text}
-
-【长难句】
-${p.sentence}
-
-【短文：${p.article.tense}】
-${p.article.text}
-
-【学习记录】
-${state.notes[i] || ''}`;
-
-    download(`CET4-Day${i}.txt`, content);
-  }
-
-  function exportAll(){
-    const content = Array.from({length:TOTAL_DAYS},(_,k) => {
-      const i = k+1;
-      return `===== Day ${i} ${fmtDate(dayDate(i))} =====
-状态：${statusOf(i)}
-最后编辑：${state.editTime[i] || '暂无'}
-记录：
-${state.notes[i] || '暂无'}
-`;
-    }).join('\n');
-
-    download('CET4-全部学习记录.txt', content);
-  }
-
-  function download(name,text){
-    const blob = new Blob([text],{type:'text/plain;charset=utf-8'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    toast('导出成功');
-  }
-
-  function applyTheme(){
-    document.documentElement.classList.toggle('light', state.theme === 'light');
-    document.documentElement.classList.toggle('dark', state.theme !== 'light');
-  }
-
-  function bindEvents(){
-    document.querySelectorAll('.navBtn').forEach(btn => {
-      btn.onclick = () => {
-        activeTab = +btn.dataset.tab;
-        render();
-      };
-    });
-
-    themeBtn.onclick = () => {
-      state.theme = state.theme === 'dark' ? 'light' : 'dark';
-      applyTheme();
-      saveState();
-    };
-
-    view.onclick = (e) => {
-      const tool = e.target.closest('.toolCard');
-      if(tool){
-        if(tool.dataset.tool === 'a4'){
-          openLink(tool.dataset.url);
-        }else{
-          copyText(syntaxPrompt,'Prompt 已复制');
-          setTimeout(() => openLink(tool.dataset.url),250);
-        }
-      }
-
-      if(e.target.id === 'copyFullPrompt'){
-        copyText(syntaxPrompt,'完整 Prompt 已复制');
-      }
-
-      if(e.target.id === 'goToday'){
-        activeTab = 1;
-        selectedDay = getTodayIndex();
-        render();
-      }
-
-      const ds = e.target.closest('.daySelect,.calDay');
-      if(ds){
-        selectedDay = +ds.dataset.day;
-        activeTab = ds.classList.contains('calDay') ? 1 : activeTab;
-        render();
-      }
-
-      if(e.target.id === 'completeBtn'){
-        state.completed[selectedDay] = !state.completed[selectedDay];
-        saveState();
-        updateHeader();
-        render();
-        toast(state.completed[selectedDay] ? '打卡完成，进度已更新' : '已取消打卡');
-      }
-
-      if(e.target.id === 'saveNote'){
-        saveNote();
-      }
-
-      if(e.target.classList.contains('copySentence')){
-        copyText(getPlan(selectedDay).sentence,'长难句已复制');
-      }
-
-      if(e.target.id === 'exportDay'){
-        exportDay(selectedDay);
-      }
-
-      if(e.target.id === 'exportAll'){
-        exportAll();
-      }
-
-      const jp = e.target.closest('.jumpPlan');
-      if(jp){
-        selectedDay = +jp.dataset.day;
-        activeTab = 1;
-        render();
-      }
-    };
-
-    view.oninput = (e) => {
-      if(e.target.id === 'noteArea'){
-        clearTimeout(window.noteTimer);
-        window.noteTimer = setTimeout(saveNote,500);
-      }
-
-      if(e.target.id === 'searchNotes'){
-        window.recordQuery = e.target.value;
-        renderRecords();
-      }
-    };
-
-    view.onchange = (e) => {
-      if(e.target.id === 'filterNotes'){
-        window.recordFilter = e.target.value;
-        renderRecords();
-      }
-    };
-  }
-
-  function render(){
-    updateHeader();
-
-    document.querySelectorAll('.navBtn').forEach(b => {
-      b.className = 'navBtn px-4 py-3 rounded-full text-sm font-bold whitespace-nowrap tap ' + (+b.dataset.tab === activeTab ? 'bg-white/20 shadow-glow' : 'hover:bg-white/10');
-    });
-
-    if(activeTab === 0) renderOverview();
-    if(activeTab === 1) renderPlan();
-    if(activeTab === 2) renderMock();
-    if(activeTab === 3) renderRecords();
-  }
-
-  applyTheme();
-  bindEvents();
-  startCountdown();
-  render();
-})();
-</script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if("05/30/2026"!=""){
+    var startSite=new Date("05/30/2026");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行 "+diffDay+" 天"+" • ";
+}
+</script></div>
 </body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+cmButton=document.getElementById("cmButton");
+    span=document.createElement("span");
+    span.setAttribute("class","Counter");
+    span.innerHTML="1";
+    cmButton.appendChild(span);
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","luliy6/luliy6.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script><script>document.addEventListener('DOMContentLoaded',function(){/* ===== 顶部进度条 ===== */var bar=document.createElement('div');bar.style.cssText='position:fixed;top:0;left:0;height:3px;width:0%;background:#0969da;z-index:9999;transition:width 0.1s';document.body.appendChild(bar);/* ===== 回顶部按钮 + 阅读百分比 ===== */var progWrap=document.createElement('div');progWrap.style.cssText='position:fixed;bottom:24px;right:24px;width:52px;cursor:pointer;z-index:999;display:none;transition:transform 0.3s;text-align:center';progWrap.onmouseover=function(){this.style.transform='scale(1.1)'};progWrap.onmouseout=function(){this.style.transform='scale(1)'};progWrap.innerHTML='<svg viewBox="0 0 44 44" style="width:44px;height:44px;transform:rotate(-90deg);border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:block;margin:0 auto"><circle cx="22" cy="22" r="20" fill="#fff" stroke="#e8e8e8" stroke-width="4"></circle><circle id="prog-circ" cx="22" cy="22" r="20" fill="transparent" stroke="#0969da" stroke-width="4" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round" style="transition:stroke-dashoffset 0.1s"></circle></svg><span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);color:#0969da;font-size:12px;font-weight:bold;font-family:monospace">↑</span><span id="prog-pct" style="display:block;font-size:11px;color:#8250df;font-weight:bold;margin-top:3px;font-family:monospace">0%</span>';document.body.appendChild(progWrap);progWrap.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};window.addEventListener('scroll',function(){var st=window.scrollY||document.documentElement.scrollTop;var dh=document.documentElement.scrollHeight-document.documentElement.clientHeight;var pct=dh>0?Math.round(st/dh*100):0;bar.style.width=pct+'%';if(st>300){progWrap.style.display='block';document.getElementById('prog-circ').style.strokeDashoffset=125.6-(125.6*pct/100);document.getElementById('prog-pct').textContent=pct+'%'}else{progWrap.style.display='none'}});/* ===== 代码语言标签 + 全屏按钮 ===== */document.querySelectorAll('pre').forEach(function(pre){var code=pre.querySelector('code');if(!code)return;var m=(code.className||'').match(/language-(\w+)/);if(!m)return;var tag=document.createElement('span');tag.textContent=m[1];tag.style.cssText='position:absolute;top:8px;right:12px;font-size:11px;color:#888;font-family:monospace;text-transform:uppercase;background:#e8e8e8;padding:2px 8px;border-radius:4px';pre.style.position='relative';pre.appendChild(tag);var fsBtn=document.createElement('button');fsBtn.textContent='⛶';fsBtn.title='全屏展开';fsBtn.style.cssText='position:absolute;top:8px;right:80px;font-size:13px;color:#888;background:#e8e8e8;border:none;padding:2px 8px;border-radius:4px;cursor:pointer';fsBtn.onclick=function(){if(!document.fullscreenElement){pre.requestFullscreen()}else{document.exitFullscreen()}};pre.appendChild(fsBtn)});/* ===== 外链新标签 ===== */document.querySelectorAll('a[href^="http"]').forEach(function(a){if(!a.href.includes('luliy6.github.io'))a.target='_blank'});/* ===== 图片懒加载 ===== */document.querySelectorAll('#postBody img').forEach(function(img){img.loading='lazy'});var pbody=document.getElementById('postBody');if(pbody){/* ===== 阅读时间 + 字数 ===== */var wc=pbody.innerText.length;var mins=Math.max(1,Math.round(wc/300));var rtag=document.createElement('p');rtag.innerHTML='预计阅读：约 '+mins+' 分钟 &nbsp;|&nbsp; 共 '+wc+' 字';rtag.style.cssText='color:#888;font-size:13px;margin-bottom:1.5rem';pbody.insertBefore(rtag,pbody.firstChild);/* ===== 标题点击复制链接 ===== */document.querySelectorAll('#postBody h1,#postBody h2,#postBody h3').forEach(function(h){h.style.cursor='pointer';h.title='点击复制链接';h.onclick=function(){var url=location.href.split('#')[0]+'#'+h.id;navigator.clipboard&&navigator.clipboard.writeText(url);var tip=document.createElement('span');tip.textContent=' 已复制!';tip.style.cssText='font-size:12px;color:#1f883d;font-weight:normal';h.appendChild(tip);setTimeout(function(){tip.remove()},2000)}});/* ===== 文末赞赏面板 ===== */var spBox=document.createElement('div');spBox.style.cssText='margin-top:50px;text-align:center';var spBtn=document.createElement('button');spBtn.innerHTML='✨ 和作者无限进步';spBtn.style.cssText='padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(240,180,41,0.3);transition:transform 0.3s';var qrP=document.createElement('div');qrP.innerHTML='<p style="font-size:13px;color:#888;margin:10px 0">无限进步，进步有你！</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="赞赏码" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';qrP.style.cssText='height:0;overflow:hidden;transition:height 0.4s ease,opacity 0.4s ease;opacity:0';spBtn.onmouseover=function(){spBtn.style.transform='translateY(-2px)'};spBtn.onmouseout=function(){spBtn.style.transform='none'};spBtn.onclick=function(){if(qrP.style.height==='0px'||!qrP.style.height){qrP.style.height='260px';qrP.style.opacity='1'}else{qrP.style.height='0px';qrP.style.opacity='0'}};spBox.appendChild(spBtn);spBox.appendChild(qrP);/* ===== 上一篇/下一篇 ===== */fetch('/postList.json').then(function(r){return r.json()}).then(function(posts){var cur=location.pathname.replace(/\/$/,'');var idx=posts.findIndex(function(p){return p.link&&p.link.replace(/\/$/,'')===cur});if(idx<0)return;var nav=document.createElement('div');nav.style.cssText='display:flex;justify-content:space-between;gap:16px;margin-top:40px;padding-top:20px;border-top:2px dashed rgba(9,105,218,0.2)';var prev=idx+1<posts.length?posts[idx+1]:null;var next=idx-1>=0?posts[idx-1]:null;function makeNavBtn(post,label,align){if(!post)return document.createElement('div');var a=document.createElement('a');a.href=post.link;a.style.cssText='flex:1;padding:14px 18px;border-radius:12px;background:rgba(9,105,218,0.05);border:1px solid rgba(9,105,218,0.15);text-decoration:none;transition:all 0.25s;text-align:'+align;a.innerHTML='<span style="display:block;font-size:11px;color:#888;margin-bottom:4px">'+label+'</span><span style="color:#0969da;font-weight:bold;font-size:14px">'+post.title+'</span>';a.onmouseover=function(){a.style.background='rgba(9,105,218,0.12)';a.style.transform='translateY(-2px)'};a.onmouseout=function(){a.style.background='rgba(9,105,218,0.05)';a.style.transform=''};return a}nav.appendChild(makeNavBtn(prev,'⬅ 上一篇','left'));nav.appendChild(makeNavBtn(next,'下一篇 ➡','right'));pbody.appendChild(nav)}).catch(function(){});pbody.appendChild(spBox);}/* ===== TOC 自动高亮 ===== */var tocTimer=null;function initTOCHighlight(){var heads=Array.from(document.querySelectorAll('#postBody h2,#postBody h3'));if(!heads.length)return;window.addEventListener('scroll',function(){if(tocTimer)clearTimeout(tocTimer);tocTimer=setTimeout(function(){var scrollY=window.scrollY||document.documentElement.scrollTop;var cur=null;heads.forEach(function(h){if(scrollY>=h.offsetTop-120)cur=h});var tocLinks=document.querySelectorAll('.toc a,.markdown-toc a,[class*="toc"] a');tocLinks.forEach(function(a){var href=a.getAttribute('href');var matched=cur&&href&&href==='#'+cur.id;a.style.color=matched?'#f0b429':'';a.style.fontWeight=matched?'bold':'';a.style.transition='color 0.2s'})},50)})}setTimeout(initTOCHighlight,800);/* ===== 动态网页标题 ===== */var oriT=document.title;var tTime;document.addEventListener('visibilitychange',function(){if(document.hidden){document.title='👀 别走呀，我还在进步！';clearTimeout(tTime)}else{document.title='✨ 欢迎回来！ '+oriT;tTime=setTimeout(function(){document.title=oriT},2000)}});/* ===== 运行时间（居中，仅秒红色） ===== */var upE=document.createElement('div');upE.style.cssText='text-align:center;font-size:13px;color:#888;padding:10px 0;margin-top:20px';document.body.appendChild(upE);var stDate=new Date('2026/05/30 00:00:00').getTime();function updateUptime(){var n=Date.now();var d=n-stDate;if(d<0){upE.innerHTML='🚀 博客即将上线，敬请期待...';return}var days=Math.floor(d/86400000);var hh=Math.floor((d%86400000)/3600000);var mm=Math.floor((d%3600000)/60000);var ss=Math.floor((d%60000)/1000);upE.innerHTML='🌱 本站已陪伴你无限进步：'+days+'天 '+hh+'小时 '+mm+'分 <span style="color:#ff4444;font-weight:bold;font-family:monospace">'+ss+'</span>秒'}updateUptime();setInterval(updateUptime,1000);/* ===== 首页公告栏 ===== */var m=document.querySelector('.container-lg');if(m){var a=document.createElement('div');a.className='announce-bar';a.innerHTML='📢 欢迎来到 Luliy 的博客！—— 记录点滴，我将无限进步！';m.insertBefore(a,m.firstChild)}/* ===== Hero 区 ===== */var hero=document.createElement('div');hero.id='site-hero';hero.innerHTML='<div style="text-align:center;padding:56px 20px 40px;background:linear-gradient(135deg,#0d1b2a 0%,#1a2a4a 40%,#8250df 100%);border-radius:18px;margin-bottom:32px;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:url(\"data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.04\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\") repeat;opacity:0.6"></div><h1 style="font-size:3rem;font-weight:900;color:#fff;margin:0 0 12px;letter-spacing:2px;position:relative;text-shadow:0 4px 20px rgba(0,0,0,0.4)">✦ Luliy ✦</h1><p style="font-size:1.1rem;color:rgba(255,255,255,0.8);margin:0 0 28px;position:relative;letter-spacing:1px">我将无限进步 · 记录点滴 · 持续成长</p><a href="#post-list" style="display:inline-block;padding:12px 32px;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;border-radius:30px;text-decoration:none;font-size:15px;position:relative;box-shadow:0 4px 20px rgba(240,180,41,0.4);transition:transform 0.2s" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'\'">🚀 开始阅读</a></div>';if(m)m.insertBefore(hero,m.children[1]||m.firstChild);/* ===== 时钟嵌入Hero（时分） ===== */var heroClock=document.createElement('div');heroClock.id='hero-clock';heroClock.style.cssText='font-size:26px;color:#ff4444;font-weight:bold;font-family:monospace;margin-bottom:18px;letter-spacing:4px;text-shadow:0 2px 8px rgba(255,68,68,0.4)';function updateClock(){var now=new Date();var h=String(now.getHours()).padStart(2,'0');var mi=String(now.getMinutes()).padStart(2,'0');heroClock.textContent=h+':'+mi}updateClock();setInterval(updateClock,1000);var heroInner=document.querySelector('#site-hero div');if(heroInner){var h1el=heroInner.querySelector('h1');if(h1el)heroInner.insertBefore(heroClock,h1el)}/* ===== 一言（hitokoto） ===== */var hBox=document.createElement('div');hBox.className='hitokoto-bar';hBox.textContent='正在加载今日一言...';if(m)m.insertBefore(hBox,document.getElementById('site-hero').nextSibling);fetch('https://v1.hitokoto.cn/?c=b&c=d&c=h&c=i&c=k&encode=json').then(function(r){return r.json()}).then(function(d){hBox.textContent=d.hitokoto+(d.from?'  ——《'+d.from+'》':'')}).catch(function(){hBox.textContent='每一天都是新的进步 🌱'});/* ===== 头像点击跳转 ===== */var av=document.querySelector('.avatar');if(av){av.style.cursor='pointer';av.onclick=function(){window.location.href='/about.html'}}/* ===== 文章列表动画 + 日期图标 + 封面占位符（无异步缩略图） ===== */var postList=document.querySelector('.post-list')||document.querySelector('.postList');if(postList)postList.id='post-list';var gradients=['linear-gradient(135deg,#8250df,#f0b429)','linear-gradient(135deg,#0969da,#34d399)','linear-gradient(135deg,#ff6b9d,#ffcd3c)','linear-gradient(135deg,#6bceff,#8250df)','linear-gradient(135deg,#34d399,#0969da)','linear-gradient(135deg,#f0b429,#ff6b9d)'];var items=document.querySelectorAll('.post-item');items.forEach(function(el,i){el.style.animationDelay=(i*0.07)+'s';var d=el.querySelector('span.color-fg-muted');if(d&&!d.innerHTML.includes('📅')){d.innerHTML='📅 '+d.innerHTML}var inner=document.createElement('div');inner.className='post-item-body';while(el.firstChild){inner.appendChild(el.firstChild)}var thumb=document.createElement('div');thumb.className='post-item-thumb-placeholder';thumb.style.cssText='width:100%;height:160px;border-radius:10px 10px 0 0;display:block;background:'+gradients[i%gradients.length]+';position:relative;overflow:hidden';var thumbEmoji=document.createElement('span');thumbEmoji.textContent=['✨','🚀','📖','💡','🌱','🎯','🔥','💎'][i%8];thumbEmoji.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;opacity:0.5';thumb.appendChild(thumbEmoji);el.appendChild(thumb);el.appendChild(inner)});/* ===== 年度归档时间轴（archive页） ===== */if(location.pathname.includes('archive')){var pb=document.getElementById('postBody');if(pb){pb.innerHTML='<p style="color:#888;font-size:14px">正在加载归档...</p>';fetch('/postList.json').then(function(r){return r.json()}).then(function(posts){var byYear={};posts.forEach(function(p){var y=p.created?p.created.slice(0,4):(p.date?p.date.slice(0,4):'未知');if(!byYear[y])byYear[y]=[];byYear[y].push(p)});var years=Object.keys(byYear).sort(function(a,b){return b-a});var html='<h1 style="color:#0969da;border-bottom:2px solid #0969da;padding-bottom:10px;margin-bottom:30px">📅 文章归档</h1>';years.forEach(function(y){html+='<div class="tl-year">'+y+' 年</div><ul class="tl-list">';byYear[y].forEach(function(p){var dateStr=p.created||p.date||'';var md=dateStr.slice(5,10).replace('-','/');html+='<li class="tl-item"><a href="'+p.link+'">'+p.title+'</a><span class="tl-date">'+md+'</span></li>'});html+='</ul>'});pb.innerHTML=html}).catch(function(){pb.innerHTML='<p style="color:#e74c3c">归档加载失败，请刷新重试</p>'})}}});</script>
+
 </html>
