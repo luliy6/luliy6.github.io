@@ -10,15 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="# Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。">
-<meta property="og:title" content="about">
-<meta property="og:description" content="# Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://luliy6.github.io/about.html">
+<meta name="description" content="我将无限进步!">
+<meta property="og:title" content="Luliy">
+<meta property="og:description" content="我将无限进步!">
+<meta property="og:type" content="blog">
+<meta property="og:url" content="https://luliy6.github.io">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
-<title>about</title>
-
-
+<title>Luliy</title>
 
 </head>
 <style>
@@ -29,57 +27,114 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </style>
 
 <style>
-.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.avatar {transition: 0.8s;width:64px;height:64px;object-fit: cover;}
+.avatar:hover{transform: scale(1.15) rotate(360deg);}
+.title-left a{color:inherit;text-decoration:none;vertical-align: bottom;font-size:40px;font-weight: bold;font-family:Monaco;margin-left:8px;}
 .title-right{display:flex;margin:auto 0 0 auto;}
-.title-right .circle{padding: 14px 16px;margin-right:8px;}
-#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
-#postBody hr{height:2px;}
-#cmButton{height:48px;margin-top:48px;}
-#comments{margin-top:64px;}
-.g-emoji{font-size:24px;}
+.title-right button{margin-right:8px;padding:16px;}
+.title-right .circle{padding: 14px 16px;}
+
+.SideNav{min-width: 360px;}
+.SideNav-icon{margin-right: 16px}
+.SideNav-item .Label{color: #fff;margin-left:4px;}
+.d-flex{min-width:0;}
+.listTitle{overflow:hidden;white-space:nowrap;text-overflow: ellipsis;max-width: 100%;}
+.listLabels{white-space:nowrap;display:flex;}
+.listLabels object{max-height:16px;max-width:24px;}
+
 @media (max-width: 600px) {
     body {padding: 8px;}
-    .postTitle{font-size:24px;}
+    .avatar {width:40px;height:40px;}
+    .blogTitle{display:none;}
+    #buttonRSS{display:none;}
+    .LabelTime{display:none;}
 }
-
 </style>
-<style>#postBody{font-size:18px;line-height:1.9;max-width:860px;counter-reset:h2}#postBody h1,#postBody h2,#postBody h3,#postBody h4{color:#0969da;font-weight:bold}#postBody h1{border-bottom:2px solid #0969da;padding-bottom:10px;margin-bottom:20px}#postBody h2{border-left:5px solid #0969da;padding-left:12px;background:rgba(9,105,218,0.05);padding-top:4px;padding-bottom:4px;border-radius:0 8px 8px 0}#postBody h2::before{counter-increment:h2;content:counter(h2) ". ";color:#0969da}#postBody strong{color:#f0b429;font-weight:bold}#postBody a{color:#f0b429;text-decoration:none}#postBody a:hover{text-decoration:underline}#postBody img{display:block;margin:0 auto;max-width:100%;border-radius:8px;background:#f6f8fa;min-height:80px}#postBody pre{background:#f6f8fa;border-radius:10px;padding:16px;overflow-x:auto}#postBody code{background:#f0f0f0;border-radius:4px;padding:2px 6px;font-size:0.9em;color:#d73a49;font-weight:bold}#postBody pre code{background:none;padding:0;color:inherit;font-weight:normal}#postBody blockquote{position:relative;border-left:4px solid #0969da;background:rgba(9,105,218,0.05);padding:18px 20px 18px 28px;border-radius:0 10px 10px 0;margin:1.5em 0;color:#555}#postBody blockquote::before{content:'\201C';position:absolute;top:-10px;left:10px;font-size:60px;color:#0969da;opacity:0.2;font-family:Georgia,serif;line-height:1}#postBody table{width:100%;border-collapse:collapse;margin:1.5em 0;box-shadow:0 0 0 1px rgba(0,0,0,0.1);border-radius:8px;overflow:hidden}#postBody th{background:rgba(9,105,218,0.1);padding:12px;color:#0969da;font-weight:bold}#postBody td{padding:12px;border:1px solid rgba(0,0,0,0.05)}#postBody tr:nth-child(even){background:rgba(0,0,0,0.02)}#postBody tr:hover{background:rgba(9,105,218,0.05)}#postBody hr{border:0;height:2px;background:#0969da;margin:2.5em 0;opacity:0.2}.img-caption{text-align:center;font-size:13px;color:#888;margin-top:-10px;margin-bottom:20px;font-style:italic}.code-fold-btn{display:block;width:100%;padding:8px;background:rgba(9,105,218,0.1);color:#0969da;border:none;cursor:pointer;font-size:13px;margin-top:-10px;border-radius:0 0 10px 10px;transition:all 0.3s}.code-fold-btn:hover{background:rgba(9,105,218,0.2)}.avatar{cursor:pointer;animation:none!important;transform:none!important}a.Label{transition:transform 0.2s,box-shadow 0.2s}a.Label:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.15)}.about-page #postBody,.about-page #postBody p,.about-page #postBody li,.about-page #postBody span{color:#fff}.link-page #postBody a{color:#f0b429!important}.tl-year{font-size:1.6rem;font-weight:900;color:#0969da;margin:2.5rem 0 1rem;padding-left:28px;position:relative}.tl-year::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:#0969da;box-shadow:0 0 0 4px rgba(9,105,218,0.18)}.tl-list{list-style:none;padding:0;margin:0;border-left:3px solid rgba(9,105,218,0.18);margin-left:8px}.tl-item{position:relative;padding:10px 0 10px 28px}.tl-item::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:#f0b429;border:2px solid #fff;box-shadow:0 0 0 2px #f0b429}.tl-item a{color:#0969da;font-size:15px;text-decoration:none;font-weight:500;transition:color 0.2s}.tl-item a:hover{color:#f0b429}.tl-date{font-size:12px;color:#aaa;margin-left:10px;font-family:monospace}</style>
-
+<style>.post-item{transition:all 0.35s cubic-bezier(.4,0,.2,1);border-radius:14px;padding:0;border-left:4px solid #8250df;background:#fff;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(130,80,223,0.08);display:flex;flex-direction:column}.post-item:nth-child(4n+2){border-left-color:#0969da}.post-item:nth-child(4n+3){border-left-color:#ff6b9d}.post-item:nth-child(4n+0){border-left-color:#f0b429}.post-item:hover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(130,80,223,0.18)}.post-item-thumb{width:100%;height:160px;object-fit:cover;border-radius:10px 10px 0 0;display:block}.post-item-thumb-placeholder{width:100%;height:160px;border-radius:10px 10px 0 0;display:block}.post-item-body{padding:18px 20px;flex-grow:1}.avatar{box-shadow:0 0 15px rgba(130,80,223,0.4);transition:box-shadow 0.3s,transform 0.3s;cursor:pointer}.avatar:hover{box-shadow:0 0 25px rgba(130,80,223,0.8);transform:rotate(5deg)}.Header-item a{transition:transform 0.2s}.Header-item a:hover{transform:scale(1.1)}.announce-bar{background:#0969da;color:#fff;text-align:center;padding:12px;border-radius:10px;margin-bottom:25px;font-size:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-weight:bold;letter-spacing:1px}.footer{text-align:center;font-size:13px;color:#888;margin-top:2rem;padding-top:1rem;border-top:1px solid #eee}.blogTitle,.blogTitle h1,.blogTitle a{font-weight:900!important;font-size:2rem!important;letter-spacing:1px;color:#fff!important;text-shadow:0 2px 10px rgba(0,0,0,0.3)}.hitokoto-bar{background:linear-gradient(135deg,rgba(130,80,223,0.08),rgba(240,180,41,0.08));border:1px solid rgba(130,80,223,0.2);border-radius:12px;padding:16px 22px;margin-bottom:24px;text-align:center;font-size:15px;color:#555;font-style:italic;letter-spacing:0.5px;position:relative}.hitokoto-bar::before{content:'\201C';font-size:40px;color:#8250df;opacity:0.25;position:absolute;top:-4px;left:12px;font-family:Georgia,serif;line-height:1}[data-color-mode="dark"] .hitokoto-bar{background:rgba(130,80,223,0.1);color:#bbb;border-color:rgba(130,80,223,0.3)}.gmeek-copy-code{position:absolute;top:8px;right:126px;font-size:12px;color:#57606a;background:#e8e8e8;border:0;padding:2px 8px;border-radius:4px;cursor:pointer;z-index:2}.gmeek-copy-code:hover{color:#0969da;background:#dbeafe}.gmeek-copy-code.is-done{color:#1f883d}.color-fg-muted.mt-2{display:none}@media (max-width:760px){.post-item{border-radius:12px!important}.post-item-body{padding:14px!important}.post-item-thumb,.post-item-thumb-placeholder{min-height:118px}}</style>
 
 
 <body>
     <div id="header">
-<h1 class="postTitle">about</h1>
+<div class="title-left">
+    <img src="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64" class="avatar circle" id="avatarImg" alt="avatar"><a class="blogTitle">Luliy</a></div>
 <div class="title-right">
-    <a href="https://luliy6.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
-        <svg class="octicon" width="16" height="16">
-            <path id="pathHome" fill-rule="evenodd"></path>
+    <a href="https://luliy6.github.io/tag.html" id="buttonSearch" class="btn btn-invisible circle" title="搜索">
+        <svg class="octicon" width="16" height="16" >
+            <path id="pathSearch" fill-rule="evenodd"></path>
         </svg>
     </a>
-    
-    <a href="https://github.com/luliy6/luliy6.github.io/issues/3" target="_blank" class="btn btn-invisible circle" title="Issue">
-        <svg class="octicon" width="16" height="16">
-            <path id="pathIssue" fill-rule="evenodd"></path>
+    <a href="https://github.com/luliy6" class="btn btn-invisible circle" title="github" target="_blank">
+        <svg class="octicon" width="16" height="16" >
+            <path id="github" fill-rule="evenodd"></path>
+        </svg>
+    </a><a href="mailto:luliy6@qq.com" class="btn btn-invisible circle" title="email" target="_blank">
+        <svg class="octicon" width="16" height="16" >
+            <path id="email" fill-rule="evenodd"></path>
+        </svg>
+    </a><a href="https://luliy6.github.io/rss.xml" class="btn btn-invisible circle" title="rss" target="_blank">
+        <svg class="octicon" width="16" height="16" >
+            <path id="rss" fill-rule="evenodd"></path>
+        </svg>
+    </a><a href="https://luliy6.github.io/tag.html" class="btn btn-invisible circle" title="tags" target="_blank">
+        <svg class="octicon" width="16" height="16" >
+            <path id="tags" fill-rule="evenodd"></path>
         </svg>
     </a>
-    
-
-    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+    <a href="https://luliy6.github.io/timeline.html" class="btn btn-invisible circle" title="timeline">
+        <svg class="octicon" width="16" height="16" >
+            <path id="timeline" fill-rule="evenodd"></path>
+        </svg>
+    </a><a href="https://luliy6.github.io/gallery.html" class="btn btn-invisible circle" title="gallery">
+        <svg class="octicon" width="16" height="16" >
+            <path id="gallery" fill-rule="evenodd"></path>
+        </svg>
+    </a><a href="https://luliy6.github.io/about.html" class="btn btn-invisible circle" title="about">
+        <svg class="octicon" width="16" height="16" >
+            <path id="about" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    <a href="https://luliy6.github.io/rss.xml" target="_blank" id="buttonRSS" class="btn btn-invisible circle" title="RSS">
+        <svg class="octicon" width="16" height="16" >
+            <path id="pathRSS" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    <a class="btn btn-invisible circle" onclick="modeSwitch()" title="切换主题">
         <svg class="octicon" width="16" height="16" >
             <path id="themeSwitch" fill-rule="evenodd"></path>
         </svg>
     </a>
-
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h1>Luliy，23岁，本科在读，喜欢历史，哲学，ai，欢迎来到我的频道。</h1>
-<p>📮 邮箱：<a href="mailto:luliy6@qq.com">luliy6@qq.com</a></p></div>
-<div style="font-size:small;margin-top:8px;float:right;"></div>
-
-<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
-<div class="comments" id="comments"></div>
-
+<div style="margin-bottom: 16px;">我将无限进步!</div>
+<nav class="SideNav border">
+<a class="SideNav-item d-flex flex-items-center flex-justify-between" href="post/book.html">
+    <div class="d-flex flex-items-center">
+        <svg class="SideNav-icon octicon" style="width:16px;height:16px"><path class="svgTop0" d=""></path>
+        </svg>
+        <span class="listTitle">book</span>
+    </div>
+    <div class="listLabels">
+        <span class="Label" style="background-color:#006b75">1</span>
+        <span class="Label LabelName" style="background-color:#e3eae8"><object><a style="color:#fff" href="tag.html#book">book</a></object></span>
+        <span class="Label LabelTime" style="background-color:#1f883d">2026-05-30</span>
+    </div>
+</a><a class="SideNav-item d-flex flex-items-center flex-justify-between" href="post/link.html">
+    <div class="d-flex flex-items-center">
+        <svg class="SideNav-icon octicon" style="width:16px;height:16px"><path class="svgTop0" d=""></path>
+        </svg>
+        <span class="listTitle">link</span>
+    </div>
+    <div class="listLabels">
+        
+        <span class="Label LabelName" style="background-color:#7478f0"><object><a style="color:#fff" href="tag.html#link">link</a></object></span>
+        <span class="Label LabelTime" style="background-color:#1f883d">2026-05-30</span>
+    </div>
+</a>
+</nav><nav class="paginate-container" aria-label="Pagination">
+    <div class="pagination"><a class="previous_page" rel="previous" href="https://luliy6.github.io/index.html" aria-label="Previous Page">上一页</a><span class="next_page" aria-disabled="true">下一页</span>
+        </div>
+</nav>
 </div>
     <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://luliy6.github.io">Luliy</a></div>
 <div id="footer2">
@@ -99,7 +154,7 @@ if("05/30/2026"!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'search': 'M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z', 'rss': 'M2.002 2.725a.75.75 0 0 1 .797-.699C8.79 2.42 13.58 7.21 13.974 13.201a.75.75 0 0 1-1.497.098 10.502 10.502 0 0 0-9.776-9.776.747.747 0 0 1-.7-.798ZM2.84 7.05h-.002a7.002 7.002 0 0 1 6.113 6.111.75.75 0 0 1-1.49.178 5.503 5.503 0 0 0-4.8-4.8.75.75 0 0 1 .179-1.489ZM2 13a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z', 'upload': 'M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z M11.78 4.72a.749.749 0 1 1-1.06 1.06L8.75 3.811V9.5a.75.75 0 0 1-1.5 0V3.811L5.28 5.78a.749.749 0 1 1-1.06-1.06l3.25-3.25a.749.749 0 0 1 1.06 0l3.25 3.25Z', 'post': 'M0 3.75C0 2.784.784 2 1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25Zm1.75-.25a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25ZM3.5 6.25a.75.75 0 0 1 .75-.75h7a.75.75 0 0 1 0 1.5h-7a.75.75 0 0 1-.75-.75Zm.75 2.25h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1 0-1.5Z', 'about': 'M10.561 8.073a6.005 6.005 0 0 1 3.432 5.142.75.75 0 1 1-1.498.07 4.5 4.5 0 0 0-8.99 0 .75.75 0 0 1-1.498-.07 6.004 6.004 0 0 1 3.431-5.142 3.999 3.999 0 1 1 5.123 0ZM10.5 5a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z', 'gallery': None, 'timeline': None, 'archive': 'M1.75 0h12.5C15.216 0 16 .784 16 1.75v2.5A1.75 1.75 0 0 1 14.25 6H2v8.25c0 .138.112.25.25.25h3a.75.75 0 0 1 0 1.5h-3A1.75 1.75 0 0 1 .5 14.25V1.75C.5.784 1.284 0 1.75 0ZM2 4.5h12.25a.25.25 0 0 0 .25-.25v-2.5a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25V4.5Zm9.75 4.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1-.75-.75Zm-6.5 4a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1-.75-.75Zm6.5 0a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1-.75-.75Z', 'book': 'M2 2.5A2.5 2.5 0 0 1 4.5 0h7A2.5 2.5 0 0 1 14 2.5v11a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5Zm2.5-1a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-11a1 1 0 0 0-1-1Zm1 2.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75Zm0 2.5a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75Zm0 2.5a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75Z', 'prompt': 'M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 14.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H1.75A1.75 1.75 0 0 1 0 10.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h2.5a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h5.25a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'link': 'M13.828 2.172a4 4 0 0 0-5.656 0L6.757 3.586a1 1 0 1 0 1.414 1.414l1.415-1.414a2 2 0 0 1 2.828 2.828L11 7.828a1 1 0 1 0 1.414 1.414l1.414-1.414a4 4 0 0 0 0-5.656ZM2.172 13.828a4 4 0 0 0 5.656 0L9.243 12.414A1 1 0 1 0 7.829 11l-1.415 1.414a2 2 0 1 1-2.828-2.828L5 8.172A1 1 0 1 0 3.586 6.758L2.172 8.172a4 4 0 0 0 0 5.656Z', 'github': 'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.67 7.67 0 0 1 8 4.58c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z', 'email': 'M1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25v-8.5C0 2.784.784 2 1.75 2ZM1.5 3.75v.736l6.5 3.9 6.5-3.9V3.75a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25Zm13 2.236-6.114 3.668a.75.75 0 0 1-.772 0L1.5 5.986v6.264c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V5.986Z', 'tags': 'M7.75 0h-4.5A1.75 1.75 0 0 0 1.5 1.75v4.5c0 .464.184.91.513 1.237l6.25 6.25a1.75 1.75 0 0 0 2.474 0l3.5-3.5a1.75 1.75 0 0 0 0-2.474l-6.25-6.25A1.75 1.75 0 0 0 7.75 0ZM3 1.75A.25.25 0 0 1 3.25 1.5h4.5c.066 0 .13.026.177.073l6.25 6.25a.25.25 0 0 1 0 .354l-3.5 3.5a.25.25 0 0 1-.354 0l-6.25-6.25A.25.25 0 0 1 3 6.25v-4.5ZM5.5 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z'};
 var utterancesLoad=0;
 
 let themeSettings={
@@ -131,55 +186,26 @@ console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 
 </script>
 
 <script>
-document.getElementById("pathHome").setAttribute("d",IconList["home"]);
-document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
-cmButton=document.getElementById("cmButton");
-    span=document.createElement("span");
-    span.setAttribute("class","Counter");
-    span.innerHTML="1";
-    cmButton.appendChild(span);
-
-
-function openComments(){
-    cm=document.getElementById("comments");
-    cmButton=document.getElementById("cmButton");
-    cmButton.disabled=true;
-    cmButton.innerHTML="loading";
-    span=document.createElement("span");
-    span.setAttribute("class","AnimatedEllipsis");
-    cmButton.appendChild(span);
-
-    script=document.createElement("script");
-    script.setAttribute("src","https://utteranc.es/client.js");
-    script.setAttribute("repo","luliy6/luliy6.github.io");
-    script.setAttribute("issue-term","title");
-    
-    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
-    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
-    else{script.setAttribute("theme","preferred-color-scheme");}
-    
-    script.setAttribute("crossorigin","anonymous");
-    script.setAttribute("async","");
-    cm.appendChild(script);
-
-    int=self.setInterval("iFrameLoading()",200);
+document.getElementById("pathSearch").setAttribute("d",IconList["search"]);
+document.getElementById("pathRSS").setAttribute("d",IconList["rss"]);
+iconTOP=document.getElementsByClassName("svgTop1");
+iconPost=document.getElementsByClassName("svgTop0");
+for(var i=0;i<iconTOP.length;i++){
+    iconTOP[i].setAttribute("d",IconList["upload"]);
+    iconTOP[i].parentNode.style.color="red";
 }
-
-function iFrameLoading(){
-    var utterances=document.getElementsByClassName('utterances');
-    if(utterances.length==1){
-        if(utterances[0].style.height!=""){
-            utterancesLoad=1;
-            int=window.clearInterval(int);
-            document.getElementById("cmButton").style.display="none";
-            console.log("utterances Load OK");
-        }
-    }
+for(var i=0;i<iconPost.length;i++){
+    iconPost[i].setAttribute("d",IconList["post"]);
 }
 
 
+document.getElementById("github").setAttribute("d",value=IconList["github"]);
+document.getElementById("email").setAttribute("d",value=IconList["email"]);
+document.getElementById("rss").setAttribute("d",value=IconList["rss"]);
+document.getElementById("tags").setAttribute("d",value=IconList["tags"]);
 
+document.getElementById("timeline").setAttribute("d",value=IconList["timeline"]);document.getElementById("gallery").setAttribute("d",value=IconList["gallery"]);document.getElementById("about").setAttribute("d",value=IconList["about"]);
 </script>
-<script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script><script>document.addEventListener('DOMContentLoaded',function(){var bar=document.createElement('div');bar.style.cssText='position:fixed;top:0;left:0;height:3px;width:0%;background:#0969da;z-index:9999;transition:width 0.1s';document.body.appendChild(bar);var progWrap=document.createElement('div');progWrap.style.cssText='position:fixed;bottom:24px;right:24px;width:52px;cursor:pointer;z-index:999;display:none;transition:transform 0.3s;text-align:center';progWrap.onmouseover=function(){this.style.transform='scale(1.1)'};progWrap.onmouseout=function(){this.style.transform='scale(1)'};progWrap.innerHTML='<svg viewBox="0 0 44 44" style="width:44px;height:44px;transform:rotate(-90deg);border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:block;margin:0 auto"><circle cx="22" cy="22" r="20" fill="#fff" stroke="#e8e8e8" stroke-width="4"></circle><circle id="prog-circ" cx="22" cy="22" r="20" fill="transparent" stroke="#0969da" stroke-width="4" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round" style="transition:stroke-dashoffset 0.1s"></circle></svg><span style="position:absolute;top:11px;left:50%;transform:translateX(-50%);color:#0969da;font-size:12px;font-weight:bold;font-family:monospace">↑</span><span id="prog-pct" style="display:block;font-size:11px;color:#8250df;font-weight:bold;margin-top:3px;font-family:monospace">0%</span>';document.body.appendChild(progWrap);progWrap.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};window.addEventListener('scroll',function(){var st=window.scrollY||document.documentElement.scrollTop;var dh=document.documentElement.scrollHeight-document.documentElement.clientHeight;var pct=dh>0?Math.round(st/dh*100):0;bar.style.width=pct+'%';if(st>300){progWrap.style.display='block';document.getElementById('prog-circ').style.strokeDashoffset=125.6-(125.6*pct/100);document.getElementById('prog-pct').textContent=pct+'%'}else{progWrap.style.display='none'}});document.querySelectorAll('pre').forEach(function(pre){var code=pre.querySelector('code');if(!code)return;var m=(code.className||'').match(/language-(\w+)/);if(!m)return;var tag=document.createElement('span');tag.textContent=m[1];tag.style.cssText='position:absolute;top:8px;right:12px;font-size:11px;color:#888;font-family:monospace;text-transform:uppercase;background:#e8e8e8;padding:2px 8px;border-radius:4px';pre.style.position='relative';pre.appendChild(tag)});document.querySelectorAll('a[href^="http"]').forEach(function(a){if(!a.href.includes('luliy6.github.io'))a.target='_blank'});document.querySelectorAll('#postBody img').forEach(function(img){img.loading='lazy'});var pbody=document.getElementById('postBody');if(pbody){var wc=pbody.innerText.length;var mins=Math.max(1,Math.round(wc/300));var rtag=document.createElement('p');rtag.innerHTML='预计阅读：约 '+mins+' 分钟 &nbsp;|&nbsp; 共 '+wc+' 字';rtag.style.cssText='color:#888;font-size:13px;margin-bottom:1.5rem';pbody.insertBefore(rtag,pbody.firstChild);document.querySelectorAll('#postBody h1,#postBody h2,#postBody h3').forEach(function(h){h.style.cursor='pointer';h.title='点击复制链接';h.onclick=function(){var url=location.href.split('#')[0]+'#'+h.id;navigator.clipboard&&navigator.clipboard.writeText(url);var tip=document.createElement('span');tip.textContent=' 已复制!';tip.style.cssText='font-size:12px;color:#1f883d;font-weight:normal';h.appendChild(tip);setTimeout(function(){tip.remove()},2000)}});var spBox=document.createElement('div');spBox.style.cssText='margin-top:50px;text-align:center';var spBtn=document.createElement('button');spBtn.innerHTML='✨ 和作者无限进步';spBtn.style.cssText='padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(240,180,41,0.3);transition:transform 0.3s';var qrP=document.createElement('div');qrP.innerHTML='<p style="font-size:13px;color:#888;margin:10px 0">无限进步，进步有你！</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="赞赏码" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';qrP.style.cssText='height:0;overflow:hidden;transition:height 0.4s ease,opacity 0.4s ease;opacity:0';spBtn.onmouseover=function(){spBtn.style.transform='translateY(-2px)'};spBtn.onmouseout=function(){spBtn.style.transform='none'};spBtn.onclick=function(){if(qrP.style.height==='0px'||!qrP.style.height){qrP.style.height='260px';qrP.style.opacity='1'}else{qrP.style.height='0px';qrP.style.opacity='0'}};spBox.appendChild(spBtn);spBox.appendChild(qrP);pbody.appendChild(spBox);var tocTimer=null;function initTOCHighlight(){var heads=Array.from(document.querySelectorAll('#postBody h2,#postBody h3'));if(!heads.length)return;window.addEventListener('scroll',function(){if(tocTimer)clearTimeout(tocTimer);tocTimer=setTimeout(function(){var scrollY=window.scrollY||document.documentElement.scrollTop;var cur=null;heads.forEach(function(h){if(scrollY>=h.offsetTop-120)cur=h});var tocLinks=document.querySelectorAll('.toc a,.markdown-toc a,[class*="toc"] a');tocLinks.forEach(function(a){a.style.fontWeight=cur&&a.getAttribute('href')==='#'+cur.id?'bold':''})},50)})}setTimeout(initTOCHighlight,800);document.addEventListener('click',function(e){var tocLink=e.target.closest('.toc a,.markdown-toc a,#markdown-toc a,[class*="toc"] a');if(tocLink){var href=tocLink.getAttribute('href');if(href&&href.startsWith('#')){e.preventDefault();try{var targetId=decodeURIComponent(href.substring(1));var targetEl=document.getElementById(targetId);if(targetEl){window.scrollTo({top:targetEl.offsetTop-90,behavior:'smooth'});history.pushState(null,null,href)}}catch(err){console.warn('TOC scroll error:',err)}}}});var oriT=document.title;var tTime;document.addEventListener('visibilitychange',function(){if(document.hidden){document.title='👀 别走呀，我还在进步！';clearTimeout(tTime)}else{document.title='✨ 欢迎回来！ '+oriT;tTime=setTimeout(function(){document.title=oriT},2000)}});var upE=document.createElement('div');upE.style.cssText='text-align:center;font-size:13px;color:#888;padding:10px 0;margin-top:20px';document.body.appendChild(upE);var stDate=new Date('2026/05/30 00:00:00').getTime();function updateUptime(){var n=Date.now();var d=n-stDate;if(d<0){upE.innerHTML='🚀 博客即将上线，敬请期待...';return}var days=Math.floor(d/86400000);var hh=Math.floor((d%86400000)/3600000);var mm=Math.floor((d%3600000)/60000);var ss=Math.floor((d%60000)/1000);upE.innerHTML='🌱 本站已陪伴你无限进步：'+days+'天 '+hh+'小时 '+mm+'分 <span style="color:#ff4444;font-weight:bold;font-family:monospace">'+ss+'</span>秒'}updateUptime();setInterval(updateUptime,1000);}document.addEventListener('DOMContentLoaded',function(){if(location.pathname.includes('archive')){var pb=document.getElementById('postBody');if(pb){pb.innerHTML='<p style="color:#888;font-size:14px">正在加载归档...</p>';fetch('/postList.json').then(function(r){return r.json()}).then(function(posts){var byYear={};posts.forEach(function(p){var y=p.created?p.created.slice(0,4):(p.date?p.date.slice(0,4):'未知');if(!byYear[y])byYear[y]=[];byYear[y].push(p)});var years=Object.keys(byYear).sort(function(a,b){return b-a});var html='<h1 style="color:#0969da;border-bottom:2px solid #0969da;padding-bottom:10px;margin-bottom:30px">📅 文章归档</h1>';years.forEach(function(y){html+='<div class="tl-year">'+y+' 年</div><ul class="tl-list">';byYear[y].forEach(function(p){var dateStr=p.created||p.date||'';var md=dateStr.slice(5,10).replace('-','/');html+='<li class="tl-item"><a href="'+p.link+'">'+p.title+'</a><span class="tl-date">'+md+'</span></li>'});html+='</ul>'});pb.innerHTML=html}).catch(function(){pb.innerHTML='<p style="color:#e74c3c">归档加载失败，请刷新重试</p>'})}}}});});</script><script id="luliy-code-copy-enhance">document.addEventListener('DOMContentLoaded',function(){function copyText(text,done){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(done).catch(function(){fallback(text,done)})}else{fallback(text,done)}}function fallback(text,done){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;left:-9999px;top:-9999px';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()}document.querySelectorAll('#postBody pre').forEach(function(pre){if(pre.querySelector('.gmeek-copy-code'))return;var code=pre.querySelector('code');if(!code)return;pre.style.position='relative';var btn=document.createElement('button');btn.type='button';btn.className='gmeek-copy-code';btn.textContent='复制';btn.title='复制代码';btn.addEventListener('click',function(){copyText(code.innerText||code.textContent||'',function(){btn.textContent='已复制';btn.classList.add('is-done');setTimeout(function(){btn.textContent='复制';btn.classList.remove('is-done')},1500)})});pre.appendChild(btn)})});</script>
+<script>document.addEventListener('DOMContentLoaded',function(){var m=document.querySelector('.container-lg');if(m){var a=document.createElement('div');a.className='announce-bar';a.innerHTML='📢 欢迎来到 Luliy 的博客！—— 记录点滴，我将无限进步！';m.insertBefore(a,m.firstChild)}var hero=document.createElement('div');hero.id='site-hero';hero.innerHTML='<div style="text-align:center;padding:56px 20px 40px;background:linear-gradient(135deg,#0d1b2a 0%,#1a2a4a 40%,#8250df 100%);border-radius:18px;margin-bottom:32px;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:url(\"data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.04\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\") repeat;opacity:0.6"></div><h1 style="font-size:3rem;font-weight:900;color:#fff;margin:0 0 12px;letter-spacing:2px;position:relative;text-shadow:0 4px 20px rgba(0,0,0,0.4)">✦ Luliy ✦</h1><p style="font-size:1.1rem;color:rgba(255,255,255,0.8);margin:0 0 28px;position:relative;letter-spacing:1px">我将无限进步 · 记录点滴 · 持续成长</p><a href="#post-list" style="display:inline-block;padding:12px 32px;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;border-radius:30px;text-decoration:none;font-size:15px;position:relative;box-shadow:0 4px 20px rgba(240,180,41,0.4);transition:transform 0.2s" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'\'">🚀 开始阅读</a></div>';if(m)m.insertBefore(hero,m.children[1]||m.firstChild);var hBox=document.createElement('div');hBox.className='hitokoto-bar';hBox.textContent='正在加载今日一言...';if(m)m.insertBefore(hBox,document.getElementById('site-hero').nextSibling);fetch('https://v1.hitokoto.cn/?c=b&c=d&c=h&c=i&c=k&encode=json').then(function(r){return r.json()}).then(function(d){hBox.textContent=d.hitokoto+(d.from?'  ——《'+d.from+'》':'')}).catch(function(){hBox.textContent='每一天都是新的进步 🌱'});var av=document.querySelector('.avatar');if(av){av.onclick=function(){window.location.href='/about.html'}}var postList=document.querySelector('.post-list')||document.querySelector('.postList');if(postList)postList.id='post-list';var gradients=['linear-gradient(135deg,#8250df,#f0b429)','linear-gradient(135deg,#0969da,#34d399)','linear-gradient(135deg,#ff6b9d,#ffcd3c)','linear-gradient(135deg,#6bceff,#8250df)','linear-gradient(135deg,#34d399,#0969da)','linear-gradient(135deg,#f0b429,#ff6b9d)'];var items=document.querySelectorAll('.post-item');items.forEach(function(el,i){el.style.animationDelay=(i*0.07)+'s';var d=el.querySelector('span.color-fg-muted');if(d&&!d.innerHTML.includes('📅')){d.innerHTML='📅 '+d.innerHTML}var thumb=document.createElement('div');thumb.className='post-item-thumb-placeholder';thumb.style.cssText='width:100%;height:160px;border-radius:10px 10px 0 0;display:block;background:'+gradients[i%gradients.length]+';position:relative;overflow:hidden';var thumbEmoji=document.createElement('span');thumbEmoji.textContent=['✨','🚀','📖','💡','🌱','🎯','🔥','💎'][i%8];thumbEmoji.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;opacity:0.5';thumb.appendChild(thumbEmoji);var body=el.querySelector('.post-item-body');if(body){el.insertBefore(thumb,body)}var titleLink=el.querySelector('a[href]');if(titleLink){(function(link,thumbEl){fetch(link.href).then(function(r){return r.text()}).then(function(html){var doc=new DOMParser().parseFromString(html,'text/html');var img=doc.querySelector('#postBody img');if(img&&img.src){var realImg=document.createElement('img');realImg.src=img.src;realImg.className='post-item-thumb';realImg.style.cssText='width:100%;height:160px;object-fit:cover;border-radius:10px 10px 0 0;display:block';realImg.onload=function(){thumbEl.replaceWith(realImg)};realImg.onerror=function(){}}}). catch(function(){})})(titleLink,thumb)}});});</script>
 
 </html>
