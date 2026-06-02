@@ -10,13 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="这份 JSON 文件是基于 **Gmeek** 框架（一个利用 GitHub Issues 自动化构建的个人博客系统）的超级魔改版配置文件（通常命名为 `config.json`）。">
-<meta property="og:title" content="本站指南">
-<meta property="og:description" content="这份 JSON 文件是基于 **Gmeek** 框架（一个利用 GitHub Issues 自动化构建的个人博客系统）的超级魔改版配置文件（通常命名为 `config.json`）。">
+<meta name="description" content="哈喽。">
+<meta property="og:title" content="book">
+<meta property="og:description" content="哈喽。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://luliy6.github.io/post/ben-zhan-zhi-nan.html">
+<meta property="og:url" content="https://luliy6.github.io/book.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
-<title>本站指南</title>
+<title>book</title>
 
 
 
@@ -49,7 +49,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">本站指南</h1>
+<h1 class="postTitle">book</h1>
 <div class="title-right">
     <a href="https://luliy6.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -57,7 +57,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         </svg>
     </a>
     
-    <a href="https://github.com/luliy6/luliy6.github.io/issues/18" target="_blank" class="btn btn-invisible circle" title="Issue">
+    <a href="https://github.com/luliy6/luliy6.github.io/issues/5" target="_blank" class="btn btn-invisible circle" title="Issue">
         <svg class="octicon" width="16" height="16">
             <path id="pathIssue" fill-rule="evenodd"></path>
         </svg>
@@ -73,152 +73,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>这份 JSON 文件是基于 <strong>Gmeek</strong> 框架（一个利用 GitHub Issues 自动化构建的个人博客系统）的超级魔改版配置文件（通常命名为 <code class="notranslate">config.json</code>）。</p>
-<p>这份配置中融入了大量的自定义 CSS 样式、前端交互脚本以及酷炫的特效（如樱花飘落、粒子点击、打字机、彩带纸屑等）。</p>
-<p>为了让你彻底搞懂，我把这段代码拆解为以下 6 个核心板块来逐一解析：</p>
-<hr>
-<h2>1. 基础元数据与全局配置</h2>
-<p>这部分定义了博客的基本身份信息和系统运行环境：</p>
-<ul>
-<li>**<code class="notranslate">title</code> / <code class="notranslate">displayTitle**</code>: 博客的总名称，这里叫 <code class="notranslate">"Luliy"</code>。</li>
-<li><strong><code class="notranslate">subTitle</code></strong>: 博客的副标题（签名）：<code class="notranslate">"我将无限进步!"</code>。</li>
-<li>**<code class="notranslate">avatarUrl</code> / <code class="notranslate">faviconUrl</code> / <code class="notranslate">ogImage**</code>: 你的头像、浏览器标签页小图标、以及网页分享时显示的缩略图链接。</li>
-<li><strong><code class="notranslate">GMEEK_VERSION</code></strong>: 规定使用的 Gmeek 框架版本，这里设置为自动获取最新版 (<code class="notranslate">"last"</code>)。</li>
-<li><strong><code class="notranslate">homeUrl</code></strong>: 博客的主页网址：<code class="notranslate">https://luliy6.github.io</code>。</li>
-<li><strong><code class="notranslate">email</code></strong>: 你的联系邮箱：<code class="notranslate">luliy6@qq.com</code>。</li>
-<li><strong><code class="notranslate">startSite</code></strong>: 博客的建站日期：<code class="notranslate">05/30/2026</code>。</li>
-<li><strong><code class="notranslate">onePageListNum</code></strong>: 首页每页文章显示的条数（一页显示 7 篇）。</li>
-<li><strong><code class="notranslate">singlePage</code></strong>: 独立页面的白名单列表，包含关于我、朋友、画廊、工具、时间轴、音乐、书籍、提示词和归档。</li>
-</ul>
-<hr>
-<h2>2. 图标与外部链接</h2>
-<ul>
-<li><strong><code class="notranslate">iconList</code></strong>: 里面包含了一整套 SVG 地图路径数据。它负责在博客的各个导航标签（如 book, prompt, archive, link 等）前面绘制出扁平化的精致小图标。</li>
-<li><strong><code class="notranslate">exlink</code></strong>: 外部链接映射表。当你在博客点击 GitHub、邮件、RSS、标签时，系统会自动去读这里配置的跳转 URL。</li>
-</ul>
-<hr>
-<h2>3. 功能功能性开关与偏好设置</h2>
-<ul>
-<li><strong><code class="notranslate">i18n</code></strong>: 语言设为 <code class="notranslate">"CN"</code>（中文）。</li>
-<li><strong><code class="notranslate">UTC</code></strong>: 时区设为 <code class="notranslate">8</code>（北京时间）。</li>
-<li><strong><code class="notranslate">urlMode</code></strong>: 文章链接生成模式为 <code class="notranslate">"pinyin"</code>（用拼音做 URL 路径，更利于 SEO）。</li>
-<li><strong><code class="notranslate">themeMode</code></strong>: 主题切换模式为 <code class="notranslate">"manual"</code>（手动切换深色/浅色模式）。</li>
-<li>**<code class="notranslate">dayTheme</code> / <code class="notranslate">nightTheme**</code>: 白天使用 GitHub 官方的 <code class="notranslate">light</code> 浅色主题，夜间使用 <code class="notranslate">dark_colorblind</code>（暗黑红绿色盲友好）主题。</li>
-<li><strong><code class="notranslate">yearColorList</code></strong>: 归档页面不同年份标题的颜色循环池。</li>
-<li><strong><code class="notranslate">commentLabelColor</code></strong>: 评论系统标签的颜色。</li>
-<li>**<code class="notranslate">showPostSource</code> / <code class="notranslate">needComment**</code>: <code class="notranslate">1</code> 表示开启显示文章源码、开启评论功能。</li>
-<li><strong><code class="notranslate">rssSplit</code></strong>: RSS 订阅的分隔策略设为 <code class="notranslate">"sentence"</code>（按句子切分）。</li>
-<li><strong><code class="notranslate">bottomText</code></strong>: 网站底部的版权声明：<code class="notranslate">"转载请注明出处"</code>。</li>
-</ul>
-<hr>
-<h2>4. 全局头部注入与依赖库 (<code class="notranslate">primerCSS</code>, <code class="notranslate">allHead</code>)</h2>
-<p>这是魔改的第一步，往博客的 <code class="notranslate">&lt;head&gt;</code> 标签中塞入了大量前端美化和渲染引擎库：</p>
-<ul>
-<li>
-<p><strong><code class="notranslate">primerCSS</code></strong>: 引入了 GitHub 官方的 UI 样式库 Primer CSS，保证了整体风格的一致性。</p>
-</li>
-<li>
-<p><strong><code class="notranslate">allHead</code> 中引入的第三方外部组件</strong>：</p>
-</li>
-<li>
-<p><strong>KaTeX</strong>: 用于在文章中完美渲染复杂的数学公式。</p>
-</li>
-<li>
-<p><strong>GmeekTOC / GmeekVercount</strong>: 文章目录插件和网站访问量统计插件。</p>
-</li>
-<li>
-<p><strong>PrismJS</strong>: 强大的代码高亮渲染器。</p>
-</li>
-<li>
-<p><strong>Mermaid</strong>: 允许你在文章中直接用代码画流程图、时序图。</p>
-</li>
-<li>
-<p><strong>Chart.js</strong>: 数据图表渲染库。</p>
-</li>
-<li>
-<p><strong>APlayer</strong>: 极其精致的网页音乐播放器。</p>
-</li>
-<li>
-<p><strong><code class="notranslate">allHead</code> 中的自定义全局样式</strong>：</p>
-</li>
-<li>
-<p>强制全站使用非常优雅的 <strong>“霞鹜文楷 (LXGW WenKai)”</strong> 字体。</p>
-</li>
-<li>
-<p>定义了平滑滚动 (<code class="notranslate">scroll-behavior: smooth</code>) 以及金黄色的文本选中特效。</p>
-</li>
-<li>
-<p>重写了夜间模式下的代码块颜色（暗红代码）、表格边框颜色、以及美化了滚动条。</p>
-</li>
-<li>
-<p><strong>注入了站内搜索功能 (<code class="notranslate">initSearch</code>)</strong>：只要在网页上按下 <code class="notranslate">/</code> 键或者点击搜索按钮，就会弹出一个毛玻璃效果的文章搜索面板。</p>
-</li>
-</ul>
-<hr>
-<h2>5. 文章页魔改脚本与样式 (<code class="notranslate">script</code>, <code class="notranslate">style</code>)</h2>
-<h3>📜 <code class="notranslate">style</code>（文章页专用样式）</h3>
-<p>专门用来美化具体文章页（<code class="notranslate">#postBody</code> 内部）的排版：</p>
-<ul>
-<li>为 <code class="notranslate">h2</code> 标题自动添加<strong>数字序号</strong>，并左置一条粗蓝线和淡淡的浅蓝背景框。</li>
-<li>将加粗文本 (<code class="notranslate">&lt;strong&gt;</code>) 和超链接 (<code class="notranslate">&lt;a&gt;</code>) 统一改为显眼的金黄色。</li>
-<li>升级了引用块 (<code class="notranslate">blockquote</code>)，在其左上角加了一个巨大的、半透明的优雅双引号 (<code class="notranslate">“</code>)。</li>
-<li>为表格添加了斑马纹阴影（奇偶行颜色交替）和鼠标悬停高亮特效。</li>
-<li>设计了归档页面（<code class="notranslate">archive</code>）专属的时间轴样式，把文章串成一条漂亮的垂直脉络。</li>
-</ul>
-<h3>⚙️ <code class="notranslate">script</code>（文章页增强逻辑）</h3>
-<p>当读者点进一篇文章时，这段庞大的 JS 脚本会在后台默默执行以下功能：</p>
-<ol>
-<li><strong>顶部进度条</strong>：随页面向下滚动，最顶部会延伸出一条蓝色的阅读进度条。</li>
-<li><strong>回顶部 + 百分比圆形按钮</strong>：右下角生成一个圆形图表，内部展示当前阅读百分比（如 45%），点击直接平滑回滚到顶部。</li>
-<li><strong>代码块增强</strong>：自动检测代码语言并在右上角贴上标签，同时额外生成一个 <code class="notranslate">⛶</code> <strong>全屏展开按钮</strong> 和一个 <strong>复制按钮</strong>。</li>
-<li><strong>外链保护</strong>：所有的外部链接自动加上 <code class="notranslate">target='_blank'</code>，让用户点击外链时在独立新标签页打开，防止流失读者。</li>
-<li><strong>阅读数据计算</strong>：根据文章总字数自动计算并置顶提示：“<em>预计阅读：约 X 分钟 | 共 X 字</em>”。</li>
-<li><strong>锚点复制</strong>：鼠标点击文章的任意标题（H1/H2/H3），会自动复制该标题的直达链接到剪贴板。</li>
-<li><strong>无限进步赞赏面板</strong>：在文末生成一个“✨ 和作者无限进步”的华丽渐变按钮，点击会像抽屉一样平滑展开你的打赏二维码（<code class="notranslate">me.jpg</code>）。</li>
-<li><strong>上一篇 / 下一篇导航</strong>：自动请求后台数据，在文章末尾生成无缝衔接的相邻文章导流卡片。</li>
-<li><strong>TOC 滚动自动高亮</strong>：侧边栏目录会随着你屏幕滚动的具体段落，自动将对应的目录项标金加粗。</li>
-<li><strong>防读者走失标题</strong>：当你切换到别的浏览器标签页时，博客标题会变成 <code class="notranslate">👀 别走呀，我还在进步！</code>；切回来时显示 <code class="notranslate">✨ 欢迎回来！</code>。</li>
-<li><strong>建站时间精确到秒</strong>：在网页最底部实时渲染一个计时器，告诉你这个网站已经平稳运行了多少天、多少小时、多少分、多少秒（秒数用红色加粗强调）。</li>
-</ol>
-<hr>
-<h2>6. 首页与归档页特效脚本与样式 (<code class="notranslate">indexStyle</code>, <code class="notranslate">indexScript</code>)</h2>
-<h3>📜 <code class="notranslate">indexStyle</code>（首页卡片样式）</h3>
-<ul>
-<li>把普通的文章列表重构成悬浮卡片 (<code class="notranslate">.post-item</code>)。</li>
-<li>运用了 <code class="notranslate">4n+1</code> 循环选择器，让不同的文章卡片左侧边框呈现<strong>紫、蓝、粉、黄四色交替</strong>。</li>
-<li>鼠标悬停在卡片上时，卡片会触发丝滑的向上浮动动画，并亮起一道绚丽的渐变外边框。</li>
-<li>美化了首页“一言（Hitokoto）”金句展示框。</li>
-</ul>
-<h3>⚙️ <code class="notranslate">indexScript</code>（首页大卡司特效）</h3>
-<p>这个脚本堪称视觉炸弹，负责在首页渲染各种大制作动画：</p>
-<ol>
-<li><strong>全局公告栏</strong>：置顶一个显眼的蓝色公告：<code class="notranslate">📢 欢迎来到 Luliy 的博客！……</code>。</li>
-<li><strong>Hero 巨幕星空顶</strong>：在首页顶部生成一个深蓝到极光紫的渐变巨幕，带有微弱科技感的网格纹理，并嵌入了一个<strong>实时同步的数字时钟（时:分）</strong>。</li>
-<li><strong>每日一言 (Hitokoto)</strong>：动态调用外部 API，每次刷新首页都会随机展示一句富有哲理的动漫/文学名言。</li>
-<li><strong>首图动态抓取器</strong>：</li>
-</ol>
-<ul>
-<li>这是个非常厉害的逻辑。首页的文章卡片本来是没有图片的。</li>
-<li>这个脚本会在后台悄悄请求每一篇文章的 HTML，<strong>抓取文章里的第一张图片</strong>作为首页卡片的缩略图封面！</li>
-<li>如果文章没图，则会自动生成一个炫彩渐变背景，并随机塞入一个 Emoji 占位（如 <code class="notranslate">✨</code>,<code class="notranslate">🚀</code>,<code class="notranslate">💡</code>）。</li>
-</ul>
-<ol start="5">
-<li><strong>打字机特效</strong>：让你的博客副标题（Luliy ✦ 我将无限进步…）像有人正在敲击键盘一样，逐字打印出来。</li>
-<li><strong>樱花飘落系统 (重点)</strong>：</li>
-</ol>
-<ul>
-<li>利用 HTML5 <code class="notranslate">Canvas</code> 在背景层绘制了 38 片不停随风摇曳、打转、下落的<strong>粉嫩樱花瓣</strong>。</li>
-<li>左下角贴心地设计了一个 <code class="notranslate">✨</code> 悬浮小图标。读者要是觉得晃眼，点一下就能<strong>彻底关闭/开启</strong>樱花特效。</li>
-</ul>
-<ol start="7">
-<li><strong>鼠标点击粒子特效</strong>：鼠标在网页上任意地方点击时，会以鼠标为中心向四周爆裂喷射出 18 颗五彩缤纷的<strong>彩色粒子火花</strong>并逐渐淡出。</li>
-<li><strong>开门红彩带纸屑 (Confetti)</strong>：每当用户第一次加载或者刷新进入首页，屏幕上方会倾泻而下无数五颜六色的<strong>庆祝彩带碎纸屑</strong>，缓缓飘落，极具仪式感。</li>
-<li><strong>自动化时间轴构建（Archive 归档页）</strong>：如果检测到用户当前在 <code class="notranslate">archive</code>（归档）页面，脚本会自动请求文章列表 JSON，按照“年份”归类，瞬间渲染出一个极其规整漂亮的编年体文章时间轴。</li>
-</ol>
-<hr>
-<h3>总结</h3>
-<p>这是一份配置水平极高的 Gmeek 博客魔改代码。它不仅把一个原本朴素的 GitHub Pages 博客在视觉、动画层级拔高到了顶尖水平，而且在用户体验（代码复制、全屏、全站搜索、文章首图抓取、自适应阅读时间、公式渲染）上做了非常全面的技术闭环。</p></div>
-<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
+<div class="markdown-body" id="postBody"><p>哈喽</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
 <div class="comments" id="comments"></div>
@@ -276,7 +132,11 @@ console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 
 <script>
 document.getElementById("pathHome").setAttribute("d",IconList["home"]);
 document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
-
+cmButton=document.getElementById("cmButton");
+    span=document.createElement("span");
+    span.setAttribute("class","Counter");
+    span.innerHTML="1";
+    cmButton.appendChild(span);
 
 
 function openComments(){
