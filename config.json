@@ -10,7 +10,6 @@
   "startSite": "05/30/2026",
   "onePageListNum": 15,
   "singlePage": [
-    "about",
     "friends",
     "gallery",
     "tools",
@@ -18,7 +17,6 @@
     "music",
     "book",
     "prompt",
-    "archive"
   ],
   "iconList": {
     "book": "M2 2.5A2.5 2.5 0 0 1 4.5 0h7A2.5 2.5 0 0 1 14 2.5v11a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5Zm2.5-1a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-11a1 1 0 0 0-1-1Zm1 2.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75Zm0 2.5a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75Zm0 2.5a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75Z",
@@ -38,7 +36,6 @@
   "exlink": {
     "github": "https://github.com/luliy6",
     "email": "mailto:luliy6@qq.com",
-    "rss": "https://luliy6.github.io/rss.xml",
     "tags": "https://luliy6.github.io/tag.html"
   },
   "i18n": "CN",
