@@ -20,6 +20,7 @@
          ⑫-e  外链新标签 & 图片懒加载
          ⑫-f  赞赏面板
          ⑫-g  上一篇 / 下一篇
+         ⑫-h  3D 虚拟控制台
      ⑬ 首页初始化 (_luliyInitIndex)
      ⑭ 主入口
    ============================================================ */
@@ -724,7 +725,122 @@
       nav.appendChild(makeNavBtn(posts[idx - 1] || null, '下一篇 ➡', 'right'));
       pbody.appendChild(nav);
     }).catch(function () {});
-    
+
+    /* ─ ⑫-h 3D 虚拟控制台 ─ */
+    (function buildConsole() {
+      var con = document.createElement('div');
+      con.id = 'luliy-console';
+      con.innerHTML =
+        '<div class="con-titlebar">' +
+          '<span class="con-dot con-dot-r"></span>' +
+          '<span class="con-dot con-dot-y"></span>' +
+          '<span class="con-dot con-dot-g"></span>' +
+          '<span class="con-title">luliy@blog ~ dashboard</span>' +
+        '</div>' +
+        '<div class="con-body" id="luliy-con-body"></div>' +
+        '<div class="con-input-row">' +
+          '<span>luliy@blog:~$</span>' +
+          '<input class="con-input" id="luliy-con-input" type="text" ' +
+            'placeholder="输入命令... (help)" autocomplete="off" spellcheck="false">' +
+        '</div>';
+
+      /* Insert just before the sponsor box (pbody's last big element) */
+      pbody.appendChild(con);
+      pbody.appendChild(spBox);
+
+      var body  = document.getElementById('luliy-con-body');
+      var input = document.getElementById('luliy-con-input');
+
+      var bootLines = [
+        { cls: 'con-info',  text: '[ OK ] Luliy Dashboard v2.0 启动中...' },
+        { cls: 'con-info',  text: '[ OK ] 加载博客配置文件...' },
+        { cls: 'con-info',  text: '[ OK ] 连接至粒子场...' },
+        { cls: 'con-dim',   text: '       正在统计文章数量...' },
+        { cls: 'con-warn',  text: '[WARN] 检测到来访者：你' },
+        { cls: 'con-info',  text: '[ OK ] 一切就绪。无限进步！' },
+        { cls: 'con-dim',   text: '       输入 help 查看可用命令。' }
+      ];
+
+      var lineDelay = 0;
+      bootLines.forEach(function (l) {
+        lineDelay += 260;
+        setTimeout(function () { addLine(l.cls, l.text); }, lineDelay);
+      });
+
+      function addLine(cls, html) {
+        var span = document.createElement('span');
+        span.className = 'con-line';
+        span.innerHTML = '<span class="con-prompt">›</span> <span class="' + cls + '">' + html + '</span>';
+        body.appendChild(span);
+        body.scrollTop = body.scrollHeight;
+      }
+
+      /* Commands */
+      var commands = {
+        help: function () {
+          addLine('con-info', '可用命令：help / time / words / clear / sfx / about / party');
+        },
+        time: function () {
+          var n = new Date();
+          addLine('con-info', '当前时间：' + n.toLocaleString('zh-CN'));
+        },
+        words: function () {
+          addLine('con-info', '本文约 ' + wc + ' 字，预计阅读 ' + Math.max(1, Math.round(wc / 300)) + ' 分钟。');
+        },
+        clear: function () {
+          body.innerHTML = '';
+        },
+        sfx: function () {
+          var cur = localStorage.getItem('luliy-sfx') !== '0';
+          localStorage.setItem('luliy-sfx', cur ? '0' : '1');
+          addLine('con-warn', '音效已' + (cur ? '关闭 🔇' : '开启 🔊'));
+        },
+        about: function () {
+          addLine('con-info',  'Luliy Blog — 记录点滴，我将无限进步！');
+          addLine('con-dim',   'Powered by Gmeek + GitHub Issues');
+          addLine('con-accent','作者：Luliy | luliy6@qq.com');
+        },
+        party: function () {
+          var emojis = ['🎉','🎊','✨','🚀','🌟','💫','🎈'];
+          for (var i = 0; i < 5; i++) {
+            (function (ii) {
+              setTimeout(function () {
+                addLine('con-info', emojis.map(function () {
+                  return emojis[Math.floor(Math.random() * emojis.length)];
+                }).join(' '));
+              }, ii * 120);
+            })(i);
+          }
+        }
+      };
+
+      input.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        var cmd = input.value.trim().toLowerCase();
+        input.value = '';
+        if (!cmd) return;
+        addLine('con-dim', '$ ' + cmd);
+        if (commands[cmd]) {
+          commands[cmd]();
+        } else {
+          addLine('con-err', 'bash: ' + cmd + ': command not found');
+          addLine('con-dim', '输入 help 查看可用命令。');
+        }
+      });
+
+      /* 3-D tilt on mouse move */
+      con.addEventListener('mousemove', function (e) {
+        var rect  = con.getBoundingClientRect();
+        var rx    = ((e.clientY - rect.top)  / rect.height - 0.5) * -6;
+        var ry    = ((e.clientX - rect.left) / rect.width  - 0.5) *  6;
+        con.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+      });
+      con.addEventListener('mouseleave', function () {
+        con.style.transform = '';
+      });
+    })();
+  }; /* end _luliyInitPost */
+
   /* ─────────────────────────────────────────────────────────
      ⑬ 首页初始化
   ───────────────────────────────────────────────────────── */
