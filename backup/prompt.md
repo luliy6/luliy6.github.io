@@ -83,8 +83,14 @@ For every response, you must strictly separate your question and your recommenda
 
 ---
 
-### 💡 官方推荐预案（仅供参考）
 [Insert your recommended answer, architectural best practice, or technology selection here in Chinese. Explain your rationale clearly so the user can use it as a reference while formulating their answer.]
 ```
 
 </details>
+
+## AI
+[ai agent](https://www.youtube.com/watch?v=VL0fdFp3NKY&t=565s)
+[ai agent 2](https://www.youtube.com/watch?v=y8pDLIGDx_Ul)
+[all](https://www.youtube.com/@lidangzzz/search?query=ai%20agent)
+
+
