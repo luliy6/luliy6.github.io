@@ -20,21 +20,21 @@
 5. [CrashCourse](https://www.youtube.com/)
 如果您想了解任何概念，无论是心理学、地理还是科学……这个频道拥有让您变得更聪明的一切。
 
-# 设计网站
+`# 设计网站
 
 四个网站完整官网链接
 
-1. reactbits（React动效组件库）
-https://www.reactbits.dev/
+1. [reactbits（React动效组件库）](https://www.reactbits.dev/)
 大量可直接复用的React动画UI组件，前端页面动效参考首选。
-2. motionsites（AI网页设计提示词）
-https://motionsites.ai/
+
+2. [motionsites（AI网页设计提示词）](https://motionsites.ai/)
+
 海量高端落地页参考+现成AI生成prompt，一键复刻网页版式。
-3. designprompt（UI风格提示词库）
-https://www.designprompts.dev/
+3. [designprompt（UI风格提示词库）](https://www.designprompts.dev/)
+
 各类网页设计风格关键词，做AI生成页面、定设计调性参考。
-4. aurabuild（AI一键生成网页代码）
-https://www.aura.build/
+4. [aurabuild（AI一键生成网页代码）](https://www.aura.build/)
+
 AI输入描述自动生成HTML/CSS页面，快速扒参考页面源码。
 找网页参考额外补充站点
 
@@ -42,4 +42,4 @@ AI输入描述自动生成HTML/CSS页面，快速扒参考页面源码。
 
 • Awwwards：awwwards.com（高分精品官网收录）
 
-• Landbook：landbook.design（落地页合集）
+• Landbook：landbook.design（落地页合集`）
