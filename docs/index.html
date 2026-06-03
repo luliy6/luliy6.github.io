@@ -266,6 +266,6 @@ document.getElementById("tags").setAttribute("d",value=IconList["tags"]);
 
 document.getElementById("Music").setAttribute("d",value=IconList["music"]);document.getElementById("gallery").setAttribute("d",value=IconList["gallery"]);document.getElementById("prompt").setAttribute("d",value=IconList["prompt"]);document.getElementById("book").setAttribute("d",value=IconList["book"]);document.getElementById("about").setAttribute("d",value=IconList["about"]);
 </script>
-<script>document.addEventListener('DOMContentLoaded',function(){if(window._luliyInitIndex)window._luliyInitIndex();});</script>
+<script>function luliyWaitIndex(){if(window._luliyInitIndex){window._luliyInitIndex();}else{setTimeout(luliyWaitIndex,50);}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',luliyWaitIndex);}else{luliyWaitIndex();}</script>
 
 </html>
