@@ -4,6 +4,7 @@
 # **VIBE CODING**
 [李厚辰主题讲](http://youtube.com/watch?v=1TqrucFn4qY)
 
+# 学习网站
 1. [Bro code](https://www.youtube.com/)
 如果您想学习编程，这个频道适合您。只需一个视频，您就可以学习一整套编程语言。它简单、清晰且免费。
 
