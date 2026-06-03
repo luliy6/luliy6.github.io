@@ -566,148 +566,79 @@
     });
   };
 
-  /* ── ⑪ 首页功能（由 indexScript 字段调用 window._luliyInitIndex） ── */
-  window._luliyInitIndex = function () {
-    var m = document.querySelector('.container-lg');
 
-    /* 公告栏 */
-    if (m) {
-      var a = document.createElement('div');
-      a.className = 'announce-bar';
-      a.innerHTML = '📢 欢迎来到 Luliy 的博客！—— 记录点滴，我将无限进步！';
-      m.insertBefore(a, m.firstChild);
+  /* ── ⑪ 首页功能 ── */
+  window._luliyInitIndex = function () {
+    /* 防止重复执行 */
+    if (document.getElementById('site-hero')) return;
+
+    /* 寻找合适的容器 - 优先用 .container-lg，没有就用 body */
+    var container = document.querySelector('.container-lg') || document.body;
+    
+    /* 查找要插入 Hero 的位置：标题后、列表前 */
+    var insertPoint = container.querySelector('.announceBar, .blogTitle, .post-list, .postList, [role="main"]');
+    
+    /* 如果是 body，查找第一个主要内容区域 */
+    if (container === document.body) {
+      insertPoint = document.querySelector('main, [role="main"], .container, .container-lg');
     }
 
-    /* Hero 区 */
+    /* 创建并插入公告栏 */
+    if (!document.querySelector('.announce-bar')) {
+      var announceBar = document.createElement('div');
+      announceBar.className = 'announce-bar';
+      announceBar.innerHTML = '📢 欢迎来到 Luliy 的博客！—— 记录点滴，我将无限进步！';
+      announceBar.style.cssText = 'background:#0969da;color:#fff;text-align:center;padding:12px;border-radius:10px;margin-bottom:25px;font-size:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-weight:bold;letter-spacing:1px;margin:0 0 20px 0;';
+      
+      if (insertPoint) {
+        insertPoint.parentNode.insertBefore(announceBar, insertPoint);
+      } else {
+        container.insertBefore(announceBar, container.firstChild);
+      }
+    }
+
+    /* 创建 Hero 区 */
     var hero = document.createElement('div');
     hero.id = 'site-hero';
+    hero.style.cssText = 'text-align:center;padding:56px 20px 40px;background:linear-gradient(135deg,#0d1b2a 0%,#1a2a4a 40%,#8250df 100%);border-radius:18px;margin-bottom:32px;position:relative;overflow:hidden;color:#fff;';
     hero.innerHTML =
-      '<div style="text-align:center;padding:56px 20px 40px;background:linear-gradient(135deg,#0d1b2a 0%,#1a2a4a 40%,#8250df 100%);border-radius:18px;margin-bottom:32px;position:relative;overflow:hidden">' +
-        '<div style="position:absolute;inset:0;opacity:0.6;background:url(\'data:image/svg+xml,<svg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'60\\\' height=\\\'60\\\'><rect width=\\\'60\\\' height=\\\'60\\\' fill=\\\'none\\\'/><circle cx=\\\'2\\\' cy=\\\'2\\\' r=\\\'1\\\' fill=\\\'rgba(255,255,255,0.15)\\\'/></svg>\') repeat"></div>' +
-        '<h1 style="font-size:3rem;font-weight:900;color:#fff;margin:0 0 12px;letter-spacing:2px;position:relative;text-shadow:0 4px 20px rgba(0,0,0,0.4)">✦ Luliy ✦</h1>' +
-        '<p style="font-size:1.1rem;color:rgba(255,255,255,0.8);margin:0 0 28px;position:relative;letter-spacing:1px">我将无限进步 · 记录点滴 · 持续成长</p>' +
-        '<a href="#post-list" style="display:inline-block;padding:12px 32px;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;border-radius:30px;text-decoration:none;font-size:15px;position:relative;box-shadow:0 4px 20px rgba(240,180,41,0.4);transition:transform 0.2s" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'\'">🚀 开始阅读</a>' +
-      '</div>';
-    if (m) m.insertBefore(hero, m.children[1] || m.firstChild);
+      '<h1 style="font-size:3rem;font-weight:900;color:#fff;margin:0 0 12px;letter-spacing:2px;position:relative;text-shadow:0 4px 20px rgba(0,0,0,0.4)">✦ Luliy ✦</h1>' +
+      '<p style="font-size:1.1rem;color:rgba(255,255,255,0.8);margin:0 0 28px;position:relative;letter-spacing:1px">我将无限进步 · 记录点滴 · 持续成长</p>' +
+      '<a href="#post-list" style="display:inline-block;padding:12px 32px;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;border-radius:30px;text-decoration:none;font-size:15px;position:relative;box-shadow:0 4px 20px rgba(240,180,41,0.4);transition:transform 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🚀 开始阅读</a>';
+
+    /* 插入 Hero 区 */
+    var announceBar = document.querySelector('.announce-bar');
+    var heroInsertPoint = announceBar ? announceBar.nextSibling : (insertPoint || container.firstChild);
+    if (container === document.body) {
+      document.body.insertBefore(hero, heroInsertPoint);
+    } else {
+      container.insertBefore(hero, heroInsertPoint);
+    }
 
     /* 时钟 */
     var heroClock = document.createElement('div');
     heroClock.id = 'hero-clock';
-    heroClock.style.cssText = 'font-size:26px;color:#ff4444;font-weight:bold;font-family:monospace;margin-bottom:18px;letter-spacing:4px;text-shadow:0 2px 8px rgba(255,68,68,0.4)';
+    heroClock.style.cssText = 'font-size:26px;color:#ff4444;font-weight:bold;font-family:monospace;margin-bottom:18px;letter-spacing:4px;text-shadow:0 2px 8px rgba(255,68,68,0.4);position:relative;z-index:2;';
     function updateClock() {
       var now = new Date();
       heroClock.textContent = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
     }
-    updateClock(); setInterval(updateClock, 1000);
-    var heroInner = document.querySelector('#site-hero div');
-    if (heroInner) { var h1el = heroInner.querySelector('h1'); if (h1el) heroInner.insertBefore(heroClock, h1el); }
+    updateClock();
+    setInterval(updateClock, 1000);
+    hero.insertBefore(heroClock, hero.firstChild);
 
     /* 一言 */
-    var hBox = document.createElement('div');
-    hBox.className = 'hitokoto-bar';
-    hBox.textContent = '正在加载今日一言...';
-    var heroEl = document.getElementById('site-hero');
-    if (m && heroEl) m.insertBefore(hBox, heroEl.nextSibling);
+    var hitokotoBar = document.createElement('div');
+    hitokotoBar.className = 'hitokoto-bar';
+    hitokotoBar.textContent = '正在加载今日一言...';
+    hitokotoBar.style.cssText = 'background:linear-gradient(135deg,rgba(130,80,223,0.08),rgba(240,180,41,0.08));border:1px solid rgba(130,80,223,0.2);border-radius:12px;padding:16px 22px;margin:0 0 24px 0;text-align:center;font-size:15px;color:#555;font-style:italic;letter-spacing:0.5px;position:relative;';
+    hero.parentNode.insertBefore(hitokotoBar, hero.nextSibling);
+    
     fetch('https://v1.hitokoto.cn/?c=b&c=d&c=h&c=i&c=k&encode=json')
       .then(function (r) { return r.json(); })
-      .then(function (d) { hBox.textContent = d.hitokoto + (d.from ? '  ——《' + d.from + '》' : ''); })
-      .catch(function () { hBox.textContent = '每一天都是新的进步 🌱'; });
-
-    /* 头像点击 */
-    var av = document.querySelector('.avatar');
-    if (av) { av.style.cursor = 'pointer'; av.onclick = function () { window.location.href = '/about.html'; }; }
-
-    /* 文章列表 */
-    var postList = document.querySelector('.post-list') || document.querySelector('.postList');
-    if (postList) postList.id = 'post-list';
-    var gradients = [
-      'linear-gradient(135deg,#8250df,#f0b429)', 'linear-gradient(135deg,#0969da,#34d399)',
-      'linear-gradient(135deg,#ff6b9d,#ffcd3c)', 'linear-gradient(135deg,#6bceff,#8250df)',
-      'linear-gradient(135deg,#34d399,#0969da)', 'linear-gradient(135deg,#f0b429,#ff6b9d)'
-    ];
-    document.querySelectorAll('.post-item').forEach(function (el, i) {
-      el.style.animationDelay = (i * 0.07) + 's';
-      var d2 = el.querySelector('span.color-fg-muted');
-      if (d2 && !d2.innerHTML.includes('📅')) d2.innerHTML = '📅 ' + d2.innerHTML;
-      var inner = document.createElement('div');
-      inner.className = 'post-item-body';
-      while (el.firstChild) inner.appendChild(el.firstChild);
-      var titleLink = inner.querySelector('a[href]');
-      var thumb = document.createElement('div');
-      thumb.className = 'post-item-thumb-placeholder';
-      thumb.style.cssText = 'width:100%;height:160px;border-radius:10px 10px 0 0;display:block;background:' + gradients[i % gradients.length] + ';position:relative;overflow:hidden';
-      var thumbEmoji = document.createElement('span');
-      thumbEmoji.textContent = ['✨','🚀','📖','💡','🌱','🎯','🔥','💎'][i % 8];
-      thumbEmoji.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;opacity:0.5';
-      thumb.appendChild(thumbEmoji); el.appendChild(thumb); el.appendChild(inner);
-      if (titleLink) {
-        (function (link, thumbEl) {
-          fetch(link.href).then(function (r) { return r.text(); }).then(function (html) {
-            var doc = new DOMParser().parseFromString(html, 'text/html');
-            var img = doc.querySelector('#postBody img');
-            if (img && img.src) {
-              var realImg = document.createElement('img');
-              realImg.src = img.src; realImg.className = 'post-item-thumb';
-              realImg.style.cssText = 'width:100%;height:160px;object-fit:cover;border-radius:10px 10px 0 0;display:block';
-              realImg.onload = function () { thumbEl.replaceWith(realImg); };
-            }
-          }).catch(function () {});
-        })(titleLink, thumb);
-      }
-    });
-
-    /* 副标题打字机 */
-    var el2 = document.querySelector('.blogTitle p') || document.querySelector('p.f4');
-    if (el2) {
-      var txt = el2.textContent; el2.textContent = ''; var idx = 0;
-      (function type() { if (idx < txt.length) { el2.textContent += txt[idx++]; setTimeout(type, 60); } })();
-    }
-
-    /* 樱花 */
-    var canvas2 = document.createElement('canvas');
-    canvas2.id = 'petals-canvas';
-    canvas2.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;display:none';
-    document.body.appendChild(canvas2);
-    var ctx2 = canvas2.getContext('2d');
-    canvas2.width = window.innerWidth; canvas2.height = window.innerHeight;
-    window.addEventListener('resize', function () { canvas2.width = window.innerWidth; canvas2.height = window.innerHeight; });
-    var petals = [];
-    for (var p = 0; p < 38; p++) {
-      petals.push({ x: Math.random() * canvas2.width, y: Math.random() * canvas2.height,
-        r: Math.random() * 7 + 4, speed: Math.random() * 1.2 + 0.4,
-        drift: Math.random() * 0.8 - 0.4, opacity: Math.random() * 0.5 + 0.3,
-        color: Math.random() > 0.5 ? '#ffb7c5' : '#fff' });
-    }
-    var petalRunning = false, petalRAF = null;
-    function animatePetals() {
-      if (!petalRunning) return;
-      ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-      petals.forEach(function (pt) {
-        ctx2.save(); ctx2.globalAlpha = pt.opacity; ctx2.beginPath();
-        ctx2.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2); ctx2.fillStyle = pt.color; ctx2.fill(); ctx2.restore();
-        pt.y += pt.speed; pt.x += pt.drift;
-        if (pt.y > canvas2.height + 10) { pt.y = -10; pt.x = Math.random() * canvas2.width; }
-      });
-      petalRAF = requestAnimationFrame(animatePetals);
-    }
-
-    /* ✨ 特效开关按钮 */
-    var fxBtn = document.createElement('button');
-    fxBtn.textContent = '✨'; fxBtn.title = '开/关樱花特效 | 长按3秒切换音效';
-    fxBtn.style.cssText = 'position:fixed;bottom:24px;left:16px;padding:0;border:none;background:none;font-size:24px;cursor:pointer;z-index:9999;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));transition:transform 0.2s,filter 0.2s';
-    fxBtn.onmouseover = function () { fxBtn.style.transform = 'scale(1.3)'; };
-    fxBtn.onmouseout = function () { fxBtn.style.transform = 'scale(1)'; };
-    document.body.appendChild(fxBtn);
-    fxBtn.onclick = function () {
-      if (petalRunning) {
-        petalRunning = false; if (petalRAF) cancelAnimationFrame(petalRAF);
-        ctx2.clearRect(0, 0, canvas2.width, canvas2.height); canvas2.style.display = 'none';
-        fxBtn.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.3)) grayscale(1)';
-      } else {
-        canvas2.style.display = ''; petalRunning = true; animatePetals();
-        fxBtn.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))';
-      }
-    };
+      .then(function (d) { hitokotoBar.textContent = d.hitokoto + (d.from ? '  ——《' + d.from + '》' : ''); })
+      .catch(function () { hitokotoBar.textContent = '每一天都是新的进步 🌱'; });
+  };
     var pressTimer = null;
     fxBtn.addEventListener('mousedown', function () {
       pressTimer = setTimeout(function () {
@@ -815,6 +746,22 @@
     initUptime();
     initSfxEvents();
     initThemeRipple();
+
+    /* 自动判断页面类型并执行对应初始化 */
+    var path = location.pathname;
+    var isIndex = path === '/' || path === '/index.html' || path === '';
+    var isPost  = !!document.getElementById('postBody');
+    var isArchive = path.includes('archive');
+
+    if (isPost) {
+      /* 文章页 */
+      window._luliyInitPost && window._luliyInitPost();
+    }
+
+    if (isIndex || isArchive || (!isPost && document.querySelector('.post-item, .postList, .post-list'))) {
+      /* 首页 / 归档页 / 任何含文章列表的页面 */
+      window._luliyInitIndex && window._luliyInitIndex();
+    }
   });
 
 })();
