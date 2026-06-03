@@ -5,6 +5,7 @@
 [李厚辰主题讲](http://youtube.com/watch?v=1TqrucFn4qY)
 
 # 学习网站
+```
 1. [Bro code](https://www.youtube.com/)
 如果您想学习编程，这个频道适合您。只需一个视频，您就可以学习一整套编程语言。它简单、清晰且免费。
 
@@ -20,10 +21,10 @@
 5. [CrashCourse](https://www.youtube.com/)
 如果您想了解任何概念，无论是心理学、地理还是科学……这个频道拥有让您变得更聪明的一切。
 
-`# 设计网站
+```
+# 设计网站
 
-四个网站完整官网链接
-
+```
 1. [reactbits（React动效组件库）](https://www.reactbits.dev/)
 大量可直接复用的React动画UI组件，前端页面动效参考首选。
 
@@ -42,4 +43,5 @@ AI输入描述自动生成HTML/CSS页面，快速扒参考页面源码。
 
 • Awwwards：awwwards.com（高分精品官网收录）
 
-• Landbook：landbook.design（落地页合集`）
+• Landbook：landbook.design（落地页合集
+```
