@@ -846,14 +846,31 @@
   ───────────────────────────────────────────────────────── */
   root._luliyInitIndex = function () {
     /* 公告栏 */
-    if (!document.querySelector('.announce-bar')) {
-      var bar = document.createElement('div');
-      bar.className = 'announce-bar';
-      bar.innerHTML = '📢 欢迎来到 Luliy 的博客！—— 记录点滴，我将无限进步！';
-      var container = document.querySelector('.container-lg') || document.body;
-      var first = container.querySelector('.post-list, .postList, [role="main"]') || container.firstChild;
-      container.insertBefore(bar, first);
-    }
+   if (!document.querySelector('.欢迎来到Luliy的世界')) {
+
+  const bar = document.createElement('div');
+
+  bar.className = 'announce-bar';
+
+  bar.innerHTML = `
+    <div class="announce-content">
+      <span class="icon">📢</span>
+      <marquee scrollamount="5">
+        欢迎来到 Luliy 的博客！记录成长、AI、编程与思考。
+      </marquee>
+      <span class="close-btn">✖</span>
+    </div>
+  `;
+
+  document
+    .querySelector('.container-lg')
+    ?.prepend(bar);
+
+  bar.querySelector('.close-btn')
+    .addEventListener('click', () => {
+      bar.remove();
+    });
+}
 
     /* 归档时间轴 */
     if (location.pathname.includes('archive')) {
