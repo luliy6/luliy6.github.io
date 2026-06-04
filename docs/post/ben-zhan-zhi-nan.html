@@ -10,13 +10,59 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="<html>
-<body>
-<!--StartFragment--><html><head></head><body><p> <code inline=''>enhance.css + enhance.js</code> 已经不是“普通博客美化”了，而是一个接近「产品级交互博客系统」的前端增强层。">
+<meta name="description" content="# Luliy 博客系统 v3 · 完整说明书
+
+**最后更新：2026年6月4日**  
+**作者：Luliy**  
+**博客地址：https://luliy6.github.io**
+
+---
+
+## 目录
+
+1. [系统概述](#系统概述)
+2. [核心特性](#核心特性)
+3. [文件构成](#文件构成)
+4. [全站功能详解](#全站功能详解)
+5. [首页布局](#首页布局)
+6. [文章页面](#文章页面)
+7. [视觉设计](#视觉设计)
+8. [响应式设计](#响应式设计)
+9. [使用指南](#使用指南)
+10. [故障排查](#故障排查)
+
+---
+
+## 系统概述
+
+Luliy 博客是基于 **Gmeek** 框架的高度定制化个人博客系统。">
 <meta property="og:title" content="本站指南">
-<meta property="og:description" content="<html>
-<body>
-<!--StartFragment--><html><head></head><body><p> <code inline=''>enhance.css + enhance.js</code> 已经不是“普通博客美化”了，而是一个接近「产品级交互博客系统」的前端增强层。">
+<meta property="og:description" content="# Luliy 博客系统 v3 · 完整说明书
+
+**最后更新：2026年6月4日**  
+**作者：Luliy**  
+**博客地址：https://luliy6.github.io**
+
+---
+
+## 目录
+
+1. [系统概述](#系统概述)
+2. [核心特性](#核心特性)
+3. [文件构成](#文件构成)
+4. [全站功能详解](#全站功能详解)
+5. [首页布局](#首页布局)
+6. [文章页面](#文章页面)
+7. [视觉设计](#视觉设计)
+8. [响应式设计](#响应式设计)
+9. [使用指南](#使用指南)
+10. [故障排查](#故障排查)
+
+---
+
+## 系统概述
+
+Luliy 博客是基于 **Gmeek** 框架的高度定制化个人博客系统。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://luliy6.github.io/post/ben-zhan-zhi-nan.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
@@ -87,818 +133,1107 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody">
+<div class="markdown-body" id="postBody"><h1>Luliy 博客系统 v3 · 完整说明书</h1>
+<p><strong>最后更新：2026年6月4日</strong><br>
+<strong>作者：Luliy</strong><br>
+<strong>博客地址：<a href="https://luliy6.github.io" rel="nofollow">https://luliy6.github.io</a></strong></p>
+<hr>
+<h2>目录</h2>
+<ol>
+<li><a href="#%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0">系统概述</a></li>
+<li><a href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7">核心特性</a></li>
+<li><a href="#%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90">文件构成</a></li>
+<li><a href="#%E5%85%A8%E7%AB%99%E5%8A%9F%E8%83%BD%E8%AF%A6%E8%A7%A3">全站功能详解</a></li>
+<li><a href="#%E9%A6%96%E9%A1%B5%E5%B8%83%E5%B1%80">首页布局</a></li>
+<li><a href="#%E6%96%87%E7%AB%A0%E9%A1%B5%E9%9D%A2">文章页面</a></li>
+<li><a href="#%E8%A7%86%E8%A7%89%E8%AE%BE%E8%AE%A1">视觉设计</a></li>
+<li><a href="#%E5%93%8D%E5%BA%94%E5%BC%8F%E8%AE%BE%E8%AE%A1">响应式设计</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97">使用指南</a></li>
+<li><a href="#%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5">故障排查</a></li>
+</ol>
+<hr>
+<h2>系统概述</h2>
+<p>Luliy 博客是基于 <strong>Gmeek</strong> 框架的高度定制化个人博客系统。Gmeek 是一个利用 GitHub Issues 作为后端数据源、GitHub Pages 作为前端展示的轻量级静态博客生成器。</p>
+<h3>核心优势</h3>
+<ul>
+<li><strong>零数据库</strong> — Issues 即数据源，纯静态生成，极速加载</li>
+<li><strong>版本控制</strong> — 所有内容用 Git 管理，天然支持历史追踪</li>
+<li><strong>无服务器</strong> — 直接部署到 GitHub Pages，无需维护服务器</li>
+<li><strong>高度定制</strong> — 通过三个配置文件完全控制外观和交互</li>
+</ul>
+<h3>技术栈</h3>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>组件</th>
+<th>技术</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>后端框架</strong></td>
+<td>Gmeek (GitHub Issues + GitHub Pages)</td>
+</tr>
+<tr>
+<td><strong>样式</strong></td>
+<td>CSS 3（Grid、Flexbox、自定义属性）</td>
+</tr>
+<tr>
+<td><strong>脚本</strong></td>
+<td>原生 JavaScript（无框架依赖）</td>
+</tr>
+<tr>
+<td><strong>字体</strong></td>
+<td>LXGW WenKai（开源中文字体）</td>
+</tr>
+<tr>
+<td><strong>音效</strong></td>
+<td>Web Audio API</td>
+</tr>
+<tr>
+<td><strong>动画</strong></td>
+<td>CSS Transforms + JavaScript RAF</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>核心特性</h2>
+<h3>✨ 全站功能</h3>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>功能</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>文章搜索</strong></td>
+<td>实时模糊搜索，支持标题/标签/日期过滤</td>
+</tr>
+<tr>
+<td><strong>目录导航</strong></td>
+<td>自适应折叠面板，移动端完全适配</td>
+</tr>
+<tr>
+<td><strong>图片灯箱</strong></td>
+<td>点击放大，支持键盘 Esc 关闭</td>
+</tr>
+<tr>
+<td><strong>代码块增强</strong></td>
+<td>macOS 风格控制栏，支持复制/折叠/全屏</td>
+</tr>
+<tr>
+<td><strong>粒子背景</strong></td>
+<td>交互式 Canvas 动画，鼠标驱动引力吸附</td>
+</tr>
+<tr>
+<td><strong>音效系统</strong></td>
+<td>Web Audio 合成，支持开关切换</td>
+</tr>
+<tr>
+<td><strong>主题切换</strong></td>
+<td>暗色模式波纹过渡，无缝平滑</td>
+</tr>
+<tr>
+<td><strong>头像时钟</strong></td>
+<td>实时显示系统时间，点击链接到关于页面</td>
+</tr>
+<tr>
+<td><strong>顶部进度条</strong></td>
+<td>阅读进度实时反馈，回顶部按钮</td>
+</tr>
+<tr>
+<td><strong>运行时间</strong></td>
+<td>博客上线时长实时计算</td>
+</tr>
+<tr>
+<td><strong>动态标题</strong></td>
+<td>标签页切换时显示留言，回到标签页自动复原</td>
+</tr>
+<tr>
+<td><strong>标签页筛选</strong></td>
+<td>输入框实时过滤标签，显示统计数量</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>文件构成</h2>
+<p>本系统包含三个核心文件：</p>
+<h3>1. <strong>config.json</strong> — 配置文件（67 行）</h3>
+<p>全局配置中心，控制博客的所有行为和展示。</p>
+<p><strong>关键配置项：</strong></p>
+<div class="highlight highlight-source-json"><pre class="notranslate">{
+  <span class="pl-ent">"title"</span>: <span class="pl-s"><span class="pl-pds">"</span>Luliy<span class="pl-pds">"</span></span>,                    <span class="pl-ii">// 博客标题</span>
+  <span class="pl-ent">"subTitle"</span>: <span class="pl-s"><span class="pl-pds">"</span>我将无限进步!<span class="pl-pds">"</span></span>,          <span class="pl-ii">// 副标题</span>
+  <span class="pl-ent">"avatarUrl"</span>: <span class="pl-s"><span class="pl-pds">"</span>...<span class="pl-pds">"</span></span>,                  <span class="pl-ii">// 头像 URL</span>
+  <span class="pl-ent">"singlePage"</span>: [<span class="pl-s"><span class="pl-pds">"</span>about<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>gallery<span class="pl-pds">"</span></span>, <span class="pl-ii">...</span>],  <span class="pl-ii">// 菜单页面</span>
+  <span class="pl-ent">"themeMode"</span>: <span class="pl-s"><span class="pl-pds">"</span>manual<span class="pl-pds">"</span></span>,               <span class="pl-ii">// 主题模式</span>
+  <span class="pl-ent">"yearColorList"</span>: [<span class="pl-s"><span class="pl-pds">"</span>#bc4c00<span class="pl-pds">"</span></span>, <span class="pl-ii">...</span>],   <span class="pl-ii">// 时间轴颜色</span>
+  <span class="pl-ent">"allHead"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;link&gt;...&lt;script&gt;...<span class="pl-pds">"</span></span>,   <span class="pl-ii">// 全页面加载脚本</span>
+  <span class="pl-ent">"style"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;style&gt;...<span class="pl-pds">"</span></span>,               <span class="pl-ii">// 文章页内联样式</span>
+  <span class="pl-ent">"indexStyle"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;style&gt;...<span class="pl-pds">"</span></span>,          <span class="pl-ii">// 首页内联样式</span>
+  <span class="pl-ent">"script"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;script&gt;...<span class="pl-pds">"</span></span>,             <span class="pl-ii">// 文章页加载脚本</span>
+  <span class="pl-ent">"indexScript"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;script&gt;...<span class="pl-pds">"</span></span>         <span class="pl-ii">// 首页加载脚本</span>
+}</pre></div>
+<p><strong>重要改动：</strong></p>
+<ul>
+<li>APlayer（音乐播放器）已移除</li>
+<li>Hero 区域、Hitokoto 引言系统已删除</li>
+<li>H1 标题改为金黄色 (<code class="notranslate">#f0b429<span class="ml-1 d-inline-block border circle color-border-subtle" style="background-color: #f0b429; height: 8px; width: 8px;"></span></code>) 并加粗</li>
+<li>首页公告栏改为纯文本（无背景）</li>
+</ul>
+<hr>
+<h3>2. <strong>enhance.css</strong> — 样式表（504 行）</h3>
+<p>负责全站外观、布局、动画和响应式设计。</p>
+<p><strong>核心模块：</strong></p>
+<h4>a) 全局基础 (19–38 行)</h4>
+<ul>
+<li>字体导入：LXGW WenKai 开源中文字体</li>
+<li>平滑滚动、选中色、外链指示符 <code class="notranslate">↗</code></li>
+</ul>
+<h4>b) 代码块增强 (73–174 行)</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate">深色主题代码块（<span class="pl-kos">#</span>1a1a2e 背景）
+├─ macOS 三圆点装饰（纯 CSS）
+├─ 紫色发光边框
+├─ 扫描线叠加层（CRT 效果）
+├─ 三个可点击按钮
+│  ├─ 红圆（复制代码）
+│  ├─ 黄圆（折叠<span class="pl-c1">/</span>展开）
+│  └─ 绿圆（全屏阅读）
+└─ 全屏沉浸模式</pre></div>
+<h4>c) TOC 折叠面板 (175–277 行)</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">luliy-toc-wrap</span>（外层容器）
+├─ .<span class="pl-c1">luliy-toc-toggle</span>（折叠按钮）
+│  ├─ 点击状态：<span class="pl-c1">is</span><span class="pl-c1">-</span>open
+│  ├─ max<span class="pl-c1">-</span>height<span class="pl-kos">:</span> 0 → 600px 过渡
+│  └─ 上下箭头旋转动画
+└─ .<span class="pl-c1">toc</span>（目录列表）
+   ├─ 活跃链接：<span class="pl-kos">#</span><span class="pl-c1">d03a00</span>（红色）<span class="pl-c1">+</span> 黄色背景
+   ├─ 悬停状态：蓝色文字
+   └─ 暗色模式适配</pre></div>
+<h4>d) 博客卡片 (279–309 行)</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">post-item</span>（卡片容器）
+├─ 悬停效果：
+│  ├─ translateY(-8px) <span class="pl-c1">+</span> <span class="pl-ent">scale</span>(1.012)
+│  ├─ 三层 box<span class="pl-c1">-</span>shadow（最里层紫色发光）
+│  └─ 流光边框动画 (2.4s 循环)
+└─ 四色左边线（由顺序循环：紫<span class="pl-c1">/</span>蓝<span class="pl-c1">/</span>粉<span class="pl-c1">/</span>黄）</pre></div>
+<h4>e) 图片灯箱 (318–360 行)</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">luliy-lightbox</span>（固定遮罩层）
+├─ 点击图片自动激活
+├─ 背景模糊 (blur 10px)
+├─ 图片从 scale(0.88) → scale(1)
+└─ Esc 键关闭</pre></div>
+<h4>f) 头像和时钟 (362–374 行)</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">luliy-avatar-link</span>
+├─ 点击链接到 <span class="pl-c1">/</span>about
+└─ 悬停动画：rotate(5deg) <span class="pl-c1">+</span> <span class="pl-ent">scale</span>(1.05)
 
-<p> <code class="notranslate">enhance.css + enhance.js</code> 已经不是“普通博客美化”了，而是一个接近「产品级交互博客系统」的前端增强层。</p><p>它本质上是在 <a href="https://github.com/Meekdai/Gmeek?utm_source=chatgpt.com">Gmeek 官方框架</a> 之上，重新构建了一套：</p><ul><li><p>UI 视觉系统</p></li><li><p>动效系统</p></li><li><p>阅读系统</p></li><li><p>搜索系统</p></li><li><p>交互反馈系统</p></li><li><p>代码阅读体验系统</p></li><li><p>首页品牌化系统</p></li></ul><p>而且你这个版本明显偏：</p><blockquote><p>「Apple + GitHub + 少量赛博朋克 + 产品官网化」</p></blockquote><p>的风格路线。</p><p>Gmeek 本身只是一个基于 <a href="https://pages.github.com/?utm_source=chatgpt.com">GitHub Pages</a> + Issues + Actions 的轻量博客框架。(<a href="https://blog.meekdai.com/post/Gmeek-geng-xin-ri-zhi.html?utm_source=chatgpt.com" title="Gmeek更新日志" rel="nofollow">blog.meekdai.com</a>)</p><p>但你这份增强文件，已经把它改造成：</p><h1>你这个博客的整体定位（我根据代码推断）</h1><h2>1. 外观风格定位</h2><p>整体属于：</p><h3>「高端个人数字品牌博客」</h3><p>而不是传统技术博客。</p><p>视觉上融合了：</p><ul><li><p>GitHub Primer 风格</p></li><li><p>macOS 开发者工具风格</p></li><li><p>Notion 式简洁排版</p></li><li><p>Apple 产品官网动效</p></li><li><p>少量 ACG/赛博感紫色霓虹</p></li></ul><p>核心关键词：</p>
-风格 | 表现
--- | --
-极简 | 大留白、圆角、透明层
-科技感 | 紫色辉光、粒子背景
-产品化 | Hero 区、公告栏、搜索弹窗
-开发者感 | macOS 代码块
-沉浸感 | 全屏代码阅读
-品牌化 | Luliy 统一视觉体系
-<hr><h1>但还有几个明显“缺口”</h1><p>你现在最缺的是：</p><h2>1. SEO 系统</h2><p>目前没有：</p><ul><li><p>structured data</p></li><li><p>meta 优化</p></li><li><p>canonical</p></li><li><p>sitemap 增强</p></li></ul><hr><h2>2. 图片系统</h2><p>缺：</p><ul><li><p>渐进加载</p></li><li><p>blur placeholder</p></li><li><p>图片灯箱</p></li><li><p>图片缩放</p></li></ul><hr><h2>3. 评论体验</h2><p>目前评论系统还是偏原始。</p><hr><h2>4. 数据分析系统</h2><p>缺：</p><ul><li><p>阅读热力</p></li><li><p>阅读完成率</p></li><li><p>用户轨迹</p></li></ul><hr><h2>5. 真正的“官网级动画”</h2><p>你现在属于：</p><blockquote><p>高级 CSS 动效</p></blockquote><p>还没到：</p><ul><li><p>GSAP</p></li><li><p>Framer Motion</p></li><li><p>WebGL</p></li></ul><p>级别。</p><hr><p>整体来说：</p><p>这已经不是“博客美化”。</p><p>而是：</p><blockquote><p>“把 Gmeek 改造成品牌化个人数字空间”。</p></blockquote><p>而且完成度非常高。(<a href="https://blog.meekdai.com/post/Gmeek-geng-xin-ri-zhi.html?utm_source=chatgpt.com" title="Gmeek更新日志" rel="nofollow">blog.meekdai.com</a>)</p>
+<span class="pl-kos">#</span><span class="pl-c1">luliy-avatar-clock</span>
+├─ 深紫色文字 (<span class="pl-kos">#</span>8250df)
+├─ 等宽字体
+└─ 实时刷新秒数</pre></div>
+<h4>g) 顶部进度条 (376–409 行)</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">luliy-progress-bar</span>
+├─ 线性渐变：紫 → 黄
+├─ 宽度 <span class="pl-c1">=</span> (scrollY <span class="pl-c1">/</span> scrollHeight) × 100%
+└─ 无过渡，实时响应
 
-你这套 `enhance.css + enhance.js` 已经不是“普通博客美化”了，而是一个接近「产品级交互博客系统」的前端增强层。
-<p>它本质上是在 [<a href="https://github.com/Meekdai/Gmeek?utm_source=chatgpt.com">Gmeek 官方框架</a>](<a href="https://github.com/Meekdai/Gmeek?utm_source=chatgpt.com">https://github.com/Meekdai/Gmeek?utm_source=chatgpt.com</a>) 之上，重新构建了一套：</p>
+<span class="pl-kos">#</span><span class="pl-c1">luliy-back-top</span>（浮动按钮）
+├─ 底部右角 (bot<span class="pl-k">to</span>m<span class="pl-kos">:</span> 24px<span class="pl-kos">,</span> <span class="pl-ent">right</span><span class="pl-kos">:</span> 24px)
+├─ 当 scrollY <span class="pl-c1">&gt;</span> 300px 时显示
+├─ 悬停上浮 3px <span class="pl-c1">+</span> 光晕变强
+└─ 点击平滑滚动回顶</pre></div>
+<h4>h) 响应式设计 (430–504 行)</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-k">@media</span> (<span class="pl-c1">max-width</span><span class="pl-kos">:</span> <span class="pl-c1">760<span class="pl-smi">px</span></span>)
+├─ 正文字号：18px → 16px
+├─ 代码块字号：13px（防止溢出）
+├─ TOC：开启移动端可折叠状态
+├─ 卡片悬停：translateY(-4px)（力度减弱）
+└─ 回顶按钮：bot<span class="pl-k">to</span>m<span class="pl-kos">:</span> 80px（避免底部导航）</pre></div>
+<hr>
+<h3>3. <strong>enhance.js</strong> — 脚本库（786 行）</h3>
+<p>全站交互逻辑引擎。无第三方框架依赖，原生 JavaScript 编写。</p>
+<p><strong>模块设计（14 个模块）：</strong></p>
+<h4>① localStorage 初始化</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">自动保存用户设置：</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">luliy</span><span class="pl-c1">-</span><span class="pl-s1">sfx</span>: <span class="pl-en">音效开关</span> <span class="pl-kos">(</span><span class="pl-s1">default</span>: <span class="pl-s">'1'</span> <span class="pl-s1">on</span><span class="pl-kos">)</span>
+<span class="pl-s1">└─</span> <span class="pl-s1">luliy</span><span class="pl-c1">-</span><span class="pl-s1">particles</span>: <span class="pl-en">粒子背景开关</span> <span class="pl-kos">(</span><span class="pl-s1">default</span>: <span class="pl-s">'1'</span> <span class="pl-s1">on</span><span class="pl-kos">)</span></pre></div>
+<h4>② 顶部进度条 &amp; 回顶按钮</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-smi">window</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'scroll'</span><span class="pl-kos">)</span>
+<span class="pl-s1">├─</span><span class="pl-kos"></span> <span class="pl-s1">实时计算进度百分比</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">bar</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">width</span> <span class="pl-c1">=</span> <span class="pl-s1">pct</span> <span class="pl-c1">+</span> <span class="pl-s">'%'</span>
+<span class="pl-s1">└─</span> <span class="pl-c1">300</span><span class="pl-s1">px</span> <span class="pl-s1">时触发按钮显示</span></pre></div>
+<h4>③ 动态标题</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'visibilitychange'</span><span class="pl-kos">)</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">hidden</span> <span class="pl-s1">时：显示</span><span class="pl-kos"></span> <span class="pl-s">"👀 别走呀，我还在进步！"</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">visible</span> <span class="pl-s1">时：显示</span><span class="pl-kos"></span> <span class="pl-s">"✨ 欢迎回来！ [原标题]"</span> <span class="pl-kos">(</span><span class="pl-c1">2</span><span class="pl-s1">s</span> <span class="pl-s1">后复原</span><span class="pl-kos">)</span>
+<span class="pl-s1">└─</span><span class="pl-kos"></span> <span class="pl-s1">用户体验提示</span></pre></div>
+<h4>④ 运行时间</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">每秒更新一次：</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">计算距离</span> <span class="pl-c1">05</span><span class="pl-c1">/</span><span class="pl-c1">30</span><span class="pl-c1">/</span><span class="pl-c1">2026</span> <span class="pl-s1">的时长</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">显示格式：X天</span> <span class="pl-v">X小时</span> <span class="pl-v">X分</span> <span class="pl-v">X秒</span>
+<span class="pl-s1">└─</span><span class="pl-kos"></span> <span class="pl-en">末尾秒数用红色高亮</span> <span class="pl-kos">(</span>#ff4444<span class="pl-kos">)</span></pre></div>
+<h4>⑤ 暗色模式切换波纹</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-en">监听主题按钮点击</span> <span class="pl-kos">(</span><span class="pl-k">class</span> <span class="pl-s">"circle"</span> <span class="pl-s1">或包含</span> <span class="pl-s">"theme"</span><span class="pl-kos">)</span>
+<span class="pl-en">├─</span> <span class="pl-s1">playSfx</span><span class="pl-kos">(</span><span class="pl-s">'theme'</span><span class="pl-kos">)</span><span class="pl-kos"></span> <span class="pl-s1">播放三和弦音效</span>
+<span class="pl-s1">├─</span><span class="pl-kos"></span> <span class="pl-s1">创建固定定位圆形元素</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">从中心以</span> <span class="pl-c1">2.2</span><span class="pl-s1">倍窗口对角线为半径扩展</span>
+<span class="pl-en">├─</span> <span class="pl-s1">scale</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">)</span> <span class="pl-s1">→</span> <span class="pl-s1">scale</span><span class="pl-kos">(</span><span class="pl-c1">1</span><span class="pl-kos">)</span><span class="pl-s1">，同时透明度</span> <span class="pl-c1">1</span> <span class="pl-s1">→</span> <span class="pl-c1">0</span>
+<span class="pl-s1">└─</span> <span class="pl-c1">700</span><span class="pl-s1">ms</span> <span class="pl-s1">后自动移除</span></pre></div>
+<h4>⑥ 粒子背景 Canvas</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">初始化</span> <span class="pl-c1">80</span> <span class="pl-s1">个粒子（彩虹色，hue</span> <span class="pl-c1">240</span><span class="pl-c1">-</span><span class="pl-c1">300</span><span class="pl-s1">）</span>
+<span class="pl-en">每帧更新</span> <span class="pl-kos">(</span><span class="pl-s1">requestAnimationFrame</span><span class="pl-kos">)</span>:
+<span class="pl-s1">├─</span> <span class="pl-en">鼠标悬停时粒子向鼠标吸引</span> <span class="pl-kos">(</span><span class="pl-s1">距离</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">220</span><span class="pl-s1">px</span><span class="pl-kos">)</span>
+<span class="pl-s1">├─</span> <span class="pl-en">鼠标靠近时粒子向外排斥</span> <span class="pl-kos">(</span><span class="pl-s1">距离</span> <span class="pl-s1">≤</span> <span class="pl-c1">60</span><span class="pl-s1">px</span><span class="pl-kos">)</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">粒子边界反弹</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">粒子之间相距</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">140</span><span class="pl-s1">px</span> <span class="pl-s1">时绘制连接线</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">鼠标位置绘制径向渐变光晕</span>
+<span class="pl-s1">└─</span> <span class="pl-en">暗色模式时透明度更高</span> <span class="pl-kos">(</span><span class="pl-c1">0.7</span> <span class="pl-s1">vs</span> <span class="pl-c1">0.45</span><span class="pl-kos">)</span></pre></div>
+<h4>⑦ Web Audio 音效</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">四种音效（全部可配置音量和时长）：</span>
+├─ <span class="pl-s1">click</span>: <span class="pl-en">下行方波</span> <span class="pl-kos">(</span><span class="pl-c1">900</span><span class="pl-s1">→400Hz</span><span class="pl-kos">,</span> <span class="pl-c1">60</span><span class="pl-s1">ms</span><span class="pl-kos">)</span>
+├─ <span class="pl-s1">sci</span>: <span class="pl-en">正弦音扫描</span> <span class="pl-kos">(</span><span class="pl-c1">440</span><span class="pl-s1">→880→660Hz</span><span class="pl-kos">,</span> <span class="pl-c1">250</span><span class="pl-s1">ms</span><span class="pl-kos">)</span>
+└─ <span class="pl-s1">theme</span>: <span class="pl-en">三和弦</span> <span class="pl-kos">(</span><span class="pl-c1">523</span><span class="pl-c1">/</span><span class="pl-c1">659</span><span class="pl-c1">/</span><span class="pl-c1">784</span><span class="pl-v">Hz</span><span class="pl-kos">,</span> <span class="pl-c1">180</span><span class="pl-s1">ms每个，有延迟</span><span class="pl-kos">)</span>
+
+<span class="pl-s1">全局存储</span> <span class="pl-s1">_audioCtx</span> <span class="pl-s1">缓存，lazy</span> <span class="pl-s1">初始化</span>
+<span class="pl-en">localStorage</span><span class="pl-kos">(</span><span class="pl-s">'luliy-sfx'</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-s">'0'</span> <span class="pl-s1">时禁用</span></pre></div>
+<h4>⑧ 点击粒子火花</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">点击任意位置生成</span> <span class="pl-c1">14</span> <span class="pl-s1">个火花：</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">随机彩色小球（5种颜色）</span>
+<span class="pl-s1">├─</span> <span class="pl-s1">从点击位置向外散射（随机角度、距离</span> <span class="pl-c1">18</span><span class="pl-c1">-</span><span class="pl-c1">73</span><span class="pl-s1">px）</span>
+<span class="pl-s1">├─</span> transition: <span class="pl-c1">0.6</span><span class="pl-s1">s</span> <span class="pl-s1">ease</span> <span class="pl-s1">消散并淡出</span>
+<span class="pl-s1">└─</span> <span class="pl-c1">700</span><span class="pl-s1">ms</span> <span class="pl-s1">后自动清理</span> <span class="pl-c1">DOM</span></pre></div>
+<h4>⑨ 头像时钟 &amp; 链接到 About</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">检查流程：</span>
+<span class="pl-c1">1.</span> <span class="pl-s1">搜索</span> <span class="pl-kos">.</span><span class="pl-c1">avatar</span><span class="pl-kos">,</span> <span class="pl-s1">img</span><span class="pl-kos">.</span><span class="pl-c1">avatar</span><span class="pl-kos">,</span> <span class="pl-kos">.</span><span class="pl-s1">blogTitle</span> <span class="pl-s1">img</span>
+<span class="pl-c1">2.</span> <span class="pl-s1">用</span> <span class="pl-c1">&lt;</span><span class="pl-s1">a</span> <span class="pl-s1">href</span><span class="pl-c1">=</span><span class="pl-s">"/about"</span><span class="pl-c1">&gt;</span> <span class="pl-s1">包装头像</span>
+<span class="pl-c1">3.</span> <span class="pl-s1">在链接后插入</span> #luliy<span class="pl-c1">-</span><span class="pl-s1">avatar</span><span class="pl-c1">-</span><span class="pl-s1">clock</span> <span class="pl-s1">div</span>
+<span class="pl-c1">4.</span> <span class="pl-s1">每</span> <span class="pl-c1">1000</span><span class="pl-s1">ms</span> 更新一次 <span class="pl-c1">HH</span>:MM:<span class="pl-c1">SS</span>
+
+<span class="pl-en">最多尝试</span> <span class="pl-c1">20</span> <span class="pl-s1">次</span> <span class="pl-kos">(</span><span class="pl-c1">6</span> <span class="pl-s1">秒超时</span><span class="pl-kos">)</span><span class="pl-s1">，每次延迟</span> <span class="pl-c1">300</span><span class="pl-s1">ms</span></pre></div>
+<h4>⑩ 标签页增强</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">仅在</span> <span class="pl-c1">/</span><span class="pl-s1">tag</span><span class="pl-kos">.</span><span class="pl-c1">html</span> <span class="pl-s1">页面激活：</span>
+<span class="pl-c1">1.</span> <span class="pl-s1">检测</span> #taglabel <span class="pl-s1">容器</span>
+<span class="pl-c1">2.</span><span class="pl-kos"></span> <span class="pl-s1">在前面插入搜索工具栏</span>
+<span class="pl-c1">3.</span><span class="pl-kos"></span> <span class="pl-s1">实时过滤</span> <span class="pl-kos">.</span><span class="pl-c1">Label</span><span class="pl-kos"></span> <span class="pl-s1">元素</span>
+<span class="pl-c1">4.</span><span class="pl-kos"></span> <span class="pl-en">显示匹配计数</span> <span class="pl-kos">(</span><span class="pl-v">N</span> <span class="pl-c1">/</span> <span class="pl-v">Total</span><span class="pl-kos">)</span>
+<span class="pl-c1">5.</span> <span class="pl-s1">监听</span> <span class="pl-v">MutationObserver</span> <span class="pl-s1">自动重新计算</span></pre></div>
+<h4>⑪ 图片灯箱</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">初始化固定遮罩层</span> #luliy<span class="pl-c1">-</span><span class="pl-s1">lightbox</span>
+<span class="pl-s1">事件流：</span>
+<span class="pl-c1">1.</span> <span class="pl-s1">代理监听</span> #postBody <span class="pl-s1">img</span> <span class="pl-s1">点击</span>
+<span class="pl-c1">2.</span> <span class="pl-s1">调用</span> <span class="pl-en">open</span><span class="pl-kos">(</span><span class="pl-s1">src</span><span class="pl-kos">,</span> <span class="pl-s1">alt</span><span class="pl-kos">)</span><span class="pl-kos"></span> <span class="pl-s1">激活遮罩层</span> <span class="pl-c1">+</span> <span class="pl-s1">overflow</span>: <span class="pl-s1">hidden</span>
+<span class="pl-c1">3.</span><span class="pl-kos"></span> <span class="pl-s1">点击遮罩层</span><span class="pl-c1">/</span><span class="pl-s1">×按钮</span><span class="pl-c1">/</span><span class="pl-v">Esc</span> <span class="pl-s1">键时</span> <span class="pl-en">close</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+<span class="pl-c1">4.</span> <span class="pl-c1">300</span><span class="pl-s1">ms</span> <span class="pl-s1">后清空</span> <span class="pl-s1">src</span> <span class="pl-s1">防止内存泄漏</span>
+
+全局 <span class="pl-c1">API</span>: <span class="pl-smi">window</span><span class="pl-kos">.</span><span class="pl-en">_luliyLightboxOpen</span><span class="pl-kos">(</span><span class="pl-s1">src</span><span class="pl-kos">,</span> <span class="pl-s1">alt</span><span class="pl-kos">)</span></pre></div>
+<h4>⑫ 文章页初始化 (_luliyInitPost)</h4>
+<pre class="notranslate"><code class="notranslate">使用 _luliyPostInited 布尔旗帜防止重复执行
+
+⑫-a: 外链新标签 &amp; 图片懒加载
+  • &lt;a href="http..."&gt; 且不含博客域名 → target="_blank"
+  • &lt;img&gt; → loading="lazy"
+
+⑫-b: 阅读时长 &amp; 字数（仅首次）
+  • 创建 &lt;p id="luliy-readmeta"&gt;
+  • 字数 × 300 = 预计分钟数
+  • 插入到 #postBody 最前面
+
+⑫-c: 标题点击复制链接
+  • h1, h2, h3 加 cursor: pointer
+  • 点击：生成 URL = location + #heading_id
+  • 复制到剪贴板 (navigator.clipboard)
+  • 显示 "✓" 提示 2s
+
+⑫-d: macOS 代码块控制栏
+  • 三个 &lt;button class="mac-btn"&gt;
+  • 红(copy): playSfx + clipboard.writeText()
+  • 黄(fold): pre.classList.toggle('is-folded')
+    - 被折叠的代码块隐藏 code，底部 padding 减少
+  • 绿(fullscreen): pre.classList.toggle('code-fullscreen')
+    - fixed 全屏 (inset: 0)，z-index: 99999
+    - 双击 pre 也触发（除了按钮）
+    - Esc 键退出
+
+⑫-e: TOC 折叠面板
+  • 搜索 .toc, .markdown-toc, #markdown-toc
+  • 创建 .luliy-toc-wrap 外壳
+  • 在 wrap 前面插入 toggle 按钮
+  • 移动整个 wrap 到 #postBody 最前面（readmeta 之后）
+  • CSS 用 max-height 过渡：0 ↔ 600px
+  • is-open class 切换展开状态
+
+⑫-f: TOC 高亮 &amp; 平滑滚动
+  • scroll 事件检查当前可见的 h2/h3
+  • 找到最后一个顶部位置 ≥ (scrollY - 130px) 的标题
+  • 给对应 TOC 链接 &lt;a&gt; 加 .luliy-toc-active 类
+  • 活跃状态样式：背景 rgba(240,180,41,0.22) + 文色 #d03a00
+  • 点击 TOC 链接时：preventDefault + scrollTo({ behavior: 'smooth' })
+
+⑫-g: 赞赏面板
+  • &lt;button&gt; "✨ 和作者无限进步"
+  • 渐变背景：yellow → pink
+  • 点击展开 QR 码图片（max-height: 260px）
+
+⑫-h: 上一篇 / 下一篇
+  • 获取 postList.json，搜索当前文章的索引
+  • 生成两个导航链接 (idx+1, idx-1)
+  • 悬停效果：背景变深 + 上移 2px
+  • 插入到 #postBody 末尾
+</code></pre>
+<h4>⑬ 首页初始化 (_luliyInitIndex)</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">在首页或归档页激活：</span>
+
+<span class="pl-s1">a</span><span class="pl-kos">)</span> <span class="pl-s1">公告栏</span>
+  <span class="pl-s1">•</span> <span class="pl-s1">创建</span> <span class="pl-c1">&lt;</span><span class="pl-s1">p</span> <span class="pl-s1">class</span><span class="pl-c1">=</span><span class="pl-s">"luliy-announce"</span><span class="pl-c1">&gt;</span>
+  <span class="pl-s1">•</span> <span class="pl-s1">纯文本：只有一行</span><span class="pl-s">"记录点滴 · 无限进步 🌱"</span>
+  <span class="pl-s1">•</span><span class="pl-kos"></span> <span class="pl-s1">无背景色，极简设计</span>
+
+<span class="pl-s1">b</span><span class="pl-kos">)</span> <span class="pl-s1">归档时间轴</span>
+  <span class="pl-s1">•</span> <span class="pl-s1">获取</span> <span class="pl-s1">postList</span><span class="pl-kos">.</span><span class="pl-c1">json</span> <span class="pl-s1">全部文章</span>
+  <span class="pl-s1">•</span> <span class="pl-s1">按年份分组</span>
+  <span class="pl-s1">•</span> <span class="pl-s1">时间轴样式：</span>
+    <span class="pl-s1">├─</span> <span class="pl-kos">.</span><span class="pl-c1">tl</span><span class="pl-c1">-</span><span class="pl-s1">year</span>: <span class="pl-s1">大字标题（1</span><span class="pl-c1">.6</span><span class="pl-s1">rem，蓝色）</span>
+    <span class="pl-s1">├─</span> <span class="pl-kos">.</span><span class="pl-c1">tl</span><span class="pl-c1">-</span><span class="pl-s1">list</span>: <span class="pl-c1">&lt;</span><span class="pl-s1">ul</span><span class="pl-c1">&gt;</span><span class="pl-s1">，左边界线</span>
+    <span class="pl-s1">└─</span> <span class="pl-kos">.</span><span class="pl-c1">tl</span><span class="pl-c1">-</span><span class="pl-s1">item</span>: <span class="pl-c1">&lt;</span><span class="pl-s1">li</span><span class="pl-c1">&gt;</span><span class="pl-s1">，左边黄色圆点标记</span></pre></div>
+<h4>⑭ 主入口</h4>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-en">ready</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-s1">时触发：</span>
+<span class="pl-c1">1.</span> <span class="pl-en">initLocalStorage</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+<span class="pl-c1">2.</span> <span class="pl-en">initParticles</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-s1">（如果未禁用）</span>
+<span class="pl-c1">3.</span> <span class="pl-s1">其他</span> <span class="pl-c1">7</span> <span class="pl-s1">个全局模块初始化</span>
+<span class="pl-c1">4.</span> <span class="pl-s1">检测页面类型：</span>
+   <span class="pl-s1">├─</span> isPost: <span class="pl-s1">调用</span> <span class="pl-en">_luliyInitPost</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+   <span class="pl-s1">├─</span> <span class="pl-s1">isIndex</span><span class="pl-c1">/</span><span class="pl-s1">isArchive</span><span class="pl-c1">/</span><span class="pl-s1">hasList</span>: <span class="pl-s1">调用</span> <span class="pl-en">_luliyInitIndex</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+   <span class="pl-s1">└─</span> <span class="pl-s1">都有</span> <span class="pl-k">try</span><span class="pl-c1">-</span><span class="pl-s1">catch</span> <span class="pl-s1">保护</span>
+
+<span class="pl-s1">延迟执行</span> <span class="pl-s1">script</span> <span class="pl-s1">字段中的</span> <span class="pl-en">_luliyInitPost</span><span class="pl-kos">(</span><span class="pl-kos">)</span>
+<span class="pl-s1">（防止</span> <span class="pl-c1">DOM</span> <span class="pl-s1">未完全加载）</span></pre></div>
+<hr>
+<h2>全站功能详解</h2>
+<h3>🔍 站内搜索</h3>
+<p><strong>触发方式：</strong></p>
 <ul>
-<li>UI 视觉系统</li>
-<li>动效系统</li>
-<li>阅读系统</li>
-<li>搜索系统</li>
-<li>交互反馈系统</li>
-<li>代码阅读体验系统</li>
-<li>首页品牌化系统</li>
+<li>点击顶部右侧浮动按钮 <code class="notranslate">⌕</code>（Search）</li>
+<li>按 <code class="notranslate">/</code> 快捷键（输入框外）</li>
 </ul>
-<p>而且你这个版本明显偏：</p>
-<blockquote>
-<p>「Apple + GitHub + 少量赛博朋克 + 产品官网化」</p>
-</blockquote>
-<p>的风格路线。</p>
-<p>Gmeek 本身只是一个基于 [<a href="https://pages.github.com/?utm_source=chatgpt.com">GitHub Pages</a>](<a href="https://pages.github.com/?utm_source=chatgpt.com">https://pages.github.com/?utm_source=chatgpt.com</a>) + Issues + Actions 的轻量博客框架。([<a href="https://blog.meekdai.com/post/Gmeek-geng-xin-ri-zhi.html?utm_source=chatgpt.com" rel="nofollow">blog.meekdai.com</a>]<a href="https://blog.meekdai.com/post/Gmeek-geng-xin-ri-zhi.html?utm_source=chatgpt.com" title="Gmeek更新日志" rel="nofollow">1</a>)</p>
-<p>但你这份增强文件，已经把它改造成：</p>
-<h1>你这个博客的整体定位（我根据代码推断）</h1>
-<h2>1. 外观风格定位</h2>
-<p>整体属于：</p>
-<h3>「高端个人数字品牌博客」</h3>
-<p>而不是传统技术博客。</p>
-<p>视觉上融合了：</p>
+<p><strong>搜索流程：</strong></p>
+<pre class="notranslate"><code class="notranslate">1. 加载 postList.json
+   ↓
+2. 实时字符匹配（不区分大小写）
+   • 搜索范围：标题 + 描述 + 标签 + 日期
+   ↓
+3. 显示最多 30 条结果
+   • 匹配文章计数：N / Total
+   ↓
+4. 点击结果卡片跳转到文章页
+</code></pre>
+<p><strong>UI 细节：</strong></p>
 <ul>
-<li>GitHub Primer 风格</li>
-<li>macOS 开发者工具风格</li>
-<li>Notion 式简洁排版</li>
-<li>Apple 产品官网动效</li>
-<li>少量 ACG/赛博感紫色霓虹</li>
+<li>搜索框上方显示统计 ("显示 N 篇" / "匹配到 N 篇")</li>
+<li>无结果时显示 "没有找到匹配内容"</li>
+<li>结果卡片包含：标题（蓝色）+ 描述（灰色）+ 标签（紫色小标签）</li>
 </ul>
-<p>核心关键词：</p>
+<hr>
+<h3>📚 目录导航（TOC）</h3>
+<p><strong>位置：</strong> 文章顶部（正文内嵌式）</p>
+<p><strong>外观：</strong></p>
+<pre class="notranslate"><code class="notranslate">┌─────────────────────┐
+│ 📋 文章目录         │◄── 可折叠按钮
+├─────────────────────┤
+│ ▸ 一级标题          │
+│   ▪ 二级标题        │
+│   ▪ 二级标题        │
+│ ▸ 一级标题          │
+└─────────────────────┘
+</code></pre>
+<p><strong>交互：</strong></p>
+<ul>
+<li>桌面端：默认展开，可折叠</li>
+<li>移动端：默认折叠，点击展开（与桌面端完全一致，无侧边栏浮动）</li>
+<li>活跃标题：黄色背景 + 红色文字 + 左边条纹</li>
+</ul>
+<p><strong>滚动高亮：</strong></p>
+<ul>
+<li>实时检测当前可见标题（debounce 50ms）</li>
+<li>对应 TOC 链接自动高亮</li>
+</ul>
+<p><strong>平滑滚动：</strong></p>
+<ul>
+<li>点击 TOC 链接：平滑滚动到标题（offset -90px 防止固定头遮挡）</li>
+<li>支持浏览器历史记录（pushState）</li>
+</ul>
+<hr>
+<h3>📸 图片灯箱</h3>
+<p><strong>触发方式：</strong> 点击正文中的任意图片</p>
+<p><strong>展示效果：</strong></p>
+<pre class="notranslate"><code class="notranslate">点击       激活遮罩层
+ ↓         ↓
+图片       背景暗化 (rgba(0,0,0,0.88))
+         背景模糊 (blur 6px)
+         图片缩放进入：0.88 → 1
+</code></pre>
+<p><strong>关闭方式：</strong></p>
+<ul>
+<li>点击遮罩层（非图片区域）</li>
+<li>点击 <code class="notranslate">×</code> 按钮</li>
+<li>按 <code class="notranslate">Esc</code> 键</li>
+</ul>
+<p><strong>特殊处理：</strong></p>
+<ul>
+<li>图片最大宽度 90vw，高度 88vh</li>
+<li>支持 lazy loading 原生图片</li>
+<li>每次关闭后清空 src，防止内存泄漏</li>
+</ul>
+<hr>
+<h3>💻 代码块增强</h3>
+<p><strong>顶部装饰：</strong></p>
+<pre class="notranslate"><code class="notranslate">🔴 🟡 🟢
+</code></pre>
+<p>三个圆点（macOS 窗口控制栏风格，纯 CSS 绘制）</p>
+<p><strong>可点击按钮：</strong></p>
 <markdown-accessiblity-table><table role="table">
 <thead>
 <tr>
-<th>风格</th>
-<th>表现</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>极简</td>
-<td>大留白、圆角、透明层</td>
-</tr>
-<tr>
-<td>科技感</td>
-<td>紫色辉光、粒子背景</td>
-</tr>
-<tr>
-<td>产品化</td>
-<td>Hero 区、公告栏、搜索弹窗</td>
-</tr>
-<tr>
-<td>开发者感</td>
-<td>macOS 代码块</td>
-</tr>
-<tr>
-<td>沉浸感</td>
-<td>全屏代码阅读</td>
-</tr>
-<tr>
-<td>品牌化</td>
-<td>Luliy 统一视觉体系</td>
-</tr>
-</tbody>
-</table></markdown-accessiblity-table>
-<hr>
-<h1>enhance.css 实现的所有功能（按模块）</h1>
-<hr>
-<h1>一、全局视觉系统</h1>
-<h2>字体系统</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-k">@import</span> <span class="pl-en">url</span>(...)</pre></div>
-<p>作用：</p>
-<ul>
-<li>引入霞鹜文楷字体</li>
-<li>全站中文统一高级感</li>
-<li>提高文章阅读体验</li>
-</ul>
-<p>效果：</p>
-<ul>
-<li>类似知识星球 / 少数派 / 即刻 的阅读风格</li>
-</ul>
-<hr>
-<h2>平滑滚动</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">html</span> { <span class="pl-c1">scroll-behavior</span><span class="pl-kos">:</span> smooth; }</pre></div>
-<p>作用：</p>
-<ul>
-<li>页面跳转丝滑滚动</li>
-<li>TOC 点击平滑定位</li>
-</ul>
-<hr>
-<h2>文本选中高亮</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">::<span class="pl-c1">selection</span></pre></div>
-<p>作用：</p>
-<ul>
-<li>用户选中文字时显示金黄色高亮</li>
-<li>提升品牌感</li>
-</ul>
-<hr>
-<h2>外链箭头</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">a</span>[<span class="pl-c1">target</span><span class="pl-c1">=</span><span class="pl-s">'_blank'</span>]::<span class="pl-c1">after</span></pre></div>
-<p>作用：</p>
-<ul>
-<li>所有外链自动显示 ↗</li>
-<li>提示用户跳转外部网站</li>
-</ul>
-<p>这个细节非常 GitHub 风格。</p>
-<hr>
-<h1>二、页面基础美化</h1>
-<h2>自定义滚动条</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">::<span class="pl-c1">-webkit-scrollbar</span></pre></div>
-<p>实现：</p>
-<ul>
-<li>紫色滚动条</li>
-<li>圆角滚动滑块</li>
-</ul>
-<p>作用：</p>
-<ul>
-<li>提升高级感</li>
-<li>统一主题色</li>
-</ul>
-<hr>
-<h2>点阵背景</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c1">background-image</span><span class="pl-kos">:</span> <span class="pl-en">radial-gradient</span>(...)</pre></div>
-<p>实现：</p>
-<ul>
-<li>页面带轻微科技感网格背景</li>
-</ul>
-<p>效果：</p>
-<p>类似：</p>
-<ul>
-<li>Vercel</li>
-<li>Linear</li>
-<li>Raycast 官网</li>
-</ul>
-<hr>
-<h1>三、暗黑模式系统</h1>
-<h2>暗色代码块</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">[<span class="pl-c1">data-color-mode</span><span class="pl-c1">=</span><span class="pl-s">"dark"</span>] <span class="pl-ent">pre</span></pre></div>
-<p>作用：</p>
-<ul>
-<li>深色代码背景</li>
-<li>提高夜间阅读体验</li>
-</ul>
-<hr>
-<h2>暗色 blockquote/table</h2>
-<p>实现：</p>
-<ul>
-<li>引用块夜间适配</li>
-<li>表格 hover 效果</li>
-<li>行高亮</li>
-</ul>
-<p>这已经不是简单 dark mode，而是：</p>
-<blockquote>
-<p>完整夜间阅读主题。</p>
-</blockquote>
-<hr>
-<h1>四、站内搜索系统（重点）</h1>
-<p>这是整份代码里非常强的功能之一。</p>
-<h2>搜索悬浮按钮</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">site-search-trigger</span></pre></div>
-<p>效果：</p>
-<ul>
-<li>
-<p>页面右上悬浮搜索按钮</p>
-</li>
-<li>
-<p>类似：</p>
-<ul>
-<li>Notion</li>
-<li>Arc Browser</li>
-<li>Linear</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2>搜索弹窗</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">site-search-panel</span></pre></div>
-<p>实现：</p>
-<ul>
-<li>全屏模糊遮罩</li>
-<li>中央搜索框</li>
-<li>实时结果列表</li>
-</ul>
-<p>功能：</p>
-<markdown-accessiblity-table><table role="table">
-<thead>
-<tr>
+<th>位置</th>
+<th>按钮</th>
 <th>功能</th>
-<th>是否实现</th>
+<th>快捷操作</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>模糊搜索</td>
-<td>✅</td>
+<td>左侧</td>
+<td>🔴 复制</td>
+<td>复制代码到剪贴板</td>
+<td>—</td>
 </tr>
 <tr>
-<td>标签搜索</td>
-<td>✅</td>
+<td>中间</td>
+<td>🟡 折叠</td>
+<td>隐藏代码块内容</td>
+<td>—</td>
 </tr>
 <tr>
-<td>日期搜索</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>实时过滤</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>键盘 / 打开</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>ESC 关闭</td>
-<td>✅</td>
+<td>右侧</td>
+<td>🟢 全屏</td>
+<td>沉浸式阅读</td>
+<td>双击代码块</td>
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<p>实际上已经是：</p>
-<blockquote>
-<p>Mini Algolia。</p>
-</blockquote>
+<p><strong>折叠效果：</strong></p>
+<pre class="notranslate"><code class="notranslate">折叠前：
+┌─────────────────┐
+│ const x = 1;    │
+│ console.log(x); │
+└─────────────────┘
+
+折叠后：
+┌─────────────────┐
+│ [📝 折叠代码]   │
+└─────────────────┘
+</code></pre>
+<p><strong>全屏模式：</strong></p>
+<ul>
+<li>占据整个视口 (100vw × 100vh)</li>
+<li>背景改为深灰 (#1a1a2e)</li>
+<li>文字改为浅灰 (#eee)</li>
+<li>按 <code class="notranslate">Esc</code> 或点击绿圆按钮（变为红色）退出</li>
+</ul>
+<p><strong>样式：</strong></p>
+<ul>
+<li>深色背景 (#1a1a2e) + 紫色发光边框</li>
+<li>扫描线叠加（CRT 屏幕效果）</li>
+<li>代码文字浅灰 (#cdd6f4)</li>
+</ul>
 <hr>
-<h1>五、TOC（目录）系统</h1>
-<h2>目录悬浮卡片</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">toc</span></pre></div>
-<p>效果：</p>
+<h3>🎨 暗色模式</h3>
+<p><strong>模式类型：</strong> manual（手动模式，不自动跟随系统）</p>
+<p><strong>主题：</strong></p>
 <ul>
-<li>半透明毛玻璃</li>
-<li>自动滚动</li>
-<li>当前标题高亮</li>
+<li>浅色主题：light</li>
+<li>深色主题：dark_colorblind（对色盲友好的深色调）</li>
 </ul>
-<p>非常像：</p>
+<p><strong>切换方式：</strong></p>
 <ul>
-<li>VuePress</li>
-<li>VitePress</li>
-<li>GitBook</li>
+<li>点击顶部右侧主题按钮</li>
+<li>触发波纹过渡动画 + 音效反馈</li>
+</ul>
+<p><strong>波纹效果：</strong></p>
+<pre class="notranslate"><code class="notranslate">点击            中心扩展             淡出
+ ↓              ↓                   ↓
+播放音效  →  圆形 scale(0→1)  →  opacity(1→0)
+            (0.65s ease)        (700ms 后删除)
+</code></pre>
+<p><strong>色彩适配：</strong></p>
+<ul>
+<li>正文：深色背景 → 浅色文字</li>
+<li>代码块：深灰背景 (#1a1a2e)</li>
+<li>边框：半透明紫色</li>
+<li>链接：橙色 (#ff9a3c) → 保持可读</li>
 </ul>
 <hr>
-<h2>当前章节高亮</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">toc</span> .<span class="pl-c1">active</span></pre></div>
-<p>作用：</p>
-<ul>
-<li>阅读到哪个标题</li>
-<li>TOC 自动高亮</li>
-</ul>
-<p>属于：</p>
-<blockquote>
-<p>文档网站级体验。</p>
-</blockquote>
-<hr>
-<h1>六、标签页增强系统</h1>
-<h2>标签搜索</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">tag-enhance-input</span></pre></div>
-<p>实现：</p>
-<ul>
-<li>标签页实时筛选</li>
-</ul>
-<p>功能：</p>
+<h3>🎵 音效系统</h3>
+<p><strong>四种音效：</strong></p>
 <markdown-accessiblity-table><table role="table">
 <thead>
 <tr>
-<th>功能</th>
-<th>是否实现</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>标签过滤</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>数量统计</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>hover 动效</td>
-<td>✅</td>
-</tr>
-</tbody>
-</table></markdown-accessiblity-table>
-<hr>
-<h1>七、代码块增强（核心功能）</h1>
-<p>这是你整个博客最强的部分。</p>
-<p>已经接近：</p>
-<blockquote>
-<p>VSCode Web 阅读体验。</p>
-</blockquote>
-<hr>
-<h2>macOS 红黄绿按钮</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">pre</span>::<span class="pl-c1">before</span></pre></div>
-<p>效果：</p>
-<p>代码块左上角：</p>
-<p>🔴 🟡 🟢</p>
-<p>瞬间变成：</p>
-<ul>
-<li>Terminal</li>
-<li>VSCode</li>
-<li>iTerm</li>
-</ul>
-<p>风格。</p>
-<hr>
-<h2>复制按钮</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">gmeek-copy-code</span></pre></div>
-<p>功能：</p>
-<ul>
-<li>一键复制代码</li>
-<li>成功反馈</li>
-</ul>
-<hr>
-<h2>折叠按钮</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">btn-fold</span></pre></div>
-<p>实现：</p>
-<ul>
-<li>折叠长代码</li>
-<li>提升阅读效率</li>
-</ul>
-<hr>
-<h2>全屏代码阅读</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">pre</span>.<span class="pl-c1">code-fullscreen</span></pre></div>
-<p>功能：</p>
-<ul>
-<li>双击代码块全屏</li>
-<li>沉浸阅读</li>
-<li>ESC 退出</li>
-</ul>
-<p>这个功能已经是：</p>
-<blockquote>
-<p>在线 IDE 级别体验。</p>
-</blockquote>
-<hr>
-<h1>八、文章卡片动画</h1>
-<h2>hover 浮起</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">post-item</span><span class="pl-kos">:</span>hover</pre></div>
-<p>效果：</p>
-<ul>
-<li>卡片浮起</li>
-<li>发光边框</li>
-<li>缩放</li>
-</ul>
-<hr>
-<h2>流光边框</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-k">@keyframes</span> luliy-glow-border</pre></div>
-<p>作用：</p>
-<ul>
-<li>动态渐变边框</li>
-<li>高级产品官网风格</li>
-</ul>
-<p>像：</p>
-<ul>
-<li>Hyper</li>
-<li>Raycast</li>
-<li>Warp Terminal</li>
-</ul>
-<hr>
-<h1>九、音效与粒子系统</h1>
-<h2>Web Audio 音效</h2>
-<p>实现：</p>
-<ul>
-<li>点击音效</li>
-<li>打字音效</li>
-<li>主题切换音效</li>
-</ul>
-<p>这是：</p>
-<blockquote>
-<p>游戏化博客。</p>
-</blockquote>
-<hr>
-<h2>粒子背景</h2>
-<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">luliy-particle-canvas</span></pre></div>
-<p>实现：</p>
-<ul>
-<li>鼠标吸附粒子</li>
-<li>黑洞效果</li>
-<li>连线动画</li>
-</ul>
-<p>类似：</p>
-<ul>
-<li>particles.js</li>
-<li>react-tsparticles</li>
-</ul>
-<hr>
-<h1>十、响应式移动端适配</h1>
-<p>你这里做得其实很完整。</p>
-<p>包括：</p>
-<markdown-accessiblity-table><table role="table">
-<thead>
-<tr>
-<th>功能</th>
-<th>是否适配</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Hero 区</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>TOC</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>搜索框</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>代码块</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>标题字号</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>卡片尺寸</td>
-<td>✅</td>
-</tr>
-</tbody>
-</table></markdown-accessiblity-table>
-<p>已经是：</p>
-<blockquote>
-<p>商业级移动端适配。</p>
-</blockquote>
-<hr>
-<h1>enhance.js 实现的功能（按系统）</h1>
-<hr>
-<h1>一、文章数据系统</h1>
-<h2>fetchPosts()</h2>
-<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-en">fetch</span><span class="pl-kos">(</span><span class="pl-s">'/postList.json'</span><span class="pl-kos">)</span></pre></div>
-<p>作用：</p>
-<ul>
-<li>获取博客所有文章</li>
-<li>建立搜索索引</li>
-</ul>
-<p>相当于：</p>
-<blockquote>
-<p>本地搜索数据库。</p>
-</blockquote>
-<hr>
-<h1>二、站内搜索引擎</h1>
-<h2>render()</h2>
-<p>实现：</p>
-<ul>
-<li>实时搜索</li>
-<li>标签匹配</li>
-<li>描述提取</li>
-<li>最近文章</li>
-</ul>
-<p>本质：</p>
-<blockquote>
-<p>前端全文搜索系统。</p>
-</blockquote>
-<hr>
-<h1>三、顶部阅读进度系统</h1>
-<h2>initProgressBar()</h2>
-<p>实现：</p>
-<ul>
-<li>顶部进度条</li>
-<li>右下圆环进度</li>
-<li>回顶部按钮</li>
-</ul>
-<p>像：</p>
-<ul>
-<li>Medium</li>
-<li>掘金</li>
-<li>少数派</li>
-</ul>
-<hr>
-<h1>四、音效引擎（高级）</h1>
-<h2>Web Audio API</h2>
-<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-v">AudioContext</span></pre></div>
-<p>实现：</p>
-<markdown-accessiblity-table><table role="table">
-<thead>
-<tr>
-<th>音效</th>
-<th>作用</th>
+<th>名称</th>
+<th>触发条件</th>
+<th>声音特性</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>click</td>
-<td>点击</td>
+<td>按钮/链接点击</td>
+<td>快速下行方波 (900→400Hz)</td>
 </tr>
 <tr>
 <td>sci</td>
-<td>科幻切换</td>
+<td>全屏代码、测试功能</td>
+<td>正弦音扫描 (440→880→660Hz)</td>
 </tr>
 <tr>
 <td>type</td>
-<td>打字</td>
+<td>输入框输入</td>
+<td>白噪声爆破 (20ms)</td>
 </tr>
 <tr>
 <td>theme</td>
 <td>主题切换</td>
+<td>三和弦上升 (523/659/784Hz)</td>
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<p>这个已经不是普通博客会做的。</p>
-<p>属于：</p>
-<blockquote>
-<p>沉浸式 UI 设计。</p>
-</blockquote>
-<hr>
-<h1>五、粒子引擎（重点）</h1>
-<h2>Canvas 粒子系统</h2>
-<p>实现：</p>
+<p><strong>控制方式：</strong></p>
 <ul>
-<li>80 个动态粒子</li>
-<li>鼠标吸附</li>
-<li>自动连线</li>
-<li>暗黑模式适配</li>
+<li>localStorage 存储开关状态 <code class="notranslate">luliy-sfx: '0'/'1'</code></li>
+<li>顶部右侧音效图标，长按 3 秒切换开关</li>
+<li>切换时显示 Toast 提示："🔊 音效已开启" / "🔇 音效已关闭"</li>
 </ul>
-<p>这是：</p>
-<blockquote>
-<p>独立动画引擎。</p>
-</blockquote>
+<p><strong>实现：</strong> Web Audio API，无外部音频文件</p>
 <hr>
-<h1>六、主题切换波纹</h1>
-<h2>triggerRipple()</h2>
-<p>效果：</p>
+<h3>⏱️ 头像时钟</h3>
+<p><strong>位置：</strong> 头像下方（如果有头像的话）</p>
+<p><strong>显示：</strong> 实时 HH:MM:SS</p>
+<p><strong>样式：</strong></p>
 <ul>
-<li>点击切换主题</li>
-<li>出现扩散波纹</li>
+<li>深紫色文字 (#8250df，暗色模式 #cba6f7)</li>
+<li>等宽字体 (JetBrains Mono)</li>
+<li>字间距加大</li>
 </ul>
-<p>像：</p>
+<p><strong>交互：</strong></p>
 <ul>
-<li>Android Material Design</li>
+<li>点击头像本体 → 链接到 <code class="notranslate">/about</code> 页面</li>
+<li>悬停头像 → 微旋转 5°，放大 1.05 倍</li>
 </ul>
 <hr>
-<h1>七、动态标题</h1>
-<h2>visibilitychange</h2>
-<p>实现：</p>
-<p>离开页面：</p>
-<div class="highlight highlight-text-adblock"><pre class="notranslate">👀 别走呀，我还在进步！</pre></div>
-<p>回来：</p>
-<div class="highlight highlight-text-adblock"><pre class="notranslate">✨ 欢迎回来！</pre></div>
-<p>这是典型：</p>
-<blockquote>
-<p>用户留存设计。</p>
-</blockquote>
-<hr>
-<h1>八、博客运行时间</h1>
-<h2>initUptime()</h2>
-<p>实现：</p>
+<h3>🎯 其他全站功能</h3>
+<h4>标签页筛选</h4>
 <ul>
-<li>博客上线计时</li>
-<li>秒级更新</li>
+<li>仅在 <code class="notranslate">/tag.html</code> 页面激活</li>
+<li>搜索框实时过滤标签（不区分大小写）</li>
+<li>显示匹配计数 <code class="notranslate">N / Total 个标签</code></li>
+<li>标签悬停动画：上浮 + 饱和度增加</li>
 </ul>
-<p>效果：</p>
-<div class="highlight highlight-text-adblock"><pre class="notranslate">🌱 本站已陪伴你无限进步：xx天xx小时</pre></div>
-<p>增强陪伴感。</p>
+<h4>动态标题</h4>
+<ul>
+<li>切离标签页 (hidden)：显示 "👀 别走呀，我还在进步！"</li>
+<li>回到标签页 (visible)：显示 "✨ 欢迎回来！ [原标题]"</li>
+<li>2 秒后自动复原原标题</li>
+</ul>
+<h4>运行时间</h4>
+<ul>
+<li>页面底部显示博客上线时长</li>
+<li>格式：<code class="notranslate">🌱 本站已陪伴你无限进步：X天 X小时 X分 X秒</code></li>
+<li>秒数用红色高亮，每秒更新</li>
+</ul>
 <hr>
-<h1>九、文章阅读系统</h1>
-<h2>阅读时间统计</h2>
-<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">预计阅读：约</span> <span class="pl-s1">x</span> <span class="pl-s1">分钟</span></pre></div>
+<h2>首页布局</h2>
+<h3>页面结构</h3>
+<pre class="notranslate"><code class="notranslate">┌─────────────────────────────────────┐
+│  Gmeek Header (导航栏)             │
+├─────────────────────────────────────┤
+│  记录点滴 · 无限进步 🌱              │  ← 公告栏（纯文本）
+├─────────────────────────────────────┤
+│  ┌─────────────────────────────────┐│
+│  │ 📄 文章卡片 1                   ││ ← 首页卡片列表
+│  │ 缩略图 | 标题、摘要、日期        ││
+│  └─────────────────────────────────┘│
+│  ┌─────────────────────────────────┐│
+│  │ 📄 文章卡片 2                   ││
+│  └─────────────────────────────────┘│
+│  ...                                 │
+├─────────────────────────────────────┤
+│  页脚 (Footer)                     │
+└─────────────────────────────────────┘
+</code></pre>
+<h3>卡片样式</h3>
+<pre class="notranslate"><code class="notranslate">┌────────────────────────────────────────┐ ◄─ 彩色左边线
+│ [缩略图，宽度 100%，高度 160px]       │     (紫/蓝/粉/黄 循环)
+├────────────────────────────────────────┤
+│ 📅 标题（蓝色，#0969da）              │
+│ 简短摘要...                           │
+│ 🏷️ 标签 1  标签 2  标签 3            │
+├────────────────────────────────────────┤
+│ 日期 (灰色)                           │
+└────────────────────────────────────────┘
+</code></pre>
+<p><strong>卡片悬停效果：</strong></p>
+<ul>
+<li>上浮 8px (translateY)</li>
+<li>缩放 1.012 倍 (scale)</li>
+<li>三层阴影扩展（最里层紫色发光）</li>
+<li>流光边框动画 (2.4s 循环)</li>
+</ul>
+<p><strong>数据源：</strong> 通过 Gmeek 从 GitHub Issues 自动生成</p>
 <hr>
-<h2>标题复制链接</h2>
-<p>点击标题：</p>
-<p>自动复制：</p>
-<div class="highlight highlight-text-adblock"><pre class="notranslate">xxx.com/post#title</pre></div>
-<p>这是：</p>
-<blockquote>
-<p>文档网站功能。</p>
-</blockquote>
-<hr>
-<h1>十、代码块系统（JS 部分）</h1>
-<p>实现：</p>
+<h2>文章页面</h2>
+<h3>页面结构</h3>
+<pre class="notranslate"><code class="notranslate">┌──────────────────────────────────────────┐
+│ Gmeek Header                            │
+├──────────────────────────────────────────┤
+│ 📋 文章目录                  ◄─ 可折叠  │
+├──────────────────────────────────────────┤
+│ 预计阅读：约 10 分钟 | 共 3000 字      │
+├──────────────────────────────────────────┤
+│ # 标题（金黄色，#f0b429，加粗）       │
+│ ## 章节 1                              │
+│ 文章内容...                           │
+│ ## 章节 2                              │
+│ 文章内容...                           │
+├──────────────────────────────────────────┤
+│ ⬅ 上一篇 | 下一篇 ➡                  │
+├──────────────────────────────────────────┤
+│ ✨ 和作者无限进步                      │
+│ (点击显示赞赏码)                      │
+├──────────────────────────────────────────┤
+│ 页脚                                   │
+└──────────────────────────────────────────┘
+</code></pre>
+<h3>文字样式</h3>
 <markdown-accessiblity-table><table role="table">
 <thead>
 <tr>
-<th>功能</th>
-<th>是否实现</th>
+<th>元素</th>
+<th>样式</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>复制代码</td>
-<td>✅</td>
+<td><strong>H1</strong></td>
+<td>金黄 (#f0b429) + 加粗 + 下划线</td>
 </tr>
 <tr>
-<td>折叠代码</td>
-<td>✅</td>
+<td><strong>H2</strong></td>
+<td>蓝色 (#0969da) + 计数器 (1. 2. 3.)</td>
 </tr>
 <tr>
-<td>全屏阅读</td>
-<td>✅</td>
+<td><strong>强调</strong></td>
+<td>金黄 (#f0b429) + 加粗</td>
 </tr>
 <tr>
-<td>双击进入全屏</td>
-<td>✅</td>
+<td><strong>链接</strong></td>
+<td>金黄 (#f0b429) + 无下划线 (悬停下划线)</td>
 </tr>
 <tr>
-<td>ESC 退出</td>
-<td>✅</td>
+<td><strong>代码</strong></td>
+<td>黑色背景 (#f0f0f0) + 红色文字 (#d73a49)</td>
+</tr>
+<tr>
+<td><strong>引文</strong></td>
+<td>左边蓝线 + 浅蓝背景 + 斜体</td>
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<p>已经非常强。</p>
-<hr>
-<h1>十一、赞赏系统</h1>
-<h2>赞赏展开面板</h2>
-<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">✨</span> <span class="pl-s1">和作者无限进步</span></pre></div>
-<p>点击展开二维码。</p>
-<p>属于：</p>
-<blockquote>
-<p>创作者商业化入口。</p>
-</blockquote>
-<hr>
-<h1>十二、上一篇下一篇导航</h1>
-<p>实现：</p>
+<h3>高级功能</h3>
+<h4>标题链接复制</h4>
 <ul>
-<li>自动读取 postList</li>
-<li>自动生成导航</li>
+<li>点击 H1/H2/H3 → 复制 <code class="notranslate">URL#heading_id</code> 到剪贴板</li>
+<li>显示 "✓" 提示 2s 消失</li>
+<li>支持分享文章的特定段落</li>
 </ul>
-<p>类似：</p>
+<h4>表格样式</h4>
+<pre class="notranslate"><code class="notranslate">┌────────────────────────────────────┐
+│ Header Row (浅蓝背景，蓝色文字)    │
+├────────────────────────────────────┤
+│ 普通行 (白背景)                   │
+│ 奇偶行背景交替 (极浅灰)           │
+│ 悬停行 (浅蓝背景)                 │
+└────────────────────────────────────┘
+</code></pre>
+<h4>图片处理</h4>
 <ul>
-<li>Docusaurus</li>
-<li>VitePress</li>
+<li>点击放大（灯箱）</li>
+<li>支持 lazy loading</li>
+<li>显示加载中占位符（SVG 动画）</li>
+<li>圆角处理 (border-radius: 8px)</li>
 </ul>
-<hr>
-<h1>十三、首页 Hero 系统</h1>
-<h2>Hero Banner</h2>
-<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">✦</span> <span class="pl-v">Luliy</span> <span class="pl-s1">✦</span></pre></div>
-<p>实现：</p>
+<h4>代码块（见前文）</h4>
 <ul>
-<li>品牌主视觉</li>
-<li>slogan</li>
-<li>CTA 按钮</li>
-</ul>
-<p>已经是：</p>
-<blockquote>
-<p>产品官网首页。</p>
-</blockquote>
-<hr>
-<h1>十四、一言系统</h1>
-<h2>fetch hitokoto API</h2>
-<div class="highlight highlight-text-adblock"><pre class="notranslate">今日一言</pre></div>
-<p>效果：</p>
-<ul>
-<li>动态语录</li>
-<li>提高首页活力</li>
+<li>macOS 风格控制栏</li>
+<li>深色主题，发光边框</li>
+<li>三种操作：复制、折叠、全屏</li>
 </ul>
 <hr>
-<h1>十五、彩带纸屑动画</h1>
-<p>首次进入：</p>
-<ul>
-<li>自动彩带</li>
-<li>欢迎动效</li>
-</ul>
-<p>非常产品化。</p>
+<h2>视觉设计</h2>
+<h3>色彩系统</h3>
+<h4>主色调</h4>
+<pre class="notranslate"><code class="notranslate">紫色   #8250df  (主要品牌色，边框/按钮/高亮)
+蓝色   #0969da  (链接/标题/强调)
+金黄   #f0b429  (H1/强调/活跃状态)
+红色   #d03a00  (TOC 活跃/警告)
+</code></pre>
+<h4>辅助色</h4>
+<pre class="notranslate"><code class="notranslate">粉红   #ff6b9d  (装饰/卡片边线)
+青色   #6bceff  (粒子动画)
+绿色   #1f883d  (成功/复制确认)
+灰色   #888     (文本/次要信息)
+</code></pre>
+<h4>深色模式色板</h4>
+<pre class="notranslate"><code class="notranslate">背景   #1a1a2e  (代码块/深色底)
+文字   #ccc     (浅灰文字)
+强调   #ff9a3c  (深色强调)
+边框   rgba(130,80,223,0.3)
+</code></pre>
+<h3>字体体系</h3>
+<pre class="notranslate"><code class="notranslate">正文       LXGW WenKai (开源中文字体，秀丽端正)
+代码       JetBrains Mono / Fira Code / Cascadia Code
+时钟/数字  等宽字体 (ui-monospace fallback)
+</code></pre>
+<h3>阴影层级</h3>
+<pre class="notranslate"><code class="notranslate">z-index 0      粒子背景 Canvas
+z-index 9998   回顶按钮、进度条
+z-index 9999   浮动搜索按钮
+z-index 99990  图片灯箱
+z-index 99999  火花粒子
+z-index 99998  暗色波纹
+</code></pre>
 <hr>
-<h1>十六、归档时间轴</h1>
-<p>实现：</p>
-<div class="highlight highlight-text-adblock"><pre class="notranslate">2026
- ├─ 文章1
- ├─ 文章2</pre></div>
-<p>类似：</p>
-<ul>
-<li>时间轴知识库</li>
-</ul>
+<h2>响应式设计</h2>
+<h3>断点</h3>
+<p><strong>主要断点：</strong> 760px（平板竖屏 / 手机横屏）</p>
+<h3>媒体查询调整</h3>
+<h4>布局</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-k">@media</span> (<span class="pl-c1">max-width</span><span class="pl-kos">:</span> <span class="pl-c1">760<span class="pl-smi">px</span></span>)
+├─ body padding<span class="pl-kos">:</span> 14px → 12px (紧凑)
+├─ .<span class="pl-c1">container-lg</span> <span class="pl-ent">padding</span><span class="pl-kos">:</span> 同上
+└─ 一列布局（无二栏设计）</pre></div>
+<h4>文字</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate">正文字号：     18px → 16px
+h1<span class="pl-kos">:</span>         1.55rem
+h2<span class="pl-kos">:</span>         1.25rem
+h3<span class="pl-kos">:</span>         1.1rem
+代码块字号： 13px (防止横向溢出)</pre></div>
+<h4>组件</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate">TOC<span class="pl-kos">:</span>               展开 → 折叠状态 (max-height 0)
+回顶按钮位置：     bot<span class="pl-k">to</span>m<span class="pl-kos">:</span> <span class="pl-c1">24<span class="pl-smi">px</span></span> → <span class="pl-c1">80<span class="pl-smi">px</span></span> (避免导航栏)
+卡片悬停效果：     translateY(<span class="pl-c1">-8<span class="pl-smi">px</span></span>) → translateY(<span class="pl-c1">-4<span class="pl-smi">px</span></span>)
+代码块按钮距离：   调整避免重叠</pre></div>
+<h4>字间距</h4>
+<div class="highlight highlight-source-css"><pre class="notranslate">公告栏字体：  缩小，无换行
+标题字体：    正常，允许换行
+代码块：      允许横向滚动</pre></div>
 <hr>
-<h1>总结：你这套代码的真实等级</h1>
-<p>我会把它定义为：</p>
-<h1>「产品官网级 Gmeek 增强方案」</h1>
-<p>已经远超：</p>
+<h2>使用指南</h2>
+<h3>📝 发布新文章</h3>
+<ol>
+<li>
+<p><strong>打开 GitHub Issues</strong></p>
 <ul>
-<li>普通 GitHub 博客</li>
-<li>普通 Hexo 主题</li>
-<li>普通 Gmeek 配置</li>
+<li>进入你的博客 Repository (e.g., <code class="notranslate">luliy6.github.io</code>)</li>
+<li>创建新 Issue</li>
 </ul>
-<p>你这套更像：</p>
+</li>
+<li>
+<p><strong>编写格式</strong></p>
+<div class="highlight highlight-text-md"><pre class="notranslate"><span class="pl-mh"># <span class="pl-en">文章标题</span></span>
+
+标签：标签1，标签2，标签3
+
+<span class="pl-mh">## <span class="pl-en">章节 1</span></span>
+正文内容...
+
+<span class="pl-mh">## <span class="pl-en">章节 2</span></span>
+正文内容...</pre></div>
+</li>
+<li>
+<p><strong>触发部署</strong></p>
+<ul>
+<li>Issue 发布后，GitHub Actions 自动运行 Gmeek 构建脚本</li>
+<li>约 30 秒后，新文章出现在博客首页</li>
+</ul>
+</li>
+</ol>
+<h3>🎨 自定义配置</h3>
+<h4>修改 config.json</h4>
 <markdown-accessiblity-table><table role="table">
 <thead>
 <tr>
-<th>类型</th>
-<th>接近程度</th>
+<th>配置项</th>
+<th>作用</th>
+<th>例子</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Apple 产品官网</td>
-<td>35%</td>
+<td>title</td>
+<td>博客名称</td>
+<td>"Luliy"</td>
 </tr>
 <tr>
-<td>Vercel Docs</td>
-<td>45%</td>
+<td>subTitle</td>
+<td>副标题</td>
+<td>"我将无限进步!"</td>
 </tr>
 <tr>
-<td>Linear 官网</td>
-<td>40%</td>
+<td>avatarUrl</td>
+<td>头像 URL</td>
+<td>GitHub 头像链接</td>
 </tr>
 <tr>
-<td>GitBook</td>
-<td>50%</td>
+<td>singlePage</td>
+<td>导航菜单</td>
+<td>["about", "gallery", ...]</td>
 </tr>
 <tr>
-<td>Raycast 官网</td>
-<td>35%</td>
+<td>themeMode</td>
+<td>主题模式</td>
+<td>"manual" (推荐)</td>
 </tr>
 <tr>
-<td>少数派</td>
-<td>60%</td>
+<td>yearColorList</td>
+<td>时间轴颜色</td>
+<td>["#bc4c00", "#0969da", ...]</td>
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
+<h4>修改 enhance.css</h4>
+<p>修改 CSS 变量或选择器来改变：</p>
+<ul>
+<li>颜色（所有 <code class="notranslate">#8250df<span class="ml-1 d-inline-block border circle color-border-subtle" style="background-color: #8250df; height: 8px; width: 8px;"></span></code> 替换为新色）</li>
+<li>间距（padding、margin）</li>
+<li>字体（font-family 对应部分）</li>
+<li>动画时长（transition/animation-duration）</li>
+</ul>
+<h4>修改 enhance.js</h4>
+<p>修改 JavaScript 来改变：</p>
+<ul>
+<li>音效（playSfx 的 frequency/gain 参数）</li>
+<li>粒子行为（粒子数量、速度、吸引力）</li>
+<li>搜索规则（textOfPost 函数的匹配逻辑）</li>
+<li>TOC 高亮样式（.luliy-toc-active 类名）</li>
+</ul>
+<h3>🚀 部署步骤</h3>
+<ol>
+<li>
+<p><strong>备份原文件</strong> (可选)</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">git checkout HEAD -- config.json enhance.css enhance.js</pre></div>
+</li>
+<li>
+<p><strong>替换三个文件</strong></p>
+<ul>
+<li>上传新的 <code class="notranslate">config.json</code> 到 Repository 根目录</li>
+<li>上传新的 <code class="notranslate">enhance.css</code> 到 <code class="notranslate">/</code> 目录</li>
+<li>上传新的 <code class="notranslate">enhance.js</code> 到 <code class="notranslate">/</code> 目录</li>
+</ul>
+</li>
+<li>
+<p><strong>提交并推送</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">git add config.json enhance.css enhance.js
+git commit -m <span class="pl-s"><span class="pl-pds">"</span>chore: update blog theme v3<span class="pl-pds">"</span></span>
+git push origin main</pre></div>
+</li>
+<li>
+<p><strong>检查 Actions</strong></p>
+<ul>
+<li>GitHub Actions 自动运行</li>
+<li>约 1-2 分钟后部署完成</li>
+<li>访问博客 URL 查看效果</li>
+</ul>
+</li>
+</ol>
 <hr>
-<h1>目前这套系统已经具备：</h1>
+<h2>故障排查</h2>
+<h3>问题 1：目录为空或不显示</h3>
+<p><strong>原因：</strong> 文章中没有 H2/H3 标题，或 Gmeek TOC 插件未生成</p>
+<p><strong>解决方案：</strong></p>
+<div class="highlight highlight-text-md"><pre class="notranslate"><span class="pl-mh"># <span class="pl-en">这是 H1（不会出现在 TOC）</span></span>
+
+<span class="pl-mh">## <span class="pl-en">这是 H2 ← TOC 才认这个</span></span>
+
+<span class="pl-mh">### <span class="pl-en">这是 H3</span></span></pre></div>
+<hr>
+<h3>问题 2：代码块样式不生效</h3>
+<p><strong>原因：</strong> HTML 结构不符合预期（缺少 <code class="notranslate">&lt;pre&gt;&lt;code&gt;</code> 嵌套）</p>
+<p><strong>排查步骤：</strong></p>
+<ol>
+<li>打开浏览器开发工具 (F12)</li>
+<li>查看代码块 HTML 结构</li>
+<li>确保 <code class="notranslate">&lt;pre&gt;&lt;code class="language-xxx"&gt;</code> 格式</li>
+</ol>
+<p><strong>临时修复：</strong> 在 enhance.css 的代码块选择器后加 <code class="notranslate">!important</code></p>
+<hr>
+<h3>问题 3：搜索功能找不到文章</h3>
+<p><strong>原因：</strong> postList.json 未正确生成或文章未发布</p>
+<p><strong>检查清单：</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> Issue 已发布（不是草稿）</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> Actions 已运行完成（检查 Repository → Actions）</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 打开 <a href="https://yourblog.github.io/postList.json" rel="nofollow">https://yourblog.github.io/postList.json</a> 查看是否包含新文章</li>
+</ul>
+<hr>
+<h3>问题 4：音效不播放</h3>
+<p><strong>原因：</strong> 浏览器禁用 Web Audio / 用户关闭音效开关</p>
+<p><strong>排查方法：</strong></p>
+<ol>
+<li>检查浏览器控制台是否有错误：<code class="notranslate">console.log(getAudioCtx())</code></li>
+<li>查看 localStorage：<code class="notranslate">localStorage.getItem('luliy-sfx')</code></li>
+<li>若为 '0'，点击音效图标长按 3 秒重新开启</li>
+</ol>
+<hr>
+<h3>问题 5：粒子背景卡顿</h3>
+<p><strong>原因：</strong> Canvas 渲染性能不足（老电脑、移动设备）</p>
+<p><strong>解决方案：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// 在 localStorage 中禁用</span>
+<span class="pl-s1">localStorage</span><span class="pl-kos">.</span><span class="pl-en">setItem</span><span class="pl-kos">(</span><span class="pl-s">'luliy-particles'</span><span class="pl-kos">,</span> <span class="pl-s">'0'</span><span class="pl-kos">)</span></pre></div>
+<p>然后刷新页面，粒子背景会被禁用，性能显著改善</p>
+<hr>
+<h3>问题 6：暗色模式样式错乱</h3>
+<p><strong>原因：</strong> 浏览器缓存或 CSS 加载顺序</p>
+<p><strong>快速修复：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// 浏览器控制台运行</span>
+<span class="pl-s1">location</span><span class="pl-kos">.</span><span class="pl-en">reload</span><span class="pl-kos">(</span><span class="pl-c1">true</span><span class="pl-kos">)</span>  <span class="pl-c">// 强制刷新（忽略缓存）</span></pre></div>
+<p>若仍未解决，检查 enhance.css 是否正确上传（网络标签查看）</p>
+<hr>
+<h3>问题 7：头像时钟不显示</h3>
+<p><strong>原因：</strong> 头像元素不符合选择器，或 JS 未找到</p>
+<p><strong>排查方法：</strong></p>
+<ol>
+<li>浏览器开发工具搜索 <code class="notranslate">.avatar</code> 或 <code class="notranslate">.blogTitle img</code></li>
+<li>检查是否存在这些 class/结构</li>
+<li>若不存在，修改 initAvatarClock 中的选择器</li>
+</ol>
+<hr>
+<h2>附录</h2>
+<h3>文件大小对比</h3>
 <markdown-accessiblity-table><table role="table">
 <thead>
 <tr>
-<th>系统</th>
-<th>完成度</th>
+<th>文件</th>
+<th>大小</th>
+<th>说明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>UI系统</td>
-<td>95%</td>
+<td>config.json</td>
+<td>~3 KB</td>
+<td>轻量配置</td>
 </tr>
 <tr>
-<td>动效系统</td>
-<td>92%</td>
+<td>enhance.css</td>
+<td>~15 KB</td>
+<td>样式表（未压缩）</td>
 </tr>
 <tr>
-<td>阅读系统</td>
-<td>93%</td>
+<td>enhance.js</td>
+<td>~28 KB</td>
+<td>脚本库（未压缩）</td>
 </tr>
 <tr>
-<td>搜索系统</td>
-<td>85%</td>
-</tr>
-<tr>
-<td>博客品牌化</td>
-<td>97%</td>
-</tr>
-<tr>
-<td>移动端</td>
-<td>88%</td>
-</tr>
-<tr>
-<td>代码阅读体验</td>
-<td>98%</td>
+<td><strong>总计</strong></td>
+<td><strong>~46 KB</strong></td>
+<td><strong>网络传输约 12 KB (gzip)</strong></td>
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
+<h3>浏览器兼容性</h3>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>浏览器</th>
+<th>支持情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chrome 90+</td>
+<td>✅ 完全支持</td>
+</tr>
+<tr>
+<td>Firefox 88+</td>
+<td>✅ 完全支持</td>
+</tr>
+<tr>
+<td>Safari 14+</td>
+<td>✅ 完全支持</td>
+</tr>
+<tr>
+<td>Edge 90+</td>
+<td>✅ 完全支持</td>
+</tr>
+<tr>
+<td>IE 11</td>
+<td>❌ 不支持（CSS Grid、Promise）</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h3>性能指标（假设）</h3>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>指标</th>
+<th>目标值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LCP (Largest Contentful Paint)</td>
+<td>&lt; 2s</td>
+</tr>
+<tr>
+<td>FID (First Input Delay)</td>
+<td>&lt; 100ms</td>
+</tr>
+<tr>
+<td>CLS (Cumulative Layout Shift)</td>
+<td>&lt; 0.1</td>
+</tr>
+<tr>
+<td>首屏加载时间</td>
+<td>&lt; 3s</td>
+</tr>
+<tr>
+<td>搜索响应时间</td>
+<td>&lt; 50ms</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h3>无障碍考量 (A11y)</h3>
+<div class="highlight highlight-source-css"><pre class="notranslate">✅ 充足的颜色对比度 (WCAG AA 标准)
+✅ 关键按钮有 aria<span class="pl-c1">-</span>label
+✅ 键盘导航支持 (Tab <span class="pl-c1">/</span> Shift<span class="pl-c1">+</span>Tab)
+✅ 屏幕阅读器支持 (标语义 HTML)
+✅ 深色主题对色盲友好 (dark_col<span class="pl-c1">or</span>blind)</pre></div>
 <hr>
-<h1>但还有几个明显“缺口”</h1>
-<p>你现在最缺的是：</p>
-<h2>1. SEO 系统</h2>
-<p>目前没有：</p>
+<h2>总结</h2>
+<p><strong>Luliy 博客 v3</strong> 是一个现代化、功能完整的个人博客系统，具有：</p>
 <ul>
-<li>structured data</li>
-<li>meta 优化</li>
-<li>canonical</li>
-<li>sitemap 增强</li>
+<li>✨ <strong>视觉精致</strong> — 紫蓝金配色，动画流畅</li>
+<li>🎯 <strong>功能齐全</strong> — 搜索、目录、灯箱、代码增强等</li>
+<li>⚡ <strong>性能优异</strong> — 纯静态，无需服务器</li>
+<li>📱 <strong>适配完美</strong> — 桌面、平板、手机无缝适配</li>
+<li>🎨 <strong>高度定制</strong> — 三个文件完全控制，易于修改</li>
 </ul>
+<p>祝你的博客之旅愉快！有任何问题，欢迎 Issue 反馈。</p>
 <hr>
-<h2>2. 图片系统</h2>
-<p>缺：</p>
-<ul>
-<li>渐进加载</li>
-<li>blur placeholder</li>
-<li>图片灯箱</li>
-<li>图片缩放</li>
-</ul>
-<hr>
-<h2>3. 评论体验</h2>
-<p>目前评论系统还是偏原始。</p>
-<hr>
-<h2>4. 数据分析系统</h2>
-<p>缺：</p>
-<ul>
-<li>阅读热力</li>
-<li>阅读完成率</li>
-<li>用户轨迹</li>
-</ul>
-<hr>
-<h2>5. 真正的“官网级动画”</h2>
-<p>你现在属于：</p>
-<blockquote>
-<p>高级 CSS 动效</p>
-</blockquote>
-<p>还没到：</p>
-<ul>
-<li>GSAP</li>
-<li>Framer Motion</li>
-<li>WebGL</li>
-</ul>
-<p>级别。</p>
-<hr>
-<p>整体来说：</p>
-<p>这已经不是“博客美化”。</p>
-<p>而是：</p>
-<blockquote>
-<p>“把 Gmeek 改造成品牌化个人数字空间”。</p>
-</blockquote>
-<p>而且完成度非常高。([<a href="https://blog.meekdai.com/post/Gmeek-geng-xin-ri-zhi.html?utm_source=chatgpt.com" rel="nofollow">blog.meekdai.com</a>]<a href="https://blog.meekdai.com/post/Gmeek-geng-xin-ri-zhi.html?utm_source=chatgpt.com" title="Gmeek更新日志" rel="nofollow">1</a>)</p></div>
+<p><strong>Luliy Blog System v3</strong><br>
+<em>Made with 💜 for infinite progress</em><br>
+<em>记录点滴，我将无限进步！</em></p></div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
