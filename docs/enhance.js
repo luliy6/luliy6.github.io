@@ -1,39 +1,36 @@
 /* ============================================================
-   enhance.js — Luliy Blog · 全站通用增强脚本 v2
+   enhance.js — Luliy Blog v3
    模块：
      ① localStorage 初始化
      ② 顶部进度条 & 回顶按钮
-     ③ 动态标题（切换标签页）
+     ③ 动态标题
      ④ 运行时间
      ⑤ 暗色模式切换波纹
      ⑥ 粒子背景 Canvas
-     ⑦ 音效 (Web Audio)
+     ⑦ Web Audio 音效
      ⑧ 点击粒子火花
-     ⑨ 头像下方时钟
+     ⑨ 头像时钟 & 头像链接到 /about
      ⑩ 标签页增强
-     ⑪ 图片灯箱 (Lightbox)
+     ⑪ 图片灯箱
      ⑫ 文章页初始化 (_luliyInitPost)
-         ⑫-a  macOS 代码块控制栏
-         ⑫-b  TOC 高亮 & 平滑滚动 & 移动端折叠
-         ⑫-c  阅读时长 & 字数
-         ⑫-d  标题复制链接
-         ⑫-e  外链新标签 & 图片懒加载
-         ⑫-f  赞赏面板
-         ⑫-g  上一篇 / 下一篇
-         ⑫-h  3D 虚拟控制台
+         a  外链新标签 & 图片懒加载
+         b  阅读时长 & 字数（只注入一次）
+         c  标题点击复制链接
+         d  macOS 代码块控制栏
+         e  TOC 折叠面板（桌面+移动统一）
+         f  TOC 高亮 & 平滑滚动
+         g  赞赏面板
+         h  上一篇 / 下一篇
      ⑬ 首页初始化 (_luliyInitIndex)
      ⑭ 主入口
    ============================================================ */
 (function (root) {
   'use strict';
 
-  /* ─────────────────────────────────────────────────────────
-     工具函数
-  ───────────────────────────────────────────────────────── */
+  /* ── 工具 ──────────────────────────────────────────────── */
   function ready(fn) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fn);
-    } else { fn(); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
   }
 
   function esc(s) {
@@ -64,13 +61,13 @@
     }
     return fetch('/postList.json', { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-      .catch(function () { return fetch('postList.json').then(function (r) { return r.ok ? r.json() : []; }); })
+      .catch(function () {
+        return fetch('postList.json').then(function (r) { return r.ok ? r.json() : []; });
+      })
       .then(normalize);
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ① localStorage 初始化
-  ───────────────────────────────────────────────────────── */
+  /* ── ① localStorage 初始化 ─────────────────────────────── */
   function initLocalStorage() {
     var defs = { 'luliy-sfx': '1', 'luliy-particles': '1' };
     Object.keys(defs).forEach(function (k) {
@@ -78,9 +75,7 @@
     });
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ② 顶部进度条 & 回顶按钮
-  ───────────────────────────────────────────────────────── */
+  /* ── ② 顶部进度条 & 回顶按钮 ──────────────────────────── */
   function initProgressBar() {
     var bar = document.createElement('div');
     bar.id = 'luliy-progress-bar';
@@ -105,9 +100,7 @@
     }, { passive: true });
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ③ 动态标题
-  ───────────────────────────────────────────────────────── */
+  /* ── ③ 动态标题 ────────────────────────────────────────── */
   function initDynamicTitle() {
     var ori = document.title, t;
     document.addEventListener('visibilitychange', function () {
@@ -121,9 +114,7 @@
     });
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ④ 运行时间
-  ───────────────────────────────────────────────────────── */
+  /* ── ④ 运行时间 ────────────────────────────────────────── */
   function initUptime() {
     var el = document.createElement('div');
     el.style.cssText = 'text-align:center;font-size:13px;color:#888;padding:10px 0;margin-top:20px';
@@ -143,9 +134,7 @@
     setInterval(update, 1000);
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ⑤ 暗色模式切换波纹
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑤ 暗色模式切换波纹 ───────────────────────────────── */
   function initThemeRipple() {
     function ripple() {
       playSfx('theme');
@@ -164,7 +153,7 @@
         'transform:translate(-50%,-50%) scale(0);' +
         'transition:transform 0.65s cubic-bezier(.4,0,.2,1),opacity 0.65s ease;';
       document.body.appendChild(el);
-      el.getBoundingClientRect(); // reflow
+      el.getBoundingClientRect();
       el.style.width  = (maxR * 2) + 'px';
       el.style.height = (maxR * 2) + 'px';
       el.style.transform = 'translate(-50%,-50%) scale(1)';
@@ -178,7 +167,7 @@
         btn.innerHTML.includes('Moon') ||
         btn.innerHTML.includes('Sun')  ||
         (btn.title && /dark|light|theme|主题/i.test(btn.title))
-      )) { ripple(); }
+      )) ripple();
     });
 
     setTimeout(function () {
@@ -190,9 +179,7 @@
     }, 800);
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ⑥ 粒子背景 Canvas
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑥ 粒子背景 Canvas ─────────────────────────────────── */
   function initParticles() {
     if (document.getElementById('luliy-particle-canvas')) return;
     var canvas = document.createElement('canvas');
@@ -200,10 +187,7 @@
     document.body.insertBefore(canvas, document.body.firstChild);
     var ctx = canvas.getContext('2d');
     var W, H;
-    function resize() {
-      W = canvas.width  = window.innerWidth;
-      H = canvas.height = window.innerHeight;
-    }
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
@@ -227,9 +211,8 @@
 
     function tick() {
       ctx.clearRect(0, 0, W, H);
-      var dark = document.documentElement.getAttribute('data-color-mode') === 'dark';
+      var dark  = document.documentElement.getAttribute('data-color-mode') === 'dark';
       var alpha = dark ? 0.7 : 0.45;
-
       pts.forEach(function (p) {
         if (mouse.active) {
           var dx = mouse.x - p.x, dy = mouse.y - p.y;
@@ -254,40 +237,31 @@
         ctx.fillStyle = 'hsla(' + p.hue + ',80%,65%,' + alpha + ')';
         ctx.fill();
       });
-
       for (var a = 0; a < pts.length; a++) {
         for (var b = a + 1; b < pts.length; b++) {
           var pa = pts[a], pb = pts[b];
           var ddx = pa.x - pb.x, ddy = pa.y - pb.y;
           var dd  = Math.sqrt(ddx * ddx + ddy * ddy);
           if (dd < 140) {
-            ctx.beginPath();
-            ctx.moveTo(pa.x, pa.y);
-            ctx.lineTo(pb.x, pb.y);
+            ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y);
             ctx.strokeStyle = 'hsla(260,70%,65%,' + (1 - dd / 140) * (dark ? 0.3 : 0.18) + ')';
-            ctx.lineWidth = 0.8;
-            ctx.stroke();
+            ctx.lineWidth = 0.8; ctx.stroke();
           }
         }
       }
-
       if (mouse.active) {
         var g = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 80);
         g.addColorStop(0, 'rgba(130,80,223,0.22)');
         g.addColorStop(1, 'rgba(130,80,223,0)');
-        ctx.beginPath();
-        ctx.arc(mouse.x, mouse.y, 80, 0, Math.PI * 2);
-        ctx.fillStyle = g;
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 80, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
       }
       requestAnimationFrame(tick);
     }
     tick();
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ⑦ Web Audio 音效
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑦ Web Audio 音效 ──────────────────────────────────── */
   var _audioCtx = null;
   function getAudioCtx() {
     if (!_audioCtx) {
@@ -298,13 +272,11 @@
 
   function playSfx(type) {
     if (localStorage.getItem('luliy-sfx') === '0') return;
-    var ctx = getAudioCtx();
-    if (!ctx) return;
+    var ctx = getAudioCtx(); if (!ctx) return;
     try {
       if (type === 'click') {
         var o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'square';
+        o.connect(g); g.connect(ctx.destination); o.type = 'square';
         o.frequency.setValueAtTime(900, ctx.currentTime);
         o.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.05);
         g.gain.setValueAtTime(0.04, ctx.currentTime);
@@ -312,8 +284,7 @@
         o.start(); o.stop(ctx.currentTime + 0.06);
       } else if (type === 'sci') {
         var o2 = ctx.createOscillator(), g2 = ctx.createGain();
-        o2.connect(g2); g2.connect(ctx.destination);
-        o2.type = 'sine';
+        o2.connect(g2); g2.connect(ctx.destination); o2.type = 'sine';
         o2.frequency.setValueAtTime(440, ctx.currentTime);
         o2.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
         o2.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.22);
@@ -323,13 +294,11 @@
       } else if (type === 'theme') {
         [0, 0.08, 0.16].forEach(function (delay, idx) {
           var ot = ctx.createOscillator(), gt = ctx.createGain();
-          ot.connect(gt); gt.connect(ctx.destination);
-          ot.type = 'sine';
+          ot.connect(gt); gt.connect(ctx.destination); ot.type = 'sine';
           ot.frequency.setValueAtTime([523, 659, 784][idx], ctx.currentTime + delay);
           gt.gain.setValueAtTime(0.05, ctx.currentTime + delay);
           gt.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + 0.18);
-          ot.start(ctx.currentTime + delay);
-          ot.stop(ctx.currentTime + delay + 0.18);
+          ot.start(ctx.currentTime + delay); ot.stop(ctx.currentTime + delay + 0.18);
         });
       }
     } catch (e) {}
@@ -346,9 +315,7 @@
     }, true);
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ⑧ 点击粒子火花
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑧ 点击粒子火花 ────────────────────────────────────── */
   function initClickSparks() {
     var colors = ['#ff6b9d','#ffcd3c','#6bceff','#a78bfa','#34d399'];
     document.addEventListener('click', function (e) {
@@ -374,24 +341,35 @@
     });
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ⑨ 头像下方系统时钟
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑨ 头像时钟 & 头像链接到 /about ───────────────────── */
   function initAvatarClock() {
     function tryInsert() {
-      /* Gmeek 头像通常在 .blogTitle 内或 Header 区 */
       var avatar = document.querySelector('.avatar, img.avatar, .blogTitle img');
       if (!avatar) return false;
       if (document.getElementById('luliy-avatar-clock')) return true;
+
+      /* 用 <a> 把头像包起来，指向 /about */
+      if (!avatar.closest('a.luliy-avatar-link')) {
+        var wrap = document.createElement('a');
+        wrap.className = 'luliy-avatar-link';
+        wrap.href = '/about';
+        wrap.title = '关于我';
+        avatar.parentNode.insertBefore(wrap, avatar);
+        wrap.appendChild(avatar);
+      }
+
+      /* 时钟插在 wrap 之后 */
+      var anchor = avatar.closest('a.luliy-avatar-link') || avatar;
       var clock = document.createElement('div');
       clock.id = 'luliy-avatar-clock';
-      avatar.parentNode.insertBefore(clock, avatar.nextSibling);
+      anchor.parentNode.insertBefore(clock, anchor.nextSibling);
+
       function updateClock() {
         var now = new Date();
-        var hh  = String(now.getHours()).padStart(2, '0');
-        var mm  = String(now.getMinutes()).padStart(2, '0');
-        var ss  = String(now.getSeconds()).padStart(2, '0');
-        clock.textContent = hh + ':' + mm + ':' + ss;
+        clock.textContent =
+          String(now.getHours()).padStart(2, '0') + ':' +
+          String(now.getMinutes()).padStart(2, '0') + ':' +
+          String(now.getSeconds()).padStart(2, '0');
       }
       updateClock();
       setInterval(updateClock, 1000);
@@ -404,9 +382,7 @@
     }
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ⑩ 标签页增强
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑩ 标签页增强 ──────────────────────────────────────── */
   function initTagEnhance() {
     if (!/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
     var tries = 0;
@@ -415,7 +391,6 @@
       if (!taglabel) { if (tries++ < 30) setTimeout(wire, 200); return; }
       document.body.classList.add('gmeek-tag-enhanced');
       if (document.getElementById('tag-enhance-toolbar')) return;
-
       var toolbar = document.createElement('div');
       toolbar.id = 'tag-enhance-toolbar';
       toolbar.className = 'tag-enhance-toolbar';
@@ -423,9 +398,8 @@
         '<input class="tag-enhance-input" type="search" placeholder="筛选标签..." autocomplete="off">' +
         '<span class="tag-enhance-count">正在统计...</span>';
       taglabel.parentNode.insertBefore(toolbar, taglabel);
-
-      var inp   = toolbar.querySelector('.tag-enhance-input');
-      var count = toolbar.querySelector('.tag-enhance-count');
+      var inp = toolbar.querySelector('.tag-enhance-input');
+      var cnt = toolbar.querySelector('.tag-enhance-count');
       function apply() {
         var q = inp.value.trim().toLowerCase(), vis = 0;
         var all = Array.from(taglabel.querySelectorAll('.Label'));
@@ -434,7 +408,7 @@
           l.style.display = ok ? 'inline-flex' : 'none';
           if (ok) vis++;
         });
-        count.textContent = vis + ' / ' + all.length + ' 个标签';
+        cnt.textContent = vis + ' / ' + all.length + ' 个标签';
       }
       inp.addEventListener('input', apply);
       new MutationObserver(apply).observe(taglabel, { childList: true, subtree: true });
@@ -443,23 +417,18 @@
     wire();
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ⑪ 图片灯箱 (Lightbox)
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑪ 图片灯箱 ────────────────────────────────────────── */
   function initLightbox() {
     if (document.getElementById('luliy-lightbox')) return;
-
     var lb = document.createElement('div');
     lb.id = 'luliy-lightbox';
     lb.innerHTML = '<button id="luliy-lightbox-close" aria-label="关闭">✕</button><img alt="">';
     document.body.appendChild(lb);
-
     var lbImg   = lb.querySelector('img');
     var lbClose = lb.querySelector('#luliy-lightbox-close');
 
     function open(src, alt) {
-      lbImg.src = src;
-      lbImg.alt = alt || '';
+      lbImg.src = src; lbImg.alt = alt || '';
       lb.classList.add('is-open');
       document.body.style.overflow = 'hidden';
     }
@@ -468,51 +437,55 @@
       document.body.style.overflow = '';
       setTimeout(function () { lbImg.src = ''; }, 300);
     }
-
-    /* Clicking the overlay (not the image) closes it */
-    lb.addEventListener('click', function (e) {
-      if (e.target === lb || e.target === lbClose) close();
-    });
+    lb.addEventListener('click', function (e) { if (e.target === lb || e.target === lbClose) close(); });
     lbClose.addEventListener('click', close);
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && lb.classList.contains('is-open')) close();
     });
-
-    /* Delegate: any postBody img click → lightbox */
     document.addEventListener('click', function (e) {
       var img = e.target.closest('#postBody img');
       if (!img) return;
-      e.preventDefault();
-      open(img.src, img.alt);
+      e.preventDefault(); open(img.src, img.alt);
     });
-
     root._luliyLightboxOpen = open;
   }
 
-  /* ─────────────────────────────────────────────────────────
-     ⑫ 文章页初始化
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑫ 文章页初始化 ─────────────────────────────────────
+   * 注意：此函数由 config.json 的 "script" 字段二次触发调用，
+   * 但 enhance.js 末尾的主入口也会在页面已有 postBody 时调用它。
+   * 用 _luliyPostInited 旗帜确保整个函数体只执行一次。
+   ───────────────────────────────────────────────────────── */
   root._luliyInitPost = function () {
+    if (root._luliyPostInited) return;
+    root._luliyPostInited = true;
+
     var pbody = document.getElementById('postBody');
 
-    /* ─ ⑫-e 外链新标签 & 图片懒加载 ─ */
+    /* ─ a 外链新标签 & 图片懒加载 ─ */
     document.querySelectorAll('a[href^="http"]').forEach(function (a) {
       if (!a.href.includes('luliy6.github.io')) a.target = '_blank';
     });
     if (pbody) pbody.querySelectorAll('img').forEach(function (img) { img.loading = 'lazy'; });
     if (!pbody) return;
 
-    /* ─ ⑫-c 阅读时长 & 字数 ─ */
-    var wc   = pbody.innerText.length;
-    var rtag = document.createElement('p');
-    rtag.innerHTML = '预计阅读：约 <strong>' + Math.max(1, Math.round(wc / 300)) + '</strong> 分钟 &nbsp;|&nbsp; 共 <strong>' + wc + '</strong> 字';
-    rtag.style.cssText = 'color:#888;font-size:13px;margin-bottom:1.5rem';
-    pbody.insertBefore(rtag, pbody.firstChild);
+    /* ─ b 阅读时长 & 字数（只注入一次）─ */
+    if (!document.getElementById('luliy-readmeta')) {
+      var wc   = pbody.innerText.length;
+      var rtag = document.createElement('p');
+      rtag.id  = 'luliy-readmeta';
+      rtag.innerHTML =
+        '预计阅读：约 <strong>' + Math.max(1, Math.round(wc / 300)) + '</strong> 分钟' +
+        ' &nbsp;|&nbsp; 共 <strong>' + wc + '</strong> 字';
+      rtag.style.cssText = 'color:#888;font-size:13px;margin-bottom:1.5rem';
+      pbody.insertBefore(rtag, pbody.firstChild);
+    }
+    var wc = wc || pbody.innerText.length; // keep wc in scope for later use
 
-    /* ─ ⑫-d 标题点击复制链接 ─ */
+    /* ─ c 标题点击复制链接 ─ */
     pbody.querySelectorAll('h1,h2,h3').forEach(function (h) {
-      h.style.cursor = 'pointer';
-      h.title = '点击复制链接';
+      if (h._luliyCopyHooked) return;
+      h._luliyCopyHooked = true;
+      h.style.cursor = 'pointer'; h.title = '点击复制链接';
       h.addEventListener('click', function () {
         var url = location.href.split('#')[0] + '#' + h.id;
         if (navigator.clipboard) navigator.clipboard.writeText(url);
@@ -524,30 +497,25 @@
       });
     });
 
-    /* ─ ⑫-a macOS 代码块控制栏 ─ */
+    /* ─ d macOS 代码块控制栏 ─ */
     pbody.querySelectorAll('pre').forEach(function (pre) {
-      if (pre.querySelector('.mac-btn')) return; // 已初始化
+      if (pre.querySelector('.mac-btn')) return;
       var code = pre.querySelector('code');
       if (!code) return;
 
-      /* 三个小按钮：红=复制, 黄=折叠, 绿=全屏 */
-      function makeBtn(cls, tipText) {
+      function makeBtn(cls, tip) {
         var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'mac-btn ' + cls;
-        b.setAttribute('data-tip', tipText);
-        b.setAttribute('aria-label', tipText);
+        b.type = 'button'; b.className = 'mac-btn ' + cls;
+        b.setAttribute('data-tip', tip); b.setAttribute('aria-label', tip);
         return b;
       }
-
       var btnRed    = makeBtn('mac-btn-red',    '复制代码');
       var btnYellow = makeBtn('mac-btn-yellow', '折叠代码');
       var btnGreen  = makeBtn('mac-btn-green',  '全屏阅读');
 
       /* 红 → 复制 */
       btnRed.addEventListener('click', function (e) {
-        e.stopPropagation();
-        playSfx('click');
+        e.stopPropagation(); playSfx('click');
         var text = code.innerText || code.textContent || '';
         function done() {
           btnRed.setAttribute('data-tip', '已复制 ✓');
@@ -561,20 +529,16 @@
           navigator.clipboard.writeText(text).then(done).catch(done);
         } else {
           var ta = document.createElement('textarea');
-          ta.value = text;
-          ta.style.cssText = 'position:fixed;left:-9999px';
-          document.body.appendChild(ta);
-          ta.select();
+          ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px';
+          document.body.appendChild(ta); ta.select();
           try { document.execCommand('copy'); } catch (_) {}
-          ta.remove();
-          done();
+          ta.remove(); done();
         }
       });
 
       /* 黄 → 折叠 / 展开 */
       btnYellow.addEventListener('click', function (e) {
-        e.stopPropagation();
-        playSfx('click');
+        e.stopPropagation(); playSfx('click');
         var folded = pre.classList.toggle('is-folded');
         btnYellow.classList.toggle('is-folded', folded);
         btnYellow.setAttribute('data-tip', folded ? '展开代码' : '折叠代码');
@@ -586,10 +550,7 @@
         var full = pre.classList.toggle('code-fullscreen');
         btnGreen.setAttribute('data-tip', full ? '退出全屏' : '全屏阅读');
       }
-      btnGreen.addEventListener('click', function (e) {
-        e.stopPropagation();
-        toggleFullscreen();
-      });
+      btnGreen.addEventListener('click', function (e) { e.stopPropagation(); toggleFullscreen(); });
       pre.addEventListener('dblclick', function (e) {
         if (e.target === btnRed || e.target === btnYellow || e.target === btnGreen) return;
         toggleFullscreen();
@@ -601,39 +562,63 @@
         }
       });
 
-      pre.appendChild(btnRed);
-      pre.appendChild(btnYellow);
-      pre.appendChild(btnGreen);
+      pre.appendChild(btnRed); pre.appendChild(btnYellow); pre.appendChild(btnGreen);
     });
 
-    /* ─ ⑫-b TOC 高亮 & 平滑滚动 & 移动端折叠开关 ─ */
-    var tocEls = Array.from(document.querySelectorAll('.toc, .markdown-toc, #markdown-toc'));
-    var heads  = Array.from(pbody.querySelectorAll('h2,h3'));
+    /* ─ e TOC 折叠面板（桌面+移动统一） ─
+     *
+     * Gmeek 把 TOC 作为独立节点注入 DOM，位置不固定。
+     * 我们找到它，在它外面套一个 .luliy-toc-wrap 容器，
+     * 容器顶部放一个折叠按钮，点击切换 is-open class。
+     * CSS 用 max-height 过渡控制展开/收起。
+     * 为了不影响正文流式排版，整个 wrap 插入到 postBody 最顶部。
+     */
+    var tocEls = Array.from(
+      document.querySelectorAll('.toc, .markdown-toc, #markdown-toc')
+    ).filter(function (el) { return !el.closest('.luliy-toc-wrap'); });
 
-    /* 移动端折叠开关 */
     tocEls.forEach(function (toc) {
+      /* 创建外层 wrap */
+      var wrap = document.createElement('div');
+      wrap.className = 'luliy-toc-wrap';
+
+      /* 折叠按钮 */
       var toggle = document.createElement('button');
       toggle.className = 'luliy-toc-toggle';
-      toggle.textContent = '📋 目录';
-      toc.parentNode.insertBefore(toggle, toc);
+      toggle.innerHTML = '📋 文章目录 <span class="luliy-toc-arrow">▼</span>';
+      toggle.setAttribute('aria-expanded', 'false');
       toggle.addEventListener('click', function () {
-        var open = toc.classList.toggle('is-toc-open');
-        toggle.textContent = open ? '📋 收起目录' : '📋 目录';
+        var open = wrap.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', String(open));
       });
+
+      /* 把 toc 移入 wrap */
+      toc.parentNode.insertBefore(wrap, toc);
+      wrap.appendChild(toggle);
+      wrap.appendChild(toc);
+
+      /* 把整个 wrap 移到 postBody 最前面（readmeta 之后） */
+      var readmeta = document.getElementById('luliy-readmeta');
+      if (readmeta && readmeta.parentNode === pbody) {
+        pbody.insertBefore(wrap, readmeta.nextSibling);
+      } else {
+        pbody.insertBefore(wrap, pbody.firstChild);
+      }
     });
 
-    /* TOC 高亮 */
-    if (heads.length && tocEls.length) {
+    /* ─ f TOC 高亮 & 平滑滚动 ─ */
+    var allTocEls = Array.from(document.querySelectorAll('.luliy-toc-wrap .toc, .luliy-toc-wrap .markdown-toc, .luliy-toc-wrap #markdown-toc'));
+    var heads = Array.from(pbody.querySelectorAll('h2,h3'));
+
+    if (heads.length && allTocEls.length) {
       var tocTimer = null;
       window.addEventListener('scroll', function () {
         if (tocTimer) clearTimeout(tocTimer);
         tocTimer = setTimeout(function () {
           var scrollY = window.scrollY || document.documentElement.scrollTop;
           var active  = null;
-          heads.forEach(function (h) {
-            if (scrollY >= h.offsetTop - 130) active = h;
-          });
-          tocEls.forEach(function (toc) {
+          heads.forEach(function (h) { if (scrollY >= h.offsetTop - 130) active = h; });
+          allTocEls.forEach(function (toc) {
             toc.querySelectorAll('a').forEach(function (a) {
               var matched = active && a.getAttribute('href') === '#' + active.id;
               a.classList.toggle('luliy-toc-active', !!matched);
@@ -645,7 +630,7 @@
 
     /* TOC 平滑滚动 */
     document.addEventListener('click', function (e) {
-      var link = e.target.closest('.toc a, .markdown-toc a, #markdown-toc a');
+      var link = e.target.closest('.luliy-toc-wrap a');
       if (!link) return;
       var href = link.getAttribute('href');
       if (!href || !href.startsWith('#')) return;
@@ -659,7 +644,7 @@
       } catch (_) {}
     });
 
-    /* ─ ⑫-f 赞赏面板 ─ */
+    /* ─ g 赞赏面板 ─ */
     var spBox = document.createElement('div');
     spBox.style.cssText = 'margin-top:50px;text-align:center';
     var spBtn = document.createElement('button');
@@ -672,8 +657,8 @@
     var qrPanel = document.createElement('div');
     qrPanel.innerHTML =
       '<p style="font-size:13px;color:#888;margin:10px 0">无限进步，进步有你！</p>' +
-      '<img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" ' +
-      'alt="赞赏码" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
+      '<img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg"' +
+      ' alt="赞赏码" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
     qrPanel.style.cssText = 'height:0;overflow:hidden;transition:height 0.4s ease,opacity 0.4s ease;opacity:0';
     spBtn.addEventListener('mouseover', function () { spBtn.style.transform = 'translateY(-2px)'; });
     spBtn.addEventListener('mouseout',  function () { spBtn.style.transform = ''; });
@@ -682,10 +667,9 @@
       qrPanel.style.height  = open ? '260px' : '0px';
       qrPanel.style.opacity = open ? '1' : '0';
     });
-    spBox.appendChild(spBtn);
-    spBox.appendChild(qrPanel);
+    spBox.appendChild(spBtn); spBox.appendChild(qrPanel);
 
-    /* ─ ⑫-g 上一篇 / 下一篇 ─ */
+    /* ─ h 上一篇 / 下一篇 ─ */
     fetchPosts().then(function (posts) {
       var cur = location.pathname.replace(/\/$/, '');
       var idx = -1;
@@ -693,13 +677,11 @@
         if (p.link && p.link.replace(/\/$/, '') === cur) idx = i;
       });
       if (idx < 0) return;
-
       var nav = document.createElement('div');
       nav.style.cssText =
         'display:flex;justify-content:space-between;gap:16px;' +
         'margin-top:40px;padding-top:20px;' +
         'border-top:2px dashed rgba(9,105,218,0.2)';
-
       function makeNavBtn(post, label, align) {
         if (!post) return document.createElement('div');
         var a = document.createElement('a');
@@ -712,12 +694,10 @@
           '<span style="display:block;font-size:11px;color:#888;margin-bottom:4px">' + label + '</span>' +
           '<span style="color:#0969da;font-weight:bold;font-size:14px">' + esc(post.title) + '</span>';
         a.addEventListener('mouseover', function () {
-          a.style.background  = 'rgba(9,105,218,0.12)';
-          a.style.transform   = 'translateY(-2px)';
+          a.style.background = 'rgba(9,105,218,0.12)'; a.style.transform = 'translateY(-2px)';
         });
         a.addEventListener('mouseout', function () {
-          a.style.background  = 'rgba(9,105,218,0.05)';
-          a.style.transform   = '';
+          a.style.background = 'rgba(9,105,218,0.05)'; a.style.transform = '';
         });
         return a;
       }
@@ -726,130 +706,18 @@
       pbody.appendChild(nav);
     }).catch(function () {});
 
-    /* ─ ⑫-h 3D 虚拟控制台 ─ */
-    (function buildConsole() {
-      var con = document.createElement('div');
-      con.id = 'luliy-console';
-      con.innerHTML =
-        '<div class="con-titlebar">' +
-          '<span class="con-dot con-dot-r"></span>' +
-          '<span class="con-dot con-dot-y"></span>' +
-          '<span class="con-dot con-dot-g"></span>' +
-          '<span class="con-title">luliy@blog ~ dashboard</span>' +
-        '</div>' +
-        '<div class="con-body" id="luliy-con-body"></div>' +
-        '<div class="con-input-row">' +
-          '<span>luliy@blog:~$</span>' +
-          '<input class="con-input" id="luliy-con-input" type="text" ' +
-            'placeholder="输入命令... (help)" autocomplete="off" spellcheck="false">' +
-        '</div>';
-
-      /* Insert just before the sponsor box (pbody's last big element) */
-      pbody.appendChild(con);
-      pbody.appendChild(spBox);
-
-      var body  = document.getElementById('luliy-con-body');
-      var input = document.getElementById('luliy-con-input');
-
-      var bootLines = [
-        { cls: 'con-info',  text: '[ OK ] Luliy Dashboard v2.0 启动中...' },
-        { cls: 'con-info',  text: '[ OK ] 加载博客配置文件...' },
-        { cls: 'con-info',  text: '[ OK ] 连接至粒子场...' },
-        { cls: 'con-dim',   text: '       正在统计文章数量...' },
-        { cls: 'con-warn',  text: '[WARN] 检测到来访者：你' },
-        { cls: 'con-info',  text: '[ OK ] 一切就绪。无限进步！' },
-        { cls: 'con-dim',   text: '       输入 help 查看可用命令。' }
-      ];
-
-      var lineDelay = 0;
-      bootLines.forEach(function (l) {
-        lineDelay += 260;
-        setTimeout(function () { addLine(l.cls, l.text); }, lineDelay);
-      });
-
-      function addLine(cls, html) {
-        var span = document.createElement('span');
-        span.className = 'con-line';
-        span.innerHTML = '<span class="con-prompt">›</span> <span class="' + cls + '">' + html + '</span>';
-        body.appendChild(span);
-        body.scrollTop = body.scrollHeight;
-      }
-
-      /* Commands */
-      var commands = {
-        help: function () {
-          addLine('con-info', '可用命令：help / time / words / clear / sfx / about / party');
-        },
-        time: function () {
-          var n = new Date();
-          addLine('con-info', '当前时间：' + n.toLocaleString('zh-CN'));
-        },
-        words: function () {
-          addLine('con-info', '本文约 ' + wc + ' 字，预计阅读 ' + Math.max(1, Math.round(wc / 300)) + ' 分钟。');
-        },
-        clear: function () {
-          body.innerHTML = '';
-        },
-        sfx: function () {
-          var cur = localStorage.getItem('luliy-sfx') !== '0';
-          localStorage.setItem('luliy-sfx', cur ? '0' : '1');
-          addLine('con-warn', '音效已' + (cur ? '关闭 🔇' : '开启 🔊'));
-        },
-        about: function () {
-          addLine('con-info',  'Luliy Blog — 记录点滴，我将无限进步！');
-          addLine('con-dim',   'Powered by Gmeek + GitHub Issues');
-          addLine('con-accent','作者：Luliy | luliy6@qq.com');
-        },
-        party: function () {
-          var emojis = ['🎉','🎊','✨','🚀','🌟','💫','🎈'];
-          for (var i = 0; i < 5; i++) {
-            (function (ii) {
-              setTimeout(function () {
-                addLine('con-info', emojis.map(function () {
-                  return emojis[Math.floor(Math.random() * emojis.length)];
-                }).join(' '));
-              }, ii * 120);
-            })(i);
-          }
-        }
-      };
-
-      input.addEventListener('keydown', function (e) {
-        if (e.key !== 'Enter') return;
-        var cmd = input.value.trim().toLowerCase();
-        input.value = '';
-        if (!cmd) return;
-        addLine('con-dim', '$ ' + cmd);
-        if (commands[cmd]) {
-          commands[cmd]();
-        } else {
-          addLine('con-err', 'bash: ' + cmd + ': command not found');
-          addLine('con-dim', '输入 help 查看可用命令。');
-        }
-      });
-
-      /* 3-D tilt on mouse move */
-      con.addEventListener('mousemove', function (e) {
-        var rect  = con.getBoundingClientRect();
-        var rx    = ((e.clientY - rect.top)  / rect.height - 0.5) * -6;
-        var ry    = ((e.clientX - rect.left) / rect.width  - 0.5) *  6;
-        con.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
-      });
-      con.addEventListener('mouseleave', function () {
-        con.style.transform = '';
-      });
-    })();
+    pbody.appendChild(spBox);
   }; /* end _luliyInitPost */
 
-  /* ─────────────────────────────────────────────────────────
-     ⑬ 首页初始化
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑬ 首页初始化 ──────────────────────────────────────── */
   root._luliyInitIndex = function () {
-    /* 公告栏 */
-    if (!document.querySelector('.announce-bar')) {
-      var bar = document.createElement('div');
-      bar.className = 'announce-bar';
-      bar.innerHTML = '📢 欢迎来到 Luliy 的博客！—— 记录点滴，我将无限进步！';
+    /* 公告栏：纯文字，无背景色块 */
+    if (!document.querySelector('.luliy-announce')) {
+      var bar = document.createElement('p');
+      bar.className = 'luliy-announce';
+      bar.style.cssText =
+        'text-align:center;font-size:14px;color:#888;margin:8px 0 20px;letter-spacing:0.5px;';
+      bar.textContent = '记录点滴 · 无限进步 🌱';
       var container = document.querySelector('.container-lg') || document.body;
       var first = container.querySelector('.post-list, .postList, [role="main"]') || container.firstChild;
       container.insertBefore(bar, first);
@@ -886,15 +754,12 @@
     }
   };
 
-  /* ─────────────────────────────────────────────────────────
-     ⑭ 主入口
-  ───────────────────────────────────────────────────────── */
+  /* ── ⑭ 主入口 ───────────────────────────────────────────── */
   initLocalStorage();
 
-  /* 粒子背景（尽早启动） */
   if (localStorage.getItem('luliy-particles') !== '0') {
-    if (document.body) { initParticles(); }
-    else { document.addEventListener('DOMContentLoaded', initParticles); }
+    if (document.body) initParticles();
+    else document.addEventListener('DOMContentLoaded', initParticles);
   }
 
   ready(function () {
@@ -908,18 +773,14 @@
     initAvatarClock();
     initLightbox();
 
-    var path     = location.pathname;
-    var isPost   = !!document.getElementById('postBody');
-    var isIndex  = path === '/' || path === '/index.html' || path === '';
+    var path      = location.pathname;
+    var isPost    = !!document.getElementById('postBody');
+    var isIndex   = path === '/' || path === '/index.html' || path === '';
     var isArchive = path.includes('archive');
-    var hasList  = !!document.querySelector('.post-item, .postList, .post-list');
+    var hasList   = !!document.querySelector('.post-item, .postList, .post-list');
 
-    if (isPost) {
-      root._luliyInitPost && root._luliyInitPost();
-    }
-    if (isIndex || isArchive || (!isPost && hasList)) {
-      root._luliyInitIndex && root._luliyInitIndex();
-    }
+    if (isPost) root._luliyInitPost();
+    if (isIndex || isArchive || (!isPost && hasList)) root._luliyInitIndex();
   });
 
 })(window);
