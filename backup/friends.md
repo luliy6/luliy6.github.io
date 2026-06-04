@@ -37,7 +37,7 @@
 </details>
 
 <details>
-<summary> 设计网站 </summary>**
+<summary> 设计网站 </summary>
 
 1. [reactbits（React动效组件库）](https://www.reactbits.dev/)
 大量可直接复用的React动画UI组件，前端页面动效参考首选。
