@@ -32,9 +32,7 @@
 如果您想了解任何概念，无论是心理学、地理还是科学……这个频道拥有让您变得更聪明的一切。
 
 <details>
- #** <summary> 设计网站 </summary>**
-
-# `设计网站`
+ # ** <summary> 设计网站 </summary>**
 
 1. [reactbits（React动效组件库）](https://www.reactbits.dev/)
 大量可直接复用的React动画UI组件，前端页面动效参考首选。
