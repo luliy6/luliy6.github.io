@@ -31,6 +31,8 @@
 5. [CrashCourse](https://www.youtube.com/)
 如果您想了解任何概念，无论是心理学、地理还是科学……这个频道拥有让您变得更聪明的一切。
 
+<details>
+<summary> # `设计网站` </summary>
 
 # `设计网站`
 
@@ -53,3 +55,5 @@ AI输入描述自动生成HTML/CSS页面，快速扒参考页面源码。
 • Awwwards：awwwards.com（高分精品官网收录）
 
 • Landbook：landbook.design（落地页合集
+
+</details>
