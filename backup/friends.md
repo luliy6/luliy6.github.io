@@ -68,3 +68,7 @@ AI输入描述自动生成HTML/CSS页面，快速扒参考页面源码。
 [CJF](https://iamx688110.github.io/)
 
 [Tiengming](https://code.buxiantang.top/)
+
+[无用功](https://g.weich.ee/)
+
+[hst](http://hst1189.github.io)
