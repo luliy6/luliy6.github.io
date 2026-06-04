@@ -1,18 +1,20 @@
 /* ============================================================
-   enhance.css — Luliy Blog v3
+   enhance.css — Luliy Blog v4
    1.  字体 & 全局基础
    2.  布局 & 点阵背景
    3.  自定义滚动条
-   4.  暗色模式覆盖
-   5.  macOS 代码块 — 带控制台边框效果
-   6.  TOC — 内嵌折叠面板（桌面 + 移动端统一）
-   7.  博客卡片
-   8.  图片灯箱
-   9.  头像下方时钟
-   10. 顶部进度条 & 回顶按钮
-   11. 暗色波纹 & 粒子 Canvas
-   12. 标签页工具栏
-   13. 响应式
+   4.  暗色模式基础覆盖
+   5.  macOS 代码块 — 控制台边框 + 三按钮
+   6.  TOC — 桌面悬浮右侧 / 移动端内嵌折叠
+   7.  主题系统 (5 种)
+   8.  博客卡片
+   9.  图片灯箱
+   10. 头像下方时钟
+   11. 顶部进度条 & 回顶按钮
+   12. 暗色波纹 & 粒子 Canvas
+   13. 标签页工具栏
+   14. 加密遮罩 (favorites 文章)
+   15. 响应式
    ============================================================ */
 
 /* ── 1. 字体 & 全局基础 ──────────────────────────────────── */
@@ -41,7 +43,7 @@ body {
 ::-webkit-scrollbar-thumb { background: #8250df; border-radius: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* ── 4. 暗色模式覆盖 ─────────────────────────────────────── */
+/* ── 4. 暗色模式基础覆盖 ─────────────────────────────────── */
 [data-color-mode="dark"] #postBody code {
   background: #2a2a3e !important;
   color: #ff9a3c !important;
@@ -59,28 +61,13 @@ body {
 [data-color-mode="dark"] #postBody tr:nth-child(even) { background: rgba(255,255,255,0.03) !important; }
 [data-color-mode="dark"] #postBody tr:hover           { background: rgba(130,80,223,0.10) !important; }
 [data-color-mode="dark"] .post-item   { background: #1a1a2e !important; }
-[data-color-mode="dark"] .announce-bar { background: #3a1f6e !important; }
-[data-color-mode="dark"] #postBody h1 {
-  color: #f0b429 !important;
-  border-bottom-color: rgba(240,180,41,0.3) !important;
-}
 
-/* ── 5. macOS 代码块 — 带控制台边框效果 ─────────────────── */
-
-/*
- * 代码块采用深色"控制台"外观：
- *   - 深色背景 + 紫色发光边框（继承自原虚拟控制台样式）
- *   - macOS 三圆点纯 CSS 装饰
- *   - 扫描线叠加层（轻微 CRT 效果）
- *   - 三个可点击按钮（红=复制, 黄=折叠, 绿=全屏）
- */
+/* ── 5. macOS 代码块 ─────────────────────────────────────── */
 #postBody pre {
   position: relative;
   padding-top: 42px !important;
   overflow-x: auto;
   max-width: 100%;
-
-  /* 控制台边框效果 */
   background: rgba(16,16,28,0.96) !important;
   border: 1px solid rgba(130,80,223,0.45) !important;
   border-radius: 14px !important;
@@ -88,7 +75,6 @@ body {
     0 0 0 1px rgba(130,80,223,0.12),
     0 8px 32px rgba(0,0,0,0.45),
     0 0 50px rgba(130,80,223,0.18) !important;
-
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
   transition: box-shadow 0.3s, transform 0.3s;
 }
@@ -99,7 +85,6 @@ body {
     0 0 70px rgba(130,80,223,0.26) !important;
   transform: translateY(-1px);
 }
-
 /* 扫描线叠加 */
 #postBody pre::after {
   content: '';
@@ -116,81 +101,64 @@ body {
   border-radius: 14px;
   z-index: 1;
 }
-
-/* macOS 三圆点（纯 CSS，不可点击） */
+/* macOS 三圆点（CSS 装饰） */
 #postBody pre::before {
   content: '';
   display: block;
   position: absolute;
-  top: 13px;
-  left: 14px;
-  width: 12px;
-  height: 12px;
+  top: 13px; left: 14px;
+  width: 12px; height: 12px;
   border-radius: 50%;
   background: #ff5f57;
   box-shadow: 20px 0 0 #febc2e, 40px 0 0 #28c840;
   z-index: 3;
   pointer-events: none;
 }
-
-/* 代码文字颜色适配深色背景 */
+/* 代码字色 */
 #postBody pre code {
   color: #cdd6f4 !important;
   background: none !important;
   padding: 0 !important;
   font-weight: normal !important;
 }
-
-/* macOS 按钮公共样式 */
+/* macOS 按钮公共 */
 .mac-btn {
   position: absolute;
   top: 9px;
-  width: 12px;
-  height: 12px;
+  width: 12px; height: 12px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
   z-index: 10;
   transition: filter 0.15s, transform 0.15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   padding: 0;
 }
 .mac-btn:hover { filter: brightness(1.18); transform: scale(1.22); }
-
 .mac-btn-red    { left: 14px; background: #ff5f57; }
 .mac-btn-yellow { left: 34px; background: #febc2e; }
 .mac-btn-green  { left: 54px; background: #28c840; }
-
-/* 工具提示 */
+/* Tooltip */
 .mac-btn::after {
   content: attr(data-tip);
   position: absolute;
-  top: 20px;
-  left: 50%;
+  top: 20px; left: 50%;
   transform: translateX(-50%);
   background: rgba(0,0,0,0.82);
-  color: #fff;
-  font-size: 11px;
+  color: #fff; font-size: 11px;
   white-space: nowrap;
-  padding: 3px 8px;
-  border-radius: 5px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.18s;
-  z-index: 20;
+  padding: 3px 8px; border-radius: 5px;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.18s; z-index: 20;
   font-family: sans-serif;
 }
 .mac-btn:hover::after { opacity: 1; }
-
-/* 状态变化 */
-.mac-btn-red.is-done        { background: #1f883d; }
-.mac-btn-yellow.is-folded   { background: #8250df; }
-pre.is-folded > code        { display: none; }
-pre.is-folded               { padding-bottom: 12px !important; }
-
-/* 全屏模式 */
+/* 状态 */
+.mac-btn-red.is-done      { background: #1f883d; }
+.mac-btn-yellow.is-folded { background: #8250df; }
+pre.is-folded > code      { display: none; }
+pre.is-folded             { padding-bottom: 12px !important; }
+/* 全屏 */
 pre.code-fullscreen {
   position: fixed !important;
   inset: 0 !important;
@@ -209,14 +177,21 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
   box-shadow: 0 0 0 3px rgba(130,80,223,0.4) !important;
 }
 
-/* ── 6. TOC — 내嵌折叠面板（桌面 + 移动端统一） ──────────
+/* ── 6. TOC 布局 ─────────────────────────────────────────────
  *
- * 策略：TOC 永远跟在正文里，不浮动，不 sticky 侧边栏。
- * 改为一个可展开/收起的面板，放在文章顶部（由 JS 移动）。
- * 这样彻底消灭了与正文内容的重叠问题。
- * ────────────────────────────────────────────────────────── */
+ * 桌面端（> 1100px）：
+ *   .luliy-toc-sidebar — fixed 悬浮右侧
+ *
+ * 中间宽度（761px – 1100px）：
+ *   .luliy-toc-wrap — 内嵌折叠面板，默认收起
+ *
+ * 移动端（≤ 760px）：
+ *   同中间宽度方案
+ *
+ * JS 会向 body 添加 .has-sidebar-toc 类来标记是否使用侧边栏。
+ * ──────────────────────────────────────────────────────────── */
 
-/* 折叠按钮 */
+/* === 内嵌折叠面板（默认样式，被侧边栏覆盖） === */
 .luliy-toc-wrap {
   margin: 0 0 24px 0;
   border-radius: 12px;
@@ -229,7 +204,6 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
   background: rgba(26,26,46,0.88);
   border-color: rgba(130,80,223,0.28);
 }
-
 .luliy-toc-toggle {
   display: flex;
   align-items: center;
@@ -237,16 +211,12 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
   width: 100%;
   padding: 10px 16px;
   background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: #0969da;
-  font-family: inherit;
+  border: none; cursor: pointer;
+  font-size: 14px; font-weight: 600;
+  color: #0969da; font-family: inherit;
 }
 [data-color-mode="dark"] .luliy-toc-toggle { color: #cba6f7; }
 .luliy-toc-toggle:hover { background: rgba(9,105,218,0.05); }
-
 .luliy-toc-arrow {
   font-size: 12px;
   transition: transform 0.28s ease;
@@ -254,9 +224,8 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
 }
 .luliy-toc-wrap.is-open .luliy-toc-arrow { transform: rotate(180deg); }
 
-/* TOC 主体：隐藏/展开靠 max-height 过渡 */
+/* TOC 内容区（内嵌时） */
 .toc, .markdown-toc, #markdown-toc {
-  /* 取消所有 sticky / float / position 覆盖，让它正常流 */
   position: static !important;
   float: none !important;
   max-height: 0 !important;
@@ -272,6 +241,8 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
   max-width: none !important;
   margin: 0 !important;
   backdrop-filter: none !important;
+  scrollbar-width: thin;
+  scrollbar-color: #c0c0c0 transparent;
 }
 .luliy-toc-wrap.is-open .toc,
 .luliy-toc-wrap.is-open .markdown-toc,
@@ -280,56 +251,6 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
   padding: 12px 14px !important;
   overflow-y: auto !important;
 }
-
-/* TOC 链接 */
-.toc a, .markdown-toc a, #markdown-toc a {
-  display: block;
-  border-radius: 7px;
-  padding: 5px 8px;
-  color: #57606a !important;
-  text-decoration: none !important;
-  line-height: 1.5;
-  transition: background 0.18s, color 0.18s;
-  font-size: 14px;
-}
-.toc a:hover, .markdown-toc a:hover, #markdown-toc a:hover {
-  background: rgba(9,105,218,0.08);
-  color: #0969da !important;
-}
-
-/* 活跃标题：黄色背景 + 红色文字 */
-.toc a.luliy-toc-active,
-.markdown-toc a.luliy-toc-active,
-#markdown-toc a.luliy-toc-active {
-  background: rgba(240,180,41,0.22) !important;
-  color: #d03a00 !important;
-  font-weight: 700 !important;
-  border-left: 3px solid #d03a00;
-  padding-left: 5px;
-}
-
-/* 暗色 TOC */
-[data-color-mode="dark"] .toc a,
-[data-color-mode="dark"] .markdown-toc a,
-[data-color-mode="dark"] #markdown-toc a { color: #bbb !important; }
-[data-color-mode="dark"] .toc a:hover,
-[data-color-mode="dark"] .markdown-toc a:hover,
-[data-color-mode="dark"] #markdown-toc a:hover {
-  background: rgba(130,80,223,0.18);
-  color: #ff9a3c !important;
-}
-[data-color-mode="dark"] .toc a.luliy-toc-active,
-[data-color-mode="dark"] .markdown-toc a.luliy-toc-active,
-[data-color-mode="dark"] #markdown-toc a.luliy-toc-active {
-  background: rgba(240,180,41,0.18) !important;
-  color: #ff9a3c !important;
-}
-
-/* TOC 窄滚动条 */
-.toc, .markdown-toc, #markdown-toc {
-  scrollbar-width: thin;
-  scrollbar-color: #c0c0c0 transparent;
-}
 .toc::-webkit-scrollbar,
 .markdown-toc::-webkit-scrollbar,
 #markdown-toc::-webkit-scrollbar { width: 4px; }
@@ -337,7 +258,343 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
 .markdown-toc::-webkit-scrollbar-thumb,
 #markdown-toc::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 4px; }
 
-/* ── 7. 博客卡片 ─────────────────────────────────────────── */
+/* === 桌面侧边栏样式（> 1100px，body.has-sidebar-toc） === */
+@media (min-width: 1101px) {
+  /* 给正文区留出右边 264px 的间距，避免遮挡 */
+  body.has-sidebar-toc #postBody {
+    padding-right: 280px !important;
+  }
+
+  /* 隐藏内嵌折叠面板 */
+  body.has-sidebar-toc .luliy-toc-wrap {
+    display: none !important;
+  }
+
+  /* 侧边栏容器 */
+  body.has-sidebar-toc .luliy-toc-sidebar {
+    display: block !important;
+  }
+}
+
+/* 侧边栏 — 默认隐藏，桌面媒体查询 + has-sidebar-toc 才显示 */
+.luliy-toc-sidebar {
+  display: none;
+  position: fixed;
+  top: 76px;
+  right: max(12px, calc((100vw - 960px) / 2 - 4px));
+  width: 240px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  border: 1px solid rgba(9,105,218,0.18);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.90);
+  box-shadow: 0 8px 28px rgba(9,105,218,0.10);
+  padding: 8px 0;
+  backdrop-filter: blur(12px);
+  z-index: 800;
+  scrollbar-width: thin;
+  scrollbar-color: #c0c0c0 transparent;
+  transition: box-shadow 0.3s;
+}
+.luliy-toc-sidebar:hover {
+  box-shadow: 0 12px 36px rgba(9,105,218,0.16);
+}
+[data-color-mode="dark"] .luliy-toc-sidebar {
+  background: rgba(26,26,46,0.92);
+  border-color: rgba(130,80,223,0.28);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+}
+.luliy-toc-sidebar::-webkit-scrollbar { width: 4px; }
+.luliy-toc-sidebar::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 4px; }
+
+/* 侧边栏标题行 */
+.luliy-toc-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0969da;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(9,105,218,0.10);
+  margin-bottom: 4px;
+}
+[data-color-mode="dark"] .luliy-toc-sidebar-header { color: #cba6f7; }
+
+/* 侧边栏中复用 TOC 内容 */
+.luliy-toc-sidebar .toc,
+.luliy-toc-sidebar .markdown-toc,
+.luliy-toc-sidebar .toc-clone {
+  position: static !important;
+  float: none !important;
+  max-height: none !important;
+  overflow: visible !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 4px 8px !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  backdrop-filter: none !important;
+  transition: none !important;
+}
+
+/* TOC 链接（内嵌 + 侧边栏共用） */
+.toc a, .markdown-toc a, #markdown-toc a,
+.luliy-toc-sidebar a {
+  display: block;
+  border-radius: 7px;
+  padding: 5px 8px;
+  color: #57606a !important;
+  text-decoration: none !important;
+  line-height: 1.5;
+  transition: background 0.18s, color 0.18s;
+  font-size: 13px;
+}
+.toc a:hover, .markdown-toc a:hover, #markdown-toc a:hover,
+.luliy-toc-sidebar a:hover {
+  background: rgba(9,105,218,0.08);
+  color: #0969da !important;
+}
+/* 活跃标题 */
+.toc a.luliy-toc-active,
+.markdown-toc a.luliy-toc-active,
+#markdown-toc a.luliy-toc-active,
+.luliy-toc-sidebar a.luliy-toc-active {
+  background: rgba(240,180,41,0.22) !important;
+  color: #d03a00 !important;
+  font-weight: 700 !important;
+  border-left: 3px solid #d03a00;
+  padding-left: 5px;
+}
+/* 暗色 TOC 链接 */
+[data-color-mode="dark"] .toc a,
+[data-color-mode="dark"] .markdown-toc a,
+[data-color-mode="dark"] #markdown-toc a,
+[data-color-mode="dark"] .luliy-toc-sidebar a { color: #bbb !important; }
+[data-color-mode="dark"] .toc a:hover,
+[data-color-mode="dark"] .markdown-toc a:hover,
+[data-color-mode="dark"] #markdown-toc a:hover,
+[data-color-mode="dark"] .luliy-toc-sidebar a:hover {
+  background: rgba(130,80,223,0.18);
+  color: #ff9a3c !important;
+}
+[data-color-mode="dark"] .toc a.luliy-toc-active,
+[data-color-mode="dark"] .markdown-toc a.luliy-toc-active,
+[data-color-mode="dark"] #markdown-toc a.luliy-toc-active,
+[data-color-mode="dark"] .luliy-toc-sidebar a.luliy-toc-active {
+  background: rgba(240,180,41,0.18) !important;
+  color: #ff9a3c !important;
+}
+
+/* ── 7. 主题系统 ─────────────────────────────────────────────
+ *
+ * 五种主题通过 body 的 data-luliy-theme 属性切换：
+ *   default        原版（黄金 H1 + 蓝色 H2）
+ *   classic-blue   经典蓝调
+ *   eco-green      生态绿意
+ *   sunset         日落余晖
+ *   mono           极简黑白
+ *   cyberpunk      赛博霓虹
+ *
+ * 切换按钮由 JS 注入到文章页右下角。
+ * ──────────────────────────────────────────────────────────── */
+
+/* --- 主题：default（原版）--- */
+body:not([data-luliy-theme]),
+body[data-luliy-theme="default"] {
+  --th-h1-color: #f0b429;
+  --th-h1-border: 2px solid rgba(240,180,41,0.4);
+  --th-h2-color: #0969da;
+  --th-h2-border-left: 5px solid #0969da;
+  --th-h2-bg: rgba(9,105,218,0.05);
+  --th-h3-color: #0969da;
+  --th-h4-color: #0969da;
+  --th-h5-color: #57606a;
+}
+
+/* --- 主题：classic-blue 经典蓝调 --- */
+body[data-luliy-theme="classic-blue"] {
+  --th-h1-color: #60a5fa;
+  --th-h1-border: 2px solid #3b82f6;
+  --th-h2-color: #93c5fd;
+  --th-h2-border-left: 4px solid #60a5fa;
+  --th-h2-bg: transparent;
+  --th-h3-color: #bfdbfe;
+  --th-h4-color: #dbeafe;
+  --th-h5-color: #eff6ff;
+}
+
+/* --- 主题：eco-green 生态绿意 --- */
+body[data-luliy-theme="eco-green"] {
+  --th-h1-color: #34d399;
+  --th-h1-border: 1px solid #059669;
+  --th-h2-color: #6ee7b7;
+  --th-h2-border-left: none;
+  --th-h2-bg: transparent;
+  --th-h3-color: #a7f3d0;
+  --th-h4-color: #d1fae5;
+  --th-h5-color: #ecfdf5;
+}
+
+/* --- 主题：sunset 日落余晖 --- */
+body[data-luliy-theme="sunset"] {
+  --th-h1-color: #fb923c;
+  --th-h1-border: none;
+  --th-h2-color: #fdba74;
+  --th-h2-border-left: none;
+  --th-h2-bg: transparent;
+  --th-h3-color: #fed7aa;
+  --th-h4-color: #ffedd5;
+  --th-h5-color: #fff7ed;
+}
+
+/* --- 主题：mono 极简黑白 --- */
+body[data-luliy-theme="mono"] {
+  --th-h1-color: #ffffff;
+  --th-h1-border: none;
+  --th-h2-color: #e5e5e5;
+  --th-h2-border-left: none;
+  --th-h2-bg: transparent;
+  --th-h3-color: #d4d4d4;
+  --th-h4-color: #a3a3a3;
+  --th-h5-color: #737373;
+}
+
+/* --- 主题：cyberpunk 赛博霓虹 --- */
+body[data-luliy-theme="cyberpunk"] {
+  --th-h1-color: #c084fc;
+  --th-h1-border: none;
+  --th-h2-color: #e879f9;
+  --th-h2-border-left: none;
+  --th-h2-bg: transparent;
+  --th-h3-color: #f0abfc;
+  --th-h4-color: #f5d0fe;
+  --th-h5-color: #fae8ff;
+}
+
+/* --- 把 CSS 变量应用到标题上 --- */
+#postBody h1 {
+  color: var(--th-h1-color, #f0b429) !important;
+  border-bottom: var(--th-h1-border, 2px solid rgba(240,180,41,0.4)) !important;
+  padding-bottom: 0.3em;
+}
+#postBody h2 {
+  color: var(--th-h2-color, #0969da) !important;
+  border-left: var(--th-h2-border-left, 5px solid #0969da) !important;
+  background: var(--th-h2-bg, rgba(9,105,218,0.05)) !important;
+  padding-left: 0.5em;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-radius: 0 8px 8px 0;
+}
+#postBody h3 { color: var(--th-h3-color, #0969da) !important; }
+#postBody h4 { color: var(--th-h4-color, #0969da) !important; }
+#postBody h5 { color: var(--th-h5-color, #57606a) !important; }
+
+/* 各主题特殊样式 */
+body[data-luliy-theme="sunset"] #postBody h1 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+body[data-luliy-theme="sunset"] #postBody h2 {
+  border-bottom: 1px dashed #ea580c !important;
+  border-left: none !important;
+}
+body[data-luliy-theme="eco-green"] #postBody h5 {
+  border-left: 2px solid #34d399 !important;
+  padding-left: 8px;
+}
+body[data-luliy-theme="mono"] #postBody h1 { font-weight: 800 !important; }
+body[data-luliy-theme="mono"] #postBody h2 { font-weight: 700 !important; }
+body[data-luliy-theme="mono"] #postBody h3 { font-weight: 600 !important; }
+body[data-luliy-theme="mono"] #postBody h4 { font-weight: 600 !important; }
+body[data-luliy-theme="mono"] #postBody h5 { text-transform: uppercase !important; }
+body[data-luliy-theme="cyberpunk"] #postBody h1 {
+  text-shadow: 0 0 8px #a855f7 !important;
+}
+body[data-luliy-theme="cyberpunk"] #postBody h2 {
+  border-bottom: 1px solid #701a75 !important;
+  border-left: none !important;
+}
+body[data-luliy-theme="classic-blue"] #postBody h5 { font-style: italic !important; }
+
+/* 主题切换器浮动按钮 */
+#luliy-theme-switcher {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+#luliy-theme-switcher-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(130,80,223,0.88);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(130,80,223,0.4);
+  transition: transform 0.25s, box-shadow 0.25s;
+  display: flex; align-items: center; justify-content: center;
+}
+#luliy-theme-switcher-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(130,80,223,0.55);
+}
+#luliy-theme-menu {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(130,80,223,0.2);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  backdrop-filter: blur(12px);
+  min-width: 140px;
+}
+[data-color-mode="dark"] #luliy-theme-menu {
+  background: rgba(26,26,46,0.96);
+  border-color: rgba(130,80,223,0.35);
+}
+#luliy-theme-menu.is-open { display: flex; }
+.luliy-theme-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #24292f;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.18s;
+  white-space: nowrap;
+}
+[data-color-mode="dark"] .luliy-theme-option { color: #ccc; }
+.luliy-theme-option:hover { background: rgba(130,80,223,0.12); }
+.luliy-theme-option.is-active {
+  background: rgba(130,80,223,0.16);
+  font-weight: 600;
+}
+.luliy-theme-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── 8. 博客卡片 ─────────────────────────────────────────── */
 .post-item {
   transition:
     transform 0.32s cubic-bezier(.4,0,.2,1),
@@ -351,7 +608,6 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
     0 0 0 2px rgba(130,80,223,0.22),
     0 0 32px 4px rgba(130,80,223,0.12);
 }
-
 @keyframes luliy-glow-border {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
@@ -368,81 +624,59 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
   animation: luliy-glow-border 2.4s ease infinite;
 }
 
-/* ── 8. 图片灯箱 ─────────────────────────────────────────── */
+/* ── 9. 图片灯箱 ─────────────────────────────────────────── */
 #luliy-lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 99990;
+  position: fixed; inset: 0; z-index: 99990;
   background: rgba(0,0,0,0.88);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: zoom-out;
-  opacity: 0;
-  pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: zoom-out; opacity: 0; pointer-events: none;
   transition: opacity 0.3s ease;
   backdrop-filter: blur(6px);
 }
-#luliy-lightbox.is-open {
-  opacity: 1;
-  pointer-events: all;
-}
+#luliy-lightbox.is-open { opacity: 1; pointer-events: all; }
 #luliy-lightbox img {
-  max-width: 90vw;
-  max-height: 88vh;
+  max-width: 90vw; max-height: 88vh;
   border-radius: 10px;
   box-shadow: 0 24px 80px rgba(0,0,0,0.5);
   transform: scale(0.88);
   transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  cursor: default;
-  object-fit: contain;
+  cursor: default; object-fit: contain;
 }
 #luliy-lightbox.is-open img { transform: scale(1); }
 #luliy-lightbox-close {
-  position: absolute;
-  top: 20px; right: 24px;
+  position: absolute; top: 20px; right: 24px;
   width: 36px; height: 36px;
-  background: rgba(255,255,255,0.12);
-  border: none; border-radius: 50%;
-  color: #fff; font-size: 20px; line-height: 1;
-  cursor: pointer;
+  background: rgba(255,255,255,0.12); border: none; border-radius: 50%;
+  color: #fff; font-size: 20px; line-height: 1; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.2s;
 }
 #luliy-lightbox-close:hover { background: rgba(255,255,255,0.28); }
 
-/* ── 9. 头像下方时钟 ─────────────────────────────────────── */
+/* ── 10. 头像下方时钟 ────────────────────────────────────── */
 #luliy-avatar-clock {
   text-align: center;
   font-size: 13px;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  color: #8250df;
-  font-weight: 600;
-  letter-spacing: 1px;
-  margin-top: 4px;
-  opacity: 0.85;
+  color: #8250df; font-weight: 600;
+  letter-spacing: 1px; margin-top: 4px; opacity: 0.85;
 }
-/* 头像链接包装 */
 a.luliy-avatar-link { display: inline-block; }
 a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
 [data-color-mode="dark"] #luliy-avatar-clock { color: #cba6f7; }
 
-/* ── 10. 顶部进度条 & 回顶按钮 ──────────────────────────── */
+/* ── 11. 顶部进度条 & 回顶按钮 ──────────────────────────── */
 #luliy-progress-bar {
   position: fixed; top: 0; left: 0;
   height: 3px; width: 0%;
   background: linear-gradient(90deg, #8250df, #f0b429);
-  z-index: 9999;
-  transition: width 0.1s linear;
-  pointer-events: none;
+  z-index: 9999; transition: width 0.1s linear; pointer-events: none;
 }
 #luliy-back-top {
   position: fixed; bottom: 24px; right: 24px;
   width: 44px; height: 44px;
-  background: rgba(130,80,223,0.9);
-  border: none; border-radius: 50%;
-  color: #fff; font-size: 18px;
-  cursor: pointer; z-index: 9998;
+  background: rgba(130,80,223,0.9); border: none; border-radius: 50%;
+  color: #fff; font-size: 18px; cursor: pointer; z-index: 9998;
   display: none; align-items: center; justify-content: center;
   box-shadow: 0 4px 16px rgba(130,80,223,0.4);
   transition: transform 0.25s, box-shadow 0.25s;
@@ -452,7 +686,7 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
   box-shadow: 0 8px 24px rgba(130,80,223,0.55);
 }
 
-/* ── 11. 暗色波纹 & 粒子 Canvas ──────────────────────────── */
+/* ── 12. 暗色波纹 & 粒子 Canvas ──────────────────────────── */
 #luliy-theme-ripple {
   position: fixed; border-radius: 50%; transform: scale(0);
   pointer-events: none; z-index: 99998; transition: none;
@@ -463,7 +697,7 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
   pointer-events: none; z-index: 0; opacity: 0.55;
 }
 
-/* ── 12. 标签页工具栏 ────────────────────────────────────── */
+/* ── 13. 标签页工具栏 ────────────────────────────────────── */
 .tag-enhance-toolbar {
   display: flex; align-items: center; gap: 10px;
   margin: 0 0 14px;
@@ -477,7 +711,75 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
 }
 .tag-enhance-count { font-size: 13px; color: #57606a; white-space: nowrap; }
 
-/* ── 13. 响应式 ──────────────────────────────────────────── */
+/* ── 14. 加密遮罩 ────────────────────────────────────────── */
+#luliy-lock-overlay {
+  position: fixed; inset: 0; z-index: 99995;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10,10,20,0.94);
+  backdrop-filter: blur(16px);
+}
+.luliy-lock-box {
+  background: rgba(26,26,46,0.98);
+  border: 1px solid rgba(130,80,223,0.45);
+  border-radius: 18px;
+  padding: 40px 48px;
+  text-align: center;
+  box-shadow:
+    0 0 0 1px rgba(130,80,223,0.12),
+    0 24px 60px rgba(0,0,0,0.6),
+    0 0 80px rgba(130,80,223,0.22);
+  max-width: 360px; width: 90%;
+}
+.luliy-lock-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+.luliy-lock-title {
+  font-size: 18px; font-weight: 700;
+  color: #cba6f7; margin-bottom: 6px;
+}
+.luliy-lock-hint {
+  font-size: 13px; color: #6c7086; margin-bottom: 22px;
+}
+.luliy-lock-input {
+  width: 100%; padding: 10px 16px;
+  border: 1px solid rgba(130,80,223,0.4);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  color: #cdd6f4; font-size: 16px;
+  text-align: center; letter-spacing: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 14px;
+}
+.luliy-lock-input:focus {
+  border-color: rgba(130,80,223,0.8);
+  box-shadow: 0 0 0 3px rgba(130,80,223,0.22);
+}
+.luliy-lock-input.is-wrong {
+  border-color: #f38ba8 !important;
+  box-shadow: 0 0 0 3px rgba(243,139,168,0.22) !important;
+  animation: lockShake 0.4s ease;
+}
+@keyframes lockShake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-8px); }
+  40%     { transform: translateX(8px); }
+  60%     { transform: translateX(-6px); }
+  80%     { transform: translateX(6px); }
+}
+.luliy-lock-btn {
+  width: 100%; padding: 11px;
+  border-radius: 10px; border: none;
+  background: linear-gradient(90deg, #8250df, #c084fc);
+  color: #fff; font-weight: 700; font-size: 15px;
+  cursor: pointer; font-family: inherit;
+  transition: filter 0.2s, transform 0.2s;
+}
+.luliy-lock-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.luliy-lock-err {
+  margin-top: 10px; font-size: 12px; color: #f38ba8; min-height: 18px;
+}
+
+/* ── 15. 响应式 ──────────────────────────────────────────── */
 @media (max-width: 760px) {
   body {
     padding-left: 12px !important;
@@ -489,6 +791,7 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
     padding-right: 12px !important;
   }
   #luliy-back-top { bottom: 80px; right: 14px; }
+  #luliy-theme-switcher { bottom: 130px; right: 14px; }
   #postBody {
     font-size: 16px !important;
     line-height: 1.85 !important;
@@ -501,4 +804,8 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
   .post-item:hover { transform: translateY(-4px); }
   .tag-enhance-toolbar { flex-direction: column; align-items: stretch; }
   .tag-enhance-count { white-space: normal; }
+  /* 移动端强制不显示侧边栏 */
+  .luliy-toc-sidebar { display: none !important; }
+  body.has-sidebar-toc #postBody { padding-right: 0 !important; }
+  body.has-sidebar-toc .luliy-toc-wrap { display: block !important; }
 }
