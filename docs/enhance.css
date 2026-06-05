@@ -1,23 +1,24 @@
 /* ============================================================
-   enhance.css — Luliy Blog v5
+   enhance.css — Luliy Blog v6 (Final Modification)
    ──────────────────────────────────────────────────────────
    结构：
      §0  全局 CSS 变量（三种阅读皮肤 + 默认）
      §1  字体 & 基础重置
-     §2  毛玻璃悬浮导航栏（暗色自适应）
+     §2  毛玻璃悬浮导航栏（暗色自适应）+ 头像位置修复
      §3  大屏居中布局（Max-Width 1000px）
      §4  自定义滚动条
      §5  粒子 Canvas & 暗色波纹
      §6  文章列表 SideNav Hover 特效
-     §7  首页卡片重构（流光浮动视差）
+     §7  首页卡片重构（流光浮动视差）+ 标题完整显示修复
      §8  macOS 代码块（三按钮，无 CSS 圆点装饰）
      §9  图片灯箱
      §10 头像时钟
-     §11 顶部进度条 & 回顶按钮
+     §11 顶部进度条 & 回顶按钮（确保圆形可见）
      §12 文章按钮组（浮动工具栏）
      §13 收藏加密遮罩
      §14 阅读皮肤（皮革/水墨/深海）
-     §15 响应式
+     §15 响应式 + 标签页样式协调
+     §16 TOC（目录）高级样式：背景图案 + 高亮跟随滚动
    ============================================================ */
 
 /* ── §0 全局 CSS 变量 ─────────────────────────────────────── */
@@ -158,7 +159,16 @@ html { scroll-behavior: smooth; }
 ::selection { background: #f0b429; color: #000; }
 a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
 
-/* ── §2 毛玻璃悬浮导航栏 ─────────────────────────────────── */
+/* 移除博客名后多余字母（如有伪元素生成） */
+.blogTitle a::after,
+.blogTitle::after,
+.postTitle::after,
+.blogTitle .blog-title::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* ── §2 毛玻璃悬浮导航栏 + 头像左偏修复 ─────────────────── */
 #header {
   position: fixed !important;
   top: 0 !important; left: 0 !important;
@@ -202,9 +212,19 @@ a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
   flex-shrink: 0 !important;
   z-index: 10000 !important;
   align-items: center !important;
+  margin-left: auto !important;  /* 关键：让右侧区域靠右，避免头像左偏 */
+}
+/* 确保头像本身不额外偏移 */
+#header .avatar,
+#header .avatar img,
+.avatar {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: none !important;
+  vertical-align: middle;
 }
 
-/* ── §3 大屏居中布局（Max-Width 1000px，参考 weich.ee/post/32） */
+/* ── §3 大屏居中布局（Max-Width 1000px） */
 #content, .main {
   margin: 85px auto 0 auto !important;
   padding: 0 24px !important;
@@ -260,12 +280,7 @@ body {
   border-left-color: #8250df !important;
 }
 
-/* ── §7 首页卡片重构（流光浮动视差） ────────────────────────
- *
- * 将 Gmeek 默认的 SideNav 列表转换为现代卡片网格。
- * JS 会为每个 .SideNav-item 添加 .luliy-card class，
- * 使 CSS 卡片样式生效而不影响原始列表结构。
- * ──────────────────────────────────────────────────────── */
+/* ── §7 首页卡片重构（流光浮动视差）+ 标题完整显示 ──────── */
 
 /* 卡片容器网格 */
 .luliy-card-grid {
@@ -285,13 +300,12 @@ body {
   background: #fff !important;
   box-shadow: 0 2px 14px rgba(130,80,223,0.08) !important;
   border: none !important;
-  border-left: none !important;           /* 覆盖 SideNav-item 的左边线 */
+  border-left: none !important;
   transform: translateY(0) scale(1);
   transition:
     transform 0.32s cubic-bezier(.4,0,.2,1),
     box-shadow 0.32s cubic-bezier(.4,0,.2,1) !important;
   will-change: transform, box-shadow;
-  /* 重置 SideNav hover 里的 translateX */
 }
 .luliy-card:hover {
   transform: translateY(-8px) scale(1.013) !important;
@@ -303,7 +317,7 @@ body {
   border-left: none !important;
 }
 
-/* 流光边框伪元素 */
+/* 流光边框 */
 .luliy-card::before {
   content: '';
   position: absolute;
@@ -330,13 +344,13 @@ body {
   animation: luliy-rainbow 2.4s ease infinite;
 }
 
-/* 四色左分条（仅视觉装饰，用 box-shadow 实现，不影响宽度） */
+/* 四色左分条 */
 .luliy-card:nth-child(4n+1)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#8250df; border-radius:16px 0 0 16px; z-index:2; }
 .luliy-card:nth-child(4n+2)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#0969da; border-radius:16px 0 0 16px; z-index:2; }
 .luliy-card:nth-child(4n+3)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#ff6b9d; border-radius:16px 0 0 16px; z-index:2; }
 .luliy-card:nth-child(4n+0)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#f0b429; border-radius:16px 0 0 16px; z-index:2; }
 
-/* 卡片内 a 链接（Gmeek 结构） */
+/* 卡片内链接样式 + 修复标题显示不全 */
 .luliy-card .SideNav-item-title-block {
   padding: 18px 18px 14px 22px;
   display: block;
@@ -346,6 +360,11 @@ body {
   text-decoration: none !important;
   display: block;
   padding: 16px 18px 12px 22px;
+  word-break: break-word;      /* 强制换行 */
+  white-space: normal;         /* 允许自动换行 */
+  overflow-wrap: anywhere;     /* 长单词/URL 可断开 */
+  line-height: 1.4;
+  font-weight: 500;
 }
 .luliy-card a:hover { color: #8250df !important; }
 [data-color-mode="dark"] .luliy-card {
@@ -366,7 +385,6 @@ body {
 .luliy-card:nth-child(6) { animation-delay: 0.25s; }
 .luliy-card:nth-child(n+7) { animation-delay: 0.30s; }
 
-/* 深色模式卡片阴影 */
 [data-color-mode="dark"] .luliy-card {
   box-shadow: 0 2px 14px rgba(0,0,0,0.35) !important;
 }
@@ -377,7 +395,7 @@ body {
     0 0 34px rgba(130,80,223,0.18) !important;
 }
 
-/* ── §8 macOS 代码块（三按钮，移除 CSS 圆点装饰） ────────── */
+/* ── §8 macOS 代码块 ────────────────────────────────────────── */
 #postBody pre {
   position: relative;
   padding-top: 42px !important;
@@ -400,21 +418,18 @@ body {
     0 0 68px rgba(130,80,223,0.24) !important;
   transform: translateY(-1px);
 }
-/* 扫描线 */
 #postBody pre::after {
   content: '';
   position: absolute; inset: 0;
   background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
   pointer-events: none; border-radius: 14px; z-index: 1;
 }
-/* 无 ::before 圆点 — 改用 JS 注入可点击按钮 */
 #postBody pre code {
   color: #cdd6f4 !important;
   background: none !important;
   padding: 0 !important;
   font-weight: normal !important;
 }
-/* macOS 按钮公共 */
 .mac-btn {
   position: absolute; top: 9px;
   width: 12px; height: 12px;
@@ -490,7 +505,7 @@ a.luliy-avatar-link { display: inline-block; }
 a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
 [data-color-mode="dark"] #luliy-avatar-clock { color: #cba6f7; }
 
-/* ── §11 顶部进度条 & 回顶按钮 ──────────────────────────── */
+/* ── §11 顶部进度条 & 回顶按钮（圆形确保可见） ───────────── */
 #luliy-progress-bar {
   position: fixed; top: 0; left: 0;
   height: 3px; width: 0%;
@@ -501,14 +516,14 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
   position: fixed; bottom: 24px; right: 24px;
   width: 44px; height: 44px;
   background: rgba(130,80,223,0.88); border: none; border-radius: 50%;
-  color: #fff; font-size: 18px; cursor: pointer; z-index: 9000;
+  color: #fff; font-size: 20px; cursor: pointer; z-index: 9000;
   display: none; align-items: center; justify-content: center;
   box-shadow: 0 4px 16px rgba(130,80,223,0.4);
   transition: transform 0.25s, box-shadow 0.25s;
 }
 #luliy-back-top:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(130,80,223,0.55); }
 
-/* ── §12 浮动工具栏（文章页右上角：主页/GitHub/主题/音效/皮肤）*/
+/* ── §12 浮动工具栏 ───────────────────────────────────────── */
 #luliy-toolbar {
   position: fixed;
   top: 76px;
@@ -545,7 +560,6 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
 [data-color-mode="dark"] .luliy-tb-btn:hover {
   background: rgba(40,40,65,0.98);
 }
-/* Tooltip */
 .luliy-tb-btn::after {
   content: attr(data-tip);
   position: absolute;
@@ -557,10 +571,9 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
   transition: opacity 0.18s; font-family: sans-serif;
 }
 .luliy-tb-btn:hover::after { opacity: 1; }
-/* 音效按钮 — 开启/关闭状态 */
 .luliy-tb-btn.sfx-off { opacity: 0.45; }
-/* 主题弹出菜单 */
-#luliy-theme-menu {
+#luliy-theme-menu,
+#luliy-skin-menu {
   display: none;
   flex-direction: column;
   gap: 3px;
@@ -571,41 +584,14 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
   backdrop-filter: blur(12px);
   min-width: 148px;
 }
-[data-color-mode="dark"] #luliy-theme-menu {
-  background: rgba(26,26,46,0.96);
-  border-color: rgba(130,80,223,0.35);
-}
-#luliy-theme-menu.is-open { display: flex; }
-.luliy-theme-opt {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 10px; border-radius: 8px;
-  border: none; background: transparent;
-  cursor: pointer; font-size: 13px;
-  color: #24292f; font-family: inherit;
-  text-align: left; transition: background 0.16s;
-  white-space: nowrap;
-}
-[data-color-mode="dark"] .luliy-theme-opt { color: #ccc; }
-.luliy-theme-opt:hover { background: rgba(130,80,223,0.12); }
-.luliy-theme-opt.is-active { background: rgba(130,80,223,0.18); font-weight:600; }
-.luliy-theme-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-/* 皮肤弹出菜单 */
-#luliy-skin-menu {
-  display: none;
-  flex-direction: column;
-  gap: 3px;
-  background: rgba(255,255,255,0.96);
-  border: 1px solid rgba(130,80,223,0.22);
-  border-radius: 12px; padding: 7px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.16);
-  backdrop-filter: blur(12px);
-  min-width: 140px;
-}
+[data-color-mode="dark"] #luliy-theme-menu,
 [data-color-mode="dark"] #luliy-skin-menu {
   background: rgba(26,26,46,0.96);
   border-color: rgba(130,80,223,0.35);
 }
+#luliy-theme-menu.is-open,
 #luliy-skin-menu.is-open { display: flex; }
+.luliy-theme-opt,
 .luliy-skin-opt {
   display: flex; align-items: center; gap: 8px;
   padding: 7px 10px; border-radius: 8px;
@@ -615,9 +601,13 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
   text-align: left; transition: background 0.16s;
   white-space: nowrap;
 }
+[data-color-mode="dark"] .luliy-theme-opt,
 [data-color-mode="dark"] .luliy-skin-opt { color: #ccc; }
+.luliy-theme-opt:hover,
 .luliy-skin-opt:hover { background: rgba(130,80,223,0.12); }
+.luliy-theme-opt.is-active,
 .luliy-skin-opt.is-active { background: rgba(130,80,223,0.18); font-weight:600; }
+.luliy-theme-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 .luliy-skin-swatch {
   width: 14px; height: 14px; border-radius: 4px;
   flex-shrink: 0; border: 1px solid rgba(0,0,0,0.12);
@@ -668,21 +658,18 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
 .luliy-lock-err { margin-top: 10px; font-size: 12px; color: #f38ba8; min-height: 18px; }
 
 /* ── §14 阅读皮肤正文样式细节 ───────────────────────────── */
-/* 羊皮纸 */
 body[data-skin="parchment"] #postBody h1,
 body[data-skin="parchment"] #postBody h2,
 body[data-skin="parchment"] #postBody h3 { color: #8b4513 !important; }
 body[data-skin="parchment"] #postBody blockquote { border-left-color: #b5651d !important; }
-/* 水墨 */
 body[data-skin="ink"] #postBody h1,
 body[data-skin="ink"] #postBody h2,
 body[data-skin="ink"] #postBody h3 { color: #e0e0e0 !important; }
-/* 深海 */
 body[data-skin="ocean"] #postBody h1 { color: #60a5fa !important; }
 body[data-skin="ocean"] #postBody h2 { color: #93c5fd !important; border-left-color: #60a5fa !important; }
 body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
 
-/* ── §15 响应式 ──────────────────────────────────────────── */
+/* ── §15 响应式 & 标签页背景协调 ────────────────────────── */
 @media (max-width: 768px) {
   #content, .main { padding: 0 12px !important; width: 100% !important; }
   #luliy-toolbar { top: auto; bottom: 130px; right: 12px; }
@@ -693,4 +680,87 @@ body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
   #postBody pre { font-size: 13px !important; }
   .luliy-card-grid { grid-template-columns: 1fr; }
   .luliy-tb-btn::after { display: none; }
+}
+
+/* 标签页背景协调（使标签背景与字体配合更好） */
+.Label,
+a.Label,
+.tag-enhance-toolbar .Label {
+  background: rgba(130,80,223,0.12) !important;
+  color: #24292f !important;
+  border-radius: 30px !important;
+  padding: 4px 12px !important;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+[data-color-mode="dark"] .Label,
+[data-color-mode="dark"] a.Label {
+  background: rgba(130,80,223,0.22) !important;
+  color: #cdd6f4 !important;
+}
+.tag-enhance-toolbar {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.tag-enhance-input {
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(130,80,223,0.3);
+  border-radius: 30px;
+  padding: 8px 16px;
+  font-size: 14px;
+  flex: 1;
+  min-width: 140px;
+}
+.tag-enhance-count {
+  font-size: 13px;
+  color: #57606a;
+}
+
+/* ── §16 TOC（目录）高级样式：背景图案 + 高亮跟随滚动 ──── */
+.article-toc,
+.toc,
+#markdown-toc {
+  background: radial-gradient(ellipse at 30% 20%, rgba(130,80,223,0.02), rgba(0,0,0,0.02));
+  backdrop-filter: blur(2px);
+  border-radius: 20px;
+  padding: 16px 20px;
+  margin: 1.5em 0 2em 0;
+  border: 1px solid rgba(130,80,223,0.25);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+.article-toc a,
+.toc a,
+#markdown-toc a {
+  text-decoration: none;
+  color: #0969da;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-block;
+  padding: 4px 0;
+}
+.article-toc a:hover,
+.toc a:hover {
+  color: #8250df;
+  transform: translateX(4px);
+}
+.article-toc a.active,
+.toc a.active {
+  color: #8250df;
+  font-weight: bold;
+  border-left: 3px solid #8250df;
+  padding-left: 10px;
+  background: linear-gradient(90deg, rgba(130,80,223,0.08), transparent);
+  border-radius: 0 6px 6px 0;
+}
+/* 深色模式 TOC 高亮 */
+[data-color-mode="dark"] .article-toc a.active,
+[data-color-mode="dark"] .toc a.active {
+  color: #cba6f7;
+  border-left-color: #cba6f7;
+  background: linear-gradient(90deg, rgba(203,166,247,0.12), transparent);
 }

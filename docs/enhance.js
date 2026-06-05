@@ -1,24 +1,26 @@
 /* ============================================================
-   enhance.js — Luliy Blog v5
+   enhance.js — Luliy Blog v6 (Final Modification)
    ──────────────────────────────────────────────────────────
    ①  localStorage 初始化
-   ②  顶部进度条 & 回顶按钮
+   ②  顶部进度条 & 回顶按钮（圆形保留）
    ③  动态标题
    ④  运行时间
    ⑤  暗色波纹
-   ⑥  粒子背景 Canvas
+   ⑥  粒子背景 Canvas（80颗粒子，色相240-300）
    ⑦  音效 (Web Audio)
    ⑧  点击粒子火花
    ⑨  头像时钟 + 链接到 /about
-   ⑩  标签页增强
+   ⑩  标签页增强（背景协调）
    ⑪  图片灯箱
    ⑫  浮动工具栏（主页 / GitHub / 主题 / 音效 / 皮肤）
    ⑬  favorites 前端加密（SHA-256）
-   ⑭  首页卡片重构
+   ⑭  首页卡片重构 + 标题完整显示修复
    ⑮  macOS 代码块三按钮
-   ⑯  文章页初始化 (_luliyInitPost)
-   ⑰  首页初始化   (_luliyInitIndex)
-   ⑱  主入口
+   ⑯  上一篇/下一篇 链接（每篇文章底部）
+   ⑰  TOC 滚动高亮与背景图案增强
+   ⑱  文章页初始化 (_luliyInitPost)
+   ⑲  首页初始化   (_luliyInitIndex)
+   ⑳  主入口
    ============================================================ */
 (function (root) {
   'use strict';
@@ -60,6 +62,7 @@
 
   /* ─── ② 顶部进度条 & 回顶 ───────────────────────────────── */
   function initProgressBar() {
+    if(document.getElementById('luliy-progress-bar')) return;
     var bar=document.createElement('div'); bar.id='luliy-progress-bar'; document.body.appendChild(bar);
     var btn=document.createElement('button'); btn.id='luliy-back-top'; btn.innerHTML='↑'; btn.title='回到顶部'; btn.style.display='none'; document.body.appendChild(btn);
     btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
@@ -121,7 +124,7 @@
     },800);
   }
 
-  /* ─── ⑥ 粒子背景 ───────────────────────────────────────── */
+  /* ─── ⑥ 粒子背景（80颗，色相240-300，每帧更新） ───────── */
   function initParticles() {
     if(document.getElementById('luliy-particle-canvas'))return;
     var canvas=document.createElement('canvas'); canvas.id='luliy-particle-canvas';
@@ -133,7 +136,15 @@
     document.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.active=true;},{passive:true});
     document.addEventListener('mouseleave',function(){mouse.active=false;});
     var pts=[];
-    for(var i=0;i<80;i++)pts.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,vx:(Math.random()-0.5)*0.6,vy:(Math.random()-0.5)*0.6,r:Math.random()*2.2+0.8,hue:Math.floor(Math.random()*60)+240});
+    // 固定80颗粒子，色相范围240-300（彩虹紫蓝区间）
+    for(var i=0;i<80;i++)pts.push({
+      x:Math.random()*window.innerWidth,
+      y:Math.random()*window.innerHeight,
+      vx:(Math.random()-0.5)*0.6,
+      vy:(Math.random()-0.5)*0.6,
+      r:Math.random()*2.2+0.8,
+      hue:Math.floor(Math.random()*60)+240   // 240~300
+    });
     function tick(){
       ctx.clearRect(0,0,W,H);
       var dark=document.documentElement.getAttribute('data-color-mode')==='dark',alpha=dark?0.7:0.45;
@@ -216,7 +227,7 @@
     if(!tryIns()){var tries=0,iv=setInterval(function(){if(tryIns()||++tries>20)clearInterval(iv);},300);}
   }
 
-  /* ─── ⑩ 标签页增强 ──────────────────────────────────────── */
+  /* ─── ⑩ 标签页增强（背景协调）────────────────────────────── */
   function initTagEnhance(){
     if(!/tag\.html?$|\/tag\/?$/i.test(location.pathname))return;
     var tries=0;
@@ -257,10 +268,7 @@
     root._luliyLightboxOpen=open;
   }
 
-  /* ─── ⑫ 浮动工具栏 ──────────────────────────────────────
-   *  按钮：主页 / GitHub / 文章主题 / 音效 / 阅读皮肤
-   *  全局注入（任何页面），右上角固定定位。
-   * ──────────────────────────────────────────────────────── */
+  /* ─── ⑫ 浮动工具栏（无改动但保留完整）──────────────────── */
   var THEMES=[
     {id:'default',     label:'默认金调',  dot:'#f0b429'},
     {id:'classic-blue',label:'经典蓝调',  dot:'#60a5fa'},
@@ -292,12 +300,9 @@
     if(document.getElementById('luliy-toolbar'))return;
     var bar=document.createElement('div');bar.id='luliy-toolbar';
 
-    /* 主页按钮 */
     var btnHome=document.createElement('a');btnHome.className='luliy-tb-btn';btnHome.href='/';btnHome.setAttribute('data-tip','主页');btnHome.innerHTML='🏠';
-    /* GitHub 按钮 */
     var btnGH=document.createElement('a');btnGH.className='luliy-tb-btn';btnGH.href='https://github.com/luliy6';btnGH.target='_blank';btnGH.setAttribute('data-tip','GitHub');btnGH.innerHTML='<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.67 7.67 0 0 1 8 4.58c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>';
 
-    /* 音效开关按钮 */
     var btnSfx=document.createElement('button');btnSfx.className='luliy-tb-btn';btnSfx.type='button';
     var sfxOn=localStorage.getItem('luliy-sfx')!=='0';
     btnSfx.innerHTML=sfxOn?'🔊':'🔇';btnSfx.setAttribute('data-tip',sfxOn?'关闭音效':'开启音效');
@@ -309,7 +314,6 @@
       btnSfx.classList.toggle('sfx-off',on);
     });
 
-    /* 文章主题按钮 + 下拉菜单 */
     var themeWrap=document.createElement('div');themeWrap.style.cssText='position:relative;';
     var btnTheme=document.createElement('button');btnTheme.className='luliy-tb-btn';btnTheme.type='button';btnTheme.setAttribute('data-tip','文章主题');btnTheme.innerHTML='🎨';
     var themeMenu=document.createElement('div');themeMenu.id='luliy-theme-menu';
@@ -322,7 +326,6 @@
     btnTheme.addEventListener('click',function(e){e.stopPropagation();themeMenu.classList.toggle('is-open');skinMenu.classList.remove('is-open');});
     themeWrap.appendChild(themeMenu);themeWrap.appendChild(btnTheme);
 
-    /* 阅读皮肤按钮 + 下拉菜单 */
     var skinWrap=document.createElement('div');skinWrap.style.cssText='position:relative;';
     var btnSkin=document.createElement('button');btnSkin.className='luliy-tb-btn';btnSkin.type='button';btnSkin.setAttribute('data-tip','阅读皮肤');btnSkin.innerHTML='🌈';
     var skinMenu=document.createElement('div');skinMenu.id='luliy-skin-menu';
@@ -335,20 +338,16 @@
     btnSkin.addEventListener('click',function(e){e.stopPropagation();skinMenu.classList.toggle('is-open');themeMenu.classList.remove('is-open');});
     skinWrap.appendChild(skinMenu);skinWrap.appendChild(btnSkin);
 
-    /* 点击外部关闭所有菜单 */
     document.addEventListener('click',function(){themeMenu.classList.remove('is-open');skinMenu.classList.remove('is-open');});
 
     bar.appendChild(btnHome);bar.appendChild(btnGH);bar.appendChild(btnSfx);bar.appendChild(themeWrap);bar.appendChild(skinWrap);
     document.body.appendChild(bar);
 
-    /* 恢复保存的主题和皮肤 */
     applyTheme(localStorage.getItem('luliy-theme')||'default');
     applySkin(localStorage.getItem('luliy-skin')||'default');
   }
 
-  /* ─── ⑬ favorites 前端加密（SHA-256） ──────────────────────
-   * 密码：121383
-   * ──────────────────────────────────────────────────────── */
+  /* ─── ⑬ favorites 前端加密（SHA-256）密码121383 ────────── */
   function sha256(str){
     function rotR(x,n){return(x>>>n)|(x<<(32-n));}
     var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
@@ -373,27 +372,23 @@
   var LOCK_KEY='luliy-unlocked-favorites';
 
   function isFavoritesPost(){
-    /* 方法 1：body 或 postBody 的 data-labels 属性 */
     var attr=(document.body.getAttribute('data-labels')||'')+
       ((document.getElementById('postBody')&&document.getElementById('postBody').getAttribute('data-labels'))||'');
     if(/favorites/i.test(attr))return true;
-    /* 方法 2：页面 DOM 里的 .Label 文字 */
     var found=false;
     document.querySelectorAll('.Label,a.Label').forEach(function(el){if(/favorites/i.test(el.textContent))found=true;});
-    /* 方法 3：页面标题 / URL 含 favorites（兜底） */
     if(!found)/favorites/i.test(document.title+location.href)&&(found=true);
     return found;
   }
 
   function initLock(){
     if(!document.getElementById('postBody'))return;
-    /* 等待标签渲染完成后再判断（Gmeek 可能异步插入 .Label） */
     function check(attempts){
       if(isFavoritesPost()){showLock();return;}
       if(attempts>0)setTimeout(function(){check(attempts-1);},300);
     }
     if(sessionStorage.getItem(LOCK_KEY)==='1')return;
-    check(6); /* 最多等待 ~1.8s */
+    check(6);
   }
 
   function showLock(){
@@ -422,11 +417,7 @@
     setTimeout(function(){inp.focus();},120);
   }
 
-  /* ─── ⑭ 首页卡片重构 ────────────────────────────────────
-   * Gmeek 首页用 <ul class="SideNav"> 渲染文章列表。
-   * 我们给 <ul> 加 .luliy-card-grid，给每个 <li> 加 .luliy-card，
-   * CSS 里的 grid + 卡片样式就自动生效。
-   * ──────────────────────────────────────────────────────── */
+  /* ─── ⑭ 首页卡片重构 + 标题完整显示（已由CSS处理） ─────── */
   function initCards(){
     var nav=document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
     if(!nav||nav.getAttribute('data-luliy-cards'))return;
@@ -437,7 +428,7 @@
     });
   }
 
-  /* ─── ⑮ macOS 代码块三按钮（无 CSS 圆点）────────────────── */
+  /* ─── ⑮ macOS 代码块三按钮 ──────────────────────────────── */
   function initCodeBlocks(pbody){
     pbody.querySelectorAll('pre').forEach(function(pre){
       if(pre.querySelector('.mac-btn'))return;
@@ -449,7 +440,6 @@
       var bR=makeBtn('mac-btn-red','复制代码');
       var bY=makeBtn('mac-btn-yellow','折叠代码');
       var bG=makeBtn('mac-btn-green','全屏阅读');
-      /* 红 → 复制 */
       bR.addEventListener('click',function(e){
         e.stopPropagation();playSfx('click');
         var txt=code.innerText||code.textContent||'';
@@ -457,12 +447,10 @@
         if(navigator.clipboard&&location.protocol==='https:')navigator.clipboard.writeText(txt).then(done).catch(done);
         else{var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(_){}ta.remove();done();}
       });
-      /* 黄 → 折叠 */
       bY.addEventListener('click',function(e){
         e.stopPropagation();playSfx('click');
         var f=pre.classList.toggle('is-folded');bY.classList.toggle('is-folded',f);bY.setAttribute('data-tip',f?'展开代码':'折叠代码');
       });
-      /* 绿 → 全屏 */
       function toggleFS(){playSfx('sci');var f=pre.classList.toggle('code-fullscreen');bG.setAttribute('data-tip',f?'退出全屏':'全屏阅读');}
       bG.addEventListener('click',function(e){e.stopPropagation();toggleFS();});
       pre.addEventListener('dblclick',function(e){if(e.target===bR||e.target===bY||e.target===bG)return;toggleFS();});
@@ -471,105 +459,144 @@
     });
   }
 
-  /* ─── ⑯ 文章页初始化 ────────────────────────────────────── */
-  root._luliyInitPost=function(){
-    if(root._luliyPostInited)return; root._luliyPostInited=true;
-    var pbody=document.getElementById('postBody');
-    /* 外链新标签 & 图片懒加载 */
-    document.querySelectorAll('a[href^="http"]').forEach(function(a){if(!a.href.includes('luliy6.github.io'))a.target='_blank';});
-    if(pbody)pbody.querySelectorAll('img').forEach(function(img){img.loading='lazy';});
-    if(!pbody)return;
-    /* 阅读时长（仅一次） */
-    if(!document.getElementById('luliy-readmeta')){
-      var wc=pbody.innerText.length;
-      var rt=document.createElement('p');rt.id='luliy-readmeta';
-      rt.innerHTML='预计阅读：约 <strong>'+Math.max(1,Math.round(wc/300))+'</strong> 分钟 &nbsp;|&nbsp; 共 <strong>'+wc+'</strong> 字';
-      rt.style.cssText='color:#888;font-size:13px;margin-bottom:1.5rem';
-      pbody.insertBefore(rt,pbody.firstChild);
+  /* ─── ⑯ 文章底部 上一篇/下一篇 链接（增强）──────────────── */
+  function initPrevNext(pbody, posts, currentLink) {
+    var idx = -1;
+    for (var i = 0; i < posts.length; i++) {
+      var link = posts[i].link.replace(/\/$/, '');
+      if (link === currentLink) { idx = i; break; }
     }
-    /* 标题复制链接 */
+    if (idx < 0) return;
+    var nav = document.createElement('div');
+    nav.style.cssText = 'display:flex;justify-content:space-between;gap:16px;margin-top:40px;padding-top:20px;border-top:2px dashed rgba(9,105,218,0.2)';
+    function mkNav(post, label, align) {
+      if (!post) return document.createElement('div');
+      var a = document.createElement('a'); a.href = post.link;
+      a.style.cssText = 'flex:1;padding:14px 18px;border-radius:12px;background:rgba(9,105,218,0.05);border:1px solid rgba(9,105,218,0.15);text-decoration:none;transition:all 0.25s;text-align:' + align;
+      a.innerHTML = '<span style="display:block;font-size:11px;color:#888;margin-bottom:4px">' + label + '</span><span style="color:#0969da;font-weight:bold;font-size:14px">' + esc(post.title) + '</span>';
+      a.addEventListener('mouseover', function () { a.style.background = 'rgba(9,105,218,0.12)'; a.style.transform = 'translateY(-2px)'; });
+      a.addEventListener('mouseout', function () { a.style.background = 'rgba(9,105,218,0.05)'; a.style.transform = ''; });
+      return a;
+    }
+    nav.appendChild(mkNav(posts[idx + 1] || null, '⬅ 上一篇', 'left'));
+    nav.appendChild(mkNav(posts[idx - 1] || null, '下一篇 ➡', 'right'));
+    pbody.appendChild(nav);
+  }
+
+  /* ─── ⑰ TOC 滚动高亮 + 背景图案增强 ────────────────────── */
+  function initTOCScroll() {
+    var tocContainer = document.querySelector('.article-toc, .toc, #markdown-toc');
+    if (!tocContainer) return;
+    // 给目录容器添加一个优雅的背景图案（已由CSS完成）
+    var headings = Array.from(document.querySelectorAll('#postBody h1, #postBody h2, #postBody h3'));
+    if (headings.length === 0) return;
+    var tocLinks = tocContainer.querySelectorAll('a');
+    if (tocLinks.length === 0) return;
+    function setActive() {
+      var scrollTop = window.scrollY + 80; // 偏移量
+      var activeIndex = -1;
+      for (var i = 0; i < headings.length; i++) {
+        var heading = headings[i];
+        if (!heading.id) heading.id = 'heading-' + i;
+        var offset = heading.offsetTop;
+        if (offset <= scrollTop) activeIndex = i;
+        else break;
+      }
+      tocLinks.forEach(function(link, idx) {
+        link.classList.remove('active');
+        if (idx === activeIndex || (activeIndex === -1 && idx === 0)) {
+          link.classList.add('active');
+        }
+      });
+    }
+    window.addEventListener('scroll', setActive);
+    setActive();
+  }
+
+  /* ─── ⑱ 文章页初始化 ────────────────────────────────────── */
+  root._luliyInitPost = function () {
+    if (root._luliyPostInited) return; root._luliyPostInited = true;
+    var pbody = document.getElementById('postBody');
+    if (!pbody) return;
+    // 外链新标签 & 图片懒加载
+    document.querySelectorAll('a[href^="http"]').forEach(function(a){if(!a.href.includes('luliy6.github.io'))a.target='_blank';});
+    pbody.querySelectorAll('img').forEach(function(img){img.loading='lazy';});
+    // 阅读时长
+    if (!document.getElementById('luliy-readmeta')) {
+      var wc = pbody.innerText.length;
+      var rt = document.createElement('p'); rt.id = 'luliy-readmeta';
+      rt.innerHTML = '预计阅读：约 <strong>' + Math.max(1, Math.round(wc / 300)) + '</strong> 分钟 &nbsp;|&nbsp; 共 <strong>' + wc + '</strong> 字';
+      rt.style.cssText = 'color:#888;font-size:13px;margin-bottom:1.5rem';
+      pbody.insertBefore(rt, pbody.firstChild);
+    }
+    // 标题复制链接
     pbody.querySelectorAll('h1,h2,h3').forEach(function(h){
-      if(h._luliyCopy)return; h._luliyCopy=true; h.style.cursor='pointer'; h.title='点击复制链接';
-      h.addEventListener('click',function(){
-        var url=location.href.split('#')[0]+'#'+h.id;
-        if(navigator.clipboard)navigator.clipboard.writeText(url);
-        var tip=document.createElement('span');tip.textContent=' ✓';tip.style.cssText='font-size:12px;color:#1f883d;font-weight:normal';
-        h.appendChild(tip);setTimeout(function(){tip.remove();},2000);
+      if (h._luliyCopy) return; h._luliyCopy = true;
+      h.style.cursor = 'pointer'; h.title = '点击复制链接';
+      h.addEventListener('click', function () {
+        var url = location.href.split('#')[0] + '#' + h.id;
+        if (navigator.clipboard) navigator.clipboard.writeText(url);
+        var tip = document.createElement('span'); tip.textContent = ' ✓'; tip.style.cssText = 'font-size:12px;color:#1f883d;font-weight:normal';
+        h.appendChild(tip); setTimeout(function () { tip.remove(); }, 2000);
       });
     });
-    /* 代码块 */
     initCodeBlocks(pbody);
-    /* 上一篇 / 下一篇 */
-    fetchPosts().then(function(posts){
-      var cur=location.pathname.replace(/\/$/,''),idx=-1;
-      posts.forEach(function(p,i){if(p.link&&p.link.replace(/\/$/,'')===cur)idx=i;});
-      if(idx<0)return;
-      var nav=document.createElement('div');
-      nav.style.cssText='display:flex;justify-content:space-between;gap:16px;margin-top:40px;padding-top:20px;border-top:2px dashed rgba(9,105,218,0.2)';
-      function mkNav(post,label,align){
-        if(!post)return document.createElement('div');
-        var a=document.createElement('a');a.href=post.link;
-        a.style.cssText='flex:1;padding:14px 18px;border-radius:12px;background:rgba(9,105,218,0.05);border:1px solid rgba(9,105,218,0.15);text-decoration:none;transition:all 0.25s;text-align:'+align;
-        a.innerHTML='<span style="display:block;font-size:11px;color:#888;margin-bottom:4px">'+label+'</span><span style="color:#0969da;font-weight:bold;font-size:14px">'+esc(post.title)+'</span>';
-        a.addEventListener('mouseover',function(){a.style.background='rgba(9,105,218,0.12)';a.style.transform='translateY(-2px)';});
-        a.addEventListener('mouseout',function(){a.style.background='rgba(9,105,218,0.05)';a.style.transform='';});
-        return a;
-      }
-      nav.appendChild(mkNav(posts[idx+1]||null,'⬅ 上一篇','left'));
-      nav.appendChild(mkNav(posts[idx-1]||null,'下一篇 ➡','right'));
-      pbody.appendChild(nav);
+    // 上一篇/下一篇
+    fetchPosts().then(function (posts) {
+      var cur = location.pathname.replace(/\/$/, '');
+      initPrevNext(pbody, posts, cur);
     }).catch(function(){});
-    /* 赞赏面板 */
-    var sp=document.createElement('div');sp.style.cssText='margin-top:50px;text-align:center';
-    var spb=document.createElement('button');spb.innerHTML='✨ 和作者无限进步';
-    spb.style.cssText='padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(240,180,41,0.3);transition:transform 0.3s';
-    var qr=document.createElement('div');
-    qr.innerHTML='<p style="font-size:13px;color:#888;margin:10px 0">无限进步，进步有你！</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="赞赏码" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
-    qr.style.cssText='height:0;overflow:hidden;transition:height 0.4s ease,opacity 0.4s ease;opacity:0';
+    // 赞赏面板
+    var sp = document.createElement('div'); sp.style.cssText = 'margin-top:50px;text-align:center';
+    var spb = document.createElement('button'); spb.innerHTML = '✨ 和作者无限进步';
+    spb.style.cssText = 'padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(240,180,41,0.3);transition:transform 0.3s';
+    var qr = document.createElement('div');
+    qr.innerHTML = '<p style="font-size:13px;color:#888;margin:10px 0">无限进步，进步有你！</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="赞赏码" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
+    qr.style.cssText = 'height:0;overflow:hidden;transition:height 0.4s ease,opacity 0.4s ease;opacity:0';
     spb.addEventListener('mouseover',function(){spb.style.transform='translateY(-2px)';});
     spb.addEventListener('mouseout',function(){spb.style.transform='';});
     spb.addEventListener('click',function(){var o=!qr.style.height||qr.style.height==='0px';qr.style.height=o?'260px':'0px';qr.style.opacity=o?'1':'0';});
     sp.appendChild(spb);sp.appendChild(qr);pbody.appendChild(sp);
+    // TOC 高亮
+    setTimeout(initTOCScroll, 300);
   };
 
-  /* ─── ⑰ 首页初始化 ──────────────────────────────────────── */
-  root._luliyInitIndex=function(){
+  /* ─── ⑲ 首页初始化 ──────────────────────────────────────── */
+  root._luliyInitIndex = function () {
     initCards();
-    /* 归档页 */
-    if(location.pathname.includes('archive')){
-      var pb=document.getElementById('postBody');
-      if(pb){
-        pb.innerHTML='<p style="color:#888;font-size:14px">正在加载归档...</p>';
-        fetchPosts().then(function(posts){
-          var byY={};
+    if (location.pathname.includes('archive')) {
+      var pb = document.getElementById('postBody');
+      if (pb) {
+        pb.innerHTML = '<p style="color:#888;font-size:14px">正在加载归档...</p>';
+        fetchPosts().then(function (posts) {
+          var byY = {};
           posts.forEach(function(p){var y=(p.created||'未知').slice(0,4);if(!byY[y])byY[y]=[];byY[y].push(p);});
-          var years=Object.keys(byY).sort(function(a,b){return b-a;});
-          var html='<h1 style="border-bottom:2px solid rgba(240,180,41,0.4);padding-bottom:10px;margin-bottom:30px">📅 文章归档</h1>';
+          var years = Object.keys(byY).sort(function(a,b){return b-a;});
+          var html = '<h1 style="border-bottom:2px solid rgba(240,180,41,0.4);padding-bottom:10px;margin-bottom:30px">📅 文章归档</h1>';
           years.forEach(function(y){
-            html+='<div class="tl-year">'+y+' 年</div><ul class="tl-list">';
+            html += '<div class="tl-year">' + y + ' 年</div><ul class="tl-list">';
             byY[y].forEach(function(p){var md=(p.created||'').slice(5,10).replace('-','/');html+='<li class="tl-item"><a href="'+esc(p.link)+'">'+esc(p.title)+'</a><span class="tl-date">'+md+'</span></li>';});
-            html+='</ul>';
+            html += '</ul>';
           });
-          pb.innerHTML=html;
+          pb.innerHTML = html;
         }).catch(function(){pb.innerHTML='<p style="color:#e74c3c">归档加载失败，请刷新重试。</p>';});
       }
     }
   };
 
-  /* ─── ⑱ 主入口 ──────────────────────────────────────────── */
+  /* ─── ⑳ 主入口 ──────────────────────────────────────────── */
   initLocalStorage();
-  /* 立即恢复主题和皮肤（防 FOUC） */
-  var savedTheme=localStorage.getItem('luliy-theme')||'default';
-  var savedSkin=localStorage.getItem('luliy-skin')||'default';
-  document.body.setAttribute('data-luliy-theme',savedTheme);
-  if(savedSkin!=='default')document.body.setAttribute('data-skin',savedSkin);
+  var savedTheme = localStorage.getItem('luliy-theme') || 'default';
+  var savedSkin = localStorage.getItem('luliy-skin') || 'default';
+  document.body.setAttribute('data-luliy-theme', savedTheme);
+  if (savedSkin !== 'default') document.body.setAttribute('data-skin', savedSkin);
 
-  if(localStorage.getItem('luliy-particles')!=='0'){
-    if(document.body)initParticles();
-    else document.addEventListener('DOMContentLoaded',initParticles);
+  if (localStorage.getItem('luliy-particles') !== '0') {
+    if (document.body) initParticles();
+    else document.addEventListener('DOMContentLoaded', initParticles);
   }
 
-  ready(function(){
+  ready(function () {
     initProgressBar();
     initDynamicTitle();
     initUptime();
@@ -582,14 +609,14 @@
     initToolbar();
     initLock();
 
-    var path=location.pathname;
-    var isPost=!!document.getElementById('postBody');
-    var isIndex=path==='/'||path==='/index.html'||path==='';
-    var isArchive=path.includes('archive');
-    var hasList=!!document.querySelector('.SideNav,.post-item,.postList,.post-list');
+    var path = location.pathname;
+    var isPost = !!document.getElementById('postBody');
+    var isIndex = path === '/' || path === '/index.html' || path === '';
+    var isArchive = path.includes('archive');
+    var hasList = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
 
-    if(isPost)root._luliyInitPost();
-    if(isIndex||isArchive||(!isPost&&hasList))root._luliyInitIndex();
+    if (isPost) root._luliyInitPost();
+    if (isIndex || isArchive || (!isPost && hasList)) root._luliyInitIndex();
   });
 
 })(window);
