@@ -1,5 +1,5 @@
 /* ============================================================
-   enhance.js — Luliy Blog v5
+   enhance.js — Luliy Blog v5 (Fixed)
    ──────────────────────────────────────────────────────────
    ①  localStorage 初始化
    ②  顶部进度条 & 回顶按钮
@@ -124,7 +124,7 @@
       var cx=window.innerWidth/2,cy=window.innerHeight/2,maxR=Math.sqrt(cx*cx+cy*cy)*2.2;
       var isDark=document.documentElement.getAttribute('data-color-mode')==='dark';
       var el=document.createElement('div'); el.id='luliy-theme-ripple';
-      el.style.cssText='position:fixed;top:'+cy+'px;left:'+cx+'px;width:0;height:0;border-radius:50%;background:'+(isDark?'rgba(10,20,40,0.96)':'rgba(255,255,255,0.96)')+';pointer-events:none;z-index:99998;transform:translate(-50%,-50%) scale(0);transition:transform 0.65s cubic-bezier(.4,0,.2,1),opacity 0.65s ease;';
+      el.style.cssText='position:fixed;top:'+cy+'px;left:'+cx+'px;width:0;height:0;border-radius:50%;background:'+(isDark?'rgba(10,20,40,0.96)':'rgba(255,255,255,0.96)')+';pointer-events:none;z-index:99998;transition:all 0.7s ease-out';
       document.body.appendChild(el); el.getBoundingClientRect();
       el.style.width=el.style.height=(maxR*2)+'px';
       el.style.transform='translate(-50%,-50%) scale(1)'; el.style.opacity='0';
@@ -153,7 +153,7 @@
     document.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.active=true;},{passive:true});
     document.addEventListener('mouseleave',function(){mouse.active=false;});
     var pts=[];
-    for(var i=0;i<80;i++)pts.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,vx:(Math.random()-0.5)*0.6,vy:(Math.random()-0.5)*0.6,r:Math.random()*2.2+0.8,hue:Math.floor(Math.random()*60)+240});
+    for(var i=0;i<80;i++)pts.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,vx:(Math.random()-0.5)*0.6,vy:(Math.random()-0.5)*0.6,r:Math.random()*2.2+0.8,hue:Math.floor(Math.random()*360)});
     function tick(){
       ctx.clearRect(0,0,W,H);
       var dark=document.documentElement.getAttribute('data-color-mode')==='dark',alpha=dark?0.7:0.45;
@@ -189,9 +189,9 @@
     if(localStorage.getItem('luliy-sfx')==='0')return;
     var ctx=getACtx();if(!ctx)return;
     try{
-      if(type==='click'){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.setValueAtTime(900,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(400,ctx.currentTime+0.05);g.gain.setValueAtTime(0.04,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.06);o.start();o.stop(ctx.currentTime+0.06);}
-      else if(type==='sci'){var o2=ctx.createOscillator(),g2=ctx.createGain();o2.connect(g2);g2.connect(ctx.destination);o2.type='sine';o2.frequency.setValueAtTime(440,ctx.currentTime);o2.frequency.exponentialRampToValueAtTime(880,ctx.currentTime+0.12);o2.frequency.exponentialRampToValueAtTime(660,ctx.currentTime+0.22);g2.gain.setValueAtTime(0.06,ctx.currentTime);g2.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.25);o2.start();o2.stop(ctx.currentTime+0.25);}
-      else if(type==='theme'){[0,0.08,0.16].forEach(function(delay,idx){var ot=ctx.createOscillator(),gt=ctx.createGain();ot.connect(gt);gt.connect(ctx.destination);ot.type='sine';ot.frequency.setValueAtTime([523,659,784][idx],ctx.currentTime+delay);gt.gain.setValueAtTime(0.05,ctx.currentTime+delay);gt.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+delay+0.18);ot.start(ctx.currentTime+delay);ot.stop(ctx.currentTime+delay+0.18);});}
+      if(type==='click'){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.setValueAtTime(900,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(600,ctx.currentTime+0.1);g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.1);o.start(ctx.currentTime);o.stop(ctx.currentTime+0.1);}
+      else if(type==='sci'){var o2=ctx.createOscillator(),g2=ctx.createGain();o2.connect(g2);g2.connect(ctx.destination);o2.type='sine';o2.frequency.setValueAtTime(440,ctx.currentTime);o2.frequency.exponentialRampToValueAtTime(880,ctx.currentTime+0.2);g2.gain.setValueAtTime(0.2,ctx.currentTime);g2.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.2);o2.start(ctx.currentTime);o2.stop(ctx.currentTime+0.2);}
+      else if(type==='theme'){[0,0.08,0.16].forEach(function(delay,idx){var ot=ctx.createOscillator(),gt=ctx.createGain();ot.connect(gt);gt.connect(ctx.destination);ot.type='sine';ot.frequency.setValueAtTime(600+idx*200,ctx.currentTime+delay);gt.gain.setValueAtTime(0.15,ctx.currentTime+delay);gt.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+delay+0.15);ot.start(ctx.currentTime+delay);ot.stop(ctx.currentTime+delay+0.15);});}
     }catch(e){}
   }
   root._luliySfx=playSfx;
@@ -209,11 +209,12 @@
       for(var i=0;i<12;i++) (function(){
         var s=document.createElement('div');
         var angle=Math.random()*360, dist=Math.random()*50+16;
-        s.style.cssText='position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:99999;background:'+colors[Math.floor(Math.random()*colors.length)]+';transform:translate(-50%,-50%);transition:transform 0.6s ease,opacity 0.6s ease;';
+        s.style.cssText='position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:99999;background:'+colors[Math.floor(Math.random()*colors.length)]+';box-shadow:0 0 6px '+colors[Math.floor(Math.random()*colors.length)];
         document.body.appendChild(s);
         requestAnimationFrame(function(){
           s.style.transform='translate(calc(-50% + '+(Math.cos(angle*Math.PI/180)*dist)+'px),calc(-50% + '+(Math.sin(angle*Math.PI/180)*dist)+'px))';
           s.style.opacity='0';
+          s.style.transition='all 0.6s ease-out';
         });
         setTimeout(function(){s.remove();},700);
       })();
@@ -223,7 +224,7 @@
   /* ⑨  头像时钟 & 链接到 About */
   function initAvatarClock(){
     function tryIns(){
-      var av=document.querySelector('.avatar, img.avatar, .blogTitle img');
+      var av=document.querySelector('.avatar, img.avatar, .blogTitle img, [class*="avatar"]');
       if(!av) return false;
       if(document.getElementById('luliy-avatar-clock')) return true;
       if(!av.closest('a.luliy-avatar-link')){
@@ -331,7 +332,7 @@
     var btnHome=document.createElement('a');btnHome.className='luliy-tb-btn';btnHome.href='/';btnHome.setAttribute('data-tip','主页');btnHome.innerHTML='🏠';
 
     /* GitHub 按钮 */
-    var btnGH=document.createElement('a');btnGH.className='luliy-tb-btn';btnGH.href='https://github.com/luliy6';btnGH.target='_blank';btnGH.setAttribute('data-tip','GitHub');btnGH.innerHTML='<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.67 7.67 0 0 1 8 4.58c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>';
+    var btnGH=document.createElement('a');btnGH.className='luliy-tb-btn';btnGH.href='https://github.com/luliy6';btnGH.target='_blank';btnGH.setAttribute('data-tip','GitHub');btnGH.innerHTML='<svg height="20" viewBox="0 0 16 16" width="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
 
     /* 音效开关按钮 */
     var btnSfx=document.createElement('button');btnSfx.className='luliy-tb-btn';btnSfx.type='button';
@@ -465,7 +466,7 @@
    * ──────────────────────────────────────────────────────── */
   function sha256(str){
     function rotR(x,n){return(x>>>n)|(x<<(32-n));}
-    var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b6918,0xca63f227,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
     var H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
     var bytes=[];
     for(var i=0;i<str.length;i++){var c=str.charCodeAt(i);if(c<128){bytes.push(c);}else if(c<2048){bytes.push(0xC0|(c>>6));bytes.push(0x80|(c&63));}else{bytes.push(0xE0|(c>>12));bytes.push(0x80|((c>>6)&63));bytes.push(0x80|(c&63));}}
@@ -510,7 +511,7 @@
     if(document.getElementById('luliy-lock-overlay'))return;
     var pbody=document.getElementById('postBody');
     var ov=document.createElement('div');ov.id='luliy-lock-overlay';
-    ov.innerHTML='<div class="luliy-lock-box"><span class="luliy-lock-icon">🔐</span><div class="luliy-lock-title">加密内容</div><div class="luliy-lock-hint">本文为私密收藏，请输入访问密码</div><input class="luliy-lock-input" type="password" placeholder="••••••" maxlength="20" autocomplete="off"><button class="luliy-lock-btn">解 锁</button><div class="luliy-lock-err"></div></div>';
+    ov.innerHTML='<div class="luliy-lock-box"><span class="luliy-lock-icon">🔐</span><div class="luliy-lock-title">加密内容</div><div class="luliy-lock-hint">本文为私密收藏，请输入密码解锁</div><input class="luliy-lock-input" type="password" placeholder="输入密码" autocomplete="off"><button class="luliy-lock-btn" type="button">解 锁</button><div class="luliy-lock-err"></div></div>';
     document.body.appendChild(ov);
     pbody.style.filter='blur(18px)';pbody.style.userSelect='none';pbody.style.pointerEvents='none';
     var inp=ov.querySelector('.luliy-lock-input'),btn2=ov.querySelector('.luliy-lock-btn'),err=ov.querySelector('.luliy-lock-err');
@@ -560,7 +561,7 @@
         var txt=code.innerText||code.textContent||'';
         function done(){bR.setAttribute('data-tip','已复制 ✓');bR.classList.add('is-done');setTimeout(function(){bR.setAttribute('data-tip','复制代码');bR.classList.remove('is-done');},1500);}
         if(navigator.clipboard&&location.protocol==='https:')navigator.clipboard.writeText(txt).then(done).catch(done);
-        else{var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(_){}ta.remove();done();}
+        else{var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){console.log('copy failed');}document.body.removeChild(ta);}
       });
       bY.addEventListener('click',function(e){
         e.stopPropagation();playSfx('click');
@@ -693,9 +694,9 @@
     /* 赞赏面板 */
     var sp=document.createElement('div');sp.style.cssText='margin-top:50px;text-align:center';
     var spb=document.createElement('button');spb.innerHTML='✨ 和作者无限进步';
-    spb.style.cssText='padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(240,180,41,0.3);transition:transform 0.3s';
+    spb.style.cssText='padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(240,180,41,0.3);transition:all 0.3s';
     var qr=document.createElement('div');
-    qr.innerHTML='<p style="font-size:13px;color:#888;margin:10px 0">无限进步，进步有你！</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="赞赏码" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
+    qr.innerHTML='<p style="font-size:13px;color:#888;margin:10px 0">无限进步，进步有你！</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="赞赏二维码" style="width:200px;height:200px;border-radius:8px">';
     qr.style.cssText='height:0;overflow:hidden;transition:height 0.4s ease,opacity 0.4s ease;opacity:0';
     spb.addEventListener('mouseover',function(){spb.style.transform='translateY(-2px)';});
     spb.addEventListener('mouseout',function(){spb.style.transform='';});
@@ -717,7 +718,7 @@
           var html='<h1 style="border-bottom:2px solid rgba(240,180,41,0.4);padding-bottom:10px;margin-bottom:30px">📅 文章归档</h1>';
           years.forEach(function(y){
             html+='<div class="tl-year">'+y+' 年</div><ul class="tl-list">';
-            byY[y].forEach(function(p){var md=(p.created||'').slice(5,10).replace('-','/');html+='<li class="tl-item"><a href="'+esc(p.link)+'">'+esc(p.title)+'</a><span class="tl-date">'+md+'</span></li>';});
+            byY[y].forEach(function(p){var md=(p.created||'').slice(5,10).replace(/-/g,'/');html+='<li class="tl-item"><a href="'+esc(p.link)+'">'+esc(p.title)+'</a><span class="tl-date">'+md+'</span></li>';});
             html+='</ul>';
           });
           pb.innerHTML=html;
