@@ -1,48 +1,38 @@
 /* ============================================================
-   enhance.css — Luliy Blog v6 (Final Modification)
+   enhance.css — Luliy Blog v6.0
    ──────────────────────────────────────────────────────────
-   结构：
-     §0  全局 CSS 变量（三种阅读皮肤 + 默认）
-     §1  字体 & 基础重置
-     §2  毛玻璃悬浮导航栏（暗色自适应）+ 头像位置修复
-     §3  大屏居中布局（Max-Width 1000px）
+   修改内容：
+     §0  全局 CSS 变量 + 阅读皮肤
+     §1  字体重置 + 基础样式
+     §2  导航栏毛玻璃效果 & 头像左偏修复
+     §3  居中布局（Max-Width 1000px）
      §4  自定义滚动条
-     §5  粒子 Canvas & 暗色波纹
-     §6  文章列表 SideNav Hover 特效
-     §7  首页卡片重构（流光浮动视差）+ 标题完整显示修复
-     §8  macOS 代码块（三按钮，无 CSS 圆点装饰）
-     §9  图片灯箱
-     §10 头像时钟
-     §11 顶部进度条 & 回顶按钮（确保圆形可见）
-     §12 文章按钮组（浮动工具栏）
-     §13 收藏加密遮罩
-     §14 阅读皮肤（皮革/水墨/深海）
-     §15 响应式 + 标签页样式协调
-     §16 TOC（目录）高级样式：背景图案 + 高亮跟随滚动
+     §5  粒子 Canvas 层级
+     §6  文章列表卡片化重构（Grid 布局）
+     §7  卡片标题完整显示（word-break + 文本截断）
+     §8  标签页样式优化（底纹与字体协调）
+     §9  回到顶部圆形按钮（右下角）
+     §10 头像时钟样式
+     §11 代码块 macOS 风格
+     §12 图片灯箱
+     §13 TOC 目录样式（带背景图案 + 高亮跟随）
+     §14 加密收藏遮罩
+     §15 响应式适配
    ============================================================ */
 
-/* ── §0 全局 CSS 变量 ─────────────────────────────────────── */
+/* 导入霞鹜文楷字体 */
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
+
+/* 全局变量 ———— 默认皮肤 + 阅读皮肤 */
 :root {
-  /* 默认皮肤变量（跟随 Gmeek 暗色模式） */
   --skin-bg:          transparent;
   --skin-text:        inherit;
   --skin-link:        #f0b429;
   --skin-code-bg:     rgba(16,16,28,0.96);
   --skin-border:      rgba(130,80,223,0.45);
   --skin-blockquote:  rgba(9,105,218,0.05);
-
-  /* 主题标题变量（五套文章主题） */
-  --th-h1: #f0b429;
-  --th-h1-border: 2px solid rgba(240,180,41,0.4);
-  --th-h2: #0969da;
-  --th-h2-bl: 5px solid #0969da;
-  --th-h2-bg: rgba(9,105,218,0.05);
-  --th-h3: #0969da;
-  --th-h4: #0969da;
-  --th-h5: #57606a;
 }
 
-/* 羊皮纸皮肤 */
 body[data-skin="parchment"] {
   --skin-bg:         #fdf6e3;
   --skin-text:       #5c4a1e;
@@ -51,7 +41,6 @@ body[data-skin="parchment"] {
   --skin-border:     rgba(181,101,29,0.4);
   --skin-blockquote: rgba(181,101,29,0.06);
 }
-/* 水墨皮肤 */
 body[data-skin="ink"] {
   --skin-bg:         #1a1a1a;
   --skin-text:       #e0e0e0;
@@ -60,7 +49,6 @@ body[data-skin="ink"] {
   --skin-border:     rgba(200,200,200,0.25);
   --skin-blockquote: rgba(200,200,200,0.05);
 }
-/* 深海蓝皮肤 */
 body[data-skin="ocean"] {
   --skin-bg:         #0d1b2a;
   --skin-text:       #cce7ff;
@@ -69,15 +57,11 @@ body[data-skin="ocean"] {
   --skin-border:     rgba(96,165,250,0.35);
   --skin-blockquote: rgba(96,165,250,0.06);
 }
-
-/* 皮肤全局应用 */
 body[data-skin] {
   background-color: var(--skin-bg) !important;
   color: var(--skin-text) !important;
 }
-body[data-skin] #postBody,
-body[data-skin] #content,
-body[data-skin] .main {
+body[data-skin] #postBody {
   background-color: var(--skin-bg) !important;
   color: var(--skin-text) !important;
 }
@@ -89,77 +73,39 @@ body[data-skin] #postBody pre {
   border-color: var(--skin-border) !important;
 }
 
-/* ── 文章主题变量 ──── */
-body:not([data-luliy-theme]), body[data-luliy-theme="default"] {
-  --th-h1:#f0b429; --th-h1-border:2px solid rgba(240,180,41,0.4);
-  --th-h2:#0969da; --th-h2-bl:5px solid #0969da; --th-h2-bg:rgba(9,105,218,0.05);
-  --th-h3:#0969da; --th-h4:#0969da; --th-h5:#57606a;
-}
-body[data-luliy-theme="classic-blue"] {
-  --th-h1:#60a5fa; --th-h1-border:2px solid #3b82f6;
-  --th-h2:#93c5fd; --th-h2-bl:4px solid #60a5fa; --th-h2-bg:transparent;
-  --th-h3:#bfdbfe; --th-h4:#dbeafe; --th-h5:#eff6ff;
-}
-body[data-luliy-theme="eco-green"] {
-  --th-h1:#34d399; --th-h1-border:1px solid #059669;
-  --th-h2:#6ee7b7; --th-h2-bl:none; --th-h2-bg:transparent;
-  --th-h3:#a7f3d0; --th-h4:#d1fae5; --th-h5:#ecfdf5;
-}
-body[data-luliy-theme="sunset"] {
-  --th-h1:#fb923c; --th-h1-border:none;
-  --th-h2:#fdba74; --th-h2-bl:none; --th-h2-bg:transparent;
-  --th-h3:#fed7aa; --th-h4:#ffedd5; --th-h5:#fff7ed;
-}
-body[data-luliy-theme="mono"] {
-  --th-h1:#ffffff; --th-h1-border:none;
-  --th-h2:#e5e5e5; --th-h2-bl:none; --th-h2-bg:transparent;
-  --th-h3:#d4d4d4; --th-h4:#a3a3a3; --th-h5:#737373;
-}
-body[data-luliy-theme="cyberpunk"] {
-  --th-h1:#c084fc; --th-h1-border:none;
-  --th-h2:#e879f9; --th-h2-bl:none; --th-h2-bg:transparent;
-  --th-h3:#f0abfc; --th-h4:#f5d0fe; --th-h5:#fae8ff;
+/* 基础重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-#postBody h1 {
-  color: var(--th-h1) !important;
-  border-bottom: var(--th-h1-border) !important;
-  padding-bottom: 0.3em;
+html {
+  scroll-behavior: smooth;
 }
-#postBody h2 {
-  color: var(--th-h2) !important;
-  border-left: var(--th-h2-bl) !important;
-  background: var(--th-h2-bg) !important;
-  padding-left: 0.5em; padding-top: 4px; padding-bottom: 4px;
-  border-radius: 0 8px 8px 0;
-}
-#postBody h3 { color: var(--th-h3) !important; }
-#postBody h4 { color: var(--th-h4) !important; }
-#postBody h5 { color: var(--th-h5) !important; }
 
-/* 主题特殊规则 */
-body[data-luliy-theme="sunset"]   #postBody h1 { text-transform:uppercase; letter-spacing:1px; }
-body[data-luliy-theme="sunset"]   #postBody h2 { border-bottom:1px dashed #ea580c !important; border-left:none !important; }
-body[data-luliy-theme="eco-green"] #postBody h5 { border-left:2px solid #34d399 !important; padding-left:8px; }
-body[data-luliy-theme="mono"]     #postBody h1 { font-weight:800 !important; }
-body[data-luliy-theme="mono"]     #postBody h2 { font-weight:700 !important; }
-body[data-luliy-theme="mono"]     #postBody h3 { font-weight:600 !important; }
-body[data-luliy-theme="mono"]     #postBody h5 { text-transform:uppercase !important; }
-body[data-luliy-theme="cyberpunk"] #postBody h1 { text-shadow:0 0 8px #a855f7 !important; }
-body[data-luliy-theme="cyberpunk"] #postBody h2 { border-bottom:1px solid #701a75 !important; border-left:none !important; }
-body[data-luliy-theme="classic-blue"] #postBody h5 { font-style:italic !important; }
-
-/* ── §1 字体 & 基础重置 ──────────────────────────────────── */
-@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
-
-body, #postBody {
+body {
   font-family: 'LXGW WenKai', 'LXGW WenKai Screen', sans-serif;
+  background-image: radial-gradient(rgba(9,105,218,0.09) 1px, transparent 1px);
+  background-size: 25px 25px;
 }
-html { scroll-behavior: smooth; }
-::selection { background: #f0b429; color: #000; }
-a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
 
-/* 移除博客名后多余字母（如有伪元素生成） */
+[data-color-mode="dark"] body {
+  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+}
+
+::selection {
+  background: #f0b429;
+  color: #000;
+}
+
+a[target='_blank']::after {
+  content: ' ↗';
+  font-size: 0.75em;
+  opacity: 0.6;
+}
+
+/* 移除博客名后多余字母（修复非全屏模式下字母残留问题）*/
 .blogTitle a::after,
 .blogTitle::after,
 .postTitle::after,
@@ -168,12 +114,13 @@ a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
   display: none !important;
 }
 
-/* ── §2 毛玻璃悬浮导航栏 + 头像左偏修复 ─────────────────── */
+/* 毛玻璃导航栏 + 头像位置修复（桌面全屏模式下头像不再过于偏左）*/
 #header {
   position: fixed !important;
-  top: 0 !important; left: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
   width: 100% !important;
-  min-height: 65px !important; height: auto !important;
+  min-height: 65px !important;
   background: rgba(255,255,255,0.75) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
@@ -185,13 +132,14 @@ a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
   align-items: center !important;
   z-index: 9999 !important;
   box-sizing: border-box !important;
-  transition: background 0.3s ease, box-shadow 0.3s ease !important;
 }
+
 [data-color-mode="dark"] #header {
   background: rgba(13,17,23,0.75) !important;
   border-bottom-color: rgba(255,255,255,0.08) !important;
   box-shadow: 0 4px 16px rgba(0,0,0,0.45) !important;
 }
+
 .blogTitle, .postTitle {
   display: block !important;
   font-size: clamp(16px, 4vw, 22px) !important;
@@ -204,19 +152,23 @@ a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
   flex: 1 !important;
   padding-right: 14px !important;
 }
+
 [data-color-mode="dark"] .blogTitle,
-[data-color-mode="dark"] .postTitle { color: #adbac7 !important; }
+[data-color-mode="dark"] .postTitle {
+  color: #adbac7 !important;
+}
+
 .title-right {
   display: flex !important;
   gap: 10px !important;
   flex-shrink: 0 !important;
   z-index: 10000 !important;
   align-items: center !important;
-  margin-left: auto !important;  /* 关键：让右侧区域靠右，避免头像左偏 */
+  margin-left: auto !important;
 }
-/* 确保头像本身不额外偏移 */
+
+/* 确保头像不额外偏移 */
 #header .avatar,
-#header .avatar img,
 .avatar {
   margin-left: 0 !important;
   margin-right: 0 !important;
@@ -224,7 +176,7 @@ a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
   vertical-align: middle;
 }
 
-/* ── §3 大屏居中布局（Max-Width 1000px） */
+/* 居中布局（Max-Width 1000px）*/
 #content, .main {
   margin: 85px auto 0 auto !important;
   padding: 0 24px !important;
@@ -234,55 +186,36 @@ a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
   border: none !important;
   box-sizing: border-box !important;
 }
-.subTitle { display: none !important; }
 
-/* ── §4 自定义滚动条 ─────────────────────────────────────── */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #8250df; border-radius: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-
-/* 点阵背景 */
-body {
-  background-image: radial-gradient(rgba(9,105,218,0.09) 1px, transparent 1px);
-  background-size: 25px 25px;
-}
-[data-color-mode="dark"] body {
-  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+.subTitle {
+  display: none !important;
 }
 
-/* ── §5 粒子 Canvas & 暗色波纹 ──────────────────────────── */
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #8250df;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 粒子 Canvas 层级 */
 #luliy-particle-canvas {
-  position: fixed; inset: 0;
-  width: 100vw; height: 100vh;
-  pointer-events: none; z-index: 0; opacity: 0.48;
-}
-#luliy-theme-ripple {
-  position: fixed; border-radius: 50%; transform: scale(0);
-  pointer-events: none; z-index: 99998; transition: none;
-}
-
-/* ── §6 文章列表 SideNav Hover 特效 ─────────────────────── */
-.SideNav-item {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border-left: 3px solid transparent !important;
-  background-color: transparent !important;
-  border-radius: 6px !important;
-  margin-bottom: 4px !important;
-}
-.SideNav-item:hover {
-  background-color: rgba(2,122,255,0.05) !important;
-  transform: translateX(5px) !important;
-  border-left: 3px solid #027aff !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
-}
-[data-color-mode="dark"] .SideNav-item:hover {
-  background-color: rgba(130,80,223,0.10) !important;
-  border-left-color: #8250df !important;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.48;
 }
 
-/* ── §7 首页卡片重构（流光浮动视差）+ 标题完整显示 ──────── */
-
-/* 卡片容器网格 */
+/* ===== 文章列表卡片化重构（Grid 布局）===== */
 .luliy-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -292,92 +225,58 @@ body {
   list-style: none;
 }
 
-/* 单张卡片 */
 .luliy-card {
   position: relative;
   border-radius: 16px !important;
   overflow: hidden !important;
   background: #fff !important;
   box-shadow: 0 2px 14px rgba(130,80,223,0.08) !important;
-  border: none !important;
-  border-left: none !important;
-  transform: translateY(0) scale(1);
-  transition:
-    transform 0.32s cubic-bezier(.4,0,.2,1),
-    box-shadow 0.32s cubic-bezier(.4,0,.2,1) !important;
-  will-change: transform, box-shadow;
+  transition: transform 0.32s cubic-bezier(.4,0,.2,1), box-shadow 0.32s cubic-bezier(.4,0,.2,1) !important;
 }
+
 .luliy-card:hover {
   transform: translateY(-8px) scale(1.013) !important;
-  box-shadow:
-    0 20px 50px rgba(130,80,223,0.22),
-    0 0 0 2px rgba(130,80,223,0.20),
-    0 0 34px rgba(130,80,223,0.12) !important;
-  background-color: transparent !important;
-  border-left: none !important;
+  box-shadow: 0 20px 50px rgba(130,80,223,0.22), 0 0 0 2px rgba(130,80,223,0.20), 0 0 34px rgba(130,80,223,0.12) !important;
 }
 
-/* 流光边框 */
-.luliy-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 2px;
-  background: linear-gradient(135deg, #8250df, #f0b429, #ff6b9d, #6bceff, #8250df);
-  background-size: 300% 300%;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.32s;
-  pointer-events: none;
-  z-index: 1;
-}
-@keyframes luliy-rainbow {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.luliy-card:hover::before {
-  opacity: 1;
-  animation: luliy-rainbow 2.4s ease infinite;
-}
-
-/* 四色左分条 */
-.luliy-card:nth-child(4n+1)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#8250df; border-radius:16px 0 0 16px; z-index:2; }
-.luliy-card:nth-child(4n+2)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#0969da; border-radius:16px 0 0 16px; z-index:2; }
-.luliy-card:nth-child(4n+3)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#ff6b9d; border-radius:16px 0 0 16px; z-index:2; }
-.luliy-card:nth-child(4n+0)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#f0b429; border-radius:16px 0 0 16px; z-index:2; }
-
-/* 卡片内链接样式 + 修复标题显示不全 */
-.luliy-card .SideNav-item-title-block {
-  padding: 18px 18px 14px 22px;
-  display: block;
-}
+/* 卡片内链接样式 + 修复标题显示不全（word-break + 换行）*/
 .luliy-card a {
   color: #24292f !important;
   text-decoration: none !important;
   display: block;
-  padding: 16px 18px 12px 22px;
-  word-break: break-word;      /* 强制换行 */
-  white-space: normal;         /* 允许自动换行 */
-  overflow-wrap: anywhere;     /* 长单词/URL 可断开 */
+  padding: 18px 20px;
+  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: anywhere;
   line-height: 1.4;
   font-weight: 500;
 }
-.luliy-card a:hover { color: #8250df !important; }
+
+.luliy-card a:hover {
+  color: #8250df !important;
+}
+
 [data-color-mode="dark"] .luliy-card {
   background: #1a1a2e !important;
 }
-[data-color-mode="dark"] .luliy-card a { color: #cdd6f4 !important; }
-
-/* 进入动画 */
-@keyframes luliy-fadeUp {
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
+[data-color-mode="dark"] .luliy-card a {
+  color: #cdd6f4 !important;
 }
-.luliy-card { animation: luliy-fadeUp 0.45s ease both; }
+
+/* 卡片进入动画 */
+@keyframes luliy-fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.luliy-card {
+  animation: luliy-fadeUp 0.45s ease both;
+}
 .luliy-card:nth-child(2) { animation-delay: 0.05s; }
 .luliy-card:nth-child(3) { animation-delay: 0.10s; }
 .luliy-card:nth-child(4) { animation-delay: 0.15s; }
@@ -385,304 +284,7 @@ body {
 .luliy-card:nth-child(6) { animation-delay: 0.25s; }
 .luliy-card:nth-child(n+7) { animation-delay: 0.30s; }
 
-[data-color-mode="dark"] .luliy-card {
-  box-shadow: 0 2px 14px rgba(0,0,0,0.35) !important;
-}
-[data-color-mode="dark"] .luliy-card:hover {
-  box-shadow:
-    0 20px 50px rgba(0,0,0,0.55),
-    0 0 0 2px rgba(130,80,223,0.35),
-    0 0 34px rgba(130,80,223,0.18) !important;
-}
-
-/* ── §8 macOS 代码块 ────────────────────────────────────────── */
-#postBody pre {
-  position: relative;
-  padding-top: 42px !important;
-  overflow-x: auto;
-  max-width: 100%;
-  background: var(--skin-code-bg, rgba(16,16,28,0.96)) !important;
-  border: 1px solid var(--skin-border, rgba(130,80,223,0.45)) !important;
-  border-radius: 14px !important;
-  box-shadow:
-    0 0 0 1px rgba(130,80,223,0.10),
-    0 8px 32px rgba(0,0,0,0.42),
-    0 0 48px rgba(130,80,223,0.16) !important;
-  font-family: 'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,monospace;
-  transition: box-shadow 0.3s, transform 0.3s;
-}
-#postBody pre:hover {
-  box-shadow:
-    0 0 0 1px rgba(130,80,223,0.24),
-    0 16px 48px rgba(0,0,0,0.52),
-    0 0 68px rgba(130,80,223,0.24) !important;
-  transform: translateY(-1px);
-}
-#postBody pre::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
-  pointer-events: none; border-radius: 14px; z-index: 1;
-}
-#postBody pre code {
-  color: #cdd6f4 !important;
-  background: none !important;
-  padding: 0 !important;
-  font-weight: normal !important;
-}
-.mac-btn {
-  position: absolute; top: 9px;
-  width: 12px; height: 12px;
-  border-radius: 50%; border: none;
-  cursor: pointer; z-index: 10;
-  transition: filter 0.15s, transform 0.15s;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0;
-}
-.mac-btn:hover { filter: brightness(1.2); transform: scale(1.25); }
-.mac-btn-red    { left: 14px; background: #ff5f57; }
-.mac-btn-yellow { left: 34px; background: #febc2e; }
-.mac-btn-green  { left: 54px; background: #28c840; }
-.mac-btn::after {
-  content: attr(data-tip);
-  position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-  background: rgba(0,0,0,0.82); color: #fff; font-size: 11px;
-  white-space: nowrap; padding: 3px 8px; border-radius: 5px;
-  pointer-events: none; opacity: 0; transition: opacity 0.18s;
-  z-index: 20; font-family: sans-serif;
-}
-.mac-btn:hover::after { opacity: 1; }
-.mac-btn-red.is-done      { background: #1f883d; }
-.mac-btn-yellow.is-folded { background: #8250df; }
-pre.is-folded > code      { display: none; }
-pre.is-folded             { padding-bottom: 12px !important; }
-pre.code-fullscreen {
-  position: fixed !important; inset: 0 !important;
-  z-index: 99999 !important; border-radius: 0 !important;
-  margin: 0 !important; max-width: 100vw !important;
-  width: 100vw !important; height: 100vh !important;
-  overflow: auto !important; padding-top: 48px !important;
-  transform: none !important;
-}
-pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
-#postBody pre:active { box-shadow: 0 0 0 3px rgba(130,80,223,0.4) !important; }
-
-/* ── §9 图片灯箱 ─────────────────────────────────────────── */
-#luliy-lightbox {
-  position: fixed; inset: 0; z-index: 99990;
-  background: rgba(0,0,0,0.88);
-  display: flex; align-items: center; justify-content: center;
-  cursor: zoom-out; opacity: 0; pointer-events: none;
-  transition: opacity 0.3s ease; backdrop-filter: blur(6px);
-}
-#luliy-lightbox.is-open { opacity: 1; pointer-events: all; }
-#luliy-lightbox img {
-  max-width: 90vw; max-height: 88vh;
-  border-radius: 10px; box-shadow: 0 24px 80px rgba(0,0,0,0.5);
-  transform: scale(0.88);
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  cursor: default; object-fit: contain;
-}
-#luliy-lightbox.is-open img { transform: scale(1); }
-#luliy-lightbox-close {
-  position: absolute; top: 20px; right: 24px;
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,0.12); border: none; border-radius: 50%;
-  color: #fff; font-size: 20px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
-}
-#luliy-lightbox-close:hover { background: rgba(255,255,255,0.28); }
-
-/* ── §10 头像时钟 ────────────────────────────────────────── */
-#luliy-avatar-clock {
-  text-align: center; font-size: 13px;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  color: #8250df; font-weight: 600; letter-spacing: 1px;
-  margin-top: 4px; opacity: 0.85;
-}
-a.luliy-avatar-link { display: inline-block; }
-a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
-[data-color-mode="dark"] #luliy-avatar-clock { color: #cba6f7; }
-
-/* ── §11 顶部进度条 & 回顶按钮（圆形确保可见） ───────────── */
-#luliy-progress-bar {
-  position: fixed; top: 0; left: 0;
-  height: 3px; width: 0%;
-  background: linear-gradient(90deg, #8250df, #f0b429);
-  z-index: 99999; transition: width 0.1s linear; pointer-events: none;
-}
-#luliy-back-top {
-  position: fixed; bottom: 24px; right: 24px;
-  width: 44px; height: 44px;
-  background: rgba(130,80,223,0.88); border: none; border-radius: 50%;
-  color: #fff; font-size: 20px; cursor: pointer; z-index: 9000;
-  display: none; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(130,80,223,0.4);
-  transition: transform 0.25s, box-shadow 0.25s;
-}
-#luliy-back-top:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(130,80,223,0.55); }
-
-/* ── §12 浮动工具栏 ───────────────────────────────────────── */
-#luliy-toolbar {
-  position: fixed;
-  top: 76px;
-  right: 16px;
-  z-index: 8900;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: flex-end;
-}
-.luliy-tb-btn {
-  width: 40px; height: 40px;
-  border-radius: 50%; border: none;
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(10px);
-  color: #24292f;
-  font-size: 17px; cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
-  text-decoration: none;
-  position: relative;
-}
-.luliy-tb-btn:hover {
-  transform: translateY(-2px) scale(1.08);
-  box-shadow: 0 6px 18px rgba(130,80,223,0.3);
-  background: rgba(255,255,255,0.98);
-}
-[data-color-mode="dark"] .luliy-tb-btn {
-  background: rgba(30,30,50,0.88);
-  color: #cdd6f4;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-}
-[data-color-mode="dark"] .luliy-tb-btn:hover {
-  background: rgba(40,40,65,0.98);
-}
-.luliy-tb-btn::after {
-  content: attr(data-tip);
-  position: absolute;
-  right: 48px; top: 50%; transform: translateY(-50%);
-  background: rgba(0,0,0,0.78); color: #fff;
-  font-size: 12px; white-space: nowrap;
-  padding: 4px 9px; border-radius: 6px;
-  pointer-events: none; opacity: 0;
-  transition: opacity 0.18s; font-family: sans-serif;
-}
-.luliy-tb-btn:hover::after { opacity: 1; }
-.luliy-tb-btn.sfx-off { opacity: 0.45; }
-#luliy-theme-menu,
-#luliy-skin-menu {
-  display: none;
-  flex-direction: column;
-  gap: 3px;
-  background: rgba(255,255,255,0.96);
-  border: 1px solid rgba(130,80,223,0.22);
-  border-radius: 12px; padding: 7px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.16);
-  backdrop-filter: blur(12px);
-  min-width: 148px;
-}
-[data-color-mode="dark"] #luliy-theme-menu,
-[data-color-mode="dark"] #luliy-skin-menu {
-  background: rgba(26,26,46,0.96);
-  border-color: rgba(130,80,223,0.35);
-}
-#luliy-theme-menu.is-open,
-#luliy-skin-menu.is-open { display: flex; }
-.luliy-theme-opt,
-.luliy-skin-opt {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 10px; border-radius: 8px;
-  border: none; background: transparent;
-  cursor: pointer; font-size: 13px;
-  color: #24292f; font-family: inherit;
-  text-align: left; transition: background 0.16s;
-  white-space: nowrap;
-}
-[data-color-mode="dark"] .luliy-theme-opt,
-[data-color-mode="dark"] .luliy-skin-opt { color: #ccc; }
-.luliy-theme-opt:hover,
-.luliy-skin-opt:hover { background: rgba(130,80,223,0.12); }
-.luliy-theme-opt.is-active,
-.luliy-skin-opt.is-active { background: rgba(130,80,223,0.18); font-weight:600; }
-.luliy-theme-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-.luliy-skin-swatch {
-  width: 14px; height: 14px; border-radius: 4px;
-  flex-shrink: 0; border: 1px solid rgba(0,0,0,0.12);
-}
-
-/* ── §13 收藏加密遮罩 ────────────────────────────────────── */
-#luliy-lock-overlay {
-  position: fixed; inset: 0; z-index: 99995;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(10,10,20,0.94); backdrop-filter: blur(16px);
-}
-.luliy-lock-box {
-  background: rgba(26,26,46,0.98);
-  border: 1px solid rgba(130,80,223,0.45);
-  border-radius: 18px; padding: 40px 48px; text-align: center;
-  box-shadow: 0 0 0 1px rgba(130,80,223,0.10),0 24px 60px rgba(0,0,0,0.6),0 0 80px rgba(130,80,223,0.22);
-  max-width: 360px; width: 90%;
-}
-.luliy-lock-icon { font-size: 48px; display: block; margin-bottom: 12px; }
-.luliy-lock-title { font-size: 18px; font-weight: 700; color: #cba6f7; margin-bottom: 6px; }
-.luliy-lock-hint  { font-size: 13px; color: #6c7086; margin-bottom: 22px; }
-.luliy-lock-input {
-  width: 100%; padding: 10px 16px;
-  border: 1px solid rgba(130,80,223,0.4); border-radius: 10px;
-  background: rgba(255,255,255,0.06); color: #cdd6f4;
-  font-size: 16px; text-align: center; letter-spacing: 4px;
-  font-family: 'JetBrains Mono', monospace; outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 14px;
-}
-.luliy-lock-input:focus { border-color: rgba(130,80,223,0.8); box-shadow: 0 0 0 3px rgba(130,80,223,0.22); }
-.luliy-lock-input.is-wrong {
-  border-color: #f38ba8 !important;
-  box-shadow: 0 0 0 3px rgba(243,139,168,0.22) !important;
-  animation: lockShake 0.4s ease;
-}
-@keyframes lockShake {
-  0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)}
-  40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
-}
-.luliy-lock-btn {
-  width: 100%; padding: 11px; border-radius: 10px; border: none;
-  background: linear-gradient(90deg,#8250df,#c084fc);
-  color: #fff; font-weight: 700; font-size: 15px;
-  cursor: pointer; font-family: inherit;
-  transition: filter 0.2s, transform 0.2s;
-}
-.luliy-lock-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
-.luliy-lock-err { margin-top: 10px; font-size: 12px; color: #f38ba8; min-height: 18px; }
-
-/* ── §14 阅读皮肤正文样式细节 ───────────────────────────── */
-body[data-skin="parchment"] #postBody h1,
-body[data-skin="parchment"] #postBody h2,
-body[data-skin="parchment"] #postBody h3 { color: #8b4513 !important; }
-body[data-skin="parchment"] #postBody blockquote { border-left-color: #b5651d !important; }
-body[data-skin="ink"] #postBody h1,
-body[data-skin="ink"] #postBody h2,
-body[data-skin="ink"] #postBody h3 { color: #e0e0e0 !important; }
-body[data-skin="ocean"] #postBody h1 { color: #60a5fa !important; }
-body[data-skin="ocean"] #postBody h2 { color: #93c5fd !important; border-left-color: #60a5fa !important; }
-body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
-
-/* ── §15 响应式 & 标签页背景协调 ────────────────────────── */
-@media (max-width: 768px) {
-  #content, .main { padding: 0 12px !important; width: 100% !important; }
-  #luliy-toolbar { top: auto; bottom: 130px; right: 12px; }
-  #luliy-back-top { bottom: 80px; right: 12px; }
-  #postBody { font-size: 16px !important; line-height: 1.85 !important; max-width: 100% !important; }
-  #postBody h1 { font-size: 1.5rem !important; }
-  #postBody h2 { font-size: 1.2rem !important; }
-  #postBody pre { font-size: 13px !important; }
-  .luliy-card-grid { grid-template-columns: 1fr; }
-  .luliy-tb-btn::after { display: none; }
-}
-
-/* 标签页背景协调（使标签背景与字体配合更好） */
+/* 标签页样式优化（底纹与字体协调）*/
 .Label,
 a.Label,
 .tag-enhance-toolbar .Label {
@@ -720,7 +322,113 @@ a.Label,
   color: #57606a;
 }
 
-/* ── §16 TOC（目录）高级样式：背景图案 + 高亮跟随滚动 ──── */
+/* 顶部进度条 */
+#luliy-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #8250df, #f0b429);
+  z-index: 99999;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* 圆形回到顶部按钮（右下角）*/
+#luliy-back-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  background: rgba(130,80,223,0.88);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 9000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(130,80,223,0.4);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+#luliy-back-top:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(130,80,223,0.55);
+}
+
+/* 头像时钟样式 */
+#luliy-avatar-clock {
+  text-align: center;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: #8250df;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+a.luliy-avatar-link {
+  display: inline-block;
+}
+a.luliy-avatar-link:hover img {
+  transform: rotate(5deg) scale(1.05);
+}
+[data-color-mode="dark"] #luliy-avatar-clock {
+  color: #cba6f7;
+}
+
+/* 代码块 macOS 风格 */
+#postBody pre {
+  position: relative;
+  padding-top: 42px !important;
+  overflow-x: auto;
+  background: var(--skin-code-bg, rgba(16,16,28,0.96)) !important;
+  border: 1px solid var(--skin-border, rgba(130,80,223,0.45)) !important;
+  border-radius: 14px !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+.mac-btn {
+  position: absolute;
+  top: 9px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+.mac-btn-red    { left: 14px; background: #ff5f57; }
+.mac-btn-yellow { left: 34px; background: #febc2e; }
+.mac-btn-green  { left: 54px; background: #28c840; }
+
+/* 图片灯箱 */
+#luliy-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  background: rgba(0,0,0,0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+}
+#luliy-lightbox.is-open {
+  opacity: 1;
+  pointer-events: all;
+}
+#luliy-lightbox img {
+  max-width: 90vw;
+  max-height: 88vh;
+  border-radius: 10px;
+}
+
+/* TOC 目录样式：背景图案 + 高亮跟随滚动 */
 .article-toc,
 .toc,
 #markdown-toc {
@@ -728,20 +436,15 @@ a.Label,
   backdrop-filter: blur(2px);
   border-radius: 20px;
   padding: 16px 20px;
-  margin: 1.5em 0 2em 0;
+  margin: 1.5em 0;
   border: 1px solid rgba(130,80,223,0.25);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.05);
-  transition: all 0.2s;
 }
 .article-toc a,
-.toc a,
-#markdown-toc a {
+.toc a {
   text-decoration: none;
   color: #0969da;
   font-weight: 500;
   transition: all 0.2s;
-  display: inline-block;
-  padding: 4px 0;
 }
 .article-toc a:hover,
 .toc a:hover {
@@ -755,12 +458,59 @@ a.Label,
   border-left: 3px solid #8250df;
   padding-left: 10px;
   background: linear-gradient(90deg, rgba(130,80,223,0.08), transparent);
-  border-radius: 0 6px 6px 0;
 }
-/* 深色模式 TOC 高亮 */
 [data-color-mode="dark"] .article-toc a.active,
 [data-color-mode="dark"] .toc a.active {
   color: #cba6f7;
   border-left-color: #cba6f7;
-  background: linear-gradient(90deg, rgba(203,166,247,0.12), transparent);
+}
+
+/* 收藏加密遮罩 */
+#luliy-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99995;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,10,20,0.94);
+  backdrop-filter: blur(16px);
+}
+.luliy-lock-box {
+  background: rgba(26,26,46,0.98);
+  border: 1px solid rgba(130,80,223,0.45);
+  border-radius: 18px;
+  padding: 40px 48px;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+}
+.luliy-lock-input {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  color: #cdd6f4;
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 4px;
+  font-family: monospace;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  #content, .main {
+    padding: 0 12px !important;
+    width: 100% !important;
+  }
+  #luliy-back-top {
+    bottom: 80px;
+    right: 12px;
+  }
+  #postBody {
+    font-size: 16px !important;
+  }
+  .luliy-card-grid {
+    grid-template-columns: 1fr;
+  }
 }
