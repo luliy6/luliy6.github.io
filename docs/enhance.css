@@ -1,251 +1,248 @@
+cat > /home/claude/enhance.css << 'CSSEOF'
 /* ============================================================
-   enhance.css
-   Modern Minimal Gmeek Theme
-   - Removed old custom TOC styles
-   - Uses articletoc.js
-   - Frosted glass adaptive header
-   - Responsive centered layout
-   - Modern homepage article cards
-   - Article list hover effect
+   enhance.css — Luliy Blog v5
+   ──────────────────────────────────────────────────────────
+   结构：
+     §0  全局 CSS 变量（三种阅读皮肤 + 默认）
+     §1  字体 & 基础重置
+     §2  毛玻璃悬浮导航栏（暗色自适应）
+     §3  大屏居中布局（Max-Width 1000px）
+     §4  自定义滚动条
+     §5  粒子 Canvas & 暗色波纹
+     §6  文章列表 SideNav Hover 特效
+     §7  首页卡片重构（流光浮动视差）
+     §8  macOS 代码块（三按钮，无 CSS 圆点装饰）
+     §9  图片灯箱
+     §10 头像时钟
+     §11 顶部进度条 & 回顶按钮
+     §12 文章按钮组（浮动工具栏）
+     §13 收藏加密遮罩
+     §14 阅读皮肤（皮革/水墨/深海）
+     §15 响应式
    ============================================================ */
 
-/* ------------------------------
-   1. Design Tokens
------------------------------- */
-
+/* ── §0 全局 CSS 变量 ─────────────────────────────────────── */
 :root {
-  --gmeek-bg: #f8fafc;
-  --gmeek-bg-soft: #ffffff;
-  --gmeek-text: #0f172a;
-  --gmeek-text-muted: #64748b;
-  --gmeek-border: rgba(15, 23, 42, 0.08);
-  --gmeek-card: rgba(255, 255, 255, 0.82);
-  --gmeek-card-hover: rgba(255, 255, 255, 0.96);
-  --gmeek-primary: #027aff;
-  --gmeek-primary-soft: rgba(2, 122, 255, 0.08);
-  --gmeek-shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.06);
-  --gmeek-shadow-md: 0 12px 32px rgba(15, 23, 42, 0.1);
-  --gmeek-shadow-lg: 0 24px 64px rgba(15, 23, 42, 0.14);
-  --gmeek-radius-sm: 8px;
-  --gmeek-radius-md: 14px;
-  --gmeek-radius-lg: 22px;
-  --gmeek-header-height: 64px;
-  --gmeek-font:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Noto Sans SC",
-    "PingFang SC",
-    "Microsoft YaHei",
-    sans-serif;
-  --gmeek-mono:
-    ui-monospace,
-    SFMono-Regular,
-    SF Mono,
-    Menlo,
-    Consolas,
-    Liberation Mono,
-    monospace;
+  /* 默认皮肤变量（跟随 Gmeek 暗色模式） */
+  --skin-bg:          transparent;
+  --skin-text:        inherit;
+  --skin-link:        #f0b429;
+  --skin-code-bg:     rgba(16,16,28,0.96);
+  --skin-border:      rgba(130,80,223,0.45);
+  --skin-blockquote:  rgba(9,105,218,0.05);
+
+  /* 主题标题变量（五套文章主题） */
+  --th-h1: #f0b429;
+  --th-h1-border: 2px solid rgba(240,180,41,0.4);
+  --th-h2: #0969da;
+  --th-h2-bl: 5px solid #0969da;
+  --th-h2-bg: rgba(9,105,218,0.05);
+  --th-h3: #0969da;
+  --th-h4: #0969da;
+  --th-h5: #57606a;
 }
 
-[data-color-mode="dark"] {
-  --gmeek-bg: #020617;
-  --gmeek-bg-soft: #0f172a;
-  --gmeek-text: #e5e7eb;
-  --gmeek-text-muted: #94a3b8;
-  --gmeek-border: rgba(148, 163, 184, 0.16);
-  --gmeek-card: rgba(15, 23, 42, 0.78);
-  --gmeek-card-hover: rgba(15, 23, 42, 0.96);
-  --gmeek-primary: #38bdf8;
-  --gmeek-primary-soft: rgba(56, 189, 248, 0.12);
-  --gmeek-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
-  --gmeek-shadow-md: 0 14px 36px rgba(0, 0, 0, 0.32);
-  --gmeek-shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.46);
+/* 羊皮纸皮肤 */
+body[data-skin="parchment"] {
+  --skin-bg:         #fdf6e3;
+  --skin-text:       #5c4a1e;
+  --skin-link:       #b5651d;
+  --skin-code-bg:    #f5e6c8;
+  --skin-border:     rgba(181,101,29,0.4);
+  --skin-blockquote: rgba(181,101,29,0.06);
+}
+/* 水墨皮肤 */
+body[data-skin="ink"] {
+  --skin-bg:         #1a1a1a;
+  --skin-text:       #e0e0e0;
+  --skin-link:       #aaa;
+  --skin-code-bg:    #111;
+  --skin-border:     rgba(200,200,200,0.25);
+  --skin-blockquote: rgba(200,200,200,0.05);
+}
+/* 深海蓝皮肤 */
+body[data-skin="ocean"] {
+  --skin-bg:         #0d1b2a;
+  --skin-text:       #cce7ff;
+  --skin-link:       #60a5fa;
+  --skin-code-bg:    #0a1628;
+  --skin-border:     rgba(96,165,250,0.35);
+  --skin-blockquote: rgba(96,165,250,0.06);
 }
 
-/* ------------------------------
-   2. Global Base
------------------------------- */
-
-html {
-  scroll-behavior: smooth;
-  text-size-adjust: 100%;
+/* 皮肤全局应用 */
+body[data-skin] {
+  background-color: var(--skin-bg) !important;
+  color: var(--skin-text) !important;
+}
+body[data-skin] #postBody,
+body[data-skin] #content,
+body[data-skin] .main {
+  background-color: var(--skin-bg) !important;
+  color: var(--skin-text) !important;
+}
+body[data-skin] #postBody a   { color: var(--skin-link) !important; }
+body[data-skin] #postBody code { background: var(--skin-code-bg) !important; }
+body[data-skin] #postBody blockquote { background: var(--skin-blockquote) !important; }
+body[data-skin] #postBody pre {
+  background: var(--skin-code-bg) !important;
+  border-color: var(--skin-border) !important;
 }
 
+/* ── 文章主题变量 ──── */
+body:not([data-luliy-theme]), body[data-luliy-theme="default"] {
+  --th-h1:#f0b429; --th-h1-border:2px solid rgba(240,180,41,0.4);
+  --th-h2:#0969da; --th-h2-bl:5px solid #0969da; --th-h2-bg:rgba(9,105,218,0.05);
+  --th-h3:#0969da; --th-h4:#0969da; --th-h5:#57606a;
+}
+body[data-luliy-theme="classic-blue"] {
+  --th-h1:#60a5fa; --th-h1-border:2px solid #3b82f6;
+  --th-h2:#93c5fd; --th-h2-bl:4px solid #60a5fa; --th-h2-bg:transparent;
+  --th-h3:#bfdbfe; --th-h4:#dbeafe; --th-h5:#eff6ff;
+}
+body[data-luliy-theme="eco-green"] {
+  --th-h1:#34d399; --th-h1-border:1px solid #059669;
+  --th-h2:#6ee7b7; --th-h2-bl:none; --th-h2-bg:transparent;
+  --th-h3:#a7f3d0; --th-h4:#d1fae5; --th-h5:#ecfdf5;
+}
+body[data-luliy-theme="sunset"] {
+  --th-h1:#fb923c; --th-h1-border:none;
+  --th-h2:#fdba74; --th-h2-bl:none; --th-h2-bg:transparent;
+  --th-h3:#fed7aa; --th-h4:#ffedd5; --th-h5:#fff7ed;
+}
+body[data-luliy-theme="mono"] {
+  --th-h1:#ffffff; --th-h1-border:none;
+  --th-h2:#e5e5e5; --th-h2-bl:none; --th-h2-bg:transparent;
+  --th-h3:#d4d4d4; --th-h4:#a3a3a3; --th-h5:#737373;
+}
+body[data-luliy-theme="cyberpunk"] {
+  --th-h1:#c084fc; --th-h1-border:none;
+  --th-h2:#e879f9; --th-h2-bl:none; --th-h2-bg:transparent;
+  --th-h3:#f0abfc; --th-h4:#f5d0fe; --th-h5:#fae8ff;
+}
+
+#postBody h1 {
+  color: var(--th-h1) !important;
+  border-bottom: var(--th-h1-border) !important;
+  padding-bottom: 0.3em;
+}
+#postBody h2 {
+  color: var(--th-h2) !important;
+  border-left: var(--th-h2-bl) !important;
+  background: var(--th-h2-bg) !important;
+  padding-left: 0.5em; padding-top: 4px; padding-bottom: 4px;
+  border-radius: 0 8px 8px 0;
+}
+#postBody h3 { color: var(--th-h3) !important; }
+#postBody h4 { color: var(--th-h4) !important; }
+#postBody h5 { color: var(--th-h5) !important; }
+
+/* 主题特殊规则 */
+body[data-luliy-theme="sunset"]   #postBody h1 { text-transform:uppercase; letter-spacing:1px; }
+body[data-luliy-theme="sunset"]   #postBody h2 { border-bottom:1px dashed #ea580c !important; border-left:none !important; }
+body[data-luliy-theme="eco-green"] #postBody h5 { border-left:2px solid #34d399 !important; padding-left:8px; }
+body[data-luliy-theme="mono"]     #postBody h1 { font-weight:800 !important; }
+body[data-luliy-theme="mono"]     #postBody h2 { font-weight:700 !important; }
+body[data-luliy-theme="mono"]     #postBody h3 { font-weight:600 !important; }
+body[data-luliy-theme="mono"]     #postBody h5 { text-transform:uppercase !important; }
+body[data-luliy-theme="cyberpunk"] #postBody h1 { text-shadow:0 0 8px #a855f7 !important; }
+body[data-luliy-theme="cyberpunk"] #postBody h2 { border-bottom:1px solid #701a75 !important; border-left:none !important; }
+body[data-luliy-theme="classic-blue"] #postBody h5 { font-style:italic !important; }
+
+/* ── §1 字体 & 基础重置 ──────────────────────────────────── */
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
+
+body, #postBody {
+  font-family: 'LXGW WenKai', 'LXGW WenKai Screen', sans-serif;
+}
+html { scroll-behavior: smooth; }
+::selection { background: #f0b429; color: #000; }
+a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
+
+/* ── §2 毛玻璃悬浮导航栏 ─────────────────────────────────── */
+#header {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  width: 100% !important;
+  min-height: 65px !important; height: auto !important;
+  background: rgba(255,255,255,0.75) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  padding: 12px 20px !important;
+  border-bottom: 1px solid rgba(0,0,0,0.08) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  z-index: 9999 !important;
+  box-sizing: border-box !important;
+  transition: background 0.3s ease, box-shadow 0.3s ease !important;
+}
+[data-color-mode="dark"] #header {
+  background: rgba(13,17,23,0.75) !important;
+  border-bottom-color: rgba(255,255,255,0.08) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.45) !important;
+}
+.blogTitle, .postTitle {
+  display: block !important;
+  font-size: clamp(16px, 4vw, 22px) !important;
+  font-weight: bold !important;
+  color: #24292f !important;
+  text-decoration: none !important;
+  word-break: break-word !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  flex: 1 !important;
+  padding-right: 14px !important;
+}
+[data-color-mode="dark"] .blogTitle,
+[data-color-mode="dark"] .postTitle { color: #adbac7 !important; }
+.title-right {
+  display: flex !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
+  z-index: 10000 !important;
+  align-items: center !important;
+}
+
+/* ── §3 大屏居中布局（Max-Width 1000px，参考 weich.ee/post/32） */
+#content, .main {
+  margin: 85px auto 0 auto !important;
+  padding: 0 24px !important;
+  width: 95% !important;
+  max-width: 1000px !important;
+  background: transparent !important;
+  border: none !important;
+  box-sizing: border-box !important;
+}
+.subTitle { display: none !important; }
+
+/* ── §4 自定义滚动条 ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #8250df; border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 点阵背景 */
 body {
-  min-height: 100vh;
-  font-family: var(--gmeek-font);
-  color: var(--gmeek-text);
-  background:
-    radial-gradient(circle at top left, rgba(2, 122, 255, 0.1), transparent 34rem),
-    radial-gradient(circle at top right, rgba(139, 92, 246, 0.08), transparent 32rem),
-    var(--gmeek-bg) !important;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  background-image: radial-gradient(rgba(9,105,218,0.09) 1px, transparent 1px);
+  background-size: 25px 25px;
 }
-
 [data-color-mode="dark"] body {
-  background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 34rem),
-    radial-gradient(circle at top right, rgba(139, 92, 246, 0.12), transparent 32rem),
-    var(--gmeek-bg) !important;
+  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
 }
 
-::selection {
-  color: #fff;
-  background: var(--gmeek-primary);
+/* ── §5 粒子 Canvas & 暗色波纹 ──────────────────────────── */
+#luliy-particle-canvas {
+  position: fixed; inset: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none; z-index: 0; opacity: 0.48;
+}
+#luliy-theme-ripple {
+  position: fixed; border-radius: 50%; transform: scale(0);
+  pointer-events: none; z-index: 99998; transition: none;
 }
 
-a {
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* ------------------------------
-   3. Scrollbar
------------------------------- */
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.42);
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--gmeek-primary);
-}
-
-/* ------------------------------
-   4. Frosted Glass Header
-   Compatible with common Gmeek/GitHub layout classes
------------------------------- */
-
-.Header,
-header,
-.AppHeader,
-.application-main > header,
-.js-header-wrapper {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 1000 !important;
-  min-height: var(--gmeek-header-height);
-  background: rgba(255, 255, 255, 0.72) !important;
-  border-bottom: 1px solid var(--gmeek-border) !important;
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-[data-color-mode="dark"] .Header,
-[data-color-mode="dark"] header,
-[data-color-mode="dark"] .AppHeader,
-[data-color-mode="dark"] .application-main > header,
-[data-color-mode="dark"] .js-header-wrapper {
-  background: rgba(2, 6, 23, 0.72) !important;
-  border-bottom-color: var(--gmeek-border) !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.24);
-}
-
-.gmeek-header-scrolled .Header,
-.gmeek-header-scrolled header,
-.gmeek-header-scrolled .AppHeader,
-.gmeek-header-scrolled .application-main > header,
-.gmeek-header-scrolled .js-header-wrapper {
-  background: rgba(255, 255, 255, 0.86) !important;
-  box-shadow: var(--gmeek-shadow-sm);
-}
-
-[data-color-mode="dark"].gmeek-header-scrolled .Header,
-[data-color-mode="dark"].gmeek-header-scrolled header,
-[data-color-mode="dark"].gmeek-header-scrolled .AppHeader,
-[data-color-mode="dark"].gmeek-header-scrolled .application-main > header,
-[data-color-mode="dark"].gmeek-header-scrolled .js-header-wrapper {
-  background: rgba(2, 6, 23, 0.86) !important;
-}
-
-/* ------------------------------
-   5. Responsive Centered Layout
------------------------------- */
-
-.container-lg,
-.container-xl,
-.container,
-.Layout,
-.Layout-main,
-.application-main {
-  box-sizing: border-box;
-}
-
-.container-lg,
-.container-xl {
-  width: min(100% - 32px, 1180px) !important;
-  max-width: 1180px !important;
-  margin-inline: auto !important;
-}
-
-.Layout {
-  max-width: 1180px !important;
-  margin-inline: auto !important;
-  gap: 24px !important;
-}
-
-.Layout-main {
-  min-width: 0 !important;
-}
-
-@media (min-width: 1440px) {
-  .container-lg,
-  .container-xl,
-  .Layout {
-    max-width: 1240px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .container-lg,
-  .container-xl {
-    width: min(100% - 20px, 100%) !important;
-  }
-
-  .Layout {
-    display: block !important;
-  }
-}
-
-/* ------------------------------
-   6. Remove Old Notice Board
------------------------------- */
-
-.luliy-announce,
-.announce-bar,
-#gmeek-notice,
-.gmeek-notice,
-.notice-board {
-  display: none !important;
-}
-
-/* ------------------------------
-   7. Article List Hover Effect
-   Requirement-provided SideNav style
------------------------------- */
-
+/* ── §6 文章列表 SideNav Hover 特效 ─────────────────────── */
 .SideNav-item {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   border-left: 3px solid transparent !important;
@@ -253,388 +250,448 @@ header,
   border-radius: 6px !important;
   margin-bottom: 4px !important;
 }
-
 .SideNav-item:hover {
-  background-color: rgba(2, 122, 255, 0.05) !important;
-  transform: translateX(5px);
+  background-color: rgba(2,122,255,0.05) !important;
+  transform: translateX(5px) !important;
   border-left: 3px solid #027aff !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
 }
-
 [data-color-mode="dark"] .SideNav-item:hover {
-  background-color: rgba(56, 189, 248, 0.1) !important;
-  border-left-color: var(--gmeek-primary) !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.32);
+  background-color: rgba(130,80,223,0.10) !important;
+  border-left-color: #8250df !important;
 }
 
-/* ------------------------------
-   8. Homepage Article Cards
------------------------------- */
+/* ── §7 首页卡片重构（流光浮动视差） ────────────────────────
+ *
+ * 将 Gmeek 默认的 SideNav 列表转换为现代卡片网格。
+ * JS 会为每个 .SideNav-item 添加 .luliy-card class，
+ * 使 CSS 卡片样式生效而不影响原始列表结构。
+ * ──────────────────────────────────────────────────────── */
 
-.post-list,
-.postList,
-#gmeek-post-list,
-.gmeek-post-list {
+/* 卡片容器网格 */
+.luliy-card-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.post-item,
-.postItem,
-.issue-item,
-.Box-row {
+/* 单张卡片 */
+.luliy-card {
   position: relative;
-  overflow: hidden;
-  border: 1px solid var(--gmeek-border) !important;
-  border-radius: var(--gmeek-radius-lg) !important;
-  background: var(--gmeek-card) !important;
-  box-shadow: var(--gmeek-shadow-sm);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  box-shadow: 0 2px 14px rgba(130,80,223,0.08) !important;
+  border: none !important;
+  border-left: none !important;           /* 覆盖 SideNav-item 的左边线 */
+  transform: translateY(0) scale(1);
   transition:
-    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.28s ease,
-    background-color 0.28s ease !important;
+    transform 0.32s cubic-bezier(.4,0,.2,1),
+    box-shadow 0.32s cubic-bezier(.4,0,.2,1) !important;
+  will-change: transform, box-shadow;
+  /* 重置 SideNav hover 里的 translateX */
+}
+.luliy-card:hover {
+  transform: translateY(-8px) scale(1.013) !important;
+  box-shadow:
+    0 20px 50px rgba(130,80,223,0.22),
+    0 0 0 2px rgba(130,80,223,0.20),
+    0 0 34px rgba(130,80,223,0.12) !important;
+  background-color: transparent !important;
+  border-left: none !important;
 }
 
-.post-item::before,
-.postItem::before,
-.issue-item::before,
-.Box-row::before {
-  content: "";
+/* 流光边框伪元素 */
+.luliy-card::before {
+  content: '';
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: linear-gradient(180deg, var(--gmeek-primary), #8b5cf6);
+  inset: 0;
+  border-radius: 16px;
+  padding: 2px;
+  background: linear-gradient(135deg, #8250df, #f0b429, #ff6b9d, #6bceff, #8250df);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   opacity: 0;
-  transition: opacity 0.28s ease;
-}
-
-.post-item:hover,
-.postItem:hover,
-.issue-item:hover,
-.Box-row:hover {
-  transform: translateY(-4px);
-  border-color: rgba(2, 122, 255, 0.28) !important;
-  background: var(--gmeek-card-hover) !important;
-  box-shadow: var(--gmeek-shadow-md);
-}
-
-.post-item:hover::before,
-.postItem:hover::before,
-.issue-item:hover::before,
-.Box-row:hover::before {
-  opacity: 1;
-}
-
-.post-item a,
-.postItem a,
-.issue-item a,
-.Box-row a {
-  color: var(--gmeek-text) !important;
-}
-
-.post-item a:hover,
-.postItem a:hover,
-.issue-item a:hover,
-.Box-row a:hover {
-  color: var(--gmeek-primary) !important;
-  text-decoration: none !important;
-}
-
-.post-item .Label,
-.postItem .Label,
-.issue-item .Label,
-.Box-row .Label {
-  border: 1px solid rgba(2, 122, 255, 0.16) !important;
-  border-radius: 999px !important;
-  color: var(--gmeek-primary) !important;
-  background: var(--gmeek-primary-soft) !important;
-  font-weight: 500 !important;
-}
-
-/* Homepage card enhancement injected by enhance.js */
-
-.gmeek-modern-card {
-  padding: 22px 24px !important;
-}
-
-.gmeek-modern-card-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: clamp(18px, 2vw, 22px);
-  font-weight: 700;
-  line-height: 1.45;
-}
-
-.gmeek-modern-card-title::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--gmeek-primary);
-  box-shadow: 0 0 0 5px var(--gmeek-primary-soft);
-}
-
-.gmeek-modern-card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-  margin-top: 12px;
-  color: var(--gmeek-text-muted);
-  font-size: 13px;
-}
-
-.gmeek-modern-card-meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* ------------------------------
-   9. Article Page Typography
------------------------------- */
-
-#postBody,
-.markdown-body {
-  color: var(--gmeek-text);
-  font-size: 16px;
-  line-height: 1.85;
-}
-
-#postBody h1,
-.markdown-body h1 {
-  margin-top: 1.4em;
-  margin-bottom: 0.75em;
-  padding-bottom: 0.35em;
-  border-bottom: 1px solid var(--gmeek-border);
-  font-size: clamp(28px, 4vw, 42px);
-  line-height: 1.2;
-}
-
-#postBody h2,
-.markdown-body h2 {
-  margin-top: 2.1em;
-  margin-bottom: 0.8em;
-  font-size: clamp(22px, 3vw, 30px);
-  border-bottom: 1px solid var(--gmeek-border);
-}
-
-#postBody h3,
-.markdown-body h3 {
-  margin-top: 1.8em;
-  font-size: 21px;
-}
-
-#postBody p,
-.markdown-body p {
-  margin: 1em 0;
-}
-
-#postBody blockquote,
-.markdown-body blockquote {
-  margin: 1.4em 0;
-  padding: 14px 18px;
-  color: var(--gmeek-text-muted);
-  background: var(--gmeek-primary-soft);
-  border-left: 4px solid var(--gmeek-primary);
-  border-radius: 0 var(--gmeek-radius-md) var(--gmeek-radius-md) 0;
-}
-
-#postBody code,
-.markdown-body code {
-  font-family: var(--gmeek-mono);
-  border-radius: 6px;
-  background: rgba(2, 122, 255, 0.08);
-  color: #0369a1;
-}
-
-[data-color-mode="dark"] #postBody code,
-[data-color-mode="dark"] .markdown-body code {
-  background: rgba(56, 189, 248, 0.12);
-  color: #7dd3fc;
-}
-
-#postBody pre,
-.markdown-body pre {
-  border: 1px solid var(--gmeek-border);
-  border-radius: var(--gmeek-radius-md);
-  background: #0f172a !important;
-  box-shadow: var(--gmeek-shadow-sm);
-}
-
-#postBody pre code,
-.markdown-body pre code {
-  background: transparent !important;
-  color: inherit !important;
-}
-
-#postBody img,
-.markdown-body img {
-  border-radius: var(--gmeek-radius-md);
-  box-shadow: var(--gmeek-shadow-sm);
-}
-
-/* ------------------------------
-   10. Article TOC Plugin Compatibility
-   Do not recreate old TOC.
-   Only provide light visual polish for articletoc.js.
------------------------------- */
-
-#ArticleToc,
-.article-toc,
-.articletoc,
-.gmeek-articletoc {
-  border: 1px solid var(--gmeek-border) !important;
-  border-radius: var(--gmeek-radius-md) !important;
-  background: var(--gmeek-card) !important;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: var(--gmeek-shadow-sm);
-}
-
-#ArticleToc a,
-.article-toc a,
-.articletoc a,
-.gmeek-articletoc a {
-  color: var(--gmeek-text-muted) !important;
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-#ArticleToc a:hover,
-.article-toc a:hover,
-.articletoc a:hover,
-.gmeek-articletoc a:hover {
-  color: var(--gmeek-primary) !important;
-  transform: translateX(3px);
-}
-
-/* Hide old custom TOC generated by previous scripts only */
-
-.luliy-toc-wrap,
-.luliy-toc-panel,
-.luliy-toc-header,
-.luliy-toc-mask {
-  display: none !important;
-}
-
-/* ------------------------------
-   11. Utility Components
------------------------------- */
-
-#gmeek-reading-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-  margin: 12px 0 24px;
-  color: var(--gmeek-text-muted);
-  font-size: 14px;
-}
-
-#gmeek-reading-info span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-#gmeek-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 2000;
-  width: 0%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--gmeek-primary), #8b5cf6, #ec4899);
-  transition: width 0.08s linear;
-}
-
-#gmeek-backtop {
-  position: fixed;
-  right: 22px;
-  bottom: 26px;
-  z-index: 1200;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border: 1px solid var(--gmeek-border);
-  border-radius: 999px;
-  color: var(--gmeek-text);
-  background: var(--gmeek-card);
-  box-shadow: var(--gmeek-shadow-md);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  cursor: pointer;
-  opacity: 0;
+  transition: opacity 0.32s;
   pointer-events: none;
-  transform: translateY(10px);
-  transition:
-    opacity 0.22s ease,
-    transform 0.22s ease,
-    background-color 0.22s ease;
+  z-index: 1;
 }
-
-#gmeek-backtop.is-visible {
+@keyframes luliy-rainbow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.luliy-card:hover::before {
   opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
+  animation: luliy-rainbow 2.4s ease infinite;
 }
 
-#gmeek-backtop:hover {
-  color: #fff;
-  background: var(--gmeek-primary);
+/* 四色左分条（仅视觉装饰，用 box-shadow 实现，不影响宽度） */
+.luliy-card:nth-child(4n+1)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#8250df; border-radius:16px 0 0 16px; z-index:2; }
+.luliy-card:nth-child(4n+2)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#0969da; border-radius:16px 0 0 16px; z-index:2; }
+.luliy-card:nth-child(4n+3)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#ff6b9d; border-radius:16px 0 0 16px; z-index:2; }
+.luliy-card:nth-child(4n+0)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#f0b429; border-radius:16px 0 0 16px; z-index:2; }
+
+/* 卡片内 a 链接（Gmeek 结构） */
+.luliy-card .SideNav-item-title-block {
+  padding: 18px 18px 14px 22px;
+  display: block;
+}
+.luliy-card a {
+  color: #24292f !important;
+  text-decoration: none !important;
+  display: block;
+  padding: 16px 18px 12px 22px;
+}
+.luliy-card a:hover { color: #8250df !important; }
+[data-color-mode="dark"] .luliy-card {
+  background: #1a1a2e !important;
+}
+[data-color-mode="dark"] .luliy-card a { color: #cdd6f4 !important; }
+
+/* 进入动画 */
+@keyframes luliy-fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.luliy-card { animation: luliy-fadeUp 0.45s ease both; }
+.luliy-card:nth-child(2) { animation-delay: 0.05s; }
+.luliy-card:nth-child(3) { animation-delay: 0.10s; }
+.luliy-card:nth-child(4) { animation-delay: 0.15s; }
+.luliy-card:nth-child(5) { animation-delay: 0.20s; }
+.luliy-card:nth-child(6) { animation-delay: 0.25s; }
+.luliy-card:nth-child(n+7) { animation-delay: 0.30s; }
+
+/* 深色模式卡片阴影 */
+[data-color-mode="dark"] .luliy-card {
+  box-shadow: 0 2px 14px rgba(0,0,0,0.35) !important;
+}
+[data-color-mode="dark"] .luliy-card:hover {
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.55),
+    0 0 0 2px rgba(130,80,223,0.35),
+    0 0 34px rgba(130,80,223,0.18) !important;
 }
 
-/* ------------------------------
-   12. Mobile Optimization
------------------------------- */
+/* ── §8 macOS 代码块（三按钮，移除 CSS 圆点装饰） ────────── */
+#postBody pre {
+  position: relative;
+  padding-top: 42px !important;
+  overflow-x: auto;
+  max-width: 100%;
+  background: var(--skin-code-bg, rgba(16,16,28,0.96)) !important;
+  border: 1px solid var(--skin-border, rgba(130,80,223,0.45)) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 0 0 1px rgba(130,80,223,0.10),
+    0 8px 32px rgba(0,0,0,0.42),
+    0 0 48px rgba(130,80,223,0.16) !important;
+  font-family: 'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,monospace;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+#postBody pre:hover {
+  box-shadow:
+    0 0 0 1px rgba(130,80,223,0.24),
+    0 16px 48px rgba(0,0,0,0.52),
+    0 0 68px rgba(130,80,223,0.24) !important;
+  transform: translateY(-1px);
+}
+/* 扫描线 */
+#postBody pre::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
+  pointer-events: none; border-radius: 14px; z-index: 1;
+}
+/* 无 ::before 圆点 — 改用 JS 注入可点击按钮 */
+#postBody pre code {
+  color: #cdd6f4 !important;
+  background: none !important;
+  padding: 0 !important;
+  font-weight: normal !important;
+}
+/* macOS 按钮公共 */
+.mac-btn {
+  position: absolute; top: 9px;
+  width: 12px; height: 12px;
+  border-radius: 50%; border: none;
+  cursor: pointer; z-index: 10;
+  transition: filter 0.15s, transform 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+}
+.mac-btn:hover { filter: brightness(1.2); transform: scale(1.25); }
+.mac-btn-red    { left: 14px; background: #ff5f57; }
+.mac-btn-yellow { left: 34px; background: #febc2e; }
+.mac-btn-green  { left: 54px; background: #28c840; }
+.mac-btn::after {
+  content: attr(data-tip);
+  position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.82); color: #fff; font-size: 11px;
+  white-space: nowrap; padding: 3px 8px; border-radius: 5px;
+  pointer-events: none; opacity: 0; transition: opacity 0.18s;
+  z-index: 20; font-family: sans-serif;
+}
+.mac-btn:hover::after { opacity: 1; }
+.mac-btn-red.is-done      { background: #1f883d; }
+.mac-btn-yellow.is-folded { background: #8250df; }
+pre.is-folded > code      { display: none; }
+pre.is-folded             { padding-bottom: 12px !important; }
+pre.code-fullscreen {
+  position: fixed !important; inset: 0 !important;
+  z-index: 99999 !important; border-radius: 0 !important;
+  margin: 0 !important; max-width: 100vw !important;
+  width: 100vw !important; height: 100vh !important;
+  overflow: auto !important; padding-top: 48px !important;
+  transform: none !important;
+}
+pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
+#postBody pre:active { box-shadow: 0 0 0 3px rgba(130,80,223,0.4) !important; }
 
+/* ── §9 图片灯箱 ─────────────────────────────────────────── */
+#luliy-lightbox {
+  position: fixed; inset: 0; z-index: 99990;
+  background: rgba(0,0,0,0.88);
+  display: flex; align-items: center; justify-content: center;
+  cursor: zoom-out; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease; backdrop-filter: blur(6px);
+}
+#luliy-lightbox.is-open { opacity: 1; pointer-events: all; }
+#luliy-lightbox img {
+  max-width: 90vw; max-height: 88vh;
+  border-radius: 10px; box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  transform: scale(0.88);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  cursor: default; object-fit: contain;
+}
+#luliy-lightbox.is-open img { transform: scale(1); }
+#luliy-lightbox-close {
+  position: absolute; top: 20px; right: 24px;
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.12); border: none; border-radius: 50%;
+  color: #fff; font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+#luliy-lightbox-close:hover { background: rgba(255,255,255,0.28); }
+
+/* ── §10 头像时钟 ────────────────────────────────────────── */
+#luliy-avatar-clock {
+  text-align: center; font-size: 13px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: #8250df; font-weight: 600; letter-spacing: 1px;
+  margin-top: 4px; opacity: 0.85;
+}
+a.luliy-avatar-link { display: inline-block; }
+a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
+[data-color-mode="dark"] #luliy-avatar-clock { color: #cba6f7; }
+
+/* ── §11 顶部进度条 & 回顶按钮 ──────────────────────────── */
+#luliy-progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 3px; width: 0%;
+  background: linear-gradient(90deg, #8250df, #f0b429);
+  z-index: 99999; transition: width 0.1s linear; pointer-events: none;
+}
+#luliy-back-top {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 44px; height: 44px;
+  background: rgba(130,80,223,0.88); border: none; border-radius: 50%;
+  color: #fff; font-size: 18px; cursor: pointer; z-index: 9000;
+  display: none; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(130,80,223,0.4);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+#luliy-back-top:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(130,80,223,0.55); }
+
+/* ── §12 浮动工具栏（文章页右上角：主页/GitHub/主题/音效/皮肤）*/
+#luliy-toolbar {
+  position: fixed;
+  top: 76px;
+  right: 16px;
+  z-index: 8900;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.luliy-tb-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(10px);
+  color: #24292f;
+  font-size: 17px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
+  text-decoration: none;
+  position: relative;
+}
+.luliy-tb-btn:hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 6px 18px rgba(130,80,223,0.3);
+  background: rgba(255,255,255,0.98);
+}
+[data-color-mode="dark"] .luliy-tb-btn {
+  background: rgba(30,30,50,0.88);
+  color: #cdd6f4;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+[data-color-mode="dark"] .luliy-tb-btn:hover {
+  background: rgba(40,40,65,0.98);
+}
+/* Tooltip */
+.luliy-tb-btn::after {
+  content: attr(data-tip);
+  position: absolute;
+  right: 48px; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.78); color: #fff;
+  font-size: 12px; white-space: nowrap;
+  padding: 4px 9px; border-radius: 6px;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.18s; font-family: sans-serif;
+}
+.luliy-tb-btn:hover::after { opacity: 1; }
+/* 音效按钮 — 开启/关闭状态 */
+.luliy-tb-btn.sfx-off { opacity: 0.45; }
+/* 主题弹出菜单 */
+#luliy-theme-menu {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(130,80,223,0.22);
+  border-radius: 12px; padding: 7px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+  backdrop-filter: blur(12px);
+  min-width: 148px;
+}
+[data-color-mode="dark"] #luliy-theme-menu {
+  background: rgba(26,26,46,0.96);
+  border-color: rgba(130,80,223,0.35);
+}
+#luliy-theme-menu.is-open { display: flex; }
+.luliy-theme-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 8px;
+  border: none; background: transparent;
+  cursor: pointer; font-size: 13px;
+  color: #24292f; font-family: inherit;
+  text-align: left; transition: background 0.16s;
+  white-space: nowrap;
+}
+[data-color-mode="dark"] .luliy-theme-opt { color: #ccc; }
+.luliy-theme-opt:hover { background: rgba(130,80,223,0.12); }
+.luliy-theme-opt.is-active { background: rgba(130,80,223,0.18); font-weight:600; }
+.luliy-theme-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+/* 皮肤弹出菜单 */
+#luliy-skin-menu {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(130,80,223,0.22);
+  border-radius: 12px; padding: 7px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+  backdrop-filter: blur(12px);
+  min-width: 140px;
+}
+[data-color-mode="dark"] #luliy-skin-menu {
+  background: rgba(26,26,46,0.96);
+  border-color: rgba(130,80,223,0.35);
+}
+#luliy-skin-menu.is-open { display: flex; }
+.luliy-skin-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 8px;
+  border: none; background: transparent;
+  cursor: pointer; font-size: 13px;
+  color: #24292f; font-family: inherit;
+  text-align: left; transition: background 0.16s;
+  white-space: nowrap;
+}
+[data-color-mode="dark"] .luliy-skin-opt { color: #ccc; }
+.luliy-skin-opt:hover { background: rgba(130,80,223,0.12); }
+.luliy-skin-opt.is-active { background: rgba(130,80,223,0.18); font-weight:600; }
+.luliy-skin-swatch {
+  width: 14px; height: 14px; border-radius: 4px;
+  flex-shrink: 0; border: 1px solid rgba(0,0,0,0.12);
+}
+
+/* ── §13 收藏加密遮罩 ────────────────────────────────────── */
+#luliy-lock-overlay {
+  position: fixed; inset: 0; z-index: 99995;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10,10,20,0.94); backdrop-filter: blur(16px);
+}
+.luliy-lock-box {
+  background: rgba(26,26,46,0.98);
+  border: 1px solid rgba(130,80,223,0.45);
+  border-radius: 18px; padding: 40px 48px; text-align: center;
+  box-shadow: 0 0 0 1px rgba(130,80,223,0.10),0 24px 60px rgba(0,0,0,0.6),0 0 80px rgba(130,80,223,0.22);
+  max-width: 360px; width: 90%;
+}
+.luliy-lock-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+.luliy-lock-title { font-size: 18px; font-weight: 700; color: #cba6f7; margin-bottom: 6px; }
+.luliy-lock-hint  { font-size: 13px; color: #6c7086; margin-bottom: 22px; }
+.luliy-lock-input {
+  width: 100%; padding: 10px 16px;
+  border: 1px solid rgba(130,80,223,0.4); border-radius: 10px;
+  background: rgba(255,255,255,0.06); color: #cdd6f4;
+  font-size: 16px; text-align: center; letter-spacing: 4px;
+  font-family: 'JetBrains Mono', monospace; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 14px;
+}
+.luliy-lock-input:focus { border-color: rgba(130,80,223,0.8); box-shadow: 0 0 0 3px rgba(130,80,223,0.22); }
+.luliy-lock-input.is-wrong {
+  border-color: #f38ba8 !important;
+  box-shadow: 0 0 0 3px rgba(243,139,168,0.22) !important;
+  animation: lockShake 0.4s ease;
+}
+@keyframes lockShake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
+}
+.luliy-lock-btn {
+  width: 100%; padding: 11px; border-radius: 10px; border: none;
+  background: linear-gradient(90deg,#8250df,#c084fc);
+  color: #fff; font-weight: 700; font-size: 15px;
+  cursor: pointer; font-family: inherit;
+  transition: filter 0.2s, transform 0.2s;
+}
+.luliy-lock-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.luliy-lock-err { margin-top: 10px; font-size: 12px; color: #f38ba8; min-height: 18px; }
+
+/* ── §14 阅读皮肤正文样式细节 ───────────────────────────── */
+/* 羊皮纸 */
+body[data-skin="parchment"] #postBody h1,
+body[data-skin="parchment"] #postBody h2,
+body[data-skin="parchment"] #postBody h3 { color: #8b4513 !important; }
+body[data-skin="parchment"] #postBody blockquote { border-left-color: #b5651d !important; }
+/* 水墨 */
+body[data-skin="ink"] #postBody h1,
+body[data-skin="ink"] #postBody h2,
+body[data-skin="ink"] #postBody h3 { color: #e0e0e0 !important; }
+/* 深海 */
+body[data-skin="ocean"] #postBody h1 { color: #60a5fa !important; }
+body[data-skin="ocean"] #postBody h2 { color: #93c5fd !important; border-left-color: #60a5fa !important; }
+body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
+
+/* ── §15 响应式 ──────────────────────────────────────────── */
 @media (max-width: 768px) {
-  body {
-    background-attachment: scroll;
-  }
-
-  .post-item,
-  .postItem,
-  .issue-item,
-  .Box-row {
-    border-radius: var(--gmeek-radius-md) !important;
-  }
-
-  .gmeek-modern-card {
-    padding: 18px !important;
-  }
-
-  #postBody,
-  .markdown-body {
-    font-size: 15.5px;
-    line-height: 1.8;
-  }
-
-  #gmeek-backtop {
-    right: 16px;
-    bottom: 18px;
-    width: 40px;
-    height: 40px;
-  }
-}
-
-/* ------------------------------
-   13. Reduced Motion
------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
+  #content, .main { padding: 0 12px !important; width: 100% !important; }
+  #luliy-toolbar { top: auto; bottom: 130px; right: 12px; }
+  #luliy-back-top { bottom: 80px; right: 12px; }
+  #postBody { font-size: 16px !important; line-height: 1.85 !important; max-width: 100% !important; }
+  #postBody h1 { font-size: 1.5rem !important; }
+  #postBody h2 { font-size: 1.2rem !important; }
+  #postBody pre { font-size: 13px !important; }
+  .luliy-card-grid { grid-template-columns: 1fr; }
+  .luliy-tb-btn::after { display: none; }
 }
