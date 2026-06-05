@@ -12,13 +12,14 @@
    ⑨  头像时钟 + 链接到 /about
    ⑩  标签页增强
    ⑪  图片灯箱
-   ⑫  浮动工具栏（主页 / GitHub / 主题 / 音效 / 皮肤）
+   ⑫  浮动工具栏（主页 / GitHub / 主题 / 音效 / 皮肤 / 背景 / 花瓣）
    ⑬  favorites 前端加密（SHA-256）
    ⑭  首页卡片重构
    ⑮  macOS 代码块三按钮
-   ⑯  文章页初始化 (_luliyInitPost)
-   ⑰  首页初始化   (_luliyInitIndex)
-   ⑱  主入口
+   ⑯  樱花花瓣效果
+   ⑰  文章页初始化 (_luliyInitPost)
+   ⑱  首页初始化   (_luliyInitIndex)
+   ⑲  主入口
    ============================================================ */
 (function (root) {
   'use strict';
@@ -54,7 +55,13 @@
 
   /* ─── ① localStorage 初始化 ─────────────────────────────── */
   function initLocalStorage() {
-    var defs={'luliy-sfx':'1','luliy-particles':'1','luliy-theme':'default','luliy-skin':'default'};
+    var defs={
+      'luliy-sfx':'1',
+      'luliy-particles':'1',
+      'luliy-sakura':'1',
+      'luliy-theme':'default',
+      'luliy-skin':'default'
+    };
     Object.keys(defs).forEach(function(k){if(localStorage.getItem(k)===null)localStorage.setItem(k,defs[k]);});
   }
 
@@ -258,8 +265,8 @@
   }
 
   /* ─── ⑫ 浮动工具栏 ──────────────────────────────────────
-   *  按钮：主页 / GitHub / 文章主题 / 音效 / 阅读皮肤
-   *  全局注入（任何页面），右上角固定定位。
+   *  按钮：主页 / GitHub / 文章主题 / 音效 / 皮肤 / 背景图片 / 花瓣
+   *  全局注入（任何页面），右侧固定定位。
    * ──────────────────────────────────────────────────────── */
   var THEMES=[
     {id:'default',     label:'默认金调',  dot:'#f0b429'},
@@ -294,6 +301,7 @@
 
     /* 主页按钮 */
     var btnHome=document.createElement('a');btnHome.className='luliy-tb-btn';btnHome.href='/';btnHome.setAttribute('data-tip','主页');btnHome.innerHTML='🏠';
+
     /* GitHub 按钮 */
     var btnGH=document.createElement('a');btnGH.className='luliy-tb-btn';btnGH.href='https://github.com/luliy6';btnGH.target='_blank';btnGH.setAttribute('data-tip','GitHub');btnGH.innerHTML='<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.67 7.67 0 0 1 8 4.58c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>';
 
@@ -319,7 +327,8 @@
       b.addEventListener('click',function(){applyTheme(t.id);themeMenu.classList.remove('is-open');playSfx('click');});
       themeMenu.appendChild(b);
     });
-    btnTheme.addEventListener('click',function(e){e.stopPropagation();themeMenu.classList.toggle('is-open');skinMenu.classList.remove('is-open');});
+    btnTheme.addEventListener('click',function(e){e.stopPropagation();themeMenu.classList.toggle('is-open');skinMenu.classList.remove('is-open');bgMenu.classList.remove('is-open');});
+    themeMenu.addEventListener('click',function(e){e.stopPropagation();});
     themeWrap.appendChild(themeMenu);themeWrap.appendChild(btnTheme);
 
     /* 阅读皮肤按钮 + 下拉菜单 */
@@ -332,13 +341,90 @@
       b.addEventListener('click',function(){applySkin(s.id);skinMenu.classList.remove('is-open');playSfx('click');});
       skinMenu.appendChild(b);
     });
-    btnSkin.addEventListener('click',function(e){e.stopPropagation();skinMenu.classList.toggle('is-open');themeMenu.classList.remove('is-open');});
+    btnSkin.addEventListener('click',function(e){e.stopPropagation();skinMenu.classList.toggle('is-open');themeMenu.classList.remove('is-open');bgMenu.classList.remove('is-open');});
+    skinMenu.addEventListener('click',function(e){e.stopPropagation();});
     skinWrap.appendChild(skinMenu);skinWrap.appendChild(btnSkin);
 
-    /* 点击外部关闭所有菜单 */
-    document.addEventListener('click',function(){themeMenu.classList.remove('is-open');skinMenu.classList.remove('is-open');});
+    /* ── 背景图片按钮 + 面板 ─────────────────────────────── */
+    var bgWrap=document.createElement('div');bgWrap.style.cssText='position:relative;';
+    var btnBg=document.createElement('button');btnBg.className='luliy-tb-btn';btnBg.type='button';btnBg.setAttribute('data-tip','背景图片');btnBg.innerHTML='🖼';
+    var bgMenu=document.createElement('div');bgMenu.id='luliy-bg-menu';
+    bgMenu.innerHTML=
+      '<div class="luliy-bg-label">背景图片链接</div>'+
+      '<input class="luliy-bg-input" type="url" placeholder="https://..." autocomplete="off" />'+
+      '<div class="luliy-bg-actions">'+
+        '<button class="luliy-bg-apply" type="button">应 用</button>'+
+        '<button class="luliy-bg-clear" type="button">清 除</button>'+
+      '</div>';
 
-    bar.appendChild(btnHome);bar.appendChild(btnGH);bar.appendChild(btnSfx);bar.appendChild(themeWrap);bar.appendChild(skinWrap);
+    /* 恢复已保存的背景 URL 到输入框 */
+    var _savedBgUrl=localStorage.getItem('luliy-bg');
+    var bgInp=bgMenu.querySelector('.luliy-bg-input');
+    if(_savedBgUrl)bgInp.value=_savedBgUrl;
+
+    var bgApply=bgMenu.querySelector('.luliy-bg-apply');
+    var bgClear=bgMenu.querySelector('.luliy-bg-clear');
+
+    bgApply.addEventListener('click',function(){
+      var url=bgInp.value.trim();
+      if(url){
+        document.body.style.backgroundImage='url('+url+')';
+        document.body.style.backgroundSize='cover';
+        document.body.style.backgroundAttachment='fixed';
+        document.body.style.backgroundPosition='center';
+        document.body.style.backgroundRepeat='no-repeat';
+        localStorage.setItem('luliy-bg',url);
+        bgMenu.classList.remove('is-open');
+        playSfx('sci');
+      }
+    });
+    bgClear.addEventListener('click',function(){
+      document.body.style.backgroundImage='';
+      document.body.style.backgroundSize='';
+      document.body.style.backgroundAttachment='';
+      document.body.style.backgroundPosition='';
+      document.body.style.backgroundRepeat='';
+      localStorage.removeItem('luliy-bg');
+      bgInp.value='';
+      bgMenu.classList.remove('is-open');
+      playSfx('click');
+    });
+    /* 按回车也触发应用 */
+    bgInp.addEventListener('keydown',function(e){if(e.key==='Enter')bgApply.click();});
+
+    btnBg.addEventListener('click',function(e){e.stopPropagation();bgMenu.classList.toggle('is-open');themeMenu.classList.remove('is-open');skinMenu.classList.remove('is-open');});
+    bgMenu.addEventListener('click',function(e){e.stopPropagation();});
+    bgWrap.appendChild(bgMenu);bgWrap.appendChild(btnBg);
+
+    /* ── 樱花花瓣开关按钮 ────────────────────────────────── */
+    var btnSakura=document.createElement('button');btnSakura.className='luliy-tb-btn';btnSakura.type='button';
+    var sakuraOn=localStorage.getItem('luliy-sakura')!=='0';
+    btnSakura.innerHTML='🌸';btnSakura.setAttribute('data-tip',sakuraOn?'关闭花瓣':'开启花瓣');
+    if(!sakuraOn)btnSakura.classList.add('sakura-off');
+    btnSakura.addEventListener('click',function(){
+      var on=localStorage.getItem('luliy-sakura')!=='0';
+      localStorage.setItem('luliy-sakura',on?'0':'1');
+      btnSakura.innerHTML='🌸';btnSakura.setAttribute('data-tip',on?'开启花瓣':'关闭花瓣');
+      btnSakura.classList.toggle('sakura-off',on);
+      if(on){var c=document.getElementById('luliy-sakura-canvas');if(c)c.remove();}
+      else initSakura();
+      playSfx('click');
+    });
+
+    /* 点击外部关闭所有弹出菜单 */
+    document.addEventListener('click',function(){
+      themeMenu.classList.remove('is-open');
+      skinMenu.classList.remove('is-open');
+      bgMenu.classList.remove('is-open');
+    });
+
+    bar.appendChild(btnHome);
+    bar.appendChild(btnGH);
+    bar.appendChild(btnSfx);
+    bar.appendChild(themeWrap);
+    bar.appendChild(skinWrap);
+    bar.appendChild(bgWrap);
+    bar.appendChild(btnSakura);
     document.body.appendChild(bar);
 
     /* 恢复保存的主题和皮肤 */
@@ -373,27 +459,23 @@
   var LOCK_KEY='luliy-unlocked-favorites';
 
   function isFavoritesPost(){
-    /* 方法 1：body 或 postBody 的 data-labels 属性 */
     var attr=(document.body.getAttribute('data-labels')||'')+
       ((document.getElementById('postBody')&&document.getElementById('postBody').getAttribute('data-labels'))||'');
     if(/favorites/i.test(attr))return true;
-    /* 方法 2：页面 DOM 里的 .Label 文字 */
     var found=false;
     document.querySelectorAll('.Label,a.Label').forEach(function(el){if(/favorites/i.test(el.textContent))found=true;});
-    /* 方法 3：页面标题 / URL 含 favorites（兜底） */
     if(!found)/favorites/i.test(document.title+location.href)&&(found=true);
     return found;
   }
 
   function initLock(){
     if(!document.getElementById('postBody'))return;
-    /* 等待标签渲染完成后再判断（Gmeek 可能异步插入 .Label） */
     function check(attempts){
       if(isFavoritesPost()){showLock();return;}
       if(attempts>0)setTimeout(function(){check(attempts-1);},300);
     }
     if(sessionStorage.getItem(LOCK_KEY)==='1')return;
-    check(6); /* 最多等待 ~1.8s */
+    check(6);
   }
 
   function showLock(){
@@ -422,11 +504,7 @@
     setTimeout(function(){inp.focus();},120);
   }
 
-  /* ─── ⑭ 首页卡片重构 ────────────────────────────────────
-   * Gmeek 首页用 <ul class="SideNav"> 渲染文章列表。
-   * 我们给 <ul> 加 .luliy-card-grid，给每个 <li> 加 .luliy-card，
-   * CSS 里的 grid + 卡片样式就自动生效。
-   * ──────────────────────────────────────────────────────── */
+  /* ─── ⑭ 首页卡片重构 ────────────────────────────────────── */
   function initCards(){
     var nav=document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
     if(!nav||nav.getAttribute('data-luliy-cards'))return;
@@ -437,7 +515,7 @@
     });
   }
 
-  /* ─── ⑮ macOS 代码块三按钮（无 CSS 圆点）────────────────── */
+  /* ─── ⑮ macOS 代码块三按钮 ──────────────────────────────── */
   function initCodeBlocks(pbody){
     pbody.querySelectorAll('pre').forEach(function(pre){
       if(pre.querySelector('.mac-btn'))return;
@@ -449,7 +527,6 @@
       var bR=makeBtn('mac-btn-red','复制代码');
       var bY=makeBtn('mac-btn-yellow','折叠代码');
       var bG=makeBtn('mac-btn-green','全屏阅读');
-      /* 红 → 复制 */
       bR.addEventListener('click',function(e){
         e.stopPropagation();playSfx('click');
         var txt=code.innerText||code.textContent||'';
@@ -457,12 +534,10 @@
         if(navigator.clipboard&&location.protocol==='https:')navigator.clipboard.writeText(txt).then(done).catch(done);
         else{var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(_){}ta.remove();done();}
       });
-      /* 黄 → 折叠 */
       bY.addEventListener('click',function(e){
         e.stopPropagation();playSfx('click');
         var f=pre.classList.toggle('is-folded');bY.classList.toggle('is-folded',f);bY.setAttribute('data-tip',f?'展开代码':'折叠代码');
       });
-      /* 绿 → 全屏 */
       function toggleFS(){playSfx('sci');var f=pre.classList.toggle('code-fullscreen');bG.setAttribute('data-tip',f?'退出全屏':'全屏阅读');}
       bG.addEventListener('click',function(e){e.stopPropagation();toggleFS();});
       pre.addEventListener('dblclick',function(e){if(e.target===bR||e.target===bY||e.target===bG)return;toggleFS();});
@@ -471,15 +546,85 @@
     });
   }
 
-  /* ─── ⑯ 文章页初始化 ────────────────────────────────────── */
+  /* ─── ⑯ 樱花花瓣效果 ────────────────────────────────────── */
+  function initSakura(){
+    if(localStorage.getItem('luliy-sakura')==='0')return;
+    if(document.getElementById('luliy-sakura-canvas'))return;
+    var canvas=document.createElement('canvas');canvas.id='luliy-sakura-canvas';
+    document.body.appendChild(canvas);
+    var ctx=canvas.getContext('2d'),W,H;
+    function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+    resize();window.addEventListener('resize',resize,{passive:true});
+
+    var COLORS=['#ffb7c5','#ffc0cb','#ff9eb5','#ffd0d8','#ffaec0','#f9c4d2','#fce4ec','#f8bbd0'];
+
+    function mkPetal(randomY){
+      var size=Math.random()*10+8;
+      return{
+        x:Math.random()*W,
+        y:randomY?Math.random()*H:-size,
+        size:size,
+        opacity:Math.random()*0.55+0.25,
+        speedX:Math.random()*1.2-0.6,
+        speedY:Math.random()*0.7+0.35,
+        rot:Math.random()*Math.PI*2,
+        rotSpeed:(Math.random()-0.5)*0.038,
+        swing:Math.random()*1.6+0.4,
+        swingAngle:Math.random()*Math.PI*2,
+        swingSpeed:0.008+Math.random()*0.018,
+        color:COLORS[Math.floor(Math.random()*COLORS.length)]
+      };
+    }
+
+    var petals=[];
+    for(var i=0;i<45;i++)petals.push(mkPetal(true));
+
+    function drawPetal(p){
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha=p.opacity;
+      /* 花瓣形：双贝塞尔曲线 */
+      var s=p.size;
+      ctx.beginPath();
+      ctx.moveTo(0,-s*0.5);
+      ctx.bezierCurveTo( s*0.55,-s*0.55,  s*0.55, s*0.55, 0, s*0.5);
+      ctx.bezierCurveTo(-s*0.55, s*0.55, -s*0.55,-s*0.55, 0,-s*0.5);
+      ctx.fillStyle=p.color;
+      ctx.fill();
+      /* 花瓣中线纹 */
+      ctx.beginPath();ctx.moveTo(0,-s*0.4);ctx.lineTo(0,s*0.4);
+      ctx.strokeStyle='rgba(255,150,170,0.25)';ctx.lineWidth=0.6;ctx.stroke();
+      ctx.restore();
+    }
+
+    var running=true;
+    function tick(){
+      if(!document.getElementById('luliy-sakura-canvas')){running=false;return;}
+      ctx.clearRect(0,0,W,H);
+      for(var i=0;i<petals.length;i++){
+        var p=petals[i];
+        p.swingAngle+=p.swingSpeed;
+        p.x+=p.speedX+Math.sin(p.swingAngle)*p.swing;
+        p.y+=p.speedY;
+        p.rot+=p.rotSpeed;
+        if(p.y>H+p.size*2||p.x<-p.size*4||p.x>W+p.size*4){
+          petals[i]=mkPetal(false);
+        }
+        drawPetal(p);
+      }
+      if(running)requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  /* ─── ⑰ 文章页初始化 ────────────────────────────────────── */
   root._luliyInitPost=function(){
     if(root._luliyPostInited)return; root._luliyPostInited=true;
     var pbody=document.getElementById('postBody');
-    /* 外链新标签 & 图片懒加载 */
     document.querySelectorAll('a[href^="http"]').forEach(function(a){if(!a.href.includes('luliy6.github.io'))a.target='_blank';});
     if(pbody)pbody.querySelectorAll('img').forEach(function(img){img.loading='lazy';});
     if(!pbody)return;
-    /* 阅读时长（仅一次） */
     if(!document.getElementById('luliy-readmeta')){
       var wc=pbody.innerText.length;
       var rt=document.createElement('p');rt.id='luliy-readmeta';
@@ -487,7 +632,6 @@
       rt.style.cssText='color:#888;font-size:13px;margin-bottom:1.5rem';
       pbody.insertBefore(rt,pbody.firstChild);
     }
-    /* 标题复制链接 */
     pbody.querySelectorAll('h1,h2,h3').forEach(function(h){
       if(h._luliyCopy)return; h._luliyCopy=true; h.style.cursor='pointer'; h.title='点击复制链接';
       h.addEventListener('click',function(){
@@ -497,7 +641,6 @@
         h.appendChild(tip);setTimeout(function(){tip.remove();},2000);
       });
     });
-    /* 代码块 */
     initCodeBlocks(pbody);
     /* 上一篇 / 下一篇 */
     fetchPosts().then(function(posts){
@@ -532,10 +675,9 @@
     sp.appendChild(spb);sp.appendChild(qr);pbody.appendChild(sp);
   };
 
-  /* ─── ⑰ 首页初始化 ──────────────────────────────────────── */
+  /* ─── ⑱ 首页初始化 ──────────────────────────────────────── */
   root._luliyInitIndex=function(){
     initCards();
-    /* 归档页 */
     if(location.pathname.includes('archive')){
       var pb=document.getElementById('postBody');
       if(pb){
@@ -556,17 +698,40 @@
     }
   };
 
-  /* ─── ⑱ 主入口 ──────────────────────────────────────────── */
+  /* ─── ⑲ 主入口 ──────────────────────────────────────────── */
   initLocalStorage();
-  /* 立即恢复主题和皮肤（防 FOUC） */
+
+  /* 立即恢复主题 & 皮肤（防 FOUC） */
   var savedTheme=localStorage.getItem('luliy-theme')||'default';
   var savedSkin=localStorage.getItem('luliy-skin')||'default';
   document.body.setAttribute('data-luliy-theme',savedTheme);
   if(savedSkin!=='default')document.body.setAttribute('data-skin',savedSkin);
 
+  /* 立即恢复背景图片（防 FOUC） */
+  (function(){
+    var bg=localStorage.getItem('luliy-bg');
+    if(!bg)return;
+    function applyBg(){
+      document.body.style.backgroundImage='url('+bg+')';
+      document.body.style.backgroundSize='cover';
+      document.body.style.backgroundAttachment='fixed';
+      document.body.style.backgroundPosition='center';
+      document.body.style.backgroundRepeat='no-repeat';
+    }
+    if(document.body)applyBg();
+    else document.addEventListener('DOMContentLoaded',applyBg);
+  })();
+
+  /* 粒子背景 */
   if(localStorage.getItem('luliy-particles')!=='0'){
     if(document.body)initParticles();
     else document.addEventListener('DOMContentLoaded',initParticles);
+  }
+
+  /* 樱花花瓣（DOMContentLoaded 后初始化） */
+  if(localStorage.getItem('luliy-sakura')!=='0'){
+    if(document.body)initSakura();
+    else document.addEventListener('DOMContentLoaded',initSakura);
   }
 
   ready(function(){
