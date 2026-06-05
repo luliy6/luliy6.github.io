@@ -10,13 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## 1.外地的病人，最好先在当地三甲做完该做的检查，拿着报告来北京找大夫看，要不然到北京大医院检查排队时间可就没准了。">
-<meta property="og:title" content="看病">
-<meta property="og:description" content="## 1.外地的病人，最好先在当地三甲做完该做的检查，拿着报告来北京找大夫看，要不然到北京大医院检查排队时间可就没准了。">
+<meta name="description" content="哈喽。">
+<meta property="og:title" content="book">
+<meta property="og:description" content="哈喽。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://luliy6.github.io/post/kan-bing.html">
+<meta property="og:url" content="https://luliy6.github.io/book.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
-<title>看病</title>
+<title>book</title>
 
 
 
@@ -49,7 +49,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">看病</h1>
+<h1 class="postTitle">book</h1>
 <div class="title-right">
     <a href="https://luliy6.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -57,7 +57,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         </svg>
     </a>
     
-    <a href="https://github.com/luliy6/luliy6.github.io/issues/22" target="_blank" class="btn btn-invisible circle" title="Issue">
+    <a href="https://github.com/luliy6/luliy6.github.io/issues/5" target="_blank" class="btn btn-invisible circle" title="Issue">
         <svg class="octicon" width="16" height="16">
             <path id="pathIssue" fill-rule="evenodd"></path>
         </svg>
@@ -73,18 +73,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>1.外地的病人，最好先在当地三甲做完该做的检查，拿着报告来北京找大夫看，要不然到北京大医院检查排队时间可就没准了。</h2>
-<h2>2.有些大夫是可以加号的，带着自己病历和报告单，看出诊时间提前2个小时就去守着，他们会给你开个条或者输进就诊卡里，再去挂号就行了（我找的医生每周就16个号，加号加到130多个）。</h2>
-<h2>3. 非万不得已不要找黄牛，找的话也要多问几个（价格体系很乱）。</h2>
-<h2>4.医院黄牛基本都有用抢号软件，跟抢火车票的差不多，只要医生放号出诊基本都可以解决，有些不放号的医生，黄牛要不然找内部关系（一般都没有），要不然就如同2条，他们去替你排队；</h2>
-<h2>5.“好大夫在线APP”是个好软件；</h2>
-<h2>6.只要有钱黄牛可以解决挂号、住院，检查提前很多事；</h2>
-<h2>7.黄牛只讲利益；</h2>
-<h2>8.医生给开了住院也要等，而且要求做完术前检查才能安排，一般15天-45天内，重急症有3天就住的，协和这种8K-20K不等可提前一周内住进去；</h2>
-<h2>9.给主刀送礼的事我咨询了很多朋友，我总结送不送是咱们的事，收不收是医生的事，所以还是找机会送吧，虽然查的严。</h2>
-<h2>10.北京的主刀医生大部分可以带着团队到你当地三甲做手术，但还是北京的设备更好。</h2>
-<h2>10.女性卵巢、子宫方面做什么检查、哪个医院好咱们可以交流。</h2></div>
-<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
+<div class="markdown-body" id="postBody"><p>哈喽</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
 <div class="comments" id="comments"></div>
@@ -142,7 +132,11 @@ console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 
 <script>
 document.getElementById("pathHome").setAttribute("d",IconList["home"]);
 document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
-
+cmButton=document.getElementById("cmButton");
+    span=document.createElement("span");
+    span.setAttribute("class","Counter");
+    span.innerHTML="1";
+    cmButton.appendChild(span);
 
 
 function openComments(){
