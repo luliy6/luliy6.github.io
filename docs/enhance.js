@@ -65,11 +65,23 @@
     Object.keys(defs).forEach(function(k){if(localStorage.getItem(k)===null)localStorage.setItem(k,defs[k]);});
   }
 
-  /* ─── ② 顶部进度条 & 回顶 ───────────────────────────────── */
+/* ②  顶部进度条 & 圆形回顶按钮 */
   function initProgressBar() {
-    var bar=document.createElement('div'); bar.id='luliy-progress-bar'; document.body.appendChild(bar);
-    var btn=document.createElement('button'); btn.id='luliy-back-top'; btn.innerHTML='↑'; btn.title='回到顶部'; btn.style.display='none'; document.body.appendChild(btn);
-    btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+    if(document.getElementById('luliy-progress-bar')) return;
+    var bar=document.createElement('div');
+    bar.id='luliy-progress-bar';
+    document.body.appendChild(bar);
+
+    var btn=document.createElement('button');
+    btn.id='luliy-back-top';
+    btn.innerHTML='↑';
+    btn.title='回到顶部';
+    document.body.appendChild(btn);
+
+    btn.addEventListener('click',function(){
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+
     window.addEventListener('scroll',function(){
       var st=window.scrollY||document.documentElement.scrollTop;
       var dh=document.documentElement.scrollHeight-document.documentElement.clientHeight;
@@ -77,6 +89,7 @@
       btn.style.display=st>300?'flex':'none';
     },{passive:true});
   }
+
 
   /* ─── ③ 动态标题 ────────────────────────────────────────── */
   function initDynamicTitle() {
@@ -193,34 +206,49 @@
   function initClickSparks(){
     var colors=['#ff6b9d','#ffcd3c','#6bceff','#a78bfa','#34d399'];
     document.addEventListener('click',function(e){
-      for(var i=0;i<12;i++)(function(){
+      for(var i=0;i<12;i++) (function(){
         var s=document.createElement('div');
-        var angle=Math.random()*360,dist=Math.random()*50+16;
+        var angle=Math.random()*360, dist=Math.random()*50+16;
         s.style.cssText='position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:99999;background:'+colors[Math.floor(Math.random()*colors.length)]+';transform:translate(-50%,-50%);transition:transform 0.6s ease,opacity 0.6s ease;';
         document.body.appendChild(s);
-        requestAnimationFrame(function(){s.style.transform='translate(calc(-50% + '+(Math.cos(angle*Math.PI/180)*dist)+'px),calc(-50% + '+(Math.sin(angle*Math.PI/180)*dist)+'px))';s.style.opacity='0';});
+        requestAnimationFrame(function(){
+          s.style.transform='translate(calc(-50% + '+(Math.cos(angle*Math.PI/180)*dist)+'px),calc(-50% + '+(Math.sin(angle*Math.PI/180)*dist)+'px))';
+          s.style.opacity='0';
+        });
         setTimeout(function(){s.remove();},700);
       })();
     });
   }
 
-  /* ─── ⑨ 头像时钟 & 链接到 /about ───────────────────────── */
+  /* ⑨  头像时钟 & 链接到 About */
   function initAvatarClock(){
     function tryIns(){
-      var av=document.querySelector('.avatar,img.avatar,.blogTitle img');
-      if(!av)return false;
-      if(document.getElementById('luliy-avatar-clock'))return true;
+      var av=document.querySelector('.avatar, img.avatar, .blogTitle img');
+      if(!av) return false;
+      if(document.getElementById('luliy-avatar-clock')) return true;
       if(!av.closest('a.luliy-avatar-link')){
-        var wrap=document.createElement('a');wrap.className='luliy-avatar-link';wrap.href='/about';wrap.title='关于我';
-        av.parentNode.insertBefore(wrap,av);wrap.appendChild(av);
+        var wrap=document.createElement('a');
+        wrap.className='luliy-avatar-link';
+        wrap.href='/about';
+        wrap.title='关于我';
+        av.parentNode.insertBefore(wrap, av);
+        wrap.appendChild(av);
       }
       var anchor=av.closest('a.luliy-avatar-link')||av;
-      var clk=document.createElement('div');clk.id='luliy-avatar-clock';
-      anchor.parentNode.insertBefore(clk,anchor.nextSibling);
-      function upd(){var n=new Date();clk.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
-      upd();setInterval(upd,1000);return true;
+      var clk=document.createElement('div');
+      clk.id='luliy-avatar-clock';
+      anchor.parentNode.insertBefore(clk, anchor.nextSibling);
+      function upd(){
+        var n=new Date();
+        clk.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+      }
+      upd();
+      setInterval(upd,1000);
+      return true;
     }
-    if(!tryIns()){var tries=0,iv=setInterval(function(){if(tryIns()||++tries>20)clearInterval(iv);},300);}
+    if(!tryIns()){
+      var tries=0, iv=setInterval(function(){ if(tryIns()||++tries>20) clearInterval(iv); },300);
+    }
   }
 
   /* ─── ⑩ 标签页增强 ──────────────────────────────────────── */
