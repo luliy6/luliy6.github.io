@@ -7,13 +7,17 @@
     <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
     <link rel="icon" href="https://github.com/your-github-username.png">
-<meta name="description" content="你好，我们大家，一起开始这段感情吧。">
-<meta property="og:title" content="favorites">
-<meta property="og:description" content="你好，我们大家，一起开始这段感情吧。">
+<meta name="description" content="# 关于我
+Luliy，
+23岁，银川能源学院，机械专业。">
+<meta property="og:title" content="about">
+<meta property="og:description" content="# 关于我
+Luliy，
+23岁，银川能源学院，机械专业。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://luliy6.github.io/post/favorites.html">
+<meta property="og:url" content="https://luliy6.github.io/post/about.html">
 <meta property="og:image" content="">
-<title>favorites</title>
+<title>about</title>
 
 
 
@@ -46,7 +50,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">favorites</h1>
+<h1 class="postTitle">about</h1>
 <div class="title-right">
     <a href="https://luliy6.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -64,7 +68,15 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>你好，我们大家，一起开始这段感情吧</p></div>
+<div class="markdown-body" id="postBody"><h1>关于我</h1>
+<p>Luliy，<br>
+23岁，银川能源学院，机械专业。</p>
+<h2>喜欢历史，</h2>
+<p>说起历史，我的起源与在小学农村那</p>
+<h2>喜欢哲学。</h2>
+<p>##ai。<br>
+📮 邮箱：<a href="mailto:luliy6@qq.com">luliy6@qq.com</a><br>
+<a href="mailto:luliy6er@gmail.com">luliy6er@gmail.com</a></p></div>
 <div style="font-size:small;margin-top:8px;float:right;">© 2026 Luliy Blog</div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -98,7 +110,11 @@ console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 
 <script>
 document.getElementById("pathHome").setAttribute("d",IconList["home"]);
 
-
+cmButton=document.getElementById("cmButton");
+    span=document.createElement("span");
+    span.setAttribute("class","Counter");
+    span.innerHTML="1";
+    cmButton.appendChild(span);
 
 
 function openComments(){
