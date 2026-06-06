@@ -560,66 +560,165 @@
   }
 
   /* ---- 14  Home card rebuild - tags TOP, title BOTTOM ----- */
+  /* v2: fetch postList.json for accurate data, support pinned post */
   function initCards() {
     var nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
-    nav.classList.add('luliy-card-grid');
 
-    nav.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function(li) {
-      li.classList.add('luliy-card');
+    /* Helper: build one card element */
+    function buildCard(post, isPinned) {
+      var li = document.createElement('li');
+      li.className = 'luliy-card';
+      if (isPinned) li.setAttribute('data-pinned', '1');
 
-      /* Find the existing anchor and its child elements */
-      var existingA = li.querySelector('a');
-      if (!existingA) return;
-
-      /* Extract labels and date from DOM */
-      var labels = Array.from(li.querySelectorAll('a.Label'));
-      var dateEl = li.querySelector('.text-gray-light, time, [class*="date"], [class*="Date"]');
-      var titleEl = li.querySelector('.text-bold, .SideNav-item-title, a > span:first-child');
-
-      /* Get text content safely */
-      var titleText = (titleEl ? titleEl.textContent : existingA.textContent).trim();
-      /* Remove label text from title */
-      labels.forEach(function(l){ titleText = titleText.replace(l.textContent, '').trim(); });
-      var dateText = dateEl ? dateEl.textContent.trim() : '';
-      /* Try extracting date from title if pattern matches */
-      if (!dateText) {
-        var dm = titleText.match(/(\d{4}-\d{2}-\d{2})/);
-        if (dm) { dateText = dm[1]; titleText = titleText.replace(dm[0], '').trim(); }
-      }
-
-      var href = existingA.href;
-
-      /* Rebuild inner HTML */
-      li.innerHTML = '';
       var a = document.createElement('a');
-      a.href = href;
+      a.href = post.link || '#';
 
       /* Tags row */
       var tagsRow = document.createElement('div');
       tagsRow.className = 'luliy-card-tags';
-      labels.forEach(function(l){ tagsRow.appendChild(l.cloneNode(true)); });
-      if (dateText) {
+
+      /* Pinned badge */
+      if (isPinned) {
+        var pin = document.createElement('span');
+        pin.style.cssText = 'font-size:10px;padding:1px 7px;border-radius:10px;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:700;margin-right:3px;white-space:nowrap';
+        pin.textContent = '\u{1F4CC} \u7f6e\u9876';
+        tagsRow.appendChild(pin);
+      }
+
+      /* Labels */
+      var labels = Array.isArray(post.labels) ? post.labels : [];
+      labels.forEach(function(lbl) {
+        var labelInfo = (typeof lbl === 'object') ? lbl : {name: lbl, color: '0969da'};
+        var color = '#' + (labelInfo.color || '0969da').replace('#','');
+        var span = document.createElement('a');
+        span.className = 'Label';
+        span.textContent = labelInfo.name || lbl;
+        span.href = '/tag.html#' + encodeURIComponent(labelInfo.name || lbl);
+        span.style.cssText = 'background:' + color + ';color:#fff';
+        tagsRow.appendChild(span);
+      });
+
+      /* Date chip */
+      if (post.created) {
         var dateChip = document.createElement('span');
         dateChip.className = 'luliy-card-date';
-        dateChip.textContent = dateText;
+        dateChip.textContent = post.created.slice(0, 10);
         tagsRow.appendChild(dateChip);
       }
 
       /* Title row */
       var titleDiv = document.createElement('div');
       titleDiv.className = 'luliy-card-title';
-      titleDiv.textContent = titleText || '\u65e0\u9898';
+      titleDiv.textContent = post.title || '\u65e0\u9898';
 
       a.appendChild(tagsRow);
       a.appendChild(titleDiv);
       li.appendChild(a);
+      return li;
+    }
+
+    /* Try to read pinned post number from meta tag or config */
+    function getPinnedNum() {
+      var meta = document.querySelector('meta[name="pinned-post"]');
+      if (meta) return parseInt(meta.content) || 0;
+      return 0; /* no pinned by default */
+    }
+
+    /* Fetch posts then rebuild grid */
+    fetchPosts().then(function(posts) {
+      if (!posts || !posts.length) {
+        /* Fallback: parse existing DOM if fetch failed */
+        fallbackDomCards(nav);
+        return;
+      }
+
+      /* Determine current page offset for pagination */
+      var pageMatch = location.search.match(/[?&]page=([0-9]+)/);
+      var pageNum = pageMatch ? parseInt(pageMatch[1]) : 1;
+      /* Gmeek default 12 per page */
+      var perPage = 12;
+      try { var cfg = {}; /* config loaded separately */ } catch(e) {}
+
+      /* For the index page, slice posts for current page */
+      var isIndex = location.pathname === '/' || location.pathname === '/index.html' || location.pathname === '';
+      var displayPosts = posts;
+      if (isIndex) {
+        var start = (pageNum - 1) * perPage;
+        displayPosts = posts.slice(start, start + perPage);
+      }
+
+      var pinnedNum = getPinnedNum();
+
+      /* Clear existing items, rebuild */
+      nav.innerHTML = '';
+      nav.classList.add('luliy-card-grid');
+
+      displayPosts.forEach(function(post, idx) {
+        /* Pinned: first post on first page gets pinned badge if pinnedNum matches */
+        var isPinned = (isIndex && pageNum === 1 && idx === 0 && pinnedNum > 0);
+        nav.appendChild(buildCard(post, isPinned));
+      });
+
+    }).catch(function() {
+      fallbackDomCards(nav);
     });
+
+    /* Fallback: use existing DOM items when fetch not available */
+    function fallbackDomCards(container) {
+      container.classList.add('luliy-card-grid');
+      container.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function(li) {
+        li.classList.add('luliy-card');
+        var existingA = li.querySelector('a');
+        if (!existingA) return;
+
+        /* Collect all text, strip label texts to isolate title */
+        var labels = Array.from(li.querySelectorAll('a.Label'));
+        var dateEl = li.querySelector('.color-fg-muted, time, [class*="date"]');
+
+        /* Build title: take full anchor text, remove each label text */
+        var rawText = existingA.innerText || existingA.textContent || '';
+        labels.forEach(function(l){ rawText = rawText.replace(l.innerText || l.textContent, ''); });
+        var dateText = dateEl ? (dateEl.innerText || dateEl.textContent).trim() : '';
+        rawText = rawText.replace(dateText, '').trim();
+        /* Strip date pattern */
+        var dm = rawText.match(/(\d{4}-\d{2}-\d{2})/);
+        if (dm) { if (!dateText) dateText = dm[1]; rawText = rawText.replace(dm[0], '').trim(); }
+
+        var titleText = rawText || '\u65e0\u9898';
+        var href = existingA.href;
+
+        li.innerHTML = '';
+        var a = document.createElement('a'); a.href = href;
+
+        var tagsRow = document.createElement('div'); tagsRow.className = 'luliy-card-tags';
+        labels.forEach(function(l){ tagsRow.appendChild(l.cloneNode(true)); });
+        if (dateText) {
+          var dc = document.createElement('span'); dc.className = 'luliy-card-date'; dc.textContent = dateText;
+          tagsRow.appendChild(dc);
+        }
+
+        var titleDiv = document.createElement('div'); titleDiv.className = 'luliy-card-title';
+        titleDiv.textContent = titleText;
+
+        a.appendChild(tagsRow); a.appendChild(titleDiv); li.appendChild(a);
+      });
+    }
   }
 
   /* ---- 15  macOS code block buttons ---------------------- */
   function initCodeBlocks(pbody) {
+    /* Run immediately, then observe for dynamically added pre blocks */
+    applyCodeBlocks(pbody);
+    if (pbody._luliyCodeObs) return;
+    pbody._luliyCodeObs = true;
+    try {
+      var obs = new MutationObserver(function(){ applyCodeBlocks(pbody); });
+      obs.observe(pbody, {childList: true, subtree: true});
+    } catch(e) {}
+  }
+  function applyCodeBlocks(pbody) {
     pbody.querySelectorAll('pre').forEach(function(pre) {
       if (pre.querySelector('.mac-btn')) return;
       var code = pre.querySelector('code'); if (!code) return;
@@ -716,9 +815,24 @@
     if (!document.getElementById('postBody')) return;
     if (document.getElementById('luliy-toc-panel')) return;
 
-    /* Collect headings */
+    /* Collect headings - auto-assign id if missing */
     var pbody = document.getElementById('postBody');
-    var headings = Array.from(pbody.querySelectorAll('h1,h2,h3')).filter(function(h){ return h.id; });
+    var allHeadings = Array.from(pbody.querySelectorAll('h1,h2,h3'));
+    allHeadings.forEach(function(h, i) {
+      if (!h.id) {
+        /* generate slug from text */
+        var slug = (h.textContent || '').trim()
+          .toLowerCase()
+          .replace(/[\s\u3000]+/g, '-')
+          .replace(/[^\w\u4e00-\u9fff-]/g, '')
+          .slice(0, 40) || ('heading-' + i);
+        /* ensure uniqueness */
+        var base = slug, n = 1;
+        while (document.getElementById(slug)) slug = base + '-' + (n++);
+        h.id = slug;
+      }
+    });
+    var headings = allHeadings.filter(function(h){ return h.id; });
     if (headings.length < 2) return; /* not worth showing TOC */
 
     /* Build panel */
@@ -830,8 +944,17 @@
       });
     });
 
+    /* Run code blocks now, and again after Prism/mermaid settle */
     initCodeBlocks(pbody);
+    setTimeout(function(){ initCodeBlocks(pbody); }, 800);
+    setTimeout(function(){ initCodeBlocks(pbody); }, 2000);
+
+    /* TOC: try now + retry after articletoc.js might have added ids */
     initTocPanel();
+    if (!document.getElementById('luliy-toc-panel')) {
+      setTimeout(function(){ initTocPanel(); }, 1000);
+      setTimeout(function(){ initTocPanel(); }, 2500);
+    }
 
     /* Prev/Next nav */
     fetchPosts().then(function(posts) {
@@ -948,8 +1071,13 @@
     var isArchive = location.pathname.includes('archive');
     var hasList   = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
 
-    if (isPost)  root._luliyInitPost();
+    if (isPost) {
+      root._luliyInitPost();
+    }
     if (isIndex || isArchive || (!isPost && hasList)) root._luliyInitIndex();
+    /* Also expose for external callers (config.json script tag) */
+    root._luliyInitPost = root._luliyInitPost;
+    root._luliyInitIndex = root._luliyInitIndex;
   });
 
 })(window);
