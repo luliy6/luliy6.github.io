@@ -8,15 +8,15 @@
    06  Particle background
    07  Web Audio SFX
    08  Click sparks
-   09  Compact hero cluster (avatar left, name+clock right of avatar)
+   09  Compact hero cluster
    10  Tag page search toolbar
    11  Image lightbox
    12  Floating toolbar (home / github / sfx / theme / skin / bg / sakura)
    13  Favorites lock (SHA-256)
-   14  Home card rebuild (tags TOP, title BOTTOM)
-   15  macOS code block buttons (red=copy, yellow=collapse, green=fullscreen)
+   14  Home card rebuild - pinned section + tags TOP / title BOTTOM
+   15  macOS code block buttons
    16  Sakura petals
-   17  TOC panel (sticky, scroll-spy, back-to-top inside)
+   17  ArticleTOC scroll-spy + back-to-top (replaces custom floating TOC)
    18  Post page init
    19  Index page init
    20  Main entry
@@ -38,14 +38,12 @@
     function norm(data) {
       if (Array.isArray(data)) return data;
       if (data && typeof data === 'object') {
-        /* Extract labelColorDict first */
         var colorDict = data.labelColorDict || {};
         return Object.keys(data)
           .filter(function(k){ return k !== 'labelColorDict'; })
           .map(function(k){
             var p = data[k] || {};
             if (typeof p === 'string') p = {postTitle: p};
-            /* labels: array of strings, attach color from colorDict */
             var rawLabels = p.labels || p.tags || [];
             var labels = rawLabels.map(function(lbl) {
               return {
@@ -104,7 +102,7 @@
   function initDynamicTitle() {
     var ori = document.title, t;
     document.addEventListener('visibilitychange', function() {
-      if (document.hidden) { clearTimeout(t); document.title = '\u{1F440} \u522b\u8d70\u554a\uff0c\u6211\u8fd8\u5728\u8fdb\u6b65\uff01'; }
+      if (document.hidden) { clearTimeout(t); document.title = '\uD83D\uDC40 \u522b\u8d70\u554a\uff0c\u6211\u8fd8\u5728\u8fdb\u6b65\uff01'; }
       else { document.title = '\u2728 \u6b22\u8fce\u56de\u6765\uff01 ' + ori; t = setTimeout(function(){ document.title = ori; }, 2000); }
     });
   }
@@ -117,8 +115,8 @@
     var start = new Date('2026/05/30 00:00:00').getTime();
     function upd() {
       var d = Date.now() - start;
-      if (d < 0) { el.innerHTML = '\u{1F680} \u535a\u5ba2\u5373\u5c06\u4e0a\u7ebf\uff0c\u656c\u8bf7\u671f\u5f85...'; return; }
-      el.innerHTML = '\u{1F331} \u672c\u7ad9\u5df2\u966a\u4f34\u4f60\u65e0\u9650\u8fdb\u6b65\uff1a' +
+      if (d < 0) { el.innerHTML = '\uD83D\uDE80 \u535a\u5ba2\u5373\u5c06\u4e0a\u7ebf\uff0c\u656c\u8bf7\u671f\u5f85...'; return; }
+      el.innerHTML = '\uD83C\uDF31 \u672c\u7ad9\u5df2\u966a\u4f34\u4f60\u65e0\u9650\u8fdb\u6b65\uff1a' +
         Math.floor(d / 86400000) + '\u5929 ' +
         Math.floor((d % 86400000) / 3600000) + '\u5c0f\u65f6 ' +
         Math.floor((d % 3600000) / 60000) + '\u5206 ' +
@@ -268,50 +266,33 @@
   }
 
   /* ---- 09  Compact hero cluster -------------------------- */
-  /* Moves avatar + name + clock into a single flex row in the navbar left side */
   function initHeroCluster() {
     function tryBuild() {
       var header = document.getElementById('header'); if (!header) return false;
       if (document.getElementById('luliy-hero-cluster')) return true;
-
       var av = header.querySelector('img.avatar, img[src*="avatar"]');
       if (!av) return false;
-
-      /* Build cluster */
       var cluster = document.createElement('a');
       cluster.id = 'luliy-hero-cluster';
       cluster.href = '/about';
       cluster.title = '\u5173\u4e8e\u6211';
-
-      /* Clone avatar into cluster */
       var avClone = av.cloneNode(true);
       avClone.style.cssText = '';
       cluster.appendChild(avClone);
-
-      /* Info column: name + clock */
       var info = document.createElement('div');
       info.id = 'luliy-hero-info';
-
       var nameEl = document.createElement('div');
       nameEl.id = 'luliy-hero-name';
       nameEl.textContent = document.title.split(' ')[0] || 'Luliy';
       info.appendChild(nameEl);
-
       var clk = document.createElement('div');
       clk.id = 'luliy-avatar-clock';
       info.appendChild(clk);
-
       cluster.appendChild(info);
-
-      /* Insert cluster as first child of header */
       header.insertBefore(cluster, header.firstChild);
-
-      /* Hide original avatar and blogTitle */
       if (av.parentElement && av.parentElement !== header) av.parentElement.style.display = 'none';
       else av.style.display = 'none';
       header.querySelectorAll('.blogTitle, .postTitle').forEach(function(el){ el.style.display = 'none'; });
-
-      /* Start clock */
       function updClock() {
         var n = new Date();
         clk.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0') + ':' + String(n.getSeconds()).padStart(2,'0');
@@ -324,7 +305,7 @@
     }
   }
 
-  /* ---- Hero banner (separate title bar below navbar) ----- */
+  /* ---- Hero banner --------------------------------------- */
   function initHeroBanner() {
     if (document.getElementById('luliy-hero-banner')) return;
     var content = document.getElementById('content') || document.querySelector('.main');
@@ -387,10 +368,10 @@
     {id:'cyberpunk',    label:'\u8d5b\u535a\u9704\u8679', dot:'#c084fc'}
   ];
   var SKINS = [
-    {id:'default',   label:'\u9ed8\u8ba4',   bg:'transparent', border:'#8250df'},
-    {id:'parchment', label:'\u7f8a\u76ae\u7eb8', bg:'#fdf6e3',  border:'#b5651d'},
-    {id:'ink',       label:'\u6c34\u58a8',   bg:'#1a1a1a',     border:'#888'},
-    {id:'ocean',     label:'\u6df1\u6d77\u84dd', bg:'#0d1b2a', border:'#60a5fa'}
+    {id:'default',   label:'\u9ed8\u8ba4',      bg:'transparent', border:'#8250df'},
+    {id:'parchment', label:'\u7f8a\u76ae\u7eb8', bg:'#fdf6e3',     border:'#b5651d'},
+    {id:'ink',       label:'\u6c34\u58a8',       bg:'#1a1a1a',     border:'#888'},
+    {id:'ocean',     label:'\u6df1\u6d77\u84dd', bg:'#0d1b2a',     border:'#60a5fa'}
   ];
 
   function applyTheme(id) {
@@ -410,7 +391,7 @@
     var bar = document.createElement('div'); bar.id = 'luliy-toolbar';
 
     /* Home */
-    var btnHome = document.createElement('a'); btnHome.className = 'luliy-tb-btn'; btnHome.href = '/'; btnHome.setAttribute('data-tip', '\u4e3b\u9875'); btnHome.innerHTML = '\u{1F3E0}';
+    var btnHome = document.createElement('a'); btnHome.className = 'luliy-tb-btn'; btnHome.href = '/'; btnHome.setAttribute('data-tip', '\u4e3b\u9875'); btnHome.innerHTML = '\uD83C\uDFE0';
 
     /* GitHub */
     var btnGH = document.createElement('a'); btnGH.className = 'luliy-tb-btn'; btnGH.href = 'https://github.com/luliy6'; btnGH.target = '_blank'; btnGH.setAttribute('data-tip', 'GitHub');
@@ -419,18 +400,18 @@
     /* SFX */
     var btnSfx = document.createElement('button'); btnSfx.className = 'luliy-tb-btn'; btnSfx.type = 'button';
     var sfxOn = localStorage.getItem('luliy-sfx') !== '0';
-    btnSfx.innerHTML = sfxOn ? '\u{1F50A}' : '\u{1F507}'; btnSfx.setAttribute('data-tip', sfxOn ? '\u5173\u95ed\u97f3\u6548' : '\u5f00\u542f\u97f3\u6548');
+    btnSfx.innerHTML = sfxOn ? '\uD83D\uDD0A' : '\uD83D\uDD07'; btnSfx.setAttribute('data-tip', sfxOn ? '\u5173\u95ed\u97f3\u6548' : '\u5f00\u542f\u97f3\u6548');
     if (!sfxOn) btnSfx.classList.add('sfx-off');
     btnSfx.addEventListener('click', function() {
       var on = localStorage.getItem('luliy-sfx') !== '0';
       localStorage.setItem('luliy-sfx', on ? '0' : '1');
-      btnSfx.innerHTML = on ? '\u{1F507}' : '\u{1F50A}'; btnSfx.setAttribute('data-tip', on ? '\u5f00\u542f\u97f3\u6548' : '\u5173\u95ed\u97f3\u6548');
+      btnSfx.innerHTML = on ? '\uD83D\uDD07' : '\uD83D\uDD0A'; btnSfx.setAttribute('data-tip', on ? '\u5f00\u542f\u97f3\u6548' : '\u5173\u95ed\u97f3\u6548');
       btnSfx.classList.toggle('sfx-off', on);
     });
 
     /* Article theme */
     var themeWrap = document.createElement('div'); themeWrap.style.cssText = 'position:relative;';
-    var btnTheme = document.createElement('button'); btnTheme.className = 'luliy-tb-btn'; btnTheme.type = 'button'; btnTheme.setAttribute('data-tip', '\u6587\u7ae0\u4e3b\u9898'); btnTheme.innerHTML = '\u{1F3A8}';
+    var btnTheme = document.createElement('button'); btnTheme.className = 'luliy-tb-btn'; btnTheme.type = 'button'; btnTheme.setAttribute('data-tip', '\u6587\u7ae0\u4e3b\u9898'); btnTheme.innerHTML = '\uD83C\uDFA8';
     var themeMenu = document.createElement('div'); themeMenu.id = 'luliy-theme-menu';
     THEMES.forEach(function(t) {
       var b = document.createElement('button'); b.className = 'luliy-theme-opt'; b.type = 'button'; b.setAttribute('data-theme', t.id);
@@ -444,7 +425,7 @@
 
     /* Reading skin */
     var skinWrap = document.createElement('div'); skinWrap.style.cssText = 'position:relative;';
-    var btnSkin = document.createElement('button'); btnSkin.className = 'luliy-tb-btn'; btnSkin.type = 'button'; btnSkin.setAttribute('data-tip', '\u9605\u8bfb\u76ae\u80a4'); btnSkin.innerHTML = '\u{1F308}';
+    var btnSkin = document.createElement('button'); btnSkin.className = 'luliy-tb-btn'; btnSkin.type = 'button'; btnSkin.setAttribute('data-tip', '\u9605\u8bfb\u76ae\u80a4'); btnSkin.innerHTML = '\uD83C\uDF08';
     var skinMenu = document.createElement('div'); skinMenu.id = 'luliy-skin-menu';
     SKINS.forEach(function(s) {
       var b = document.createElement('button'); b.className = 'luliy-skin-opt'; b.type = 'button'; b.setAttribute('data-skin', s.id);
@@ -458,7 +439,7 @@
 
     /* Background image */
     var bgWrap = document.createElement('div'); bgWrap.style.cssText = 'position:relative;';
-    var btnBg = document.createElement('button'); btnBg.className = 'luliy-tb-btn'; btnBg.type = 'button'; btnBg.setAttribute('data-tip', '\u80cc\u666f\u56fe\u7247'); btnBg.innerHTML = '\u{1F5BC}';
+    var btnBg = document.createElement('button'); btnBg.className = 'luliy-tb-btn'; btnBg.type = 'button'; btnBg.setAttribute('data-tip', '\u80cc\u666f\u56fe\u7247'); btnBg.innerHTML = '\uD83D\uDDBC';
     var bgMenu = document.createElement('div'); bgMenu.id = 'luliy-bg-menu';
     bgMenu.innerHTML =
       '<div class="luliy-bg-label">\u80cc\u666f\u56fe\u7247\u94fe\u63a5</div>' +
@@ -490,19 +471,18 @@
     /* Sakura toggle */
     var btnSakura = document.createElement('button'); btnSakura.className = 'luliy-tb-btn'; btnSakura.type = 'button';
     var sakuraOn = localStorage.getItem('luliy-sakura') !== '0';
-    btnSakura.innerHTML = '\u{1F338}'; btnSakura.setAttribute('data-tip', sakuraOn ? '\u5173\u95ed\u82b1\u74e3' : '\u5f00\u542f\u82b1\u74e3');
+    btnSakura.innerHTML = '\uD83C\uDF38'; btnSakura.setAttribute('data-tip', sakuraOn ? '\u5173\u95ed\u82b1\u74e3' : '\u5f00\u542f\u82b1\u74e3');
     if (!sakuraOn) btnSakura.classList.add('sakura-off');
     btnSakura.addEventListener('click', function() {
       var on = localStorage.getItem('luliy-sakura') !== '0';
       localStorage.setItem('luliy-sakura', on ? '0' : '1');
-      btnSakura.innerHTML = '\u{1F338}'; btnSakura.setAttribute('data-tip', on ? '\u5f00\u542f\u82b1\u74e3' : '\u5173\u95ed\u82b1\u74e3');
+      btnSakura.innerHTML = '\uD83C\uDF38'; btnSakura.setAttribute('data-tip', on ? '\u5f00\u542f\u82b1\u74e3' : '\u5173\u95ed\u82b1\u74e3');
       btnSakura.classList.toggle('sakura-off', on);
       if (on) { var c = document.getElementById('luliy-sakura-canvas'); if (c) c.remove(); }
       else initSakura();
       playSfx('click');
     });
 
-    /* Close all popups on outside click */
     document.addEventListener('click', function() {
       themeMenu.classList.remove('is-open'); skinMenu.classList.remove('is-open'); bgMenu.classList.remove('is-open');
     });
@@ -558,7 +538,7 @@
     if (document.getElementById('luliy-lock-overlay')) return;
     var pbody = document.getElementById('postBody');
     var ov = document.createElement('div'); ov.id = 'luliy-lock-overlay';
-    ov.innerHTML = '<div class="luliy-lock-box"><span class="luliy-lock-icon">\u{1F510}</span><div class="luliy-lock-title">\u52a0\u5bc6\u5185\u5bb9</div><div class="luliy-lock-hint">\u672c\u6587\u4e3a\u79c1\u5bc6\u6536\u85cf\uff0c\u8bf7\u8f93\u5165\u8bbf\u95ee\u5bc6\u7801</div><input class="luliy-lock-input" type="password" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022" maxlength="20" autocomplete="off"><button class="luliy-lock-btn">\u89e3 \u9501</button><div class="luliy-lock-err"></div></div>';
+    ov.innerHTML = '<div class="luliy-lock-box"><span class="luliy-lock-icon">\uD83D\uDD10</span><div class="luliy-lock-title">\u52a0\u5bc6\u5185\u5bb9</div><div class="luliy-lock-hint">\u672c\u6587\u4e3a\u79c1\u5bc6\u6536\u85cf\uff0c\u8bf7\u8f93\u5165\u8bbf\u95ee\u5bc6\u7801</div><input class="luliy-lock-input" type="password" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022" maxlength="20" autocomplete="off"><button class="luliy-lock-btn">\u89e3 \u9501</button><div class="luliy-lock-err"></div></div>';
     document.body.appendChild(ov);
     pbody.style.filter = 'blur(18px)'; pbody.style.userSelect = 'none'; pbody.style.pointerEvents = 'none';
     var inp = ov.querySelector('.luliy-lock-input'), btn2 = ov.querySelector('.luliy-lock-btn'), err = ov.querySelector('.luliy-lock-err');
@@ -580,14 +560,13 @@
     setTimeout(function(){ inp.focus(); }, 120);
   }
 
-  /* ---- 14  Home card rebuild - tags TOP, title BOTTOM ----- */
-  /* v2: fetch postList.json for accurate data, support pinned post */
+  /* ---- 14  Home card rebuild - Pinned section + card grid - */
   function initCards() {
     var nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
 
-    /* Helper: build one card element */
+    /* Build a single card element */
     function buildCard(post, isPinned) {
       var li = document.createElement('li');
       li.className = 'luliy-card';
@@ -596,7 +575,7 @@
       var a = document.createElement('a');
       a.href = post.link || '#';
 
-      /* Tags row */
+      /* Tags row (top) */
       var tagsRow = document.createElement('div');
       tagsRow.className = 'luliy-card-tags';
 
@@ -604,7 +583,7 @@
       if (isPinned) {
         var pin = document.createElement('span');
         pin.style.cssText = 'font-size:10px;padding:1px 7px;border-radius:10px;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:700;margin-right:3px;white-space:nowrap';
-        pin.textContent = '\u{1F4CC} \u7f6e\u9876';
+        pin.textContent = '\uD83D\uDCCC \u7f6e\u9876';
         tagsRow.appendChild(pin);
       }
 
@@ -612,6 +591,8 @@
       var labels = Array.isArray(post.labels) ? post.labels : [];
       labels.forEach(function(lbl) {
         var labelInfo = (typeof lbl === 'object') ? lbl : {name: lbl, color: '0969da'};
+        /* skip 'pinned' label itself from display */
+        if ((labelInfo.name || lbl) === 'pinned') return;
         var color = '#' + (labelInfo.color || '0969da').replace('#','');
         var span = document.createElement('a');
         span.className = 'Label';
@@ -629,7 +610,7 @@
         tagsRow.appendChild(dateChip);
       }
 
-      /* Title row */
+      /* Title row (bottom) */
       var titleDiv = document.createElement('div');
       titleDiv.className = 'luliy-card-title';
       titleDiv.textContent = post.title || '\u65e0\u9898';
@@ -640,89 +621,81 @@
       return li;
     }
 
-    /* Try to read pinned post number from meta tag or config */
-    function getPinnedNum() {
-      var meta = document.querySelector('meta[name="pinned-post"]');
-      if (meta) return parseInt(meta.content) || 0;
-      return 0; /* no pinned by default */
-    }
-
-    /* Fetch posts then rebuild grid */
     fetchPosts().then(function(posts) {
-      if (!posts || !posts.length) {
-        /* Fallback: parse existing DOM if fetch failed */
-        fallbackDomCards(nav);
-        return;
-      }
+      if (!posts || !posts.length) { fallbackDomCards(nav); return; }
 
-      /* Determine current page offset for pagination */
+      /* Separate pinned and regular */
+      var pinnedPosts  = posts.filter(function(p){ return p.pinned; });
+      var regularPosts = posts.filter(function(p){ return !p.pinned; });
+
+      /* Pagination (only regular posts paginate) */
       var pageMatch = location.search.match(/[?&]page=([0-9]+)/);
       var pageNum = pageMatch ? parseInt(pageMatch[1]) : 1;
-      /* Gmeek default 12 per page */
       var perPage = 12;
-      try { var cfg = {}; /* config loaded separately */ } catch(e) {}
-
-      /* For the index page, slice posts for current page */
       var isIndex = location.pathname === '/' || location.pathname === '/index.html' || location.pathname === '';
-      var displayPosts = posts;
+
+      var displayPosts = regularPosts;
       if (isIndex) {
         var start = (pageNum - 1) * perPage;
-        displayPosts = posts.slice(start, start + perPage);
+        displayPosts = regularPosts.slice(start, start + perPage);
       }
 
-      var pinnedNum = getPinnedNum();
+      /* Insert pinned section above the card grid (only page 1) */
+      if (pinnedPosts.length > 0 && isIndex && pageNum === 1) {
+        var existing = document.getElementById('luliy-pinned-section');
+        if (existing) existing.remove();
 
-      /* Clear existing items, rebuild */
+        var ps = document.createElement('div');
+        ps.id = 'luliy-pinned-section';
+
+        var ph = document.createElement('div');
+        ph.className = 'luliy-pinned-header';
+        ph.innerHTML = '<span class="luliy-pinned-pin">\uD83D\uDCCC</span>\u7f6e\u9876\u6587\u7ae0';
+        ps.appendChild(ph);
+
+        var pg = document.createElement('ul');
+        pg.className = 'luliy-pinned-grid';
+        pinnedPosts.forEach(function(post){ pg.appendChild(buildCard(post, true)); });
+        ps.appendChild(pg);
+
+        /* Insert before the nav (card grid) */
+        nav.parentNode.insertBefore(ps, nav);
+      }
+
+      /* Rebuild main card grid */
       nav.innerHTML = '';
       nav.classList.add('luliy-card-grid');
+      displayPosts.forEach(function(post){ nav.appendChild(buildCard(post, false)); });
 
-      displayPosts.forEach(function(post, idx) {
-        /* Pinned: first post on first page gets pinned badge if pinnedNum matches */
-        var isPinned = !!post.pinned;
-        nav.appendChild(buildCard(post, isPinned));
-      });
+    }).catch(function(){ fallbackDomCards(nav); });
 
-    }).catch(function() {
-      fallbackDomCards(nav);
-    });
-
-    /* Fallback: use existing DOM items when fetch not available */
+    /* Fallback: use existing DOM items */
     function fallbackDomCards(container) {
       container.classList.add('luliy-card-grid');
       container.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function(li) {
         li.classList.add('luliy-card');
         var existingA = li.querySelector('a');
         if (!existingA) return;
-
-        /* Collect all text, strip label texts to isolate title */
         var labels = Array.from(li.querySelectorAll('a.Label'));
         var dateEl = li.querySelector('.color-fg-muted, time, [class*="date"]');
-
-        /* Build title: take full anchor text, remove each label text */
         var rawText = existingA.innerText || existingA.textContent || '';
         labels.forEach(function(l){ rawText = rawText.replace(l.innerText || l.textContent, ''); });
         var dateText = dateEl ? (dateEl.innerText || dateEl.textContent).trim() : '';
         rawText = rawText.replace(dateText, '').trim();
-        /* Strip date pattern */
         var dm = rawText.match(/(\d{4}-\d{2}-\d{2})/);
         if (dm) { if (!dateText) dateText = dm[1]; rawText = rawText.replace(dm[0], '').trim(); }
-
         var titleText = rawText || '\u65e0\u9898';
         var href = existingA.href;
-
         li.innerHTML = '';
         var a = document.createElement('a'); a.href = href;
-
         var tagsRow = document.createElement('div'); tagsRow.className = 'luliy-card-tags';
         labels.forEach(function(l){ tagsRow.appendChild(l.cloneNode(true)); });
         if (dateText) {
           var dc = document.createElement('span'); dc.className = 'luliy-card-date'; dc.textContent = dateText;
           tagsRow.appendChild(dc);
         }
-
         var titleDiv = document.createElement('div'); titleDiv.className = 'luliy-card-title';
         titleDiv.textContent = titleText;
-
         a.appendChild(tagsRow); a.appendChild(titleDiv); li.appendChild(a);
       });
     }
@@ -730,7 +703,6 @@
 
   /* ---- 15  macOS code block buttons ---------------------- */
   function initCodeBlocks(pbody) {
-    /* Run immediately, then observe for dynamically added pre blocks */
     applyCodeBlocks(pbody);
     if (pbody._luliyCodeObs) return;
     pbody._luliyCodeObs = true;
@@ -743,12 +715,10 @@
     pbody.querySelectorAll('pre').forEach(function(pre) {
       if (pre.querySelector('.mac-btn')) return;
       var code = pre.querySelector('code'); if (!code) return;
-
       function makeBtn(cls, tip) {
         var b = document.createElement('button'); b.type = 'button'; b.className = 'mac-btn ' + cls;
         b.setAttribute('data-tip', tip); b.setAttribute('aria-label', tip); return b;
       }
-
       /* RED = Copy */
       var bR = makeBtn('mac-btn-red', '\u590d\u5236\u4ee3\u7801');
       bR.addEventListener('click', function(e) {
@@ -758,8 +728,7 @@
         if (navigator.clipboard && location.protocol === 'https:') navigator.clipboard.writeText(txt).then(done).catch(done);
         else { var ta = document.createElement('textarea'); ta.value = txt; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(_){} ta.remove(); done(); }
       });
-
-      /* YELLOW = Collapse/Expand */
+      /* YELLOW = Collapse */
       var bY = makeBtn('mac-btn-yellow', '\u6298\u53e0\u4ee3\u7801');
       bY.addEventListener('click', function(e) {
         e.stopPropagation(); playSfx('click');
@@ -767,7 +736,6 @@
         bY.classList.toggle('is-folded', folded);
         bY.setAttribute('data-tip', folded ? '\u5c55\u5f00\u4ee3\u7801' : '\u6298\u53e0\u4ee3\u7801');
       });
-
       /* GREEN = Fullscreen */
       var bG = makeBtn('mac-btn-green', '\u5168\u5c4f\u9605\u8bfb');
       function toggleFS() {
@@ -780,7 +748,6 @@
       document.addEventListener('keydown', function(e){
         if (e.key === 'Escape' && pre.classList.contains('code-fullscreen')) { pre.classList.remove('code-fullscreen'); bG.setAttribute('data-tip', '\u5168\u5c4f\u9605\u8bfb'); }
       });
-
       pre.appendChild(bR); pre.appendChild(bY); pre.appendChild(bG);
     });
   }
@@ -830,118 +797,107 @@
     tick();
   }
 
-  /* ---- 17  TOC panel with scroll-spy & back-to-top ------- */
-  /* Replaces the back-to-top button; merged into a single TOC toggle */
-  function initTocPanel() {
+  /* ---- 17  ArticleTOC scroll-spy + back-to-top ----------- */
+  /* Replaces the old custom floating TOC panel.
+     Finds the ArticleTOC generated by articletoc.js plugin,
+     injects a header row (label + back-to-top) and adds scroll-spy. */
+  function initArticleTocSpy() {
     if (!document.getElementById('postBody')) return;
-    if (document.getElementById('luliy-toc-panel')) return;
-
-    /* Collect headings - auto-assign id if missing */
     var pbody = document.getElementById('postBody');
-    var allHeadings = Array.from(pbody.querySelectorAll('h1,h2,h3'));
-    allHeadings.forEach(function(h, i) {
-      if (!h.id) {
-        /* generate slug from text */
-        var slug = (h.textContent || '').trim()
-          .toLowerCase()
-          .replace(/[\s\u3000]+/g, '-')
-          .replace(/[^\w\u4e00-\u9fff-]/g, '')
-          .slice(0, 40) || ('heading-' + i);
-        /* ensure uniqueness */
-        var base = slug, n = 1;
-        while (document.getElementById(slug)) slug = base + '-' + (n++);
-        h.id = slug;
+
+    function trySetup() {
+      /* ArticleTOC can be #TOC, .articletoc, .toc, or any nav inside postBody */
+      var toc = document.querySelector('#TOC, .articletoc, .toc, #postBody > nav');
+      if (!toc) return false;
+      if (toc._luliySpy) return true;
+      toc._luliySpy = true;
+
+      /* Inject header row if not already there */
+      if (!toc.querySelector('.luliy-toc-injected-hdr')) {
+        var hdr = document.createElement('div');
+        hdr.className = 'luliy-toc-injected-hdr';
+
+        var lbl = document.createElement('span');
+        lbl.className = 'luliy-toc-injected-label';
+        lbl.textContent = '\u76ee\u5f55';
+
+        var totop = document.createElement('button');
+        totop.type = 'button';
+        totop.className = 'luliy-toc-injected-totop';
+        totop.textContent = '\u2191 \u56de\u9876';
+        totop.addEventListener('click', function(){
+          window.scrollTo({top: 0, behavior: 'smooth'});
+          playSfx('click');
+        });
+
+        hdr.appendChild(lbl);
+        hdr.appendChild(totop);
+        toc.insertBefore(hdr, toc.firstChild);
       }
-    });
-    var headings = allHeadings.filter(function(h){ return h.id; });
-    if (headings.length < 2) return; /* not worth showing TOC */
 
-    /* Build panel */
-    var panel = document.createElement('div'); panel.id = 'luliy-toc-panel'; panel.classList.add('is-visible');
+      /* Assign ids to headings that lack them */
+      var allH = Array.from(pbody.querySelectorAll('h1,h2,h3,h4'));
+      allH.forEach(function(h, i) {
+        if (!h.id) {
+          var slug = (h.textContent || '').trim()
+            .toLowerCase()
+            .replace(/[\s\u3000]+/g, '-')
+            .replace(/[^\w\u4e00-\u9fff-]/g, '')
+            .slice(0, 40) || ('h-' + i);
+          var base = slug, n = 1;
+          while (document.getElementById(slug)) slug = base + '-' + (n++);
+          h.id = slug;
+        }
+      });
 
-    /* Dropdown */
-    var dropdown = document.createElement('div'); dropdown.id = 'luliy-toc-dropdown';
+      var headings = allH.filter(function(h){ return h.id; });
+      var links = Array.from(toc.querySelectorAll('a[href^="#"]'));
+      if (!headings.length || !links.length) return true;
 
-    /* Header row inside dropdown */
-    var hdr = document.createElement('div'); hdr.id = 'luliy-toc-header';
-    var lbl = document.createElement('span'); lbl.id = 'luliy-toc-label'; lbl.textContent = '\u76ee\u5f55';
-    var totop = document.createElement('button'); totop.id = 'luliy-toc-totop'; totop.type = 'button'; totop.textContent = '\u2191 \u56de\u9876';
-    totop.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); playSfx('click'); });
-    hdr.appendChild(lbl); hdr.appendChild(totop); dropdown.appendChild(hdr);
+      var lastActiveId = null;
+      function onScroll() {
+        var activeH = null;
+        for (var i = 0; i < headings.length; i++) {
+          if (headings[i].getBoundingClientRect().top <= 110) activeH = headings[i];
+          else break;
+        }
+        if (!activeH && headings.length) activeH = headings[0];
+        var newId = activeH ? activeH.id : null;
+        if (newId === lastActiveId) return;
+        lastActiveId = newId;
 
-    /* Links list */
-    var ul = document.createElement('ul'); ul.id = 'luliy-toc-list';
-    headings.forEach(function(h) {
-      var li = document.createElement('li'); li.setAttribute('data-level', h.tagName.slice(1));
-      var a = document.createElement('a'); a.href = '#' + h.id; a.textContent = h.textContent.replace(/\s*\u2713\s*$/, '').trim();
-      a.addEventListener('click', function(e){ e.preventDefault(); playSfx('click'); dropdown.classList.remove('is-open'); var target = document.getElementById(h.id); if (target) target.scrollIntoView({behavior:'smooth', block:'start'}); });
-      li.appendChild(a); ul.appendChild(li);
-    });
-    dropdown.appendChild(ul);
-
-    /* Toggle button */
-    var tocBtn = document.createElement('button'); tocBtn.id = 'luliy-toc-btn'; tocBtn.type = 'button';
-    tocBtn.innerHTML = '\u{1F4CB}';
-    tocBtn.addEventListener('click', function(e){ e.stopPropagation(); dropdown.classList.toggle('is-open'); });
-    document.addEventListener('click', function(){ dropdown.classList.remove('is-open'); });
-    dropdown.addEventListener('click', function(e){ e.stopPropagation(); });
-
-    panel.appendChild(dropdown);
-    panel.appendChild(tocBtn);
-    document.body.appendChild(panel);
-
-    /* Position panel below toolbar (offset by toolbar height) */
-    function positionPanel() {
-      var toolbar = document.getElementById('luliy-toolbar');
-      if (toolbar) {
-        var tbBottom = toolbar.getBoundingClientRect().bottom;
-        panel.style.top = (tbBottom + 8) + 'px';
-      }
-    }
-    setTimeout(positionPanel, 500);
-    window.addEventListener('resize', positionPanel, {passive: true});
-
-    /* Scroll-spy: highlight the currently visible heading link */
-    var links = Array.from(ul.querySelectorAll('a'));
-    var lastActive = null;
-    function onScroll() {
-      var scrollY = window.scrollY || window.pageYOffset;
-      var activeH = null;
-      for (var i = 0; i < headings.length; i++) {
-        var rect = headings[i].getBoundingClientRect();
-        if (rect.top <= 100) activeH = headings[i];
-        else break;
-      }
-      if (!activeH && headings.length) activeH = headings[0];
-      if (activeH && activeH === lastActive) return;
-      lastActive = activeH;
-      links.forEach(function(a){ a.classList.remove('luliy-toc-active'); });
-      if (activeH) {
-        var matchLink = links.find(function(a){ return a.getAttribute('href') === '#' + activeH.id; });
-        if (matchLink) {
-          matchLink.classList.add('luliy-toc-active');
-          /* Scroll link into view inside dropdown if it's open */
-          if (dropdown.classList.contains('is-open')) {
-            var linkRect = matchLink.getBoundingClientRect();
-            var dropRect = dropdown.getBoundingClientRect();
-            if (linkRect.top < dropRect.top || linkRect.bottom > dropRect.bottom) {
-              matchLink.scrollIntoView({block:'nearest'});
-            }
+        links.forEach(function(a){ a.classList.remove('active', 'luliy-toc-active'); });
+        if (activeH) {
+          var matchLink = null;
+          for (var j = 0; j < links.length; j++) {
+            if (links[j].getAttribute('href') === '#' + activeH.id) { matchLink = links[j]; break; }
           }
+          if (matchLink) matchLink.classList.add('active', 'luliy-toc-active');
         }
       }
+      window.addEventListener('scroll', onScroll, {passive: true});
+      onScroll();
+      return true;
     }
-    window.addEventListener('scroll', onScroll, {passive: true});
-    onScroll();
+
+    /* articletoc.js may run after us - retry a few times */
+    if (!trySetup()) {
+      var n = 0, iv = setInterval(function(){
+        if (trySetup() || ++n > 20) clearInterval(iv);
+      }, 400);
+    }
   }
 
   /* ---- 18  Post page init -------------------------------- */
   root._luliyInitPost = function() {
     if (root._luliyPostInited) return; root._luliyPostInited = true;
     var pbody = document.getElementById('postBody');
+
+    /* External links open in new tab */
     document.querySelectorAll('a[href^="http"]').forEach(function(a){
       if (!a.href.includes('luliy6.github.io') && !a.href.includes('luliy.indevs.in')) a.target = '_blank';
     });
+
     if (pbody) pbody.querySelectorAll('img').forEach(function(img){ img.loading = 'lazy'; });
     if (!pbody) return;
 
@@ -965,36 +921,66 @@
       });
     });
 
-    /* Run code blocks now, and again after Prism/mermaid settle */
+    /* macOS code blocks */
     initCodeBlocks(pbody);
     setTimeout(function(){ initCodeBlocks(pbody); }, 800);
     setTimeout(function(){ initCodeBlocks(pbody); }, 2000);
 
-    /* TOC: try now + retry after articletoc.js might have added ids */
-    initTocPanel();
-    if (!document.getElementById('luliy-toc-panel')) {
-      setTimeout(function(){ initTocPanel(); }, 1000);
-      setTimeout(function(){ initTocPanel(); }, 2500);
-    }
+    /* ArticleTOC scroll-spy - try now + retry after plugin settles */
+    initArticleTocSpy();
+    setTimeout(function(){ initArticleTocSpy(); }, 600);
+    setTimeout(function(){ initArticleTocSpy(); }, 2000);
 
-    /* Prev/Next nav */
+    /* ---- Prev / Next navigation -------------------------- */
     fetchPosts().then(function(posts) {
-      var cur = location.pathname.replace(/\/$/, ''), idx = -1;
-      posts.forEach(function(p, i){ if (p.link && p.link.replace(/\/$/, '') === cur) idx = i; });
-      if (idx < 0) return;
+      /* Remove pinned posts from navigation sequence */
+      var navPosts = posts.filter(function(p){ return !p.pinned; });
+
+      /* Normalize current URL for flexible matching */
+      var curPath = location.pathname;
+      var curNorm = curPath.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '');
+
+      var idx = -1;
+      navPosts.forEach(function(p, i) {
+        if (!p.link) return;
+        var lnk = p.link.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '');
+        /* Match by normalized path OR by full pathname ending */
+        if (lnk === curNorm ||
+            curPath === '/' + p.link ||
+            curPath === p.link ||
+            curPath.endsWith('/' + lnk)) {
+          idx = i;
+        }
+      });
+
+      if (idx < 0) return; /* current post not found in list */
+
+      var prevPost = navPosts[idx + 1] || null; /* older */
+      var nextPost = navPosts[idx - 1] || null; /* newer */
+
+      if (!prevPost && !nextPost) return;
+
       var nav = document.createElement('div');
-      nav.style.cssText = 'display:flex;justify-content:space-between;gap:16px;margin-top:40px;padding-top:20px;border-top:2px dashed rgba(9,105,218,0.2)';
-      function mkNav(post, label, align) {
-        if (!post) return document.createElement('div');
-        var a = document.createElement('a'); a.href = post.link;
-        a.style.cssText = 'flex:1;padding:14px 18px;border-radius:12px;background:rgba(9,105,218,0.05);border:1px solid rgba(9,105,218,0.15);text-decoration:none;transition:all 0.25s;text-align:' + align;
-        a.innerHTML = '<span style="display:block;font-size:11px;color:#888;margin-bottom:4px">' + label + '</span><span style="color:#0969da;font-weight:bold;font-size:14px">' + esc(post.title) + '</span>';
-        a.addEventListener('mouseover', function(){ a.style.background = 'rgba(9,105,218,0.12)'; a.style.transform = 'translateY(-2px)'; });
-        a.addEventListener('mouseout', function(){ a.style.background = 'rgba(9,105,218,0.05)'; a.style.transform = ''; });
+      nav.className = 'luliy-prevnext';
+
+      function mkNavLink(post, labelText, align) {
+        if (!post) {
+          /* Empty placeholder to keep layout balanced */
+          var empty = document.createElement('div');
+          empty.style.flex = '1';
+          return empty;
+        }
+        var a = document.createElement('a');
+        a.href = post.link;
+        a.style.textAlign = align;
+        a.innerHTML =
+          '<span class="pn-label">' + esc(labelText) + '</span>' +
+          '<span class="pn-title">' + esc(post.title) + '</span>';
         return a;
       }
-      nav.appendChild(mkNav(posts[idx+1] || null, '\u2B05 \u4e0a\u4e00\u7bc7', 'left'));
-      nav.appendChild(mkNav(posts[idx-1] || null, '\u4e0b\u4e00\u7bc7 \u27A1', 'right'));
+
+      nav.appendChild(mkNavLink(prevPost, '\u2B05 \u4e0a\u4e00\u7bc7', 'left'));
+      nav.appendChild(mkNavLink(nextPost, '\u4e0b\u4e00\u7bc7 \u27A1', 'right'));
       pbody.appendChild(nav);
     }).catch(function(){});
 
@@ -1003,7 +989,7 @@
     var spb = document.createElement('button'); spb.innerHTML = '\u2728 \u548c\u4f5c\u8005\u65e0\u9650\u8fdb\u6b65';
     spb.style.cssText = 'padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(240,180,41,0.3);transition:transform 0.3s';
     var qr = document.createElement('div');
-    qr.innerHTML = '<p style="font-size:13px;color:#888;margin:10px 0">\u65e0\u9650\u8fdb\u6b65\uff0c\u8fdb\u6b65\u6709\u4f60\uff01</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="\u8d5e\u8d4f\u7801" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
+    qr.innerHTML = '<p style="font-size:13px;color:#888;margin:10px 0">\u65e0\u9650\u8fdb\u6b65\uff0c\u8fdb\u6b65\u6709\u4f60\uff01</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="\u8d5b\u8d4f\u7801" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
     qr.style.cssText = 'height:0;overflow:hidden;transition:height 0.4s ease,opacity 0.4s ease;opacity:0';
     spb.addEventListener('mouseover', function(){ spb.style.transform = 'translateY(-2px)'; });
     spb.addEventListener('mouseout', function(){ spb.style.transform = ''; });
@@ -1024,7 +1010,7 @@
           var byY = {};
           posts.forEach(function(p){ var y = (p.created||'\u672a\u77e5').slice(0,4); if (!byY[y]) byY[y]=[]; byY[y].push(p); });
           var years = Object.keys(byY).sort(function(a,b){ return b-a; });
-          var html = '<h1 style="border-bottom:2px solid rgba(240,180,41,0.4);padding-bottom:10px;margin-bottom:30px">\u{1F4C5} \u6587\u7ae0\u5f52\u6863</h1>';
+          var html = '<h1 style="border-bottom:2px solid rgba(240,180,41,0.4);padding-bottom:10px;margin-bottom:30px">\uD83D\uDCC5 \u6587\u7ae0\u5f52\u6863</h1>';
           years.forEach(function(y) {
             html += '<div class="tl-year">' + y + ' \u5e74</div><ul class="tl-list">';
             byY[y].forEach(function(p){ var md = (p.created||'').slice(5,10).replace('-','/'); html += '<li class="tl-item"><a href="' + esc(p.link) + '">' + esc(p.title) + '</a><span class="tl-date">' + md + '</span></li>'; });
@@ -1092,13 +1078,8 @@
     var isArchive = location.pathname.includes('archive');
     var hasList   = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
 
-    if (isPost) {
-      root._luliyInitPost();
-    }
+    if (isPost) root._luliyInitPost();
     if (isIndex || isArchive || (!isPost && hasList)) root._luliyInitIndex();
-    /* Also expose for external callers (config.json script tag) */
-    root._luliyInitPost = root._luliyInitPost;
-    root._luliyInitIndex = root._luliyInitIndex;
   });
 
 })(window);
