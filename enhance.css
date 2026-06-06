@@ -1,35 +1,36 @@
 /* ============================================================
-   enhance.css — Luliy Blog v5
-   ──────────────────────────────────────────────────────────
-   结构：
-     §0  全局 CSS 变量（三种阅读皮肤 + 默认）
-     §1  字体 & 基础重置
-     §2  毛玻璃悬浮导航栏（暗色自适应）
-     §3  大屏居中布局（Max-Width 1000px）
-     §4  自定义滚动条
-     §5  粒子 Canvas & 暗色波纹
-     §6  文章列表 SideNav Hover 特效
-     §7  首页卡片重构（流光浮动视差）
-     §8  macOS 代码块（三按钮，无 CSS 圆点装饰）
-     §9  图片灯箱
-     §10 头像时钟
-     §11 顶部进度条 & 回顶按钮
-     §12 文章按钮组（浮动工具栏）
-     §13 收藏加密遮罩
-     §14 阅读皮肤（皮革/水墨/深海）
-     §15 响应式
-     §16 樱花花瓣画布
-     §17 背景图片菜单
+   enhance.css - Luliy Blog v6
+   Sections:
+     0   CSS Variables (themes + skins)
+     1   Font & Base Reset
+     2   Frosted-glass Navbar - compact hero layout
+     3   Hero Title Bar
+     4   Max-width layout
+     5   Scrollbar
+     6   Particle Canvas
+     7   Article List - cards (tags top, title bottom)
+     8   macOS Code Blocks
+     9   Image Lightbox
+    10   Avatar Clock
+    11   Progress Bar (no back-to-top button here)
+    12   Floating Toolbar
+    13   Favorites Lock Overlay
+    14   Reading Skins
+    15   TOC - sticky, active highlight, scroll-spy
+    16   Responsive
+    17   Sakura Canvas
+    18   Background Image Menu
+    19   Strong / Bold theme adaptations
    ============================================================ */
 
-/* ── §0 全局 CSS 变量 ─────────────────────────────────────── */
+/* ---- 0  CSS Variables ------------------------------------ */
 :root {
-  --skin-bg:          transparent;
-  --skin-text:        inherit;
-  --skin-link:        #f0b429;
-  --skin-code-bg:     rgba(16,16,28,0.96);
-  --skin-border:      rgba(130,80,223,0.45);
-  --skin-blockquote:  rgba(9,105,218,0.05);
+  --skin-bg:         transparent;
+  --skin-text:       inherit;
+  --skin-link:       #f0b429;
+  --skin-code-bg:    rgba(16,16,28,0.96);
+  --skin-border:     rgba(130,80,223,0.45);
+  --skin-blockquote: rgba(9,105,218,0.05);
 
   --th-h1: #f0b429;
   --th-h1-border: 2px solid rgba(240,180,41,0.4);
@@ -39,9 +40,9 @@
   --th-h3: #0969da;
   --th-h4: #0969da;
   --th-h5: #57606a;
+  --th-strong: #f0b429;
 }
 
-/* 羊皮纸皮肤 */
 body[data-skin="parchment"] {
   --skin-bg:         #fdf6e3;
   --skin-text:       #5c4a1e;
@@ -50,7 +51,6 @@ body[data-skin="parchment"] {
   --skin-border:     rgba(181,101,29,0.4);
   --skin-blockquote: rgba(181,101,29,0.06);
 }
-/* 水墨皮肤 */
 body[data-skin="ink"] {
   --skin-bg:         #1a1a1a;
   --skin-text:       #e0e0e0;
@@ -59,7 +59,6 @@ body[data-skin="ink"] {
   --skin-border:     rgba(200,200,200,0.25);
   --skin-blockquote: rgba(200,200,200,0.05);
 }
-/* 深海蓝皮肤 */
 body[data-skin="ocean"] {
   --skin-bg:         #0d1b2a;
   --skin-text:       #cce7ff;
@@ -69,7 +68,6 @@ body[data-skin="ocean"] {
   --skin-blockquote: rgba(96,165,250,0.06);
 }
 
-/* 皮肤全局应用 */
 body[data-skin] {
   background-color: var(--skin-bg) !important;
   color: var(--skin-text) !important;
@@ -88,38 +86,46 @@ body[data-skin] #postBody pre {
   border-color: var(--skin-border) !important;
 }
 
-/* ── 文章主题变量 ──── */
-body:not([data-luliy-theme]), body[data-luliy-theme="default"] {
+/* Article theme CSS variables */
+body:not([data-luliy-theme]),
+body[data-luliy-theme="default"] {
   --th-h1:#f0b429; --th-h1-border:2px solid rgba(240,180,41,0.4);
   --th-h2:#0969da; --th-h2-bl:5px solid #0969da; --th-h2-bg:rgba(9,105,218,0.05);
   --th-h3:#0969da; --th-h4:#0969da; --th-h5:#57606a;
+  --th-strong:#f0b429;
 }
 body[data-luliy-theme="classic-blue"] {
   --th-h1:#60a5fa; --th-h1-border:2px solid #3b82f6;
   --th-h2:#93c5fd; --th-h2-bl:4px solid #60a5fa; --th-h2-bg:transparent;
   --th-h3:#bfdbfe; --th-h4:#dbeafe; --th-h5:#eff6ff;
+  --th-strong:#60a5fa;
 }
 body[data-luliy-theme="eco-green"] {
   --th-h1:#34d399; --th-h1-border:1px solid #059669;
   --th-h2:#6ee7b7; --th-h2-bl:none; --th-h2-bg:transparent;
   --th-h3:#a7f3d0; --th-h4:#d1fae5; --th-h5:#ecfdf5;
+  --th-strong:#34d399;
 }
 body[data-luliy-theme="sunset"] {
   --th-h1:#fb923c; --th-h1-border:none;
   --th-h2:#fdba74; --th-h2-bl:none; --th-h2-bg:transparent;
   --th-h3:#fed7aa; --th-h4:#ffedd5; --th-h5:#fff7ed;
+  --th-strong:#fb923c;
 }
 body[data-luliy-theme="mono"] {
   --th-h1:#ffffff; --th-h1-border:none;
   --th-h2:#e5e5e5; --th-h2-bl:none; --th-h2-bg:transparent;
   --th-h3:#d4d4d4; --th-h4:#a3a3a3; --th-h5:#737373;
+  --th-strong:#e5e5e5;
 }
 body[data-luliy-theme="cyberpunk"] {
   --th-h1:#c084fc; --th-h1-border:none;
   --th-h2:#e879f9; --th-h2-bl:none; --th-h2-bg:transparent;
   --th-h3:#f0abfc; --th-h4:#f5d0fe; --th-h5:#fae8ff;
+  --th-strong:#c084fc;
 }
 
+/* Apply heading variables */
 #postBody h1 {
   color: var(--th-h1) !important;
   border-bottom: var(--th-h1-border) !important;
@@ -136,19 +142,32 @@ body[data-luliy-theme="cyberpunk"] {
 #postBody h4 { color: var(--th-h4) !important; }
 #postBody h5 { color: var(--th-h5) !important; }
 
-/* 主题特殊规则 */
-body[data-luliy-theme="sunset"]   #postBody h1 { text-transform:uppercase; letter-spacing:1px; }
-body[data-luliy-theme="sunset"]   #postBody h2 { border-bottom:1px dashed #ea580c !important; border-left:none !important; }
+/* ---- 19  Strong / Bold theme adaptations ----------------- */
+#postBody strong {
+  color: var(--th-strong) !important;
+  font-weight: bold !important;
+}
+/* theme-specific strong decorations */
+body[data-luliy-theme="default"]     #postBody strong { text-shadow: 0 0 8px rgba(240,180,41,0.3); }
+body[data-luliy-theme="classic-blue"] #postBody strong { border-bottom: 1px solid rgba(96,165,250,0.4); }
+body[data-luliy-theme="eco-green"]   #postBody strong { background: rgba(52,211,153,0.08); border-radius: 3px; padding: 0 3px; }
+body[data-luliy-theme="sunset"]      #postBody strong { text-shadow: 0 1px 4px rgba(251,146,60,0.4); }
+body[data-luliy-theme="mono"]        #postBody strong { font-weight: 900 !important; letter-spacing: 0.02em; }
+body[data-luliy-theme="cyberpunk"]   #postBody strong { text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7; }
+
+/* Theme special rules */
+body[data-luliy-theme="sunset"]    #postBody h1 { text-transform:uppercase; letter-spacing:1px; }
+body[data-luliy-theme="sunset"]    #postBody h2 { border-bottom:1px dashed #ea580c !important; border-left:none !important; }
 body[data-luliy-theme="eco-green"] #postBody h5 { border-left:2px solid #34d399 !important; padding-left:8px; }
-body[data-luliy-theme="mono"]     #postBody h1 { font-weight:800 !important; }
-body[data-luliy-theme="mono"]     #postBody h2 { font-weight:700 !important; }
-body[data-luliy-theme="mono"]     #postBody h3 { font-weight:600 !important; }
-body[data-luliy-theme="mono"]     #postBody h5 { text-transform:uppercase !important; }
+body[data-luliy-theme="mono"]      #postBody h1 { font-weight:800 !important; }
+body[data-luliy-theme="mono"]      #postBody h2 { font-weight:700 !important; }
+body[data-luliy-theme="mono"]      #postBody h3 { font-weight:600 !important; }
+body[data-luliy-theme="mono"]      #postBody h5 { text-transform:uppercase !important; }
 body[data-luliy-theme="cyberpunk"] #postBody h1 { text-shadow:0 0 8px #a855f7 !important; }
 body[data-luliy-theme="cyberpunk"] #postBody h2 { border-bottom:1px solid #701a75 !important; border-left:none !important; }
 body[data-luliy-theme="classic-blue"] #postBody h5 { font-style:italic !important; }
 
-/* ── §1 字体 & 基础重置 ──────────────────────────────────── */
+/* ---- 1  Font & Base Reset -------------------------------- */
 @import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
 
 body, #postBody {
@@ -156,61 +175,125 @@ body, #postBody {
 }
 html { scroll-behavior: smooth; }
 ::selection { background: #f0b429; color: #000; }
-a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
+a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; }
 
-/* ── §2 毛玻璃悬浮导航栏 ─────────────────────────────────── */
+/* ---- 2  Navbar - compact hero ----------------------------- */
 #header {
   position: fixed !important;
   top: 0 !important; left: 0 !important;
   width: 100% !important;
-  min-height: 65px !important; height: auto !important;
-  background: rgba(255,255,255,0.82) !important;
+  height: auto !important;
+  min-height: 56px !important;
+  background: rgba(255,255,255,0.85) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
-  /* align to same 1000px column as body content */
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
-  padding-left: clamp(16px, calc((100vw - 1000px) / 2 + 20px), 50%) !important;
-  padding-right: clamp(16px, calc((100vw - 1000px) / 2 + 20px), 50%) !important;
-  border-bottom: 1px solid rgba(0,0,0,0.08) !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+  padding: 8px clamp(16px, calc((100vw - 1000px)/2 + 20px), 50%) !important;
+  border-bottom: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05) !important;
   display: flex !important;
-  justify-content: space-between !important;
   align-items: center !important;
+  justify-content: space-between !important;
   z-index: 9999 !important;
   box-sizing: border-box !important;
-  transition: background 0.3s ease, box-shadow 0.3s ease !important;
+  transition: background 0.3s, box-shadow 0.3s !important;
+  gap: 12px !important;
 }
 [data-color-mode="dark"] #header {
-  background: rgba(13,17,23,0.75) !important;
-  border-bottom-color: rgba(255,255,255,0.08) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.45) !important;
-}
-.blogTitle, .postTitle {
-  display: block !important;
-  font-size: clamp(16px, 4vw, 22px) !important;
-  font-weight: bold !important;
-  color: #24292f !important;
-  text-decoration: none !important;
-  word-break: break-word !important;
-  line-height: 1.3 !important;
-  margin: 0 !important;
-  flex: 1 !important;
-  padding-right: 14px !important;
-}
-[data-color-mode="dark"] .blogTitle,
-[data-color-mode="dark"] .postTitle { color: #adbac7 !important; }
-.title-right {
-  display: flex !important;
-  gap: 10px !important;
-  flex-shrink: 0 !important;
-  z-index: 10000 !important;
-  align-items: center !important;
+  background: rgba(13,17,23,0.82) !important;
+  border-bottom-color: rgba(255,255,255,0.07) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
 }
 
-/* ── §3 大屏居中布局（Max-Width 1000px） ─────────────────── */
+/* Left hero cluster: avatar + info */
+#luliy-hero-cluster {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
+  text-decoration: none !important;
+}
+#luliy-hero-cluster img.avatar {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 2px rgba(130,80,223,0.35) !important;
+  transition: box-shadow 0.3s, transform 0.3s !important;
+  display: block !important;
+}
+#luliy-hero-cluster img.avatar:hover {
+  box-shadow: 0 0 0 3px rgba(130,80,223,0.7) !important;
+  transform: rotate(4deg) scale(1.06) !important;
+}
+#luliy-hero-info {
+  display: flex !important;
+  flex-direction: column !important;
+  line-height: 1.2 !important;
+}
+#luliy-hero-name {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #24292f !important;
+  letter-spacing: 0.5px !important;
+}
+[data-color-mode="dark"] #luliy-hero-name { color: #cdd6f4 !important; }
+#luliy-avatar-clock {
+  font-size: 11px !important;
+  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+  color: #8250df !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+  margin-top: 2px !important;
+  opacity: 0.85 !important;
+}
+[data-color-mode="dark"] #luliy-avatar-clock { color: #cba6f7 !important; }
+
+/* Hide Gmeek's default avatar / blogTitle rendering in header area
+   so our cluster is the sole branding element */
+#header .blogTitle,
+#header .postTitle {
+  display: none !important;
+}
+/* But if there's no hero cluster yet (non-enhanced page), show it */
+#header.no-cluster .blogTitle,
+#header.no-cluster .postTitle {
+  display: block !important;
+}
+
+/* Right: nav icons */
+.title-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+  z-index: 10000 !important;
+}
+
+/* ---- 3  Hero Title Bar ------------------------------------ */
+#luliy-hero-banner {
+  margin: 72px auto 0 auto;
+  width: 95%;
+  max-width: 1000px;
+  padding: 18px 28px;
+  background: linear-gradient(135deg, rgba(130,80,223,0.12), rgba(240,180,41,0.08));
+  border: 1px solid rgba(130,80,223,0.20);
+  border-radius: 14px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #8250df;
+  box-shadow: 0 4px 20px rgba(130,80,223,0.10);
+  box-sizing: border-box;
+}
+[data-color-mode="dark"] #luliy-hero-banner {
+  background: linear-gradient(135deg, rgba(130,80,223,0.18), rgba(240,180,41,0.06));
+  border-color: rgba(130,80,223,0.30);
+  color: #cba6f7;
+}
+
+/* ---- 4  Max-width Layout ---------------------------------- */
 #content, .main {
-  margin: 85px auto 0 auto !important;
+  margin: 16px auto 0 auto !important;
   padding: 0 24px !important;
   width: 95% !important;
   max-width: 1000px !important;
@@ -220,12 +303,12 @@ a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
 }
 .subTitle { display: none !important; }
 
-/* ── §4 自定义滚动条 ─────────────────────────────────────── */
+/* ---- 5  Scrollbar ---------------------------------------- */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #8250df; border-radius: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* 点阵背景 */
+/* Dot background */
 body {
   background-image: radial-gradient(rgba(9,105,218,0.09) 1px, transparent 1px);
   background-size: 25px 25px;
@@ -233,13 +316,12 @@ body {
 [data-color-mode="dark"] body {
   background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
 }
-/* 设置了自定义背景图时覆盖点阵 */
 body[style*="backgroundImage: url"],
 body[style*="background-image: url"] {
   background-size: cover !important;
 }
 
-/* ── §5 粒子 Canvas & 暗色波纹 ──────────────────────────── */
+/* ---- 6  Particle Canvas ----------------------------------- */
 #luliy-particle-canvas {
   position: fixed; inset: 0;
   width: 100vw; height: 100vh;
@@ -250,7 +332,18 @@ body[style*="background-image: url"] {
   pointer-events: none; z-index: 99998; transition: none;
 }
 
-/* ── §6 文章列表 SideNav Hover 特效 ─────────────────────── */
+/* ---- 7  Article List Cards - Tags TOP, Title BOTTOM ------- */
+/* Container becomes grid */
+.luliy-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* SideNav hover effect (list pages) */
 .SideNav-item {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   border-left: 3px solid transparent !important;
@@ -269,23 +362,7 @@ body[style*="background-image: url"] {
   border-left-color: #8250df !important;
 }
 
-/* ── §7 首页卡片重构（流光浮动视差） ────────────────────────
- *
- * 将 Gmeek 默认的 SideNav 列表转换为现代卡片网格。
- * JS 会为每个 .SideNav-item 添加 .luliy-card class。
- * ──────────────────────────────────────────────────────── */
-
-/* 卡片容器网格 */
-.luliy-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* 单张卡片 */
+/* Individual card */
 .luliy-card {
   position: relative;
   border-radius: 16px !important;
@@ -299,6 +376,8 @@ body[style*="background-image: url"] {
     transform 0.32s cubic-bezier(.4,0,.2,1),
     box-shadow 0.32s cubic-bezier(.4,0,.2,1) !important;
   will-change: transform, box-shadow;
+  display: flex !important;
+  flex-direction: column !important;
 }
 .luliy-card:hover {
   transform: translateY(-8px) scale(1.013) !important;
@@ -310,11 +389,10 @@ body[style*="background-image: url"] {
   border-left: none !important;
 }
 
-/* 流光边框伪元素 */
+/* Rainbow border glow on hover */
 .luliy-card::before {
   content: '';
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   border-radius: 16px;
   padding: 2px;
   background: linear-gradient(135deg, #8250df, #f0b429, #ff6b9d, #6bceff, #8250df);
@@ -337,30 +415,66 @@ body[style*="background-image: url"] {
   animation: luliy-rainbow 2.4s ease infinite;
 }
 
-/* 四色左分条 */
+/* Four-color left stripe */
 .luliy-card:nth-child(4n+1)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#8250df; border-radius:16px 0 0 16px; z-index:2; }
 .luliy-card:nth-child(4n+2)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#0969da; border-radius:16px 0 0 16px; z-index:2; }
 .luliy-card:nth-child(4n+3)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#ff6b9d; border-radius:16px 0 0 16px; z-index:2; }
 .luliy-card:nth-child(4n+0)::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:#f0b429; border-radius:16px 0 0 16px; z-index:2; }
 
-/* 卡片内链接 */
-.luliy-card .SideNav-item-title-block {
-  padding: 18px 18px 14px 22px;
-  display: block;
+/* Tags area - TOP of card */
+.luliy-card-tags {
+  padding: 12px 14px 6px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  min-height: 32px;
+  align-items: center;
 }
-.luliy-card a {
-  color: #24292f !important;
-  text-decoration: none !important;
-  display: block;
-  padding: 16px 18px 12px 22px;
+/* Date chip */
+.luliy-card-date {
+  font-size: 10px;
+  color: #999;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 2px 6px;
+  background: rgba(130,80,223,0.06);
+  border-radius: 8px;
+  margin-left: auto;
+  white-space: nowrap;
 }
-.luliy-card a:hover { color: #8250df !important; }
-[data-color-mode="dark"] .luliy-card {
-  background: #1a1a2e !important;
-}
-[data-color-mode="dark"] .luliy-card a { color: #cdd6f4 !important; }
+[data-color-mode="dark"] .luliy-card-date { color: #6c7086; background: rgba(130,80,223,0.12); }
 
-/* 进入动画 */
+/* Title area - BOTTOM of card */
+.luliy-card-title {
+  padding: 6px 14px 16px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #24292f;
+  line-height: 1.5;
+  word-break: break-word;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+}
+[data-color-mode="dark"] .luliy-card-title { color: #cdd6f4; }
+.luliy-card:hover .luliy-card-title { color: #8250df; }
+[data-color-mode="dark"] .luliy-card:hover .luliy-card-title { color: #cba6f7; }
+
+/* Card anchor wraps everything */
+.luliy-card > a {
+  display: flex !important;
+  flex-direction: column !important;
+  text-decoration: none !important;
+  height: 100% !important;
+  padding: 0 !important;
+}
+
+[data-color-mode="dark"] .luliy-card { background: #1a1a2e !important; }
+[data-color-mode="dark"] .luliy-card { box-shadow: 0 2px 14px rgba(0,0,0,0.35) !important; }
+[data-color-mode="dark"] .luliy-card:hover {
+  box-shadow: 0 20px 50px rgba(0,0,0,0.55), 0 0 0 2px rgba(130,80,223,0.35), 0 0 34px rgba(130,80,223,0.18) !important;
+}
+
+/* Card fade-in animation */
 @keyframes luliy-fadeUp {
   from { opacity: 0; transform: translateY(22px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -373,21 +487,29 @@ body[style*="background-image: url"] {
 .luliy-card:nth-child(6) { animation-delay: 0.25s; }
 .luliy-card:nth-child(n+7) { animation-delay: 0.30s; }
 
-/* 深色模式卡片阴影 */
-[data-color-mode="dark"] .luliy-card {
-  box-shadow: 0 2px 14px rgba(0,0,0,0.35) !important;
+/* Label tag pills - keep original Gmeek style */
+a.Label {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 1px 8px !important;
+  border-radius: 20px !important;
+  font-size: 11px !important;
+  line-height: 18px !important;
+  height: 20px !important;
+  margin: 0 3px 3px 0 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  box-sizing: border-box !important;
 }
-[data-color-mode="dark"] .luliy-card:hover {
-  box-shadow:
-    0 20px 50px rgba(0,0,0,0.55),
-    0 0 0 2px rgba(130,80,223,0.35),
-    0 0 34px rgba(130,80,223,0.18) !important;
-}
+a.Label * { vertical-align: middle !important; line-height: 1 !important; }
+a.Label:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
 
-/* ── §8 macOS 代码块（三按钮） ───────────────────────────── */
+/* ---- 8  macOS Code Blocks --------------------------------- */
 #postBody pre {
   position: relative;
-  padding-top: 42px !important;
+  padding-top: 44px !important;
   overflow-x: auto;
   max-width: 100%;
   background: var(--skin-code-bg, rgba(16,16,28,0.96)) !important;
@@ -407,7 +529,7 @@ body[style*="background-image: url"] {
     0 0 68px rgba(130,80,223,0.24) !important;
   transform: translateY(-1px);
 }
-/* 扫描线 */
+/* Scanline overlay */
 #postBody pre::after {
   content: '';
   position: absolute; inset: 0;
@@ -420,30 +542,35 @@ body[style*="background-image: url"] {
   padding: 0 !important;
   font-weight: normal !important;
 }
-/* macOS 按钮公共 */
+
+/* macOS buttons - traffic lights */
 .mac-btn {
-  position: absolute; top: 9px;
-  width: 12px; height: 12px;
+  position: absolute; top: 12px;
+  width: 13px; height: 13px;
   border-radius: 50%; border: none;
   cursor: pointer; z-index: 10;
   transition: filter 0.15s, transform 0.15s;
   display: flex; align-items: center; justify-content: center;
-  padding: 0;
+  padding: 0; font-size: 0;
 }
-.mac-btn:hover { filter: brightness(1.2); transform: scale(1.25); }
+.mac-btn:hover { filter: brightness(1.2); transform: scale(1.25); font-size: 8px; color: rgba(0,0,0,0.6); }
 .mac-btn-red    { left: 14px; background: #ff5f57; }
 .mac-btn-yellow { left: 34px; background: #febc2e; }
 .mac-btn-green  { left: 54px; background: #28c840; }
+
+/* Tooltip on hover */
 .mac-btn::after {
   content: attr(data-tip);
-  position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+  position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
   background: rgba(0,0,0,0.82); color: #fff; font-size: 11px;
   white-space: nowrap; padding: 3px 8px; border-radius: 5px;
   pointer-events: none; opacity: 0; transition: opacity 0.18s;
   z-index: 20; font-family: sans-serif;
 }
 .mac-btn:hover::after { opacity: 1; }
-.mac-btn-red.is-done      { background: #1f883d; }
+
+/* State changes */
+.mac-btn-red.is-copied    { background: #1f883d; }
 .mac-btn-yellow.is-folded { background: #8250df; }
 pre.is-folded > code      { display: none; }
 pre.is-folded             { padding-bottom: 12px !important; }
@@ -458,7 +585,7 @@ pre.code-fullscreen {
 pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
 #postBody pre:active { box-shadow: 0 0 0 3px rgba(130,80,223,0.4) !important; }
 
-/* ── §9 图片灯箱 ─────────────────────────────────────────── */
+/* ---- 9  Image Lightbox ------------------------------------ */
 #luliy-lightbox {
   position: fixed; inset: 0; z-index: 99990;
   background: rgba(0,0,0,0.88);
@@ -485,39 +612,22 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
 }
 #luliy-lightbox-close:hover { background: rgba(255,255,255,0.28); }
 
-/* ── §10 头像时钟 ────────────────────────────────────────── */
-#luliy-avatar-clock {
-  text-align: center; font-size: 13px;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  color: #8250df; font-weight: 600; letter-spacing: 1px;
-  margin-top: 4px; opacity: 0.85;
-}
+/* ---- 10  Avatar Clock ------------------------------------- */
+/* (styles are now inside #luliy-hero-cluster - see section 2) */
 a.luliy-avatar-link { display: inline-block; }
-a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
-[data-color-mode="dark"] #luliy-avatar-clock { color: #cba6f7; }
 
-/* ── §11 顶部进度条 & 回顶按钮 ──────────────────────────── */
+/* ---- 11  Progress Bar (back-to-top merged into TOC) ------- */
 #luliy-progress-bar {
   position: fixed; top: 0; left: 0;
   height: 3px; width: 0%;
   background: linear-gradient(90deg, #8250df, #f0b429);
   z-index: 99999; transition: width 0.1s linear; pointer-events: none;
 }
-#luliy-back-top {
-  position: fixed; bottom: 24px; right: 24px;
-  width: 44px; height: 44px;
-  background: rgba(130,80,223,0.88); border: none; border-radius: 50%;
-  color: #fff; font-size: 18px; cursor: pointer; z-index: 9000;
-  display: none; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(130,80,223,0.4);
-  transition: transform 0.25s, box-shadow 0.25s;
-}
-#luliy-back-top:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(130,80,223,0.55); }
 
-/* ── §12 浮动工具栏（右侧固定：主页/GitHub/主题/音效/皮肤/背景/花瓣）*/
+/* ---- 12  Floating Toolbar --------------------------------- */
 #luliy-toolbar {
   position: fixed;
-  top: 76px;
+  top: 72px;
   right: 16px;
   z-index: 8900;
   display: flex;
@@ -548,92 +658,70 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
   color: #cdd6f4;
   box-shadow: 0 2px 10px rgba(0,0,0,0.4);
 }
-[data-color-mode="dark"] .luliy-tb-btn:hover {
-  background: rgba(40,40,65,0.98);
-}
-/* Tooltip */
+[data-color-mode="dark"] .luliy-tb-btn:hover { background: rgba(40,40,65,0.98); }
 .luliy-tb-btn::after {
   content: attr(data-tip);
-  position: absolute;
-  right: 48px; top: 50%; transform: translateY(-50%);
+  position: absolute; right: 48px; top: 50%; transform: translateY(-50%);
   background: rgba(0,0,0,0.78); color: #fff;
   font-size: 12px; white-space: nowrap;
   padding: 4px 9px; border-radius: 6px;
-  pointer-events: none; opacity: 0;
-  transition: opacity 0.18s; font-family: sans-serif;
+  pointer-events: none; opacity: 0; transition: opacity 0.18s; font-family: sans-serif;
 }
 .luliy-tb-btn:hover::after { opacity: 1; }
-/* 音效关闭状态 */
 .luliy-tb-btn.sfx-off { opacity: 0.45; }
-/* 樱花关闭状态 */
 .luliy-tb-btn.sakura-off { opacity: 0.45; }
 
-/* ── 文章主题弹出菜单 ── */
+/* Article theme popup */
 #luliy-theme-menu {
-  display: none;
-  flex-direction: column;
-  gap: 3px;
+  display: none; flex-direction: column; gap: 3px;
   background: rgba(255,255,255,0.96);
   border: 1px solid rgba(130,80,223,0.22);
   border-radius: 12px; padding: 7px;
   box-shadow: 0 8px 28px rgba(0,0,0,0.16);
-  backdrop-filter: blur(12px);
-  min-width: 148px;
+  backdrop-filter: blur(12px); min-width: 148px;
 }
 [data-color-mode="dark"] #luliy-theme-menu {
-  background: rgba(26,26,46,0.96);
-  border-color: rgba(130,80,223,0.35);
+  background: rgba(26,26,46,0.96); border-color: rgba(130,80,223,0.35);
 }
 #luliy-theme-menu.is-open { display: flex; }
 .luliy-theme-opt {
   display: flex; align-items: center; gap: 8px;
   padding: 7px 10px; border-radius: 8px;
   border: none; background: transparent;
-  cursor: pointer; font-size: 13px;
-  color: #24292f; font-family: inherit;
-  text-align: left; transition: background 0.16s;
-  white-space: nowrap;
+  cursor: pointer; font-size: 13px; color: #24292f; font-family: inherit;
+  text-align: left; transition: background 0.16s; white-space: nowrap;
 }
 [data-color-mode="dark"] .luliy-theme-opt { color: #ccc; }
 .luliy-theme-opt:hover { background: rgba(130,80,223,0.12); }
 .luliy-theme-opt.is-active { background: rgba(130,80,223,0.18); font-weight:600; }
 .luliy-theme-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 
-/* ── 阅读皮肤弹出菜单 ── */
+/* Reading skin popup */
 #luliy-skin-menu {
-  display: none;
-  flex-direction: column;
-  gap: 3px;
+  display: none; flex-direction: column; gap: 3px;
   background: rgba(255,255,255,0.96);
   border: 1px solid rgba(130,80,223,0.22);
   border-radius: 12px; padding: 7px;
   box-shadow: 0 8px 28px rgba(0,0,0,0.16);
-  backdrop-filter: blur(12px);
-  min-width: 140px;
+  backdrop-filter: blur(12px); min-width: 140px;
 }
 [data-color-mode="dark"] #luliy-skin-menu {
-  background: rgba(26,26,46,0.96);
-  border-color: rgba(130,80,223,0.35);
+  background: rgba(26,26,46,0.96); border-color: rgba(130,80,223,0.35);
 }
 #luliy-skin-menu.is-open { display: flex; }
 .luliy-skin-opt {
   display: flex; align-items: center; gap: 8px;
   padding: 7px 10px; border-radius: 8px;
   border: none; background: transparent;
-  cursor: pointer; font-size: 13px;
-  color: #24292f; font-family: inherit;
-  text-align: left; transition: background 0.16s;
-  white-space: nowrap;
+  cursor: pointer; font-size: 13px; color: #24292f; font-family: inherit;
+  text-align: left; transition: background 0.16s; white-space: nowrap;
 }
 [data-color-mode="dark"] .luliy-skin-opt { color: #ccc; }
 .luliy-skin-opt:hover { background: rgba(130,80,223,0.12); }
 .luliy-skin-opt.is-active { background: rgba(130,80,223,0.18); font-weight:600; }
-.luliy-skin-swatch {
-  width: 14px; height: 14px; border-radius: 4px;
-  flex-shrink: 0; border: 1px solid rgba(0,0,0,0.12);
-}
+.luliy-skin-swatch { width:14px; height:14px; border-radius:4px; flex-shrink:0; border:1px solid rgba(0,0,0,0.12); }
 
-/* ── §13 收藏加密遮罩 ────────────────────────────────────── */
+/* ---- 13  Favorites Lock Overlay -------------------------- */
 #luliy-lock-overlay {
   position: fixed; inset: 0; z-index: 99995;
   display: flex; align-items: center; justify-content: center;
@@ -678,85 +766,153 @@ a.luliy-avatar-link:hover img { transform: rotate(5deg) scale(1.05); }
 .luliy-lock-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
 .luliy-lock-err { margin-top: 10px; font-size: 12px; color: #f38ba8; min-height: 18px; }
 
-/* ── §14 阅读皮肤正文样式细节 ───────────────────────────── */
-/* 羊皮纸 */
+/* ---- 14  Reading Skins detail ---------------------------- */
 body[data-skin="parchment"] #postBody h1,
 body[data-skin="parchment"] #postBody h2,
 body[data-skin="parchment"] #postBody h3 { color: #8b4513 !important; }
 body[data-skin="parchment"] #postBody blockquote { border-left-color: #b5651d !important; }
-/* 水墨 */
 body[data-skin="ink"] #postBody h1,
 body[data-skin="ink"] #postBody h2,
 body[data-skin="ink"] #postBody h3 { color: #e0e0e0 !important; }
-/* 深海 */
 body[data-skin="ocean"] #postBody h1 { color: #60a5fa !important; }
 body[data-skin="ocean"] #postBody h2 { color: #93c5fd !important; border-left-color: #60a5fa !important; }
 body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
 
-/* ── §15 响应式 ──────────────────────────────────────────── */
-@media (max-width: 768px) {
-  #content, .main { padding: 0 12px !important; width: 100% !important; }
-  #luliy-toolbar { top: auto; bottom: 130px; right: 12px; }
-  #luliy-back-top { bottom: 80px; right: 12px; }
-  #postBody { font-size: 16px !important; line-height: 1.85 !important; max-width: 100% !important; }
-  #postBody h1 { font-size: 1.5rem !important; }
-  #postBody h2 { font-size: 1.2rem !important; }
-  #postBody pre { font-size: 13px !important; }
-  .luliy-card-grid { grid-template-columns: 1fr; }
-  .luliy-tb-btn::after { display: none; }
-  #luliy-bg-menu { min-width: 180px; }
-}
-
-/* ── §16 樱花花瓣画布 ────────────────────────────────────── */
-#luliy-sakura-canvas {
+/* ---- 15  TOC - sticky panel with scroll-spy & back-to-top  */
+/* TOC panel wrapper injected by JS */
+#luliy-toc-panel {
   position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.88;
+  top: 80px;
+  right: 16px;
+  z-index: 8800;
+  display: none; /* JS shows on post pages */
+}
+#luliy-toc-panel.is-visible { display: block; }
+
+/* TOC toggle button (replaces old back-to-top) */
+#luliy-toc-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(10px);
+  color: #24292f;
+  font-size: 17px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
+  position: relative;
+}
+[data-color-mode="dark"] #luliy-toc-btn {
+  background: rgba(30,30,50,0.88); color: #cdd6f4;
+}
+#luliy-toc-btn:hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 6px 18px rgba(130,80,223,0.3);
+}
+#luliy-toc-btn::after {
+  content: '目录';
+  position: absolute; right: 48px; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.78); color: #fff; font-size: 12px;
+  white-space: nowrap; padding: 4px 9px; border-radius: 6px;
+  pointer-events: none; opacity: 0; transition: opacity 0.18s; font-family: sans-serif;
+}
+#luliy-toc-btn:hover::after { opacity: 1; }
+
+/* TOC dropdown */
+#luliy-toc-dropdown {
+  display: none;
+  flex-direction: column;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(130,80,223,0.22);
+  border-radius: 14px;
+  padding: 10px 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  backdrop-filter: blur(14px);
+  min-width: 220px;
+  max-width: 280px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 6px;
+}
+[data-color-mode="dark"] #luliy-toc-dropdown {
+  background: rgba(20,20,40,0.96); border-color: rgba(130,80,223,0.35);
+}
+#luliy-toc-dropdown.is-open { display: flex; }
+
+/* TOC header row with back-to-top */
+#luliy-toc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 14px 8px 14px;
+  border-bottom: 1px solid rgba(130,80,223,0.12);
+  margin-bottom: 4px;
+}
+#luliy-toc-label {
+  font-size: 11px; font-weight: 700;
+  color: #8250df; letter-spacing: 1px; text-transform: uppercase;
+}
+[data-color-mode="dark"] #luliy-toc-label { color: #cba6f7; }
+#luliy-toc-totop {
+  font-size: 11px; cursor: pointer;
+  color: #8250df; background: rgba(130,80,223,0.10);
+  border: none; border-radius: 8px; padding: 3px 8px;
+  font-family: inherit; transition: background 0.15s;
+}
+#luliy-toc-totop:hover { background: rgba(130,80,223,0.22); }
+[data-color-mode="dark"] #luliy-toc-totop { color: #cba6f7; }
+
+/* TOC links list */
+#luliy-toc-list {
+  list-style: none; margin: 0; padding: 0 8px;
+}
+#luliy-toc-list li { margin: 0; }
+#luliy-toc-list a {
+  display: block;
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  color: #57606a;
+  text-decoration: none;
+  line-height: 1.5;
+  transition: background 0.16s, color 0.16s, border-left 0.16s, padding-left 0.16s;
+  border-left: 2px solid transparent;
+  word-break: break-word;
+}
+[data-color-mode="dark"] #luliy-toc-list a { color: #848d97; }
+#luliy-toc-list a:hover {
+  background: rgba(130,80,223,0.08);
+  color: #8250df;
+}
+[data-color-mode="dark"] #luliy-toc-list a:hover { color: #cba6f7; }
+
+/* Active state - scroll-spy highlight */
+#luliy-toc-list a.luliy-toc-active {
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(240,180,41,0.06) 3px, rgba(240,180,41,0.06) 6px),
+    linear-gradient(135deg, rgba(240,180,41,0.16), rgba(130,80,223,0.09)) !important;
+  color: #d03a00 !important;
+  font-weight: 700 !important;
+  border-left: 3px solid #f0b429 !important;
+  padding-left: 10px !important;
+  border-radius: 0 7px 7px 0 !important;
+}
+[data-color-mode="dark"] #luliy-toc-list a.luliy-toc-active {
+  color: #f0b429 !important;
 }
 
-/* ── §16b Label/tag 紧凑对齐修复 ─────────────────────────── */
-/* Gmeek 默认的 .Label 标签有错位和过大背景问题，统一修正 */
-a.Label {
-  display: inline-flex !important;
-  align-items: center !important;
-  padding: 1px 8px !important;
-  border-radius: 20px !important;
-  font-size: 11px !important;
-  line-height: 18px !important;
-  height: 20px !important;
-  margin: 0 3px 3px 0 !important;
-  vertical-align: middle !important;
-  white-space: nowrap !important;
-  text-decoration: none !important;
-  font-weight: 500 !important;
-  box-sizing: border-box !important;
-}
-a.Label * {
-  vertical-align: middle !important;
-  line-height: 1 !important;
-}
+/* H2 vs H3 indent */
+#luliy-toc-list li[data-level="2"] a { padding-left: 8px; }
+#luliy-toc-list li[data-level="3"] a { padding-left: 20px; font-size: 11px; }
+#luliy-toc-list li[data-level="3"] a.luliy-toc-active { padding-left: 24px !important; }
 
-/* ── §16c TOC 当前高亮 + 背景纹理 ───────────────────────── */
-/* articletoc.js 给当前标题对应链接加 .active 类 */
+/* Keep original articletoc TOC also highlighted */
 #TOC a.active,
 .toc a.active,
 .articletoc a.active,
 .toc-item.active > a,
 [id*="toc"] a.active,
 .luliy-toc-active {
-  /* 渐变 + 45° 斜线纹理 */
   background:
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 3px,
-      rgba(240,180,41,0.07) 3px,
-      rgba(240,180,41,0.07) 6px
-    ),
+    repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(240,180,41,0.07) 3px, rgba(240,180,41,0.07) 6px),
     linear-gradient(135deg, rgba(240,180,41,0.18), rgba(130,80,223,0.10)) !important;
   color: #d03a00 !important;
   font-weight: 700 !important;
@@ -765,7 +921,6 @@ a.Label * {
   border-radius: 0 4px 4px 0 !important;
   display: block !important;
 }
-/* TOC 容器 */
 #TOC, .toc, .articletoc {
   background: rgba(255,255,255,0.90) !important;
   border: 1px solid rgba(130,80,223,0.18) !important;
@@ -779,90 +934,60 @@ a.Label * {
   border-color: rgba(130,80,223,0.30) !important;
 }
 
-/* ── §17 背景图片菜单 ────────────────────────────────────── */
+/* ---- 16  Responsive --------------------------------------- */
+@media (max-width: 768px) {
+  #content, .main { padding: 0 12px !important; width: 100% !important; }
+  #luliy-toolbar  { right: 8px; }
+  #luliy-toc-panel { right: 8px; }
+  #postBody { font-size: 16px !important; line-height: 1.85 !important; }
+  #postBody h1 { font-size: 1.5rem !important; }
+  #postBody h2 { font-size: 1.2rem !important; }
+  #postBody pre { font-size: 13px !important; }
+  .luliy-card-grid { grid-template-columns: 1fr; }
+  .luliy-tb-btn::after { display: none; }
+  #luliy-toc-btn::after { display: none; }
+  #luliy-bg-menu { min-width: 180px; }
+  #luliy-hero-banner { margin-top: 64px; }
+}
+
+/* ---- 17  Sakura Canvas ------------------------------------ */
+#luliy-sakura-canvas {
+  position: fixed; inset: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none; z-index: 1; opacity: 0.88;
+}
+
+/* ---- 18  Background Image Menu ---------------------------- */
 #luliy-bg-menu {
-  display: none;
-  flex-direction: column;
-  gap: 6px;
+  display: none; flex-direction: column; gap: 6px;
   background: rgba(255,255,255,0.96);
   border: 1px solid rgba(130,80,223,0.22);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 12px; padding: 12px;
   box-shadow: 0 8px 28px rgba(0,0,0,0.16);
-  backdrop-filter: blur(12px);
-  min-width: 210px;
+  backdrop-filter: blur(12px); min-width: 210px;
 }
 [data-color-mode="dark"] #luliy-bg-menu {
-  background: rgba(26,26,46,0.96);
-  border-color: rgba(130,80,223,0.35);
+  background: rgba(26,26,46,0.96); border-color: rgba(130,80,223,0.35);
 }
 #luliy-bg-menu.is-open { display: flex; }
-
-.luliy-bg-label {
-  font-size: 11px;
-  color: #888;
-  text-align: center;
-  font-family: sans-serif;
-  letter-spacing: 0.5px;
-}
+.luliy-bg-label { font-size: 11px; color: #888; text-align: center; font-family: sans-serif; letter-spacing: 0.5px; }
 [data-color-mode="dark"] .luliy-bg-label { color: #6c7086; }
-
 .luliy-bg-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 8px 10px;
-  border: 1px solid rgba(130,80,223,0.3);
-  border-radius: 8px;
-  background: rgba(0,0,0,0.04);
-  color: #24292f;
-  font-size: 12px;
-  outline: none;
-  font-family: 'JetBrains Mono', monospace;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%; box-sizing: border-box; padding: 8px 10px;
+  border: 1px solid rgba(130,80,223,0.3); border-radius: 8px;
+  background: rgba(0,0,0,0.04); color: #24292f; font-size: 12px; outline: none;
+  font-family: 'JetBrains Mono', monospace; transition: border-color 0.2s, box-shadow 0.2s;
 }
-[data-color-mode="dark"] .luliy-bg-input {
-  background: rgba(255,255,255,0.06);
-  color: #cdd6f4;
-  border-color: rgba(130,80,223,0.4);
-}
-.luliy-bg-input:focus {
-  border-color: rgba(130,80,223,0.7);
-  box-shadow: 0 0 0 2px rgba(130,80,223,0.18);
-}
+[data-color-mode="dark"] .luliy-bg-input { background: rgba(255,255,255,0.06); color: #cdd6f4; border-color: rgba(130,80,223,0.4); }
+.luliy-bg-input:focus { border-color: rgba(130,80,223,0.7); box-shadow: 0 0 0 2px rgba(130,80,223,0.18); }
 .luliy-bg-input::placeholder { color: #aaa; font-style: italic; }
-
-.luliy-bg-actions {
-  display: flex;
-  gap: 6px;
-}
-.luliy-bg-apply,
-.luliy-bg-clear {
-  flex: 1;
-  padding: 7px 4px;
-  border-radius: 8px;
-  border: none;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
+.luliy-bg-actions { display: flex; gap: 6px; }
+.luliy-bg-apply, .luliy-bg-clear {
+  flex: 1; padding: 7px 4px; border-radius: 8px; border: none;
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
   transition: filter 0.18s, transform 0.18s;
 }
-.luliy-bg-apply {
-  background: linear-gradient(90deg, #8250df, #c084fc);
-  color: #fff;
-}
-.luliy-bg-clear {
-  background: rgba(130,80,223,0.10);
-  color: #8250df;
-  border: 1px solid rgba(130,80,223,0.2);
-}
-[data-color-mode="dark"] .luliy-bg-clear {
-  color: #c084fc;
-  border-color: rgba(192,132,252,0.3);
-  background: rgba(192,132,252,0.08);
-}
-.luliy-bg-apply:hover,
-.luliy-bg-clear:hover {
-  filter: brightness(1.12);
-  transform: translateY(-1px);
-}
+.luliy-bg-apply { background: linear-gradient(90deg, #8250df, #c084fc); color: #fff; }
+.luliy-bg-clear { background: rgba(130,80,223,0.10); color: #8250df; border: 1px solid rgba(130,80,223,0.2); }
+[data-color-mode="dark"] .luliy-bg-clear { color: #c084fc; border-color: rgba(192,132,252,0.3); background: rgba(192,132,252,0.08); }
+.luliy-bg-apply:hover, .luliy-bg-clear:hover { filter: brightness(1.12); transform: translateY(-1px); }
