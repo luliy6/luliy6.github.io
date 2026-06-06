@@ -64,8 +64,7 @@
     }
     var tryUrls = [
       location.origin + '/postList.json',
-      '/postList.json',
-      'https://luliy.indevs.in/postList.json'
+      '/postList.json'
     ];
     function tryNext(urls) {
       if (!urls.length) return Promise.resolve([]);
@@ -487,7 +486,7 @@
       themeMenu.classList.remove('is-open'); skinMenu.classList.remove('is-open'); bgMenu.classList.remove('is-open');
     });
 
-    bar.appendChild(btnHome); bar.appendChild(btnGH); bar.appendChild(btnSfx);
+    bar.appendChild(btnSfx);
     bar.appendChild(themeWrap); bar.appendChild(skinWrap); bar.appendChild(bgWrap); bar.appendChild(btnSakura);
     document.body.appendChild(bar);
 
@@ -943,12 +942,19 @@
       var idx = -1;
       navPosts.forEach(function(p, i) {
         if (!p.link) return;
-        var lnk = p.link.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '');
-        /* Match by normalized path OR by full pathname ending */
-        if (lnk === curNorm ||
+        /* Normalize: strip leading slash, strip .html, strip trailing slash, strip leading 'post/' to get the slug */
+        function normLink(s) {
+          return s.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '').replace(/^post\//, '');
+        }
+        var lnkSlug = normLink(p.link);
+        var curSlug = normLink(curNorm);
+        /* Match by slug OR by full path */
+        if (lnkSlug === curSlug ||
+            lnkSlug === curNorm ||
+            p.link === curNorm ||
             curPath === '/' + p.link ||
             curPath === p.link ||
-            curPath.endsWith('/' + lnk)) {
+            curPath.endsWith('/' + lnkSlug)) {
           idx = i;
         }
       });
