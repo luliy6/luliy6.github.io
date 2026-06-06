@@ -38,23 +38,44 @@
     function norm(data) {
       if (Array.isArray(data)) return data;
       if (data && typeof data === 'object') {
-        return Object.keys(data).filter(function(k){return k !== 'labelColorDict';}).map(function(k){
-          var p = data[k] || {}; if (typeof p === 'string') p = {title: p};
-          return {
-            title: p.title || p.name || k,
-            link: p.link || p.url || ('post/' + k + '.html'),
-            created: p.created || p.date || p.updated || '',
-            labels: p.labels || p.tags || [],
-            desc: p.desc || p.description || ''
-          };
-        });
+        /* Extract labelColorDict first */
+        var colorDict = data.labelColorDict || {};
+        return Object.keys(data)
+          .filter(function(k){ return k !== 'labelColorDict'; })
+          .map(function(k){
+            var p = data[k] || {};
+            if (typeof p === 'string') p = {postTitle: p};
+            /* labels: array of strings, attach color from colorDict */
+            var rawLabels = p.labels || p.tags || [];
+            var labels = rawLabels.map(function(lbl) {
+              return {
+                name: lbl,
+                color: (colorDict[lbl] || '0969da').replace(/^#/, '')
+              };
+            });
+            return {
+              title: p.postTitle || p.title || p.name || k,
+              link: p.postUrl || p.link || p.url || ('post/' + k + '.html'),
+              created: p.createdDate || p.created || p.date || '',
+              labels: labels,
+              pinned: rawLabels.indexOf('pinned') >= 0
+            };
+          });
       }
       return [];
     }
-    return fetch('/postList.json', {cache: 'no-store'})
-      .then(function(r){ if (!r.ok) throw 0; return r.json(); })
-      .catch(function(){ return fetch('postList.json').then(function(r){ return r.ok ? r.json() : []; }); })
-      .then(norm);
+    var tryUrls = [
+      location.origin + '/postList.json',
+      '/postList.json',
+      'https://luliy.indevs.in/postList.json'
+    ];
+    function tryNext(urls) {
+      if (!urls.length) return Promise.resolve([]);
+      return fetch(urls[0], {cache: 'no-store'})
+        .then(function(r){ if (!r.ok) throw 0; return r.json(); })
+        .catch(function(){ return tryNext(urls.slice(1)); });
+    }
+    return tryNext(tryUrls).then(norm);
   }
 
   /* ---- 01  localStorage init ----------------------------- */
@@ -657,7 +678,7 @@
 
       displayPosts.forEach(function(post, idx) {
         /* Pinned: first post on first page gets pinned badge if pinnedNum matches */
-        var isPinned = (isIndex && pageNum === 1 && idx === 0 && pinnedNum > 0);
+        var isPinned = !!post.pinned;
         nav.appendChild(buildCard(post, isPinned));
       });
 
