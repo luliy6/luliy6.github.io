@@ -8,15 +8,15 @@
      4   Max-width layout
      5   Scrollbar
      6   Particle Canvas
-     7   Article List - cards (tags top, title bottom)
+     7   Article List - cards + Pinned Section
      8   macOS Code Blocks
      9   Image Lightbox
     10   Avatar Clock
-    11   Progress Bar (no back-to-top button here)
+    11   Progress Bar
     12   Floating Toolbar
     13   Favorites Lock Overlay
     14   Reading Skins
-    15   TOC - sticky, active highlight, scroll-spy
+    15   ArticleTOC - scroll-spy, active highlight
     16   Responsive
     17   Sakura Canvas
     18   Background Image Menu
@@ -147,7 +147,6 @@ body[data-luliy-theme="cyberpunk"] {
   color: var(--th-strong) !important;
   font-weight: bold !important;
 }
-/* theme-specific strong decorations */
 body[data-luliy-theme="default"]     #postBody strong { text-shadow: 0 0 8px rgba(240,180,41,0.3); }
 body[data-luliy-theme="classic-blue"] #postBody strong { border-bottom: 1px solid rgba(96,165,250,0.4); }
 body[data-luliy-theme="eco-green"]   #postBody strong { background: rgba(52,211,153,0.08); border-radius: 3px; padding: 0 3px; }
@@ -155,7 +154,6 @@ body[data-luliy-theme="sunset"]      #postBody strong { text-shadow: 0 1px 4px r
 body[data-luliy-theme="mono"]        #postBody strong { font-weight: 900 !important; letter-spacing: 0.02em; }
 body[data-luliy-theme="cyberpunk"]   #postBody strong { text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7; }
 
-/* Theme special rules */
 body[data-luliy-theme="sunset"]    #postBody h1 { text-transform:uppercase; letter-spacing:1px; }
 body[data-luliy-theme="sunset"]    #postBody h2 { border-bottom:1px dashed #ea580c !important; border-left:none !important; }
 body[data-luliy-theme="eco-green"] #postBody h5 { border-left:2px solid #34d399 !important; padding-left:8px; }
@@ -177,7 +175,7 @@ html { scroll-behavior: smooth; }
 ::selection { background: #f0b429; color: #000; }
 a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; }
 
-/* ---- 2  Navbar - compact hero ----------------------------- */
+/* ---- 2  Navbar ------------------------------------------- */
 #header {
   position: fixed !important;
   top: 0 !important; left: 0 !important;
@@ -204,7 +202,6 @@ a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; 
   box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
 }
 
-/* Left hero cluster: avatar + info */
 #luliy-hero-cluster {
   display: flex !important;
   align-items: center !important;
@@ -247,19 +244,11 @@ a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; 
 }
 [data-color-mode="dark"] #luliy-avatar-clock { color: #cba6f7 !important; }
 
-/* Hide Gmeek's default avatar / blogTitle rendering in header area
-   so our cluster is the sole branding element */
 #header .blogTitle,
-#header .postTitle {
-  display: none !important;
-}
-/* But if there's no hero cluster yet (non-enhanced page), show it */
+#header .postTitle { display: none !important; }
 #header.no-cluster .blogTitle,
-#header.no-cluster .postTitle {
-  display: block !important;
-}
+#header.no-cluster .postTitle { display: block !important; }
 
-/* Right: nav icons */
 .title-right {
   display: flex !important;
   align-items: center !important;
@@ -308,7 +297,6 @@ a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; 
 ::-webkit-scrollbar-thumb { background: #8250df; border-radius: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* Dot background */
 body {
   background-image: radial-gradient(rgba(9,105,218,0.09) 1px, transparent 1px);
   background-size: 25px 25px;
@@ -317,9 +305,7 @@ body {
   background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
 }
 body[style*="backgroundImage: url"],
-body[style*="background-image: url"] {
-  background-size: cover !important;
-}
+body[style*="background-image: url"] { background-size: cover !important; }
 
 /* ---- 6  Particle Canvas ----------------------------------- */
 #luliy-particle-canvas {
@@ -332,8 +318,44 @@ body[style*="background-image: url"] {
   pointer-events: none; z-index: 99998; transition: none;
 }
 
-/* ---- 7  Article List Cards - Tags TOP, Title BOTTOM ------- */
-/* Container becomes grid */
+/* ---- 7  Pinned Section + Article List Cards -------------- */
+
+/* === Pinned Section === */
+#luliy-pinned-section {
+  max-width: 1000px;
+  width: 95%;
+  margin: 0 auto 20px auto;
+  box-sizing: border-box;
+}
+.luliy-pinned-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #8250df;
+  letter-spacing: 1px;
+  padding: 6px 2px 10px 2px;
+  text-transform: uppercase;
+}
+[data-color-mode="dark"] .luliy-pinned-header { color: #cba6f7; }
+.luliy-pinned-pin { font-size: 15px; }
+.luliy-pinned-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(240,180,41,0.06), rgba(130,80,223,0.04));
+  border: 1.5px dashed rgba(240,180,41,0.4);
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(240,180,41,0.07), inset 0 0 0 1px rgba(240,180,41,0.06);
+}
+[data-color-mode="dark"] .luliy-pinned-grid {
+  background: linear-gradient(135deg, rgba(240,180,41,0.05), rgba(130,80,223,0.07));
+  border-color: rgba(240,180,41,0.28);
+}
+
+/* === Card Grid === */
 .luliy-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -343,7 +365,6 @@ body[style*="background-image: url"] {
   list-style: none;
 }
 
-/* SideNav hover effect (list pages) */
 .SideNav-item {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   border-left: 3px solid transparent !important;
@@ -430,7 +451,6 @@ body[style*="background-image: url"] {
   min-height: 32px;
   align-items: center;
 }
-/* Date chip */
 .luliy-card-date {
   font-size: 10px;
   color: #999;
@@ -459,7 +479,6 @@ body[style*="background-image: url"] {
 .luliy-card:hover .luliy-card-title { color: #8250df; }
 [data-color-mode="dark"] .luliy-card:hover .luliy-card-title { color: #cba6f7; }
 
-/* Card anchor wraps everything */
 .luliy-card > a {
   display: flex !important;
   flex-direction: column !important;
@@ -474,7 +493,6 @@ body[style*="background-image: url"] {
   box-shadow: 0 20px 50px rgba(0,0,0,0.55), 0 0 0 2px rgba(130,80,223,0.35), 0 0 34px rgba(130,80,223,0.18) !important;
 }
 
-/* Card fade-in animation */
 @keyframes luliy-fadeUp {
   from { opacity: 0; transform: translateY(22px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -487,7 +505,6 @@ body[style*="background-image: url"] {
 .luliy-card:nth-child(6) { animation-delay: 0.25s; }
 .luliy-card:nth-child(n+7) { animation-delay: 0.30s; }
 
-/* Label tag pills - keep original Gmeek style */
 a.Label {
   display: inline-flex !important;
   align-items: center !important;
@@ -505,6 +522,50 @@ a.Label {
 }
 a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 a.Label:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+
+/* Prev/Next navigation */
+.luliy-prevnext {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 2px dashed rgba(9,105,218,0.2);
+}
+.luliy-prevnext a {
+  flex: 1;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(9,105,218,0.05);
+  border: 1px solid rgba(9,105,218,0.15);
+  text-decoration: none;
+  transition: all 0.25s;
+  display: block;
+}
+.luliy-prevnext a:hover {
+  background: rgba(9,105,218,0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(9,105,218,0.15);
+}
+.luliy-prevnext .pn-label {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 4px;
+}
+.luliy-prevnext .pn-title {
+  display: block;
+  color: #0969da;
+  font-weight: bold;
+  font-size: 14px;
+  word-break: break-word;
+}
+[data-color-mode="dark"] .luliy-prevnext a {
+  background: rgba(9,105,218,0.08);
+  border-color: rgba(9,105,218,0.22);
+}
+[data-color-mode="dark"] .luliy-prevnext .pn-title { color: #60a5fa; }
+[data-color-mode="dark"] .luliy-prevnext .pn-label { color: #6c7086; }
 
 /* ---- 8  macOS Code Blocks --------------------------------- */
 #postBody pre {
@@ -529,7 +590,6 @@ a.Label:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.
     0 0 68px rgba(130,80,223,0.24) !important;
   transform: translateY(-1px);
 }
-/* Scanline overlay */
 #postBody pre::after {
   content: '';
   position: absolute; inset: 0;
@@ -543,7 +603,6 @@ a.Label:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.
   font-weight: normal !important;
 }
 
-/* macOS buttons - traffic lights */
 .mac-btn {
   position: absolute; top: 12px;
   width: 13px; height: 13px;
@@ -558,7 +617,6 @@ a.Label:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.
 .mac-btn-yellow { left: 34px; background: #febc2e; }
 .mac-btn-green  { left: 54px; background: #28c840; }
 
-/* Tooltip on hover */
 .mac-btn::after {
   content: attr(data-tip);
   position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
@@ -569,7 +627,6 @@ a.Label:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.
 }
 .mac-btn:hover::after { opacity: 1; }
 
-/* State changes */
 .mac-btn-red.is-copied    { background: #1f883d; }
 .mac-btn-yellow.is-folded { background: #8250df; }
 pre.is-folded > code      { display: none; }
@@ -613,10 +670,9 @@ pre.code-fullscreen .mac-btn-green { background: #ff5f57; }
 #luliy-lightbox-close:hover { background: rgba(255,255,255,0.28); }
 
 /* ---- 10  Avatar Clock ------------------------------------- */
-/* (styles are now inside #luliy-hero-cluster - see section 2) */
 a.luliy-avatar-link { display: inline-block; }
 
-/* ---- 11  Progress Bar (back-to-top merged into TOC) ------- */
+/* ---- 11  Progress Bar ------------------------------------- */
 #luliy-progress-bar {
   position: fixed; top: 0; left: 0;
   height: 3px; width: 0%;
@@ -778,94 +834,58 @@ body[data-skin="ocean"] #postBody h1 { color: #60a5fa !important; }
 body[data-skin="ocean"] #postBody h2 { color: #93c5fd !important; border-left-color: #60a5fa !important; }
 body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
 
-/* ---- 15  TOC - sticky panel with scroll-spy & back-to-top  */
-/* TOC panel wrapper injected by JS */
-#luliy-toc-panel {
-  position: fixed;
-  top: 80px;
-  right: 16px;
-  z-index: 8800;
-  display: none; /* JS shows on post pages */
-}
-#luliy-toc-panel.is-visible { display: block; }
+/* ---- 15  ArticleTOC - styled + scroll-spy active --------- */
 
-/* TOC toggle button (replaces old back-to-top) */
-#luliy-toc-btn {
-  width: 40px; height: 40px;
-  border-radius: 50%; border: none;
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(10px);
-  color: #24292f;
-  font-size: 17px; cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
-  position: relative;
+/* Base container for ArticleTOC */
+#TOC, .toc, .articletoc {
+  background: rgba(255,255,255,0.92) !important;
+  border: 1px solid rgba(130,80,223,0.20) !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  box-shadow: 0 4px 20px rgba(130,80,223,0.08) !important;
+  margin: 0 0 2em 0 !important;
 }
-[data-color-mode="dark"] #luliy-toc-btn {
-  background: rgba(30,30,50,0.88); color: #cdd6f4;
+[data-color-mode="dark"] #TOC,
+[data-color-mode="dark"] .toc,
+[data-color-mode="dark"] .articletoc {
+  background: rgba(20,20,40,0.92) !important;
+  border-color: rgba(130,80,223,0.32) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
 }
-#luliy-toc-btn:hover {
-  transform: translateY(-2px) scale(1.08);
-  box-shadow: 0 6px 18px rgba(130,80,223,0.3);
-}
-#luliy-toc-btn::after {
-  content: '目录';
-  position: absolute; right: 48px; top: 50%; transform: translateY(-50%);
-  background: rgba(0,0,0,0.78); color: #fff; font-size: 12px;
-  white-space: nowrap; padding: 4px 9px; border-radius: 6px;
-  pointer-events: none; opacity: 0; transition: opacity 0.18s; font-family: sans-serif;
-}
-#luliy-toc-btn:hover::after { opacity: 1; }
 
-/* TOC dropdown */
-#luliy-toc-dropdown {
-  display: none;
-  flex-direction: column;
-  background: rgba(255,255,255,0.96);
-  border: 1px solid rgba(130,80,223,0.22);
-  border-radius: 14px;
-  padding: 10px 0;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
-  backdrop-filter: blur(14px);
-  min-width: 220px;
-  max-width: 280px;
-  max-height: 60vh;
-  overflow-y: auto;
+/* Injected header row (label + back-to-top) */
+.luliy-toc-injected-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 8px 0;
   margin-bottom: 6px;
+  border-bottom: 1px solid rgba(130,80,223,0.14);
 }
-[data-color-mode="dark"] #luliy-toc-dropdown {
-  background: rgba(20,20,40,0.96); border-color: rgba(130,80,223,0.35);
+.luliy-toc-injected-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8250df;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
-#luliy-toc-dropdown.is-open { display: flex; }
+[data-color-mode="dark"] .luliy-toc-injected-label { color: #cba6f7; }
+.luliy-toc-injected-totop {
+  font-size: 11px;
+  cursor: pointer;
+  color: #8250df;
+  background: rgba(130,80,223,0.10);
+  border: none;
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.luliy-toc-injected-totop:hover { background: rgba(130,80,223,0.22); }
+[data-color-mode="dark"] .luliy-toc-injected-totop { color: #cba6f7; }
 
-/* TOC header row with back-to-top */
-#luliy-toc-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 4px 14px 8px 14px;
-  border-bottom: 1px solid rgba(130,80,223,0.12);
-  margin-bottom: 4px;
-}
-#luliy-toc-label {
-  font-size: 11px; font-weight: 700;
-  color: #8250df; letter-spacing: 1px; text-transform: uppercase;
-}
-[data-color-mode="dark"] #luliy-toc-label { color: #cba6f7; }
-#luliy-toc-totop {
-  font-size: 11px; cursor: pointer;
-  color: #8250df; background: rgba(130,80,223,0.10);
-  border: none; border-radius: 8px; padding: 3px 8px;
-  font-family: inherit; transition: background 0.15s;
-}
-#luliy-toc-totop:hover { background: rgba(130,80,223,0.22); }
-[data-color-mode="dark"] #luliy-toc-totop { color: #cba6f7; }
-
-/* TOC links list */
-#luliy-toc-list {
-  list-style: none; margin: 0; padding: 0 8px;
-}
-#luliy-toc-list li { margin: 0; }
-#luliy-toc-list a {
+/* TOC links */
+#TOC a, .toc a, .articletoc a {
   display: block;
   padding: 5px 8px;
   border-radius: 7px;
@@ -873,19 +893,26 @@ body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
   color: #57606a;
   text-decoration: none;
   line-height: 1.5;
-  transition: background 0.16s, color 0.16s, border-left 0.16s, padding-left 0.16s;
+  transition: background 0.16s, color 0.16s, padding-left 0.16s;
   border-left: 2px solid transparent;
   word-break: break-word;
 }
-[data-color-mode="dark"] #luliy-toc-list a { color: #848d97; }
-#luliy-toc-list a:hover {
+[data-color-mode="dark"] #TOC a,
+[data-color-mode="dark"] .toc a,
+[data-color-mode="dark"] .articletoc a { color: #848d97; }
+#TOC a:hover, .toc a:hover, .articletoc a:hover {
   background: rgba(130,80,223,0.08);
   color: #8250df;
 }
-[data-color-mode="dark"] #luliy-toc-list a:hover { color: #cba6f7; }
+[data-color-mode="dark"] #TOC a:hover,
+[data-color-mode="dark"] .toc a:hover,
+[data-color-mode="dark"] .articletoc a:hover { color: #cba6f7; }
 
-/* Active state - scroll-spy highlight */
-#luliy-toc-list a.luliy-toc-active {
+/* Active / scroll-spy highlight */
+#TOC a.active, #TOC a.luliy-toc-active,
+.toc a.active, .toc a.luliy-toc-active,
+.articletoc a.active, .articletoc a.luliy-toc-active,
+.luliy-toc-active {
   background:
     repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(240,180,41,0.06) 3px, rgba(240,180,41,0.06) 6px),
     linear-gradient(135deg, rgba(240,180,41,0.16), rgba(130,80,223,0.09)) !important;
@@ -894,60 +921,30 @@ body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
   border-left: 3px solid #f0b429 !important;
   padding-left: 10px !important;
   border-radius: 0 7px 7px 0 !important;
-}
-[data-color-mode="dark"] #luliy-toc-list a.luliy-toc-active {
-  color: #f0b429 !important;
-}
-
-/* H2 vs H3 indent */
-#luliy-toc-list li[data-level="2"] a { padding-left: 8px; }
-#luliy-toc-list li[data-level="3"] a { padding-left: 20px; font-size: 11px; }
-#luliy-toc-list li[data-level="3"] a.luliy-toc-active { padding-left: 24px !important; }
-
-/* Keep original articletoc TOC also highlighted */
-#TOC a.active,
-.toc a.active,
-.articletoc a.active,
-.toc-item.active > a,
-[id*="toc"] a.active,
-.luliy-toc-active {
-  background:
-    repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(240,180,41,0.07) 3px, rgba(240,180,41,0.07) 6px),
-    linear-gradient(135deg, rgba(240,180,41,0.18), rgba(130,80,223,0.10)) !important;
-  color: #d03a00 !important;
-  font-weight: 700 !important;
-  border-left: 3px solid #f0b429 !important;
-  padding-left: 8px !important;
-  border-radius: 0 4px 4px 0 !important;
   display: block !important;
 }
-#TOC, .toc, .articletoc {
-  background: rgba(255,255,255,0.90) !important;
-  border: 1px solid rgba(130,80,223,0.18) !important;
-  border-radius: 10px !important;
-  padding: 12px 14px !important;
-}
-[data-color-mode="dark"] #TOC,
-[data-color-mode="dark"] .toc,
-[data-color-mode="dark"] .articletoc {
-  background: rgba(20,20,40,0.90) !important;
-  border-color: rgba(130,80,223,0.30) !important;
+[data-color-mode="dark"] #TOC a.active,
+[data-color-mode="dark"] #TOC a.luliy-toc-active,
+[data-color-mode="dark"] .toc a.active,
+[data-color-mode="dark"] .toc a.luliy-toc-active,
+[data-color-mode="dark"] .articletoc a.active,
+[data-color-mode="dark"] .articletoc a.luliy-toc-active {
+  color: #f0b429 !important;
 }
 
 /* ---- 16  Responsive --------------------------------------- */
 @media (max-width: 768px) {
   #content, .main { padding: 0 12px !important; width: 100% !important; }
   #luliy-toolbar  { right: 8px; }
-  #luliy-toc-panel { right: 8px; }
   #postBody { font-size: 16px !important; line-height: 1.85 !important; }
   #postBody h1 { font-size: 1.5rem !important; }
   #postBody h2 { font-size: 1.2rem !important; }
   #postBody pre { font-size: 13px !important; }
   .luliy-card-grid { grid-template-columns: 1fr; }
+  .luliy-pinned-grid { grid-template-columns: 1fr; }
   .luliy-tb-btn::after { display: none; }
-  #luliy-toc-btn::after { display: none; }
-  #luliy-bg-menu { min-width: 180px; }
   #luliy-hero-banner { margin-top: 64px; }
+  .luliy-prevnext { flex-direction: column; }
 }
 
 /* ---- 17  Sakura Canvas ------------------------------------ */
