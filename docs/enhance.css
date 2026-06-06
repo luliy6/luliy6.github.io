@@ -164,10 +164,14 @@ a[target='_blank']::after { content: ' ↗'; font-size: 0.75em; opacity: 0.6; }
   top: 0 !important; left: 0 !important;
   width: 100% !important;
   min-height: 65px !important; height: auto !important;
-  background: rgba(255,255,255,0.75) !important;
+  background: rgba(255,255,255,0.82) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
-  padding: 12px 20px !important;
+  /* align to same 1000px column as body content */
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  padding-left: clamp(16px, calc((100vw - 1000px) / 2 + 20px), 50%) !important;
+  padding-right: clamp(16px, calc((100vw - 1000px) / 2 + 20px), 50%) !important;
   border-bottom: 1px solid rgba(0,0,0,0.08) !important;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
   display: flex !important;
@@ -712,6 +716,67 @@ body[data-skin="ocean"] #postBody h3 { color: #bfdbfe !important; }
   pointer-events: none;
   z-index: 1;
   opacity: 0.88;
+}
+
+/* ── §16b Label/tag 紧凑对齐修复 ─────────────────────────── */
+/* Gmeek 默认的 .Label 标签有错位和过大背景问题，统一修正 */
+a.Label {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 1px 8px !important;
+  border-radius: 20px !important;
+  font-size: 11px !important;
+  line-height: 18px !important;
+  height: 20px !important;
+  margin: 0 3px 3px 0 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  box-sizing: border-box !important;
+}
+a.Label * {
+  vertical-align: middle !important;
+  line-height: 1 !important;
+}
+
+/* ── §16c TOC 当前高亮 + 背景纹理 ───────────────────────── */
+/* articletoc.js 给当前标题对应链接加 .active 类 */
+#TOC a.active,
+.toc a.active,
+.articletoc a.active,
+.toc-item.active > a,
+[id*="toc"] a.active,
+.luliy-toc-active {
+  /* 渐变 + 45° 斜线纹理 */
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 3px,
+      rgba(240,180,41,0.07) 3px,
+      rgba(240,180,41,0.07) 6px
+    ),
+    linear-gradient(135deg, rgba(240,180,41,0.18), rgba(130,80,223,0.10)) !important;
+  color: #d03a00 !important;
+  font-weight: 700 !important;
+  border-left: 3px solid #f0b429 !important;
+  padding-left: 8px !important;
+  border-radius: 0 4px 4px 0 !important;
+  display: block !important;
+}
+/* TOC 容器 */
+#TOC, .toc, .articletoc {
+  background: rgba(255,255,255,0.90) !important;
+  border: 1px solid rgba(130,80,223,0.18) !important;
+  border-radius: 10px !important;
+  padding: 12px 14px !important;
+}
+[data-color-mode="dark"] #TOC,
+[data-color-mode="dark"] .toc,
+[data-color-mode="dark"] .articletoc {
+  background: rgba(20,20,40,0.90) !important;
+  border-color: rgba(130,80,223,0.30) !important;
 }
 
 /* ── §17 背景图片菜单 ────────────────────────────────────── */
