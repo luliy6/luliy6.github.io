@@ -546,7 +546,7 @@
     setTimeout(function(){ inp.focus(); }, 120);
   }
 
-  /* ---- 14  Home card rebuild — Hex grid layout ------------ */
+  /* ---- 14  Home card rebuild — Rectangle card grid ---------- */
   function initCards() {
     /* Do not run on the tag page — it uses .SideNav for label listing */
     if (/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
@@ -554,17 +554,15 @@
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
 
-    /* Build a single hexagon card element */
+    /* Build a single card element */
     function buildCard(post, isPinned, colourIdx) {
-      /* Outer wrapper: drop-shadow host (clip-path kills box-shadow) */
       var wrapper = document.createElement('li');
-      wrapper.className = 'luliy-hex-wrap';
+      wrapper.className = 'luliy-card-wrap';
       if (isPinned) wrapper.setAttribute('data-pinned', '1');
 
-      /* Hexagon shape container */
-      var hex = document.createElement('a');
-      hex.className = 'luliy-hex';
-      hex.href = (function() {
+      var card = document.createElement('a');
+      card.className = 'luliy-card';
+      card.href = (function() {
         var lnk = post.link || '#';
         if (lnk !== '#') {
           lnk = lnk.replace(/^\//, '');
@@ -574,49 +572,46 @@
         }
         return lnk;
       })();
-      /* Colour index cycles 0-3 and reads from CSS vars */
-      hex.setAttribute('data-ci', String((colourIdx || 0) % 4));
+      card.setAttribute('data-ci', String((colourIdx || 0) % 4));
 
-      /* Date — top center */
+      /* Date — top */
       var dateEl = document.createElement('span');
-      dateEl.className = 'luliy-hex-date';
+      dateEl.className = 'luliy-card-date';
       dateEl.textContent = post.created ? post.created.slice(0, 10) : '';
 
-      /* Title — center bold */
+      /* Title — middle */
       var titleEl = document.createElement('span');
-      titleEl.className = 'luliy-hex-title';
+      titleEl.className = 'luliy-card-title';
       titleEl.textContent = post.title || '\u65e0\u9898';
 
-      /* Tags — bottom pills */
+      /* Tags — bottom */
       var tagsEl = document.createElement('div');
-      tagsEl.className = 'luliy-hex-tags';
+      tagsEl.className = 'luliy-card-tags';
       var labels = Array.isArray(post.labels) ? post.labels : [];
       labels.forEach(function(lbl) {
         var info = (typeof lbl === 'object') ? lbl : {name: lbl, color: '0969da'};
         if ((info.name || lbl) === 'pinned') return;
         var pill = document.createElement('a');
-        pill.className = 'luliy-hex-pill';
+        pill.className = 'luliy-card-pill';
         pill.href = '/tag.html#' + encodeURIComponent(info.name || lbl);
         pill.textContent = info.name || lbl;
         pill.style.background = '#' + (info.color || '0969da').replace('#','');
         tagsEl.appendChild(pill);
       });
 
-      hex.appendChild(dateEl);
-      hex.appendChild(titleEl);
-      hex.appendChild(tagsEl);
-      wrapper.appendChild(hex);
+      card.appendChild(dateEl);
+      card.appendChild(titleEl);
+      card.appendChild(tagsEl);
+      wrapper.appendChild(card);
       return wrapper;
     }
 
     fetchPosts().then(function(posts) {
       if (!posts || !posts.length) { fallbackDomCards(nav); return; }
 
-      /* Separate pinned and regular */
       var pinnedPosts  = posts.filter(function(p){ return p.pinned; });
       var regularPosts = posts.filter(function(p){ return !p.pinned; });
 
-      /* Pagination (only regular posts paginate) */
       var pageMatch = location.search.match(/[?&]page=([0-9]+)/);
       var pageNum = pageMatch ? parseInt(pageMatch[1]) : 1;
       var perPage = 12;
@@ -628,7 +623,6 @@
         displayPosts = regularPosts.slice(start, start + perPage);
       }
 
-      /* Insert pinned section above the card grid (only page 1) */
       if (pinnedPosts.length > 0 && isIndex && pageNum === 1) {
         var existing = document.getElementById('luliy-pinned-section');
         if (existing) existing.remove();
@@ -637,38 +631,34 @@
         ps.id = 'luliy-pinned-section';
 
         var pg = document.createElement('ul');
-        pg.className = 'luliy-hex-grid luliy-pinned-grid';
+        pg.className = 'luliy-card-grid luliy-pinned-grid';
         pinnedPosts.forEach(function(post, i){ pg.appendChild(buildCard(post, true, i)); });
         ps.appendChild(pg);
-
-        /* Insert before the nav (card grid) */
         nav.parentNode.insertBefore(ps, nav);
       }
 
-      /* Rebuild main card grid — hex layout */
       nav.innerHTML = '';
-      nav.className = 'luliy-hex-grid';
+      nav.className = 'luliy-card-grid';
       displayPosts.forEach(function(post, i){ nav.appendChild(buildCard(post, false, i)); });
 
     }).catch(function(){ fallbackDomCards(nav); });
 
-    /* Fallback: use existing DOM items as simple hex wrappers */
     function fallbackDomCards(container) {
-      container.className = 'luliy-hex-grid';
+      container.className = 'luliy-card-grid';
       container.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function(li, i) {
-        li.className = 'luliy-hex-wrap';
+        li.className = 'luliy-card-wrap';
         var existingA = li.querySelector('a');
         if (!existingA) return;
         var rawText = (existingA.innerText || existingA.textContent || '').trim();
         var href = existingA.href;
         li.innerHTML = '';
-        var hex = document.createElement('a'); hex.className = 'luliy-hex'; hex.href = href;
-        hex.setAttribute('data-ci', String(i % 4));
-        var d = document.createElement('span'); d.className = 'luliy-hex-date';
-        var t = document.createElement('span'); t.className = 'luliy-hex-title'; t.textContent = rawText || '\u65e0\u9898';
-        var tg = document.createElement('div'); tg.className = 'luliy-hex-tags';
-        hex.appendChild(d); hex.appendChild(t); hex.appendChild(tg);
-        li.appendChild(hex);
+        var card = document.createElement('a'); card.className = 'luliy-card'; card.href = href;
+        card.setAttribute('data-ci', String(i % 4));
+        var d = document.createElement('span'); d.className = 'luliy-card-date';
+        var t = document.createElement('span'); t.className = 'luliy-card-title'; t.textContent = rawText || '\u65e0\u9898';
+        var tg = document.createElement('div'); tg.className = 'luliy-card-tags';
+        card.appendChild(d); card.appendChild(t); card.appendChild(tg);
+        li.appendChild(card);
       });
     }
   }
