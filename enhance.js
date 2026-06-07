@@ -370,7 +370,8 @@
     {id:'default',   label:'\u9ed8\u8ba4',      bg:'transparent', border:'#8250df'},
     {id:'parchment', label:'\u7f8a\u76ae\u7eb8', bg:'#fdf6e3',     border:'#b5651d'},
     {id:'ink',       label:'\u6c34\u58a8',       bg:'#1a1a1a',     border:'#888'},
-    {id:'ocean',     label:'\u6df1\u6d77\u84dd', bg:'#0d1b2a',     border:'#60a5fa'}
+    {id:'ocean',     label:'\u6df1\u6d77\u84dd', bg:'#0d1b2a',     border:'#60a5fa'},
+    {id:'sakura',    label:'\u6a31\u82b1\u5c11\u5973', bg:'#fff0f5',  border:'#f9a8c9'}
   ];
 
   function applyTheme(id) {
@@ -561,6 +562,8 @@
 
   /* ---- 14  Home card rebuild - Pinned section + card grid - */
   function initCards() {
+    /* Do not run on the tag page — it uses .SideNav for label listing */
+    if (/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
     var nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
@@ -577,14 +580,6 @@
       /* Tags row (top) */
       var tagsRow = document.createElement('div');
       tagsRow.className = 'luliy-card-tags';
-
-      /* Pinned badge */
-      if (isPinned) {
-        var pin = document.createElement('span');
-        pin.style.cssText = 'font-size:10px;padding:1px 7px;border-radius:10px;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:700;margin-right:3px;white-space:nowrap';
-        pin.textContent = '\uD83D\uDCCC \u7f6e\u9876';
-        tagsRow.appendChild(pin);
-      }
 
       /* Labels */
       var labels = Array.isArray(post.labels) ? post.labels : [];
@@ -646,11 +641,6 @@
 
         var ps = document.createElement('div');
         ps.id = 'luliy-pinned-section';
-
-        var ph = document.createElement('div');
-        ph.className = 'luliy-pinned-header';
-        ph.innerHTML = '<span class="luliy-pinned-pin">\uD83D\uDCCC</span>\u7f6e\u9876\u6587\u7ae0';
-        ps.appendChild(ph);
 
         var pg = document.createElement('ul');
         pg.className = 'luliy-pinned-grid';
@@ -977,7 +967,15 @@
           return empty;
         }
         var a = document.createElement('a');
-        a.href = post.link;
+        /* Ensure link always starts with /post/ without doubling */
+        var lnk = post.link || '#';
+        if (lnk !== '#') {
+          lnk = lnk.replace(/^\//, '');          /* strip leading slash */
+          lnk = lnk.replace(/^post\/post\//, 'post/'); /* fix double post/ */
+          if (!/^post\//.test(lnk) && !/^https?:\/\//.test(lnk)) lnk = 'post/' + lnk;
+          lnk = '/' + lnk;
+        }
+        a.href = lnk;
         a.style.textAlign = align;
         a.innerHTML =
           '<span class="pn-label">' + esc(labelText) + '</span>' +
