@@ -332,7 +332,7 @@ body[style*="background-image: url"] { background-size: cover !important; }
   pointer-events: none; z-index: 99998; transition: none;
 }
 
-/* ---- 7  Hexagonal Card Grid + Pinned Section ------------- */
+/* ---- 7  Rectangle Card Grid + Pinned Section ------------- */
 
 /* === Pinned Section wrapper === */
 #luliy-pinned-section {
@@ -342,225 +342,217 @@ body[style*="background-image: url"] { background-size: cover !important; }
   box-sizing: border-box;
 }
 
-/* === Hex grid container === */
-.luliy-hex-grid {
+/* === Card grid: 3 columns === */
+.luliy-card-grid {
   list-style: none;
   margin: 0 auto;
   padding: 0 0 48px 0;
   max-width: 1040px;
   width: 95%;
   box-sizing: border-box;
-
-  /* 每行4列蜂窝布局 */
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
-/* Pinned section: 轻微区分但不突兀 */
+/* Pinned section subtle highlight */
 .luliy-pinned-grid {
-  padding: 16px 16px 32px 16px;
+  padding: 16px;
   background: rgba(240,180,41,0.04);
-  border: 1.5px dashed rgba(240,180,41,0.30);
-  border-radius: 20px;
+  border: 1.5px dashed rgba(240,180,41,0.35);
+  border-radius: 16px;
   margin-bottom: 20px;
+  gap: 14px;
 }
 [data-color-mode="dark"] .luliy-pinned-grid {
-  background: rgba(240,180,41,0.04);
-  border-color: rgba(240,180,41,0.20);
+  background: rgba(240,180,41,0.05);
+  border-color: rgba(240,180,41,0.22);
 }
 
-/* ── 蜂窝偏移：偶数行（5-8, 13-16, 21-24）右移半格 ─── */
-.luliy-hex-wrap:nth-child(n+5):nth-child(-n+8)   { transform: translateX(50%); }
-.luliy-hex-wrap:nth-child(n+13):nth-child(-n+16)  { transform: translateX(50%); }
-.luliy-hex-wrap:nth-child(n+21):nth-child(-n+24)  { transform: translateX(50%); }
-
-/* 行间紧密咬合的负边距 */
-.luliy-hex-wrap:nth-child(n+5) { margin-top: -28px; }
-
-/* ── Hex wrapper：drop-shadow 宿主（clip-path 会裁掉 box-shadow） ── */
-.luliy-hex-wrap {
-  position: relative;
+/* === Card wrapper === */
+.luliy-card-wrap {
+  list-style: none;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 5px;
-  box-sizing: border-box;
 }
 
-/* ── 六边形主体：白色卡片风格 ─────────────────────────────── */
-.luliy-hex {
-  position: relative;
+/* === Card body === */
+.luliy-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
   width: 100%;
-  aspect-ratio: 1 / 1.155;           /* 标准平顶六边形比例 */
-  padding: 20% 12% 16%;
+  padding: 16px 18px 14px;
   box-sizing: border-box;
   text-decoration: none;
-  color: #1a1a2e;
-
-  /* 六边形剪裁 */
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-
-  /* 白色背景，带极淡渐变 */
-  background: linear-gradient(160deg, #ffffff 0%, #f8f6ff 60%, #f3f0ff 100%);
-
-  /* drop-shadow 模拟阴影（clip-path 后 box-shadow 失效） */
-  filter:
-    drop-shadow(0 3px 10px rgba(130,80,223,0.13))
-    drop-shadow(0 1px 3px rgba(0,0,0,0.06));
-
+  border-radius: 14px;
+  border: 1px solid rgba(130,80,223,0.13);
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(130,80,223,0.07), 0 1px 3px rgba(0,0,0,0.04);
   transition:
-    filter    0.28s cubic-bezier(.4,0,.2,1),
-    transform 0.28s cubic-bezier(.4,0,.2,1),
-    background 0.28s;
-
+    transform 0.25s cubic-bezier(.4,0,.2,1),
+    box-shadow 0.25s cubic-bezier(.4,0,.2,1),
+    border-color 0.25s;
   cursor: pointer;
+  position: relative;
   overflow: hidden;
 }
 
-/* 六边形内壁边框效果：用伪元素画一圈细描边 */
-.luliy-hex::before {
+/* 左侧彩色边条 — 4 种循环颜色 */
+.luliy-card::before {
   content: '';
-  position: absolute; inset: 0;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  background: transparent;
-  /* 用 outline 模拟描边不生效，改用内嵌渐变边框 */
-  box-shadow: inset 0 0 0 1.5px rgba(200,185,240,0.55);
-  pointer-events: none;
-  z-index: 0;
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 14px 0 0 14px;
+  transition: width 0.25s;
+}
+.luliy-card[data-ci="0"]::before { background: #8250df; }
+.luliy-card[data-ci="1"]::before { background: #0969da; }
+.luliy-card[data-ci="2"]::before { background: #f0b429; }
+.luliy-card[data-ci="3"]::before { background: #e85d9a; }
+
+/* Hover */
+.luliy-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(130,80,223,0.18), 0 2px 8px rgba(0,0,0,0.06);
+  border-color: rgba(130,80,223,0.30);
+}
+.luliy-card:hover::before { width: 6px; }
+
+/* ── 暗色模式：高对比度可见 ── */
+[data-color-mode="dark"] .luliy-card {
+  background: #1e1b2e;
+  border-color: rgba(130,80,223,0.28);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.40), 0 1px 4px rgba(130,80,223,0.15);
+}
+[data-color-mode="dark"] .luliy-card:hover {
+  background: #231f38;
+  border-color: rgba(130,80,223,0.55);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.55), 0 2px 10px rgba(130,80,223,0.30);
 }
 
-/* 顶部极淡色带——区分4种卡片颜色 */
-.luliy-hex[data-ci="0"] { background: linear-gradient(170deg, #f0e8ff 0%, #ffffff 30%, #fafafa 100%); }
-.luliy-hex[data-ci="1"] { background: linear-gradient(170deg, #e8f0ff 0%, #ffffff 30%, #fafafa 100%); }
-.luliy-hex[data-ci="2"] { background: linear-gradient(170deg, #ffe8f4 0%, #ffffff 30%, #fafafa 100%); }
-.luliy-hex[data-ci="3"] { background: linear-gradient(170deg, #fff8e0 0%, #ffffff 30%, #fafafa 100%); }
+/* ── 卡片内容 ── */
 
-/* ── 暗色模式 ── */
-[data-color-mode="dark"] .luliy-hex {
-  background: linear-gradient(160deg, #1e1a35 0%, #181530 60%, #141228 100%);
-  filter:
-    drop-shadow(0 4px 16px rgba(0,0,0,0.45))
-    drop-shadow(0 1px 4px rgba(130,80,223,0.20));
-}
-[data-color-mode="dark"] .luliy-hex[data-ci="0"] { background: linear-gradient(170deg, #2a1f45 0%, #1a1535 30%, #141228 100%); }
-[data-color-mode="dark"] .luliy-hex[data-ci="1"] { background: linear-gradient(170deg, #1a2040 0%, #141830 30%, #101428 100%); }
-[data-color-mode="dark"] .luliy-hex[data-ci="2"] { background: linear-gradient(170deg, #2e1830 0%, #1e1530 30%, #141228 100%); }
-[data-color-mode="dark"] .luliy-hex[data-ci="3"] { background: linear-gradient(170deg, #2a2010 0%, #1e1a18 30%, #141210 100%); }
-
-/* ── Hover 效果 ── */
-.luliy-hex:hover {
-  transform: scale(1.07) translateY(-5px);
-  filter:
-    drop-shadow(0 12px 28px rgba(130,80,223,0.28))
-    drop-shadow(0 2px 8px rgba(130,80,223,0.16));
-  z-index: 2;
-}
-[data-color-mode="dark"] .luliy-hex:hover {
-  filter:
-    drop-shadow(0 14px 32px rgba(0,0,0,0.60))
-    drop-shadow(0 2px 10px rgba(130,80,223,0.40));
-}
-
-/* ── 卡片内部文字 ───────────────────────────────────────────── */
-
-/* 日期——顶部，灰色小字 */
-.luliy-hex-date {
-  position: relative; z-index: 1;
-  font-size: 10.5px;
+/* 日期 */
+.luliy-card-date {
+  font-size: 11px;
   color: #9ca3af;
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.3px;
-  text-align: center;
-  line-height: 1;
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
-[data-color-mode="dark"] .luliy-hex-date { color: #6b7280; }
+[data-color-mode="dark"] .luliy-card-date { color: #6b7280; }
 
-/* 标题——中央，深色粗体 */
-.luliy-hex-title {
-  position: relative; z-index: 1;
-  font-size: 14px;
+/* 标题 */
+.luliy-card-title {
+  font-size: 14.5px;
   font-weight: 700;
   color: #1f2937;
-  text-align: center;
-  line-height: 1.45;
+  line-height: 1.5;
   word-break: break-word;
-  padding: 0 6px;
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-bottom: 12px;
 }
-[data-color-mode="dark"] .luliy-hex-title { color: #e5e7eb; }
-.luliy-hex:hover .luliy-hex-title { color: #7c3aed; }
-[data-color-mode="dark"] .luliy-hex:hover .luliy-hex-title { color: #c084fc; }
+[data-color-mode="dark"] .luliy-card-title { color: #e2e8f0; }
+.luliy-card:hover .luliy-card-title { color: #7c3aed; }
+[data-color-mode="dark"] .luliy-card:hover .luliy-card-title { color: #c084fc; }
 
-/* 标签——底部，彩色小药丸 */
-.luliy-hex-tags {
-  position: relative; z-index: 1;
+/* 标签行 */
+.luliy-card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  justify-content: center;
+  gap: 5px;
   flex-shrink: 0;
-  max-width: 100%;
 }
-.luliy-hex-pill {
+.luliy-card-pill {
   display: inline-block;
-  padding: 2px 9px;
+  padding: 2px 10px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
-  line-height: 17px;
+  line-height: 18px;
   white-space: nowrap;
-  max-width: 80px;
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.95;
-  transition: transform 0.15s, opacity 0.15s;
+  opacity: 0.92;
+  transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
 }
-.luliy-hex-pill:hover { opacity: 1; transform: scale(1.08); }
-
-/* Staggered fade-in 动画 */
-@keyframes luliy-hexIn {
-  from { opacity: 0; transform: scale(0.84) translateY(20px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+.luliy-card-pill:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
 }
-.luliy-hex-wrap { animation: luliy-hexIn 0.40s cubic-bezier(.4,0,.2,1) both; }
-.luliy-hex-wrap:nth-child(2)  { animation-delay: 0.04s; }
-.luliy-hex-wrap:nth-child(3)  { animation-delay: 0.08s; }
-.luliy-hex-wrap:nth-child(4)  { animation-delay: 0.12s; }
-.luliy-hex-wrap:nth-child(5)  { animation-delay: 0.16s; }
-.luliy-hex-wrap:nth-child(6)  { animation-delay: 0.20s; }
-.luliy-hex-wrap:nth-child(7)  { animation-delay: 0.24s; }
-.luliy-hex-wrap:nth-child(8)  { animation-delay: 0.28s; }
-.luliy-hex-wrap:nth-child(n+9) { animation-delay: 0.32s; }
 
-/* 手机端：2列蜂窝 */
+/* Staggered fade-in */
+@keyframes luliy-cardIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.luliy-card-wrap { animation: luliy-cardIn 0.38s cubic-bezier(.4,0,.2,1) both; }
+.luliy-card-wrap:nth-child(2)  { animation-delay: 0.05s; }
+.luliy-card-wrap:nth-child(3)  { animation-delay: 0.10s; }
+.luliy-card-wrap:nth-child(4)  { animation-delay: 0.14s; }
+.luliy-card-wrap:nth-child(5)  { animation-delay: 0.18s; }
+.luliy-card-wrap:nth-child(6)  { animation-delay: 0.22s; }
+.luliy-card-wrap:nth-child(7)  { animation-delay: 0.26s; }
+.luliy-card-wrap:nth-child(8)  { animation-delay: 0.30s; }
+.luliy-card-wrap:nth-child(n+9) { animation-delay: 0.34s; }
+
+/* 手机端：1列 */
 @media (max-width: 768px) {
-  .luliy-hex-grid { grid-template-columns: repeat(2, 1fr); }
-  /* 重置4列偏移，改为2列偏移规则 */
-  .luliy-hex-wrap:nth-child(n+5):nth-child(-n+8)  { transform: none; }
-  .luliy-hex-wrap:nth-child(n+13):nth-child(-n+16) { transform: none; }
-  .luliy-hex-wrap:nth-child(n+21):nth-child(-n+24) { transform: none; }
-  .luliy-hex-wrap:nth-child(n+3):nth-child(-n+4)   { transform: translateX(50%); }
-  .luliy-hex-wrap:nth-child(n+7):nth-child(-n+8)   { transform: translateX(50%); }
-  .luliy-hex-wrap:nth-child(n+11):nth-child(-n+12) { transform: translateX(50%); }
-  .luliy-hex-wrap:nth-child(n+15):nth-child(-n+16) { transform: translateX(50%); }
-  .luliy-hex-wrap:nth-child(n+19):nth-child(-n+20) { transform: translateX(50%); }
-  .luliy-hex-wrap:nth-child(n+23):nth-child(-n+24) { transform: translateX(50%); }
-  .luliy-hex-wrap:nth-child(n+3) { margin-top: -20px; }
-  .luliy-hex-wrap { padding: 4px 3px; }
-  .luliy-hex-title { font-size: 11px; }
-  .luliy-hex-date, .luliy-hex-tags { display: none; }
+  .luliy-card-grid { grid-template-columns: 1fr; gap: 12px; }
+  .luliy-card-title { font-size: 13.5px; }
 }
+/* 平板：2列 */
+@media (min-width: 769px) and (max-width: 960px) {
+  .luliy-card-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── 表格：白天模式适配 ─────────────────────────────────────── */
+#postBody table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  font-size: 14px;
+}
+#postBody th {
+  background: rgba(130,80,223,0.10);
+  color: #3b3b5c;
+  font-weight: 700;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 2px solid rgba(130,80,223,0.20);
+}
+#postBody td {
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  color: #374151;
+  vertical-align: top;
+}
+#postBody tr:last-child td { border-bottom: none; }
+#postBody tr:nth-child(even) td { background: rgba(130,80,223,0.03); }
+#postBody tr:hover td {
+  background: rgba(130,80,223,0.07);
+  transition: background 0.15s;
+}
+/* 暗色模式表格 */
+[data-color-mode="dark"] #postBody th {
+  background: rgba(130,80,223,0.22);
+  color: #cba6f7;
+  border-bottom-color: rgba(130,80,223,0.35);
+}
+[data-color-mode="dark"] #postBody td {
+  color: #c9d1d9;
+  border-bottom-color: rgba(255,255,255,0.07);
+}
+[data-color-mode="dark"] #postBody tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+[data-color-mode="dark"] #postBody tr:hover td { background: rgba(130,80,223,0.12); }
 
 /* Tag page: preserve SideNav-item default look */
 .SideNav-item {
