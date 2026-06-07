@@ -5,7 +5,7 @@
    03  Dynamic title
    04  Uptime counter
    05  Dark-mode ripple
-   06  Particle background
+   06  Static background image (particles removed)
    07  Web Audio SFX
    08  Click sparks
    09  Compact hero cluster
@@ -13,7 +13,7 @@
    11  Image lightbox
    12  Floating toolbar (sfx / sink / sakura)  — bg removed, theme+skin merged
    13  Favorites lock (SHA-256)
-   14  Home card rebuild - hexagonal grid layout
+   14  Home card rebuild - rounded-rect cards with gradient border
    15  macOS code block buttons
    16  Sakura petals
    17  ArticleTOC scroll-spy + back-to-top (replaces custom floating TOC)
@@ -152,58 +152,8 @@
     }, 800);
   }
 
-  /* ---- 06  Particle background --------------------------- */
-  function initParticles() {
-    if (document.getElementById('luliy-particle-canvas')) return;
-    var canvas = document.createElement('canvas'); canvas.id = 'luliy-particle-canvas';
-    document.body.insertBefore(canvas, document.body.firstChild);
-    var ctx = canvas.getContext('2d'), W, H;
-    function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-    resize(); window.addEventListener('resize', resize, {passive: true});
-    var mouse = {x: -9999, y: -9999, active: false};
-    document.addEventListener('mousemove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; }, {passive: true});
-    document.addEventListener('mouseleave', function(){ mouse.active = false; });
-    var pts = [];
-    for (var i = 0; i < 80; i++) pts.push({
-      x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.6, vy: (Math.random() - 0.5) * 0.6,
-      r: Math.random() * 2.2 + 0.8, hue: Math.floor(Math.random() * 60) + 240
-    });
-    function tick() {
-      ctx.clearRect(0, 0, W, H);
-      var dark = document.documentElement.getAttribute('data-color-mode') === 'dark', alpha = dark ? 0.7 : 0.45;
-      pts.forEach(function(p) {
-        if (mouse.active) {
-          var dx = mouse.x - p.x, dy = mouse.y - p.y, d = Math.sqrt(dx*dx + dy*dy);
-          if (d < 220 && d > 60) { var f = 0.018 * (1 - d/220); p.vx += dx/d*f; p.vy += dy/d*f; }
-          else if (d <= 60) { p.vx -= dx/d*0.04; p.vy -= dy/d*0.04; }
-        }
-        p.vx *= 0.98; p.vy *= 0.98;
-        var spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
-        if (spd > 3) { p.vx = p.vx/spd*3; p.vy = p.vy/spd*3; }
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0) { p.x = 0; p.vx *= -1; } if (p.x > W) { p.x = W; p.vx *= -1; }
-        if (p.y < 0) { p.y = 0; p.vy *= -1; } if (p.y > H) { p.y = H; p.vy *= -1; }
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = 'hsla(' + p.hue + ',80%,65%,' + alpha + ')'; ctx.fill();
-      });
-      for (var a = 0; a < pts.length; a++) for (var b = a+1; b < pts.length; b++) {
-        var pa = pts[a], pb = pts[b], ddx = pa.x - pb.x, ddy = pa.y - pb.y, dd = Math.sqrt(ddx*ddx + ddy*ddy);
-        if (dd < 140) {
-          ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y);
-          ctx.strokeStyle = 'hsla(260,70%,65%,' + (1 - dd/140) * (dark ? 0.3 : 0.18) + ')';
-          ctx.lineWidth = 0.8; ctx.stroke();
-        }
-      }
-      if (mouse.active) {
-        var g = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 80);
-        g.addColorStop(0, 'rgba(130,80,223,0.22)'); g.addColorStop(1, 'rgba(130,80,223,0)');
-        ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 80, 0, Math.PI*2); ctx.fillStyle = g; ctx.fill();
-      }
-      requestAnimationFrame(tick);
-    }
-    tick();
-  }
+  /* ---- 06  Static background image (particles removed) ------- */
+  function initParticles() { /* removed — static bg set in CSS */ }
 
   /* ---- 07  Web Audio SFX --------------------------------- */
   var _actx = null;
@@ -303,7 +253,7 @@
     }
   }
 
-  /* ---- Hero banner --------------------------------------- */
+  /* ---- Hero banner (folds upward on scroll) ------------ */
   function initHeroBanner() {
     if (document.getElementById('luliy-hero-banner')) return;
     var content = document.getElementById('content') || document.querySelector('.main');
@@ -312,6 +262,18 @@
     banner.id = 'luliy-hero-banner';
     banner.textContent = 'Remember, this is your world.';
     content.parentNode.insertBefore(banner, content);
+
+    /* Scroll-fold: slides up and fades as page scrolls down */
+    var bannerH = 0;
+    function getBannerH() { bannerH = banner.offsetHeight || 56; }
+    getBannerH();
+    window.addEventListener('resize', getBannerH, {passive: true});
+    window.addEventListener('scroll', function() {
+      var st = window.scrollY || window.pageYOffset || 0;
+      var progress = Math.min(1, st / (bannerH + 32));
+      banner.style.transform = 'translateY(-' + (progress * (bannerH + 32)) + 'px)';
+      banner.style.opacity = String(1 - progress);
+    }, {passive: true});
   }
 
   /* ---- 10  Tag page search toolbar ----------------------- */
@@ -506,19 +468,31 @@
   var LOCK_KEY  = 'luliy-unlocked-favorites';
 
   function isFavoritesPost() {
+    /* Check body/post attributes */
     var attr = (document.body.getAttribute('data-labels') || '') +
       ((document.getElementById('postBody') && document.getElementById('postBody').getAttribute('data-labels')) || '');
-    if (/favorites/i.test(attr)) return true;
+    if (/favorites?/i.test(attr)) return true;
+    /* Check labels on the page */
     var found = false;
-    document.querySelectorAll('.Label, a.Label').forEach(function(el){ if (/favorites/i.test(el.textContent)) found = true; });
-    if (!found) found = /favorites/i.test(document.title + location.href);
+    document.querySelectorAll('.Label, a.Label').forEach(function(el){ if (/favorites?/i.test(el.textContent)) found = true; });
+    /* Check URL and title */
+    if (!found) found = /favorites?/i.test(document.title + location.href);
+    /* Check nav links — any link whose text contains "Favourite/Favorites" */
+    if (!found) {
+      document.querySelectorAll('#header a, .title-right a, nav a').forEach(function(a) {
+        if (/favou?ri/i.test(a.textContent)) found = true;
+      });
+    }
     return found;
   }
   function initLock() {
-    if (!document.getElementById('postBody')) return;
+    /* Global lock: runs on every page (post and index) */
     if (sessionStorage.getItem(LOCK_KEY) === '1') return;
-    function check(n){ if (isFavoritesPost()){ showLock(); return; } if (n > 0) setTimeout(function(){ check(n-1); }, 300); }
-    check(6);
+    function check(n) {
+      if (isFavoritesPost()) { showLock(); return; }
+      if (n > 0) setTimeout(function(){ check(n-1); }, 300);
+    }
+    check(8);
   }
   function showLock() {
     if (document.getElementById('luliy-lock-overlay')) return;
@@ -526,7 +500,7 @@
     var ov = document.createElement('div'); ov.id = 'luliy-lock-overlay';
     ov.innerHTML = '<div class="luliy-lock-box"><span class="luliy-lock-icon">\uD83D\uDD10</span><div class="luliy-lock-title">\u52a0\u5bc6\u5185\u5bb9</div><div class="luliy-lock-hint">\u672c\u6587\u4e3a\u79c1\u5bc6\u6536\u85cf\uff0c\u8bf7\u8f93\u5165\u8bbf\u95ee\u5bc6\u7801</div><input class="luliy-lock-input" type="password" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022" maxlength="20" autocomplete="off"><button class="luliy-lock-btn">\u89e3 \u9501</button><div class="luliy-lock-err"></div></div>';
     document.body.appendChild(ov);
-    pbody.style.filter = 'blur(18px)'; pbody.style.userSelect = 'none'; pbody.style.pointerEvents = 'none';
+    if (pbody) { pbody.style.filter = 'blur(18px)'; pbody.style.userSelect = 'none'; pbody.style.pointerEvents = 'none'; }
     var inp = ov.querySelector('.luliy-lock-input'), btn2 = ov.querySelector('.luliy-lock-btn'), err = ov.querySelector('.luliy-lock-err');
     function tryUnlock() {
       if (!inp.value) { err.textContent = '\u8bf7\u8f93\u5165\u5bc6\u7801'; return; }
@@ -546,7 +520,7 @@
     setTimeout(function(){ inp.focus(); }, 120);
   }
 
-  /* ---- 14  Home card rebuild — Rectangle card grid ---------- */
+  /* ---- 14  Home card rebuild — Hex grid layout ------------ */
   function initCards() {
     /* Do not run on the tag page — it uses .SideNav for label listing */
     if (/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
@@ -554,15 +528,15 @@
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
 
-    /* Build a single card element */
+    /* Build a single rounded-rect card element */
     function buildCard(post, isPinned, colourIdx) {
-      var wrapper = document.createElement('li');
-      wrapper.className = 'luliy-card-wrap';
-      if (isPinned) wrapper.setAttribute('data-pinned', '1');
+      var li = document.createElement('li');
+      li.className = 'luliy-card';
+      li.setAttribute('data-ci', String((colourIdx || 0) % 4));
+      if (isPinned) li.setAttribute('data-pinned', '1');
 
-      var card = document.createElement('a');
-      card.className = 'luliy-card';
-      card.href = (function() {
+      var a = document.createElement('a');
+      a.href = (function() {
         var lnk = post.link || '#';
         if (lnk !== '#') {
           lnk = lnk.replace(/^\//, '');
@@ -572,19 +546,19 @@
         }
         return lnk;
       })();
-      card.setAttribute('data-ci', String((colourIdx || 0) % 4));
+      a.className = 'luliy-card-inner';
 
-      /* Date — top */
-      var dateEl = document.createElement('span');
+      /* Date — top center, small gray */
+      var dateEl = document.createElement('div');
       dateEl.className = 'luliy-card-date';
       dateEl.textContent = post.created ? post.created.slice(0, 10) : '';
 
-      /* Title — middle */
-      var titleEl = document.createElement('span');
+      /* Title — center bold, core visual */
+      var titleEl = document.createElement('div');
       titleEl.className = 'luliy-card-title';
       titleEl.textContent = post.title || '\u65e0\u9898';
 
-      /* Tags — bottom */
+      /* Tags — bottom rounded-pill row */
       var tagsEl = document.createElement('div');
       tagsEl.className = 'luliy-card-tags';
       var labels = Array.isArray(post.labels) ? post.labels : [];
@@ -599,19 +573,21 @@
         tagsEl.appendChild(pill);
       });
 
-      card.appendChild(dateEl);
-      card.appendChild(titleEl);
-      card.appendChild(tagsEl);
-      wrapper.appendChild(card);
-      return wrapper;
+      a.appendChild(dateEl);
+      a.appendChild(titleEl);
+      a.appendChild(tagsEl);
+      li.appendChild(a);
+      return li;
     }
 
     fetchPosts().then(function(posts) {
       if (!posts || !posts.length) { fallbackDomCards(nav); return; }
 
+      /* Separate pinned and regular */
       var pinnedPosts  = posts.filter(function(p){ return p.pinned; });
       var regularPosts = posts.filter(function(p){ return !p.pinned; });
 
+      /* Pagination (only regular posts paginate) */
       var pageMatch = location.search.match(/[?&]page=([0-9]+)/);
       var pageNum = pageMatch ? parseInt(pageMatch[1]) : 1;
       var perPage = 12;
@@ -623,6 +599,7 @@
         displayPosts = regularPosts.slice(start, start + perPage);
       }
 
+      /* Insert pinned section above the card grid (only page 1) */
       if (pinnedPosts.length > 0 && isIndex && pageNum === 1) {
         var existing = document.getElementById('luliy-pinned-section');
         if (existing) existing.remove();
@@ -634,31 +611,35 @@
         pg.className = 'luliy-card-grid luliy-pinned-grid';
         pinnedPosts.forEach(function(post, i){ pg.appendChild(buildCard(post, true, i)); });
         ps.appendChild(pg);
+
+        /* Insert before the nav (card grid) */
         nav.parentNode.insertBefore(ps, nav);
       }
 
+      /* Rebuild main card grid — hex layout */
       nav.innerHTML = '';
       nav.className = 'luliy-card-grid';
       displayPosts.forEach(function(post, i){ nav.appendChild(buildCard(post, false, i)); });
 
     }).catch(function(){ fallbackDomCards(nav); });
 
+    /* Fallback: use existing DOM items as simple hex wrappers */
     function fallbackDomCards(container) {
       container.className = 'luliy-card-grid';
       container.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function(li, i) {
-        li.className = 'luliy-card-wrap';
+        li.className = 'luliy-hex-wrap';
         var existingA = li.querySelector('a');
         if (!existingA) return;
         var rawText = (existingA.innerText || existingA.textContent || '').trim();
         var href = existingA.href;
         li.innerHTML = '';
-        var card = document.createElement('a'); card.className = 'luliy-card'; card.href = href;
-        card.setAttribute('data-ci', String(i % 4));
-        var d = document.createElement('span'); d.className = 'luliy-card-date';
-        var t = document.createElement('span'); t.className = 'luliy-card-title'; t.textContent = rawText || '\u65e0\u9898';
-        var tg = document.createElement('div'); tg.className = 'luliy-card-tags';
-        card.appendChild(d); card.appendChild(t); card.appendChild(tg);
-        li.appendChild(card);
+        var hex = document.createElement('a'); hex.className = 'luliy-hex'; hex.href = href;
+        hex.setAttribute('data-ci', String(i % 4));
+        var d = document.createElement('span'); d.className = 'luliy-hex-date';
+        var t = document.createElement('span'); t.className = 'luliy-hex-title'; t.textContent = rawText || '\u65e0\u9898';
+        var tg = document.createElement('div'); tg.className = 'luliy-hex-tags';
+        hex.appendChild(d); hex.appendChild(t); hex.appendChild(tg);
+        li.appendChild(hex);
       });
     }
   }
@@ -1027,11 +1008,7 @@
   })();
 
 
-  /* Particles */
-  if (localStorage.getItem('luliy-particles') !== '0') {
-    if (document.body) initParticles();
-    else document.addEventListener('DOMContentLoaded', initParticles);
-  }
+  /* Particles removed — static background image used instead */
 
   /* Sakura */
   if (localStorage.getItem('luliy-sakura') !== '0') {
