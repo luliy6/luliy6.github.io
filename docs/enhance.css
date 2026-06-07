@@ -320,6 +320,7 @@ a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; 
   width: 95% !important;
   max-width: 1000px !important;
   background: transparent !important;
+  background-color: transparent !important;
   border: none !important;
   box-sizing: border-box !important;
 }
@@ -331,11 +332,24 @@ a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; 
 ::-webkit-scrollbar-track { background: transparent; }
 
 body {
-  background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+  background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+  background-color: transparent !important;
+}
+
+/* Force every page container to be transparent so the body bg shows through */
+html,
+#content, .main,
+#postBody,
+.container, .container-xl, .container-lg,
+.markdown-body,
+[class*="Layout"], [class*="layout"],
+.gist-meta, .gist-file {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* ---- 6  Theme Ripple (particle canvas removed) ----------- */
