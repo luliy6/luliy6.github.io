@@ -11,9 +11,9 @@
    09  Compact hero cluster
    10  Tag page search toolbar
    11  Image lightbox
-   12  Floating toolbar (home / github / sfx / theme / skin / bg / sakura)
+   12  Floating toolbar (sfx / sink / sakura)  — bg removed, theme+skin merged
    13  Favorites lock (SHA-256)
-   14  Home card rebuild - pinned section + tags TOP / title BOTTOM
+   14  Home card rebuild - hexagonal grid layout
    15  macOS code block buttons
    16  Sakura petals
    17  ArticleTOC scroll-spy + back-to-top (replaces custom floating TOC)
@@ -81,8 +81,7 @@
       'luliy-sfx': '1',
       'luliy-particles': '1',
       'luliy-sakura': '1',
-      'luliy-theme': 'default',
-      'luliy-skin': 'default'
+      'luliy-sink': 'default'
     };
     Object.keys(defs).forEach(function(k){ if (localStorage.getItem(k) === null) localStorage.setItem(k, defs[k]); });
   }
@@ -358,141 +357,128 @@
   }
 
   /* ---- 12  Floating toolbar ------------------------------ */
-  var THEMES = [
-    {id:'default',      label:'\u9ed8\u8ba4\u91d1\u8c03', dot:'#f0b429'},
-    {id:'classic-blue', label:'\u7ecf\u5178\u84dd\u8c03', dot:'#60a5fa'},
-    {id:'eco-green',    label:'\u751f\u6001\u7eff\u610f', dot:'#34d399'},
-    {id:'sunset',       label:'\u65e5\u843d\u4f59\u6656', dot:'#fb923c'},
-    {id:'mono',         label:'\u6781\u7b80\u9ed1\u767d', dot:'#e5e5e5'},
-    {id:'cyberpunk',    label:'\u8d5b\u535a\u9704\u8679', dot:'#c084fc'}
-  ];
-  var SKINS = [
-    {id:'default',   label:'\u9ed8\u8ba4',      bg:'transparent', border:'#8250df'},
-    {id:'parchment', label:'\u7f8a\u76ae\u7eb8', bg:'#fdf6e3',     border:'#b5651d'},
-    {id:'ink',       label:'\u6c34\u58a8',       bg:'#1a1a1a',     border:'#888'},
-    {id:'ocean',     label:'\u6df1\u6d77\u84dd', bg:'#0d1b2a',     border:'#60a5fa'},
-    {id:'sakura',    label:'\u6a31\u82b1\u5c11\u5973', bg:'#fff0f5',  border:'#f9a8c9'}
+  /* ---- Unified SINK — one button replaces article-theme + reading-skin + bg */
+  var SINKS = [
+    {
+      id: 'default', label: '\u9ed8\u8ba4', dot: '#8250df',
+      skin: 'default', theme: 'default',
+      cardPalette: ['#8250df','#0969da','#ff6b9d','#f0b429'],
+      desc: '\u7ecf\u5178\u7d2b\u8c03\uff0c\u7b80\u6d01\u73b0\u4ee3'
+    },
+    {
+      id: 'sakura', label: '\u6a31\u82b1\u5c11\u5973', dot: '#f9a8c9',
+      skin: 'sakura', theme: 'sakura',
+      cardPalette: ['#e05c8a','#f9a8c9','#c94070','#ffb7c5'],
+      desc: '\u7c89\u5ae9\u6a31\u82b1\uff0c\u5c11\u5973\u5fc3\u601d'
+    },
+    {
+      id: 'ocean', label: '\u6df1\u6d77\u84dd', dot: '#60a5fa',
+      skin: 'ocean', theme: 'classic-blue',
+      cardPalette: ['#60a5fa','#0ea5e9','#38bdf8','#0969da'],
+      desc: '\u6df1\u6d77\u84dd\u8c03\uff0c\u79d1\u6280\u6b23\u7136'
+    },
+    {
+      id: 'mono', label: '\u6c34\u58a8\u9ed1\u767d', dot: '#999',
+      skin: 'ink', theme: 'mono',
+      cardPalette: ['#555','#888','#aaa','#333'],
+      desc: '\u6c34\u58a8\u6de1\u96c5\uff0c\u5f22\u6587\u8bba\u9053'
+    },
+    {
+      id: 'sunset', label: '\u65e5\u843d\u9633\u5149', dot: '#fb923c',
+      skin: 'default', theme: 'sunset',
+      cardPalette: ['#fb923c','#f0b429','#ef4444','#fbbf24'],
+      desc: '\u6696\u8272\u65e5\u843d\uff0c\u6e29\u66a8\u4e1c\u65b9'
+    }
   ];
 
-  function applyTheme(id) {
-    document.body.setAttribute('data-luliy-theme', id);
-    localStorage.setItem('luliy-theme', id);
-    document.querySelectorAll('.luliy-theme-opt').forEach(function(b){ b.classList.toggle('is-active', b.getAttribute('data-theme') === id); });
+  function applySink(id) {
+    var s = null;
+    SINKS.forEach(function(x) { if (x.id === id) s = x; });
+    if (!s) s = SINKS[0];
+    localStorage.setItem('luliy-sink', s.id);
+    /* skin */
+    if (s.skin === 'default') document.body.removeAttribute('data-skin');
+    else document.body.setAttribute('data-skin', s.skin);
+    /* theme */
+    document.body.setAttribute('data-luliy-theme', s.theme || 'default');
+    /* card palette CSS vars */
+    document.documentElement.style.setProperty('--card-c1', s.cardPalette[0]);
+    document.documentElement.style.setProperty('--card-c2', s.cardPalette[1]);
+    document.documentElement.style.setProperty('--card-c3', s.cardPalette[2]);
+    document.documentElement.style.setProperty('--card-c4', s.cardPalette[3]);
+    /* update menu active state */
+    document.querySelectorAll('.luliy-sink-opt').forEach(function(b) {
+      b.classList.toggle('is-active', b.getAttribute('data-sink') === s.id);
+    });
   }
-  function applySkin(id) {
-    if (id === 'default') document.body.removeAttribute('data-skin');
-    else document.body.setAttribute('data-skin', id);
-    localStorage.setItem('luliy-skin', id);
-    document.querySelectorAll('.luliy-skin-opt').forEach(function(b){ b.classList.toggle('is-active', b.getAttribute('data-skin') === id); });
-  }
+  /* Legacy shims */
+  function applyTheme() {}
+  function applySkin() {}
 
   function initToolbar() {
     if (document.getElementById('luliy-toolbar')) return;
     var bar = document.createElement('div'); bar.id = 'luliy-toolbar';
 
-    /* Home */
-    var btnHome = document.createElement('a'); btnHome.className = 'luliy-tb-btn'; btnHome.href = '/'; btnHome.setAttribute('data-tip', '\u4e3b\u9875'); btnHome.innerHTML = '\uD83C\uDFE0';
-
-    /* GitHub */
-    var btnGH = document.createElement('a'); btnGH.className = 'luliy-tb-btn'; btnGH.href = 'https://github.com/luliy6'; btnGH.target = '_blank'; btnGH.setAttribute('data-tip', 'GitHub');
-    btnGH.innerHTML = '<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.67 7.67 0 0 1 8 4.58c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>';
-
     /* SFX */
     var btnSfx = document.createElement('button'); btnSfx.className = 'luliy-tb-btn'; btnSfx.type = 'button';
     var sfxOn = localStorage.getItem('luliy-sfx') !== '0';
-    btnSfx.innerHTML = sfxOn ? '\uD83D\uDD0A' : '\uD83D\uDD07'; btnSfx.setAttribute('data-tip', sfxOn ? '\u5173\u95ed\u97f3\u6548' : '\u5f00\u542f\u97f3\u6548');
+    btnSfx.innerHTML = sfxOn ? '\uD83D\uDD0A' : '\uD83D\uDD07';
+    btnSfx.setAttribute('data-tip', sfxOn ? '\u5173\u95ed\u97f3\u6548' : '\u5f00\u542f\u97f3\u6548');
     if (!sfxOn) btnSfx.classList.add('sfx-off');
     btnSfx.addEventListener('click', function() {
       var on = localStorage.getItem('luliy-sfx') !== '0';
       localStorage.setItem('luliy-sfx', on ? '0' : '1');
-      btnSfx.innerHTML = on ? '\uD83D\uDD07' : '\uD83D\uDD0A'; btnSfx.setAttribute('data-tip', on ? '\u5f00\u542f\u97f3\u6548' : '\u5173\u95ed\u97f3\u6548');
+      btnSfx.innerHTML = on ? '\uD83D\uDD07' : '\uD83D\uDD0A';
+      btnSfx.setAttribute('data-tip', on ? '\u5f00\u542f\u97f3\u6548' : '\u5173\u95ed\u97f3\u6548');
       btnSfx.classList.toggle('sfx-off', on);
     });
 
-    /* Article theme */
-    var themeWrap = document.createElement('div'); themeWrap.style.cssText = 'position:relative;';
-    var btnTheme = document.createElement('button'); btnTheme.className = 'luliy-tb-btn'; btnTheme.type = 'button'; btnTheme.setAttribute('data-tip', '\u6587\u7ae0\u4e3b\u9898'); btnTheme.innerHTML = '\uD83C\uDFA8';
-    var themeMenu = document.createElement('div'); themeMenu.id = 'luliy-theme-menu';
-    THEMES.forEach(function(t) {
-      var b = document.createElement('button'); b.className = 'luliy-theme-opt'; b.type = 'button'; b.setAttribute('data-theme', t.id);
-      b.innerHTML = '<span class="luliy-theme-dot" style="background:' + t.dot + '"></span>' + t.label;
-      b.addEventListener('click', function(){ applyTheme(t.id); themeMenu.classList.remove('is-open'); playSfx('click'); });
-      themeMenu.appendChild(b);
+    /* Unified Sink button (✨) */
+    var sinkWrap = document.createElement('div'); sinkWrap.style.cssText = 'position:relative;';
+    var btnSink = document.createElement('button'); btnSink.className = 'luliy-tb-btn'; btnSink.type = 'button';
+    btnSink.setAttribute('data-tip', '\u98ce\u683c\u4e3b\u9898'); btnSink.innerHTML = '\u2728';
+    var sinkMenu = document.createElement('div'); sinkMenu.id = 'luliy-sink-menu';
+    SINKS.forEach(function(s) {
+      var b = document.createElement('button'); b.className = 'luliy-sink-opt'; b.type = 'button';
+      b.setAttribute('data-sink', s.id);
+      b.innerHTML =
+        '<span class="luliy-sink-dot" style="background:' + s.dot + '"></span>' +
+        '<span class="luliy-sink-info">' +
+          '<span class="luliy-sink-name">' + s.label + '</span>' +
+          '<span class="luliy-sink-desc">' + s.desc + '</span>' +
+        '</span>';
+      b.addEventListener('click', function() { applySink(s.id); sinkMenu.classList.remove('is-open'); playSfx('click'); });
+      sinkMenu.appendChild(b);
     });
-    btnTheme.addEventListener('click', function(e){ e.stopPropagation(); themeMenu.classList.toggle('is-open'); skinMenu.classList.remove('is-open'); bgMenu.classList.remove('is-open'); });
-    themeMenu.addEventListener('click', function(e){ e.stopPropagation(); });
-    themeWrap.appendChild(themeMenu); themeWrap.appendChild(btnTheme);
-
-    /* Reading skin */
-    var skinWrap = document.createElement('div'); skinWrap.style.cssText = 'position:relative;';
-    var btnSkin = document.createElement('button'); btnSkin.className = 'luliy-tb-btn'; btnSkin.type = 'button'; btnSkin.setAttribute('data-tip', '\u9605\u8bfb\u76ae\u80a4'); btnSkin.innerHTML = '\uD83C\uDF08';
-    var skinMenu = document.createElement('div'); skinMenu.id = 'luliy-skin-menu';
-    SKINS.forEach(function(s) {
-      var b = document.createElement('button'); b.className = 'luliy-skin-opt'; b.type = 'button'; b.setAttribute('data-skin', s.id);
-      b.innerHTML = '<span class="luliy-skin-swatch" style="background:' + s.bg + ';border-color:' + s.border + '"></span>' + s.label;
-      b.addEventListener('click', function(){ applySkin(s.id); skinMenu.classList.remove('is-open'); playSfx('click'); });
-      skinMenu.appendChild(b);
-    });
-    btnSkin.addEventListener('click', function(e){ e.stopPropagation(); skinMenu.classList.toggle('is-open'); themeMenu.classList.remove('is-open'); bgMenu.classList.remove('is-open'); });
-    skinMenu.addEventListener('click', function(e){ e.stopPropagation(); });
-    skinWrap.appendChild(skinMenu); skinWrap.appendChild(btnSkin);
-
-    /* Background image */
-    var bgWrap = document.createElement('div'); bgWrap.style.cssText = 'position:relative;';
-    var btnBg = document.createElement('button'); btnBg.className = 'luliy-tb-btn'; btnBg.type = 'button'; btnBg.setAttribute('data-tip', '\u80cc\u666f\u56fe\u7247'); btnBg.innerHTML = '\uD83D\uDDBC';
-    var bgMenu = document.createElement('div'); bgMenu.id = 'luliy-bg-menu';
-    bgMenu.innerHTML =
-      '<div class="luliy-bg-label">\u80cc\u666f\u56fe\u7247\u94fe\u63a5</div>' +
-      '<input class="luliy-bg-input" type="url" placeholder="https://..." autocomplete="off" />' +
-      '<div class="luliy-bg-actions">' +
-      '<button class="luliy-bg-apply" type="button">\u5e94 \u7528</button>' +
-      '<button class="luliy-bg-clear" type="button">\u6e05 \u9664</button>' +
-      '</div>';
-    var bgInp = bgMenu.querySelector('.luliy-bg-input');
-    var savedBg = localStorage.getItem('luliy-bg'); if (savedBg) bgInp.value = savedBg;
-    var bgApply = bgMenu.querySelector('.luliy-bg-apply'), bgClear = bgMenu.querySelector('.luliy-bg-clear');
-    bgApply.addEventListener('click', function() {
-      var url = bgInp.value.trim();
-      if (url) {
-        document.body.style.backgroundImage = 'url(' + url + ')'; document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundAttachment = 'fixed'; document.body.style.backgroundPosition = 'center'; document.body.style.backgroundRepeat = 'no-repeat';
-        localStorage.setItem('luliy-bg', url); bgMenu.classList.remove('is-open'); playSfx('sci');
-      }
-    });
-    bgClear.addEventListener('click', function() {
-      ['backgroundImage','backgroundSize','backgroundAttachment','backgroundPosition','backgroundRepeat'].forEach(function(p){ document.body.style[p] = ''; });
-      localStorage.removeItem('luliy-bg'); bgInp.value = ''; bgMenu.classList.remove('is-open'); playSfx('click');
-    });
-    bgInp.addEventListener('keydown', function(e){ if (e.key === 'Enter') bgApply.click(); });
-    btnBg.addEventListener('click', function(e){ e.stopPropagation(); bgMenu.classList.toggle('is-open'); themeMenu.classList.remove('is-open'); skinMenu.classList.remove('is-open'); });
-    bgMenu.addEventListener('click', function(e){ e.stopPropagation(); });
-    bgWrap.appendChild(bgMenu); bgWrap.appendChild(btnBg);
+    btnSink.addEventListener('click', function(e) { e.stopPropagation(); sinkMenu.classList.toggle('is-open'); });
+    sinkMenu.addEventListener('click', function(e) { e.stopPropagation(); });
+    sinkWrap.appendChild(sinkMenu); sinkWrap.appendChild(btnSink);
 
     /* Sakura toggle */
     var btnSakura = document.createElement('button'); btnSakura.className = 'luliy-tb-btn'; btnSakura.type = 'button';
     var sakuraOn = localStorage.getItem('luliy-sakura') !== '0';
-    btnSakura.innerHTML = '\uD83C\uDF38'; btnSakura.setAttribute('data-tip', sakuraOn ? '\u5173\u95ed\u82b1\u74e3' : '\u5f00\u542f\u82b1\u74e3');
+    btnSakura.innerHTML = '\uD83C\uDF38';
+    btnSakura.setAttribute('data-tip', sakuraOn ? '\u5173\u95ed\u82b1\u74e3' : '\u5f00\u542f\u82b1\u74e3');
     if (!sakuraOn) btnSakura.classList.add('sakura-off');
     btnSakura.addEventListener('click', function() {
       var on = localStorage.getItem('luliy-sakura') !== '0';
       localStorage.setItem('luliy-sakura', on ? '0' : '1');
-      btnSakura.innerHTML = '\uD83C\uDF38'; btnSakura.setAttribute('data-tip', on ? '\u5f00\u542f\u82b1\u74e3' : '\u5173\u95ed\u82b1\u74e3');
+      btnSakura.innerHTML = '\uD83C\uDF38';
+      btnSakura.setAttribute('data-tip', on ? '\u5f00\u542f\u82b1\u74e3' : '\u5173\u95ed\u82b1\u74e3');
       btnSakura.classList.toggle('sakura-off', on);
       if (on) { var c = document.getElementById('luliy-sakura-canvas'); if (c) c.remove(); }
       else initSakura();
       playSfx('click');
     });
 
-    document.addEventListener('click', function() {
-      themeMenu.classList.remove('is-open'); skinMenu.classList.remove('is-open'); bgMenu.classList.remove('is-open');
-    });
+    document.addEventListener('click', function() { sinkMenu.classList.remove('is-open'); });
 
     bar.appendChild(btnSfx);
-    bar.appendChild(themeWrap); bar.appendChild(skinWrap); bar.appendChild(bgWrap); bar.appendChild(btnSakura);
+    bar.appendChild(sinkWrap);
+    bar.appendChild(btnSakura);
     document.body.appendChild(bar);
 
-    applyTheme(localStorage.getItem('luliy-theme') || 'default');
-    applySkin(localStorage.getItem('luliy-skin') || 'default');
+    applySink(localStorage.getItem('luliy-sink') || 'default');
   }
 
   /* ---- 13  Favorites lock (SHA-256) ---------------------- */
@@ -560,7 +546,7 @@
     setTimeout(function(){ inp.focus(); }, 120);
   }
 
-  /* ---- 14  Home card rebuild - Pinned section + card grid - */
+  /* ---- 14  Home card rebuild — Hex grid layout ------------ */
   function initCards() {
     /* Do not run on the tag page — it uses .SideNav for label listing */
     if (/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
@@ -568,51 +554,59 @@
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
 
-    /* Build a single card element */
-    function buildCard(post, isPinned) {
-      var li = document.createElement('li');
-      li.className = 'luliy-card';
-      if (isPinned) li.setAttribute('data-pinned', '1');
+    /* Build a single hexagon card element */
+    function buildCard(post, isPinned, colourIdx) {
+      /* Outer wrapper: drop-shadow host (clip-path kills box-shadow) */
+      var wrapper = document.createElement('li');
+      wrapper.className = 'luliy-hex-wrap';
+      if (isPinned) wrapper.setAttribute('data-pinned', '1');
 
-      var a = document.createElement('a');
-      a.href = post.link || '#';
+      /* Hexagon shape container */
+      var hex = document.createElement('a');
+      hex.className = 'luliy-hex';
+      hex.href = (function() {
+        var lnk = post.link || '#';
+        if (lnk !== '#') {
+          lnk = lnk.replace(/^\//, '');
+          lnk = lnk.replace(/^post\/post\//, 'post/');
+          if (!/^post\//.test(lnk) && !/^https?:\/\//.test(lnk)) lnk = 'post/' + lnk;
+          lnk = '/' + lnk;
+        }
+        return lnk;
+      })();
+      /* Colour index cycles 0-3 and reads from CSS vars */
+      hex.setAttribute('data-ci', String((colourIdx || 0) % 4));
 
-      /* Tags row (top) */
-      var tagsRow = document.createElement('div');
-      tagsRow.className = 'luliy-card-tags';
+      /* Date — top center */
+      var dateEl = document.createElement('span');
+      dateEl.className = 'luliy-hex-date';
+      dateEl.textContent = post.created ? post.created.slice(0, 10) : '';
 
-      /* Labels */
+      /* Title — center bold */
+      var titleEl = document.createElement('span');
+      titleEl.className = 'luliy-hex-title';
+      titleEl.textContent = post.title || '\u65e0\u9898';
+
+      /* Tags — bottom pills */
+      var tagsEl = document.createElement('div');
+      tagsEl.className = 'luliy-hex-tags';
       var labels = Array.isArray(post.labels) ? post.labels : [];
       labels.forEach(function(lbl) {
-        var labelInfo = (typeof lbl === 'object') ? lbl : {name: lbl, color: '0969da'};
-        /* skip 'pinned' label itself from display */
-        if ((labelInfo.name || lbl) === 'pinned') return;
-        var color = '#' + (labelInfo.color || '0969da').replace('#','');
-        var span = document.createElement('a');
-        span.className = 'Label';
-        span.textContent = labelInfo.name || lbl;
-        span.href = '/tag.html#' + encodeURIComponent(labelInfo.name || lbl);
-        span.style.cssText = 'background:' + color + ';color:#fff';
-        tagsRow.appendChild(span);
+        var info = (typeof lbl === 'object') ? lbl : {name: lbl, color: '0969da'};
+        if ((info.name || lbl) === 'pinned') return;
+        var pill = document.createElement('a');
+        pill.className = 'luliy-hex-pill';
+        pill.href = '/tag.html#' + encodeURIComponent(info.name || lbl);
+        pill.textContent = info.name || lbl;
+        pill.style.background = '#' + (info.color || '0969da').replace('#','');
+        tagsEl.appendChild(pill);
       });
 
-      /* Date chip */
-      if (post.created) {
-        var dateChip = document.createElement('span');
-        dateChip.className = 'luliy-card-date';
-        dateChip.textContent = post.created.slice(0, 10);
-        tagsRow.appendChild(dateChip);
-      }
-
-      /* Title row (bottom) */
-      var titleDiv = document.createElement('div');
-      titleDiv.className = 'luliy-card-title';
-      titleDiv.textContent = post.title || '\u65e0\u9898';
-
-      a.appendChild(tagsRow);
-      a.appendChild(titleDiv);
-      li.appendChild(a);
-      return li;
+      hex.appendChild(dateEl);
+      hex.appendChild(titleEl);
+      hex.appendChild(tagsEl);
+      wrapper.appendChild(hex);
+      return wrapper;
     }
 
     fetchPosts().then(function(posts) {
@@ -643,49 +637,38 @@
         ps.id = 'luliy-pinned-section';
 
         var pg = document.createElement('ul');
-        pg.className = 'luliy-pinned-grid';
-        pinnedPosts.forEach(function(post){ pg.appendChild(buildCard(post, true)); });
+        pg.className = 'luliy-hex-grid luliy-pinned-grid';
+        pinnedPosts.forEach(function(post, i){ pg.appendChild(buildCard(post, true, i)); });
         ps.appendChild(pg);
 
         /* Insert before the nav (card grid) */
         nav.parentNode.insertBefore(ps, nav);
       }
 
-      /* Rebuild main card grid */
+      /* Rebuild main card grid — hex layout */
       nav.innerHTML = '';
-      nav.classList.add('luliy-card-grid');
-      displayPosts.forEach(function(post){ nav.appendChild(buildCard(post, false)); });
+      nav.className = 'luliy-hex-grid';
+      displayPosts.forEach(function(post, i){ nav.appendChild(buildCard(post, false, i)); });
 
     }).catch(function(){ fallbackDomCards(nav); });
 
-    /* Fallback: use existing DOM items */
+    /* Fallback: use existing DOM items as simple hex wrappers */
     function fallbackDomCards(container) {
-      container.classList.add('luliy-card-grid');
-      container.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function(li) {
-        li.classList.add('luliy-card');
+      container.className = 'luliy-hex-grid';
+      container.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function(li, i) {
+        li.className = 'luliy-hex-wrap';
         var existingA = li.querySelector('a');
         if (!existingA) return;
-        var labels = Array.from(li.querySelectorAll('a.Label'));
-        var dateEl = li.querySelector('.color-fg-muted, time, [class*="date"]');
-        var rawText = existingA.innerText || existingA.textContent || '';
-        labels.forEach(function(l){ rawText = rawText.replace(l.innerText || l.textContent, ''); });
-        var dateText = dateEl ? (dateEl.innerText || dateEl.textContent).trim() : '';
-        rawText = rawText.replace(dateText, '').trim();
-        var dm = rawText.match(/(\d{4}-\d{2}-\d{2})/);
-        if (dm) { if (!dateText) dateText = dm[1]; rawText = rawText.replace(dm[0], '').trim(); }
-        var titleText = rawText || '\u65e0\u9898';
+        var rawText = (existingA.innerText || existingA.textContent || '').trim();
         var href = existingA.href;
         li.innerHTML = '';
-        var a = document.createElement('a'); a.href = href;
-        var tagsRow = document.createElement('div'); tagsRow.className = 'luliy-card-tags';
-        labels.forEach(function(l){ tagsRow.appendChild(l.cloneNode(true)); });
-        if (dateText) {
-          var dc = document.createElement('span'); dc.className = 'luliy-card-date'; dc.textContent = dateText;
-          tagsRow.appendChild(dc);
-        }
-        var titleDiv = document.createElement('div'); titleDiv.className = 'luliy-card-title';
-        titleDiv.textContent = titleText;
-        a.appendChild(tagsRow); a.appendChild(titleDiv); li.appendChild(a);
+        var hex = document.createElement('a'); hex.className = 'luliy-hex'; hex.href = href;
+        hex.setAttribute('data-ci', String(i % 4));
+        var d = document.createElement('span'); d.className = 'luliy-hex-date';
+        var t = document.createElement('span'); t.className = 'luliy-hex-title'; t.textContent = rawText || '\u65e0\u9898';
+        var tg = document.createElement('div'); tg.className = 'luliy-hex-tags';
+        hex.appendChild(d); hex.appendChild(t); hex.appendChild(tg);
+        li.appendChild(hex);
       });
     }
   }
@@ -1029,28 +1012,30 @@
   /* ---- 20  Main entry ------------------------------------ */
   initLocalStorage();
 
-  /* Restore theme & skin immediately (prevent FOUC) */
-  var savedTheme = localStorage.getItem('luliy-theme') || 'default';
-  var savedSkin  = localStorage.getItem('luliy-skin')  || 'default';
-  function _restoreBodyAttrs() {
-    if (!document.body) return;
-    document.body.setAttribute('data-luliy-theme', savedTheme);
-    if (savedSkin !== 'default') document.body.setAttribute('data-skin', savedSkin);
-  }
-  if (document.body) _restoreBodyAttrs();
-  else document.addEventListener('DOMContentLoaded', _restoreBodyAttrs);
-
-  /* Restore background image */
+  /* Restore sink immediately (prevent FOUC) */
   (function() {
-    var bg = localStorage.getItem('luliy-bg'); if (!bg) return;
-    function applyBg() {
-      document.body.style.backgroundImage = 'url(' + bg + ')';
-      document.body.style.backgroundSize = 'cover'; document.body.style.backgroundAttachment = 'fixed';
-      document.body.style.backgroundPosition = 'center'; document.body.style.backgroundRepeat = 'no-repeat';
+    var savedSinkId = localStorage.getItem('luliy-sink') || 'default';
+    var sinkDefs = {
+      'default': {skin:'default', theme:'default', c:['#8250df','#0969da','#ff6b9d','#f0b429']},
+      'sakura':  {skin:'sakura',  theme:'sakura',  c:['#e05c8a','#f9a8c9','#c94070','#ffb7c5']},
+      'ocean':   {skin:'ocean',   theme:'classic-blue', c:['#60a5fa','#0ea5e9','#38bdf8','#0969da']},
+      'mono':    {skin:'ink',     theme:'mono',    c:['#555','#888','#aaa','#333']},
+      'sunset':  {skin:'default', theme:'sunset',  c:['#fb923c','#f0b429','#ef4444','#fbbf24']}
+    };
+    var def = sinkDefs[savedSinkId] || sinkDefs['default'];
+    function applyFouc() {
+      if (!document.body) return;
+      document.body.setAttribute('data-luliy-theme', def.theme);
+      if (def.skin !== 'default') document.body.setAttribute('data-skin', def.skin);
+      document.documentElement.style.setProperty('--card-c1', def.c[0]);
+      document.documentElement.style.setProperty('--card-c2', def.c[1]);
+      document.documentElement.style.setProperty('--card-c3', def.c[2]);
+      document.documentElement.style.setProperty('--card-c4', def.c[3]);
     }
-    if (document.body) applyBg();
-    else document.addEventListener('DOMContentLoaded', applyBg);
+    if (document.body) applyFouc();
+    else document.addEventListener('DOMContentLoaded', applyFouc);
   })();
+
 
   /* Particles */
   if (localStorage.getItem('luliy-particles') !== '0') {
