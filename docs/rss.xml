@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Luliy</title><link>https://luliy6.github.io</link><description>我将无限进步!</description><copyright>Luliy</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy6.github.io</link></image><lastBuildDate>Sun, 07 Jun 2026 08:14:46 +0000</lastBuildDate><managingEditor>Luliy</managingEditor><ttl>60</ttl><webMaster>Luliy</webMaster><item><title>gmeek ui</title><link>https://luliy6.github.io/post/gmeek%20ui.html</link><description># 🍎 Gmeek UI 增强插件使用教程
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Luliy</title><link>https://luliy6.github.io</link><description>我将无限进步!</description><copyright>Luliy</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy6.github.io</link></image><lastBuildDate>Sun, 07 Jun 2026 10:58:11 +0000</lastBuildDate><managingEditor>Luliy</managingEditor><ttl>60</ttl><webMaster>Luliy</webMaster><item><title>gmeek ui</title><link>https://luliy6.github.io/post/gmeek%20ui.html</link><description># 🍎 Gmeek UI 增强插件使用教程
 
 ## 📦 插件简介
 
@@ -15,17 +15,9 @@ Gmeek UI 插件通过纯前端增强的方式，为 Gmeek 框架博客带来 App
 ## 还是来了 20260601
 我发现一个非常重要的问题，
 我的大计划是学习英语四级，
-小计划是个人成长，却一项都没有落实。</description><guid isPermaLink="true">https://luliy6.github.io/post/favorites.html</guid><pubDate>Tue, 02 Jun 2026 16:25:37 +0000</pubDate></item><item><title>本站指南</title><link>https://luliy6.github.io/post/ben-zhan-zhi-nan.html</link><description># Luliy 博客系统 v3 · 完整说明书
+小计划是个人成长，却一项都没有落实。</description><guid isPermaLink="true">https://luliy6.github.io/post/favorites.html</guid><pubDate>Tue, 02 Jun 2026 16:25:37 +0000</pubDate></item><item><title>本站指南</title><link>https://luliy6.github.io/post/ben-zhan-zhi-nan.html</link><description># Luliy Blog v6 增强功能完整说明书
 
-**最后更新：2026年6月4日**  
-**作者：Luliy**  
-**博客地址：https://luliy6.github.io**
-
----
-
-## 系统概述
-
-Luliy 博客是基于 **Gmeek** 框架的高度定制化个人博客系统。</description><guid isPermaLink="true">https://luliy6.github.io/post/ben-zhan-zhi-nan.html</guid><pubDate>Tue, 02 Jun 2026 13:37:56 +0000</pubDate></item><item><title>Music</title><link>https://luliy6.github.io/post/Music.html</link><guid isPermaLink="true">https://luliy6.github.io/post/Music.html</guid><pubDate>Mon, 01 Jun 2026 17:53:07 +0000</pubDate></item><item><title>养生</title><link>https://luliy6.github.io/post/yang-sheng.html</link><description>&gt; 补充一篇 24 年初的文章，分享最近一年的一些个人实践：[养生博主的 23 年总结](https://zhuanlan.zhihu.com/p/675470252)。</description><guid isPermaLink="true">https://luliy6.github.io/post/yang-sheng.html</guid><pubDate>Sat, 30 May 2026 13:58:09 +0000</pubDate></item><item><title>about</title><link>https://luliy6.github.io/about.html</link><description># 关于我
+本文档基于您提供的 `enhance.js`、`enhance.css` 以及 Gmeek 配置文件 `config.json` 编写。</description><guid isPermaLink="true">https://luliy6.github.io/post/ben-zhan-zhi-nan.html</guid><pubDate>Tue, 02 Jun 2026 13:37:56 +0000</pubDate></item><item><title>Music</title><link>https://luliy6.github.io/post/Music.html</link><guid isPermaLink="true">https://luliy6.github.io/post/Music.html</guid><pubDate>Mon, 01 Jun 2026 17:53:07 +0000</pubDate></item><item><title>养生</title><link>https://luliy6.github.io/post/yang-sheng.html</link><description>&gt; 补充一篇 24 年初的文章，分享最近一年的一些个人实践：[养生博主的 23 年总结](https://zhuanlan.zhihu.com/p/675470252)。</description><guid isPermaLink="true">https://luliy6.github.io/post/yang-sheng.html</guid><pubDate>Sat, 30 May 2026 13:58:09 +0000</pubDate></item><item><title>about</title><link>https://luliy6.github.io/about.html</link><description># 关于我
 Luliy，
 23岁，银川能源学院，机械专业。</description><guid isPermaLink="true">https://luliy6.github.io/about.html</guid><pubDate>Sat, 30 May 2026 10:29:29 +0000</pubDate></item><item><title>book</title><link>https://luliy6.github.io/book.html</link><description>哈喽。</description><guid isPermaLink="true">https://luliy6.github.io/book.html</guid><pubDate>Sat, 30 May 2026 10:43:19 +0000</pubDate></item><item><title>prompt</title><link>https://luliy6.github.io/prompt.html</link><description># 英语
 ## CET4
