@@ -1291,7 +1291,7 @@ body[data-luliy-theme="space"] {
    20  Back-to-top
 ══════════════════════════════════════════════════════════ */
 #luliy-back-top {
-  position: fixed; bottom: 40px; right: 22px;
+  position: fixed; bottom: 80px; right: 22px;
   width: 40px; height: 40px; border-radius: 50%;
   background: rgba(130,80,223,0.22);
   backdrop-filter: blur(14px);
