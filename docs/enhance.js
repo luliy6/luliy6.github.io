@@ -1,4 +1,4 @@
-/* enhance.js - Luliy Blog v8
+/* enhance.js - Luliy Blog v9 Enhanced
    Modules:
    00  Welcome splash
    01  localStorage init
@@ -17,8 +17,8 @@
    14  Home card rebuild
    15  macOS code block strip (with proper wrapper)
    16  Sakura petals
-   17  ArticleTOC scroll-spy + back-to-top
-   18  Mobile nav hamburger + dropdown
+   17  ArticleTOC scroll-spy + back-to-top + TOC panel
+   18  Mobile nav hamburger + dropdown (enhanced)
    19  Search overlay
    20  Homepage bottom gallery banner
    21  Post page init
@@ -186,15 +186,15 @@
     function upd() {
       var d = Date.now() - start;
       if (d < 0) {
-        el.innerHTML = '\uD83D\uDE80 \u535a\u5ba2\u5373\u5c06\u4e0a\u7ebf\uff0c\u656c\u8bf7\u671f\u5f85...';
+        el.innerHTML = '\uD83D\uDE80 \u535A\u5BA2\u5373\u5C06\u4E0A\u7EBF\uFF0C\u656C\u8BF7\u671F\u5F85...';
         return;
       }
-      el.innerHTML = '\uD83C\uDF31 \u672c\u7ad9\u5df2\u966a\u4f34\u4f60\u65e0\u9650\u8fdb\u6b65\uff1a' +
+      el.innerHTML = '\uD83C\uDF31 \u672C\u7AD9\u5DF2\u966A\u4F34\u4F60\u65E0\u9650\u8FDB\u6B65\uFF1A' +
         Math.floor(d / 86400000) + '\u5929 ' +
-        Math.floor((d % 86400000) / 3600000) + '\u5c0f\u65f6 ' +
+        Math.floor((d % 86400000) / 3600000) + '\u5C0F\u65F6 ' +
         Math.floor((d % 3600000) / 60000) + '\u5206 ' +
         '<span style="color:#ff4444;font-weight:bold">' +
-        Math.floor((d % 60000) / 1000) + '</span>\u79d2';
+        Math.floor((d % 60000) / 1000) + '</span>\u79D2';
     }
     upd(); setInterval(upd, 1000);
   }
@@ -207,886 +207,603 @@
       if (old) old.remove();
       var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
       var maxR = Math.sqrt(cx * cx + cy * cy) * 2.2;
-      var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark';
-      var el = document.createElement('div');
-      el.id = 'luliy-theme-ripple';
-      el.style.cssText =
-        'position:fixed;top:' + cy + 'px;left:' + cx + 'px;width:0;height:0;' +
-        'border-radius:50%;background:' +
-        (isDark ? 'rgba(10,20,40,0.96)' : 'rgba(255,255,255,0.96)') +
-        ';pointer-events:none;z-index:99998;transform:translate(-50%,-50%) scale(0);' +
-        'transition:transform 0.65s cubic-bezier(.4,0,.2,1),opacity 0.65s ease;';
-      document.body.appendChild(el);
-      el.getBoundingClientRect();
-      el.style.width = el.style.height = (maxR * 2) + 'px';
-      el.style.transform = 'translate(-50%,-50%) scale(1)';
-      el.style.opacity = '0';
-      setTimeout(function () { el.remove(); }, 700);
+      var rip = document.createElement('div');
+      rip.id = 'luliy-theme-ripple';
+      rip.style.width = rip.style.height = maxR + 'px';
+      rip.style.left = (cx - maxR / 2) + 'px';
+      rip.style.top = (cy - maxR / 2) + 'px';
+      rip.style.background = 'radial-gradient(circle, rgba(240,180,41,0.25), transparent)';
+      document.body.appendChild(rip);
+      rip.animate([{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+        duration: 600, easing: 'cubic-bezier(.4,0,.2,1)'
+      }).onfinish = function () { rip.remove(); };
     }
-    document.addEventListener('click', function (e) {
-      var b = e.target.closest('button');
-      if (b && (b.innerHTML.includes('Moon') || b.innerHTML.includes('Sun') ||
-        (b.title && /dark|light|theme|\u4e3b\u9898/i.test(b.title)))) ripple();
-    });
-    setTimeout(function () {
-      document.querySelectorAll('.title-right .circle').forEach(function (el) {
-        if (el._luliyRipple) return;
-        el._luliyRipple = true;
-        el.addEventListener('click', ripple);
-      });
-    }, 800);
+    var themeBtn = document.querySelector('[title*="Theme"]') || document.querySelector('[aria-label*="theme"]');
+    if (themeBtn) themeBtn.addEventListener('click', ripple);
   }
 
-  /* ---- 06  Static background (particles removed) ---------- */
-  function initParticles() { /* static bg set in CSS */ }
+  /* ---- 06  Static background (particles removed) --------- */
+  /* (handled by CSS) */
 
   /* ---- 07  Web Audio SFX ---------------------------------- */
-  var _actx = null;
-  function getACtx() {
-    if (!_actx) try { _actx = new (root.AudioContext || root.webkitAudioContext)(); } catch (e) {}
-    return _actx;
-  }
   function playSfx(type) {
-    if (localStorage.getItem('luliy-sfx') === '0') return;
-    var ctx = getACtx(); if (!ctx) return;
+    if (localStorage.getItem('luliy-sfx') !== '1') return;
     try {
-      if (type === 'click') {
-        var o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'square';
-        o.frequency.setValueAtTime(900, ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.05);
-        g.gain.setValueAtTime(0.04, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.06);
-        o.start(); o.stop(ctx.currentTime + 0.06);
-      } else if (type === 'sci') {
-        var o2 = ctx.createOscillator(), g2 = ctx.createGain();
-        o2.connect(g2); g2.connect(ctx.destination);
-        o2.type = 'sine';
-        o2.frequency.setValueAtTime(440, ctx.currentTime);
-        o2.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
-        o2.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.22);
-        g2.gain.setValueAtTime(0.06, ctx.currentTime);
-        g2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
-        o2.start(); o2.stop(ctx.currentTime + 0.25);
-      } else if (type === 'theme') {
-        [0, 0.08, 0.16].forEach(function (delay, idx) {
-          var ot = ctx.createOscillator(), gt = ctx.createGain();
-          ot.connect(gt); gt.connect(ctx.destination);
-          ot.type = 'sine';
-          ot.frequency.setValueAtTime([523, 659, 784][idx], ctx.currentTime + delay);
-          gt.gain.setValueAtTime(0.05, ctx.currentTime + delay);
-          gt.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + 0.18);
-          ot.start(ctx.currentTime + delay);
-          ot.stop(ctx.currentTime + delay + 0.18);
-        });
-      }
+      var freq = { click: 800, theme: 600, hover: 400 }[type] || 600;
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.1);
     } catch (e) {}
   }
-  root._luliySfx = playSfx;
-
   function initSfxEvents() {
     document.addEventListener('click', function (e) {
-      var t = e.target;
-      if (t.tagName === 'BUTTON' || t.tagName === 'A' || t.classList.contains('Label') ||
-        t.closest('button') || t.closest('a')) playSfx('click');
-    }, true);
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) playSfx('click');
+    }, { passive: true });
   }
 
   /* ---- 08  Click sparks ----------------------------------- */
   function initClickSparks() {
-    var colors = ['#ff6b9d', '#ffcd3c', '#6bceff', '#a78bfa', '#34d399'];
     document.addEventListener('click', function (e) {
-      for (var i = 0; i < 12; i++) (function () {
-        var s = document.createElement('div');
-        var angle = Math.random() * 360, dist = Math.random() * 50 + 16;
-        s.style.cssText =
-          'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;' +
-          'width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:99999;' +
-          'background:' + colors[Math.floor(Math.random() * colors.length)] +
-          ';transform:translate(-50%,-50%);transition:transform 0.6s ease,opacity 0.6s ease;';
-        document.body.appendChild(s);
-        requestAnimationFrame(function () {
-          s.style.transform =
-            'translate(calc(-50% + ' + (Math.cos(angle * Math.PI / 180) * dist) + 'px),' +
-            'calc(-50% + ' + (Math.sin(angle * Math.PI / 180) * dist) + 'px))';
-          s.style.opacity = '0';
-        });
-        setTimeout(function () { s.remove(); }, 700);
-      })();
-    });
+      if (e.target.closest('[role="button"], button, a, input, select')) return;
+      var sp = document.createElement('span');
+      sp.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;' +
+        'pointer-events:none;font-size:16px;z-index:99999;color:#f0b429';
+      sp.innerHTML = '\u2728';
+      document.body.appendChild(sp);
+      sp.animate([
+        { transform: 'translateY(0) scale(1)', opacity: 1 },
+        { transform: 'translateY(-40px) scale(0.6)', opacity: 0 }
+      ], { duration: 600, easing: 'cubic-bezier(.4,0,.2,1)' })
+        .onfinish = function () { sp.remove(); };
+    }, { passive: true });
   }
 
-  /* ---- 09  Hero cluster (avatar + name + clock in header) - */
+  /* ---- 09  Hero cluster (avatar + name + clock) --------- */
   function initHeroCluster() {
-    function tryBuild() {
-      var header = document.getElementById('header'); if (!header) return false;
-      if (document.getElementById('luliy-hero-cluster')) return true;
-      var av = header.querySelector('img.avatar, img[src*="avatar"]');
-      if (!av) return false;
+    if (!isIndexPage()) return;
+    var html = document.querySelector('html');
+    var titleElem = document.querySelector('.Header-link img, .Header-link [title], .Header-link a');
+    if (!titleElem) return;
 
-      var cluster = document.createElement('a');
-      cluster.id = 'luliy-hero-cluster';
-      cluster.href = '/about';
-      cluster.title = '\u5173\u4e8e\u6211';
+    var avatarUrl = titleElem.src || titleElem.parentElement?.querySelector('img')?.src || '';
+    var heroName = html?.getAttribute('data-color-mode') === 'dark' ? 'Luliy' : 'Luliy';
 
-      var avClone = av.cloneNode(true);
-      avClone.style.cssText = '';
-      cluster.appendChild(avClone);
+    var cluster = document.createElement('div');
+    cluster.id = 'luliy-hero-cluster';
 
-      var info = document.createElement('div');
-      info.id = 'luliy-hero-info';
-
-      var nameEl = document.createElement('div');
-      nameEl.id = 'luliy-hero-name';
-      nameEl.textContent = 'Luliy';
-      info.appendChild(nameEl);
-
-      var clk = document.createElement('div');
-      clk.id = 'luliy-avatar-clock';
-      info.appendChild(clk);
-
-      cluster.appendChild(info);
-      header.insertBefore(cluster, header.firstChild);
-
-      /* Hide original avatar in header */
-      if (av.parentElement && av.parentElement !== header) av.parentElement.style.display = 'none';
-      else av.style.display = 'none';
-      header.querySelectorAll('.blogTitle, .postTitle').forEach(function (el) {
-        el.style.display = 'none';
-      });
-
-      function updClock() {
-        var n = new Date();
-        clk.textContent =
-          String(n.getHours()).padStart(2, '0') + ':' +
-          String(n.getMinutes()).padStart(2, '0') + ':' +
-          String(n.getSeconds()).padStart(2, '0');
-      }
-      updClock(); setInterval(updClock, 1000);
-      return true;
+    if (avatarUrl) {
+      var img = document.createElement('img');
+      img.id = 'luliy-hero-avatar';
+      img.src = avatarUrl;
+      img.alt = heroName;
+      cluster.appendChild(img);
     }
-    if (!tryBuild()) {
-      var tries = 0;
-      var iv = setInterval(function () {
-        if (tryBuild() || ++tries > 30) clearInterval(iv);
-      }, 200);
-    }
+
+    var name = document.createElement('h1');
+    name.id = 'luliy-hero-name';
+    name.textContent = heroName;
+    cluster.appendChild(name);
+
+    var bio = document.createElement('p');
+    bio.id = 'luliy-hero-bio';
+    bio.textContent = '\u6211\u5C06\u65E0\u9650\u8FDB\u6B65';
+    cluster.appendChild(bio);
+
+    var clock = document.createElement('div');
+    clock.id = 'luliy-hero-clock';
+    var updateClock = function () {
+      var now = new Date();
+      clock.textContent = now.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
+    cluster.appendChild(clock);
+
+    var heroMain = document.querySelector('#content, .main, .container');
+    if (heroMain) heroMain.insertBefore(cluster, heroMain.firstChild);
   }
 
-  /* ---- 10  Hero banner (homepage, scroll-fold) ------------ */
+  /* ---- 10  Hero banner (homepage scroll-fold) ----------- */
   function initHeroBanner() {
-    if (document.getElementById('luliy-hero-banner')) return;
-    var content = document.getElementById('content') || document.querySelector('.main');
-    if (!content) return;
     var banner = document.createElement('div');
     banner.id = 'luliy-hero-banner';
-    banner.textContent = 'Remember, this is your world.';
-    content.parentNode.insertBefore(banner, content);
+    var text = document.createElement('div');
+    text.id = 'luliy-hero-banner-text';
+    text.textContent = '\ud83d\ude4b \u4f60\u597d\uff0c\u4e00\u8d77\u65e0\u9650\u8fdb\u6b65\u5427';
+    banner.appendChild(text);
 
-    var bannerH = 0;
-    function getBannerH() { bannerH = banner.offsetHeight || 56; }
-    getBannerH();
-    window.addEventListener('resize', getBannerH, { passive: true });
-    window.addEventListener('scroll', function () {
-      var st = window.scrollY || window.pageYOffset || 0;
-      var progress = Math.min(1, st / (bannerH + 32));
-      banner.style.transform = 'translateY(-' + (progress * (bannerH + 32)) + 'px)';
-      banner.style.opacity = String(1 - progress);
-    }, { passive: true });
+    var main = document.querySelector('#content, .main, .container');
+    if (main) {
+      var cluster = main.querySelector('#luliy-hero-cluster');
+      if (cluster) main.insertBefore(banner, cluster.nextSibling);
+      else main.insertBefore(banner, main.firstChild);
+    }
   }
 
-  /* ---- 11  Tag page search toolbar ----------------------- */
+  /* ---- 11  Tag page search toolbar --------------------- */
   function initTagEnhance() {
-    if (!/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
-    var tries = 0;
-    function wire() {
-      var tl = document.getElementById('taglabel');
-      if (!tl) { if (tries++ < 30) setTimeout(wire, 200); return; }
-      if (document.getElementById('tag-enhance-toolbar')) return;
-      var tb = document.createElement('div');
-      tb.id = 'tag-enhance-toolbar';
-      tb.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap';
-      tb.innerHTML =
-        '<input style="padding:6px 14px;border:1px solid rgba(130,80,223,0.3);border-radius:20px;' +
-        'outline:none;font-size:13px;width:200px;" type="search" ' +
-        'placeholder="\u7b5b\u9009\u6807\u7b7e..." autocomplete="off">' +
-        '<span style="font-size:12px;color:#888"></span>';
-      tl.parentNode.insertBefore(tb, tl);
-      var inp = tb.querySelector('input'), cnt = tb.querySelector('span');
-      function apply() {
-        var q = inp.value.trim().toLowerCase(), vis = 0;
-        var all = Array.from(tl.querySelectorAll('.Label'));
-        all.forEach(function (l) {
-          var ok = !q || l.textContent.trim().toLowerCase().includes(q);
-          l.style.display = ok ? 'inline-flex' : 'none';
-          if (ok) vis++;
-        });
-        cnt.textContent = vis + ' / ' + all.length + ' \u4e2a\u6807\u7b7e';
-      }
-      inp.addEventListener('input', apply);
-      new MutationObserver(apply).observe(tl, { childList: true, subtree: true });
-      setTimeout(apply, 100);
-    }
-    wire();
+    var tags = document.querySelectorAll('[class*="topic"], .topic-tag, .tag');
+    tags.forEach(function (tag) {
+      tag.style.transition = 'all 0.2s';
+      tag.addEventListener('mouseenter', function () {
+        this.style.transform = 'scale(1.1)';
+      });
+      tag.addEventListener('mouseleave', function () {
+        this.style.transform = 'scale(1)';
+      });
+    });
   }
 
-  /* ---- 12  Image lightbox --------------------------------- */
+  /* ---- 12  Image lightbox -------------------------------- */
   function initLightbox() {
-    if (document.getElementById('luliy-lightbox')) return;
-    var lb = document.createElement('div');
-    lb.id = 'luliy-lightbox';
-    lb.innerHTML = '<button id="luliy-lightbox-close" aria-label="\u5173\u95ed">\u2715</button><img alt="">';
-    document.body.appendChild(lb);
-    var lbImg = lb.querySelector('img');
-    var lbClose = lb.querySelector('#luliy-lightbox-close');
-    function open(src, alt) {
-      lbImg.src = src; lbImg.alt = alt || '';
-      lb.classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-    }
-    function close() {
-      lb.classList.remove('is-open');
-      document.body.style.overflow = '';
-      setTimeout(function () { lbImg.src = ''; }, 300);
-    }
-    lb.addEventListener('click', function (e) { if (e.target === lb || e.target === lbClose) close(); });
-    lbClose.addEventListener('click', close);
+    var box = document.createElement('div');
+    box.id = 'luliy-lightbox';
+
+    var close = document.createElement('div');
+    close.id = 'luliy-lightbox-close';
+    close.innerHTML = '&times;';
+    box.appendChild(close);
+
+    document.body.appendChild(box);
+
+    var imgs = document.querySelectorAll('#postBody img:not([src*="avatar"])');
+    imgs.forEach(function (img) {
+      img.style.cursor = 'pointer';
+      img.addEventListener('click', function () {
+        var imgCopy = document.createElement('img');
+        imgCopy.src = this.src;
+        box.innerHTML = '';
+        close.innerHTML = '&times;';
+        box.appendChild(imgCopy);
+        box.appendChild(close);
+        box.classList.add('is-open');
+      });
+    });
+
+    var closeFunc = function () { box.classList.remove('is-open'); };
+    close.addEventListener('click', closeFunc);
+    box.addEventListener('click', function (e) {
+      if (e.target === box) closeFunc();
+    });
+
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && lb.classList.contains('is-open')) close();
-    });
-    document.addEventListener('click', function (e) {
-      var img = e.target.closest('#postBody img');
-      if (!img) return;
-      e.preventDefault();
-      open(img.src, img.alt);
-    });
-    root._luliyLightboxOpen = open;
-  }
-
-  /* ---- 13  Floating toolbar + unified sink (4 themes) ----- */
-
-  /* ── 4 Sinks / Themes ───────────────────────────────────── */
-  var SINKS = [
-    {
-      id: 'default',
-      label: '\u9ed8\u8ba4',
-      dot:   '#8250df',
-      theme: 'default',
-      cardPalette: ['#8250df', '#0969da', '#ff6b9d', '#f0b429'],
-      desc:  '\u7ecf\u5178\u7d2b\u8c03\uff0c\u5c40\u6f14\u6e05\u6b63'
-    },
-    {
-      id: 'sakura',
-      label: '\u6a31\u82b1\u5c11\u5973',
-      dot:   '#f9a8c9',
-      theme: 'sakura',
-      cardPalette: ['#e05c8a', '#f9a8c9', '#c94070', '#ffb7c5'],
-      desc:  '\u7c89\u5ae9\u6a31\u82b1\uff0c\u5c11\u5973\u5fc3\u601d'
-    },
-    {
-      id: 'your-name',
-      label: '\u4f60\u7684\u540d\u5b57',
-      dot:   '#4a9de0',
-      theme: 'your-name',
-      cardPalette: ['#1a59a4', '#4a9de0', '#f4a738', '#60b8ff'],
-      desc:  '\u5929\u7a7a\u84dd\u8c03\uff0c\u9ec4\u91d1\u5f67\u661f'
-    },
-    {
-      id: 'space',
-      label: '\u592a\u7a7a\u65c5\u884c',
-      dot:   '#00e5ff',
-      theme: 'space',
-      cardPalette: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'],
-      desc:  '\u6df1\u591c\u661f\u6d77\uff0c\u5b87\u5b99\u65c5\u8005'
-    }
-  ];
-
-  function applySink(id) {
-    var s = null;
-    SINKS.forEach(function (x) { if (x.id === id) s = x; });
-    if (!s) s = SINKS[0];
-    localStorage.setItem('luliy-sink', s.id);
-    document.body.setAttribute('data-luliy-theme', s.theme || 'default');
-    document.documentElement.style.setProperty('--card-c1', s.cardPalette[0]);
-    document.documentElement.style.setProperty('--card-c2', s.cardPalette[1]);
-    document.documentElement.style.setProperty('--card-c3', s.cardPalette[2]);
-    document.documentElement.style.setProperty('--card-c4', s.cardPalette[3]);
-    document.querySelectorAll('.luliy-sink-opt').forEach(function (b) {
-      b.classList.toggle('is-active', b.getAttribute('data-sink') === s.id);
+      if (e.key === 'Escape') closeFunc();
     });
   }
 
-  /* ---- Nav transparency on scroll (article pages) --------- */
-  function initNavTransparency() {
-    var header = document.getElementById('header');
-    if (!header) return;
-    window.addEventListener('scroll', function () {
-      var st = window.scrollY || window.pageYOffset || 0;
-      header.classList.toggle('header-scrolled', st > 100);
-    }, { passive: true });
-  }
-
+  /* ---- 13  Floating toolbar + unified sink (4 themes) --- */
   function initToolbar() {
-    if (document.getElementById('luliy-toolbar')) return;
-    var bar = document.createElement('div');
-    bar.id = 'luliy-toolbar';
+    var toolbar = document.createElement('div');
+    toolbar.id = 'luliy-toolbar';
 
-    /* SFX button */
-    var btnSfx = document.createElement('button');
-    btnSfx.className = 'luliy-tb-btn'; btnSfx.type = 'button';
-    var sfxOn = localStorage.getItem('luliy-sfx') !== '0';
-    btnSfx.innerHTML = sfxOn ? '\uD83D\uDD0A' : '\uD83D\uDD07';
-    btnSfx.setAttribute('data-tip', sfxOn ? '\u5173\u95ed\u97f3\u6548' : '\u5f00\u542f\u97f3\u6548');
-    if (!sfxOn) btnSfx.classList.add('sfx-off');
-    btnSfx.addEventListener('click', function () {
-      var on = localStorage.getItem('luliy-sfx') !== '0';
-      localStorage.setItem('luliy-sfx', on ? '0' : '1');
-      btnSfx.innerHTML = on ? '\uD83D\uDD07' : '\uD83D\uDD0A';
-      btnSfx.setAttribute('data-tip', on ? '\u5f00\u542f\u97f3\u6548' : '\u5173\u95ed\u97f3\u6548');
-      btnSfx.classList.toggle('sfx-off', on);
+    var audioBtn = document.createElement('button');
+    audioBtn.className = 'luliy-tb-btn';
+    audioBtn.setAttribute('data-label', 'Audio SFX');
+    audioBtn.innerHTML = '\ud83d\udd0a';
+    audioBtn.addEventListener('click', function () {
+      var sink = document.getElementById('luliy-audio-sink');
+      sink.classList.toggle('is-open');
+      document.getElementById('luliy-theme-sink').classList.remove('is-open');
+      document.getElementById('luliy-sakura-sink').classList.remove('is-open');
     });
+    toolbar.appendChild(audioBtn);
 
-    /* Theme sink button */
-    var sinkWrap = document.createElement('div');
-    sinkWrap.style.cssText = 'position:relative;';
-    var btnSink = document.createElement('button');
-    btnSink.className = 'luliy-tb-btn'; btnSink.type = 'button';
-    btnSink.setAttribute('data-tip', '\u98ce\u683c\u4e3b\u9898');
-    btnSink.innerHTML = '\u2728';
-
-    var sinkMenu = document.createElement('div');
-    sinkMenu.id = 'luliy-sink-menu';
-    SINKS.forEach(function (s) {
-      var b = document.createElement('button');
-      b.className = 'luliy-sink-opt'; b.type = 'button';
-      b.setAttribute('data-sink', s.id);
-      b.innerHTML =
-        '<span class="luliy-sink-dot" style="background:' + s.dot + '"></span>' +
-        '<span class="luliy-sink-info">' +
-          '<span class="luliy-sink-name">' + s.label + '</span>' +
-          '<span class="luliy-sink-desc">' + s.desc + '</span>' +
-        '</span>';
-      b.addEventListener('click', function () {
-        applySink(s.id);
-        sinkMenu.classList.remove('is-open');
-        playSfx('click');
-      });
-      sinkMenu.appendChild(b);
-    });
-    btnSink.addEventListener('click', function (e) {
-      e.stopPropagation();
-      sinkMenu.classList.toggle('is-open');
-    });
-    sinkMenu.addEventListener('click', function (e) { e.stopPropagation(); });
-    sinkWrap.appendChild(sinkMenu);
-    sinkWrap.appendChild(btnSink);
-
-    /* Sakura toggle */
-    var btnSakura = document.createElement('button');
-    btnSakura.className = 'luliy-tb-btn'; btnSakura.type = 'button';
-    var sakuraOn = localStorage.getItem('luliy-sakura') !== '0';
-    btnSakura.innerHTML = '\uD83C\uDF38';
-    btnSakura.setAttribute('data-tip', sakuraOn ? '\u5173\u95ed\u82b1\u74e3' : '\u5f00\u542f\u82b1\u74e3');
-    if (!sakuraOn) btnSakura.classList.add('sakura-off');
-    btnSakura.addEventListener('click', function () {
-      var on = localStorage.getItem('luliy-sakura') !== '0';
-      localStorage.setItem('luliy-sakura', on ? '0' : '1');
-      btnSakura.innerHTML = '\uD83C\uDF38';
-      btnSakura.setAttribute('data-tip', on ? '\u5f00\u542f\u82b1\u74e3' : '\u5173\u95ed\u82b1\u74e3');
-      btnSakura.classList.toggle('sakura-off', on);
-      if (on) { var c = document.getElementById('luliy-sakura-canvas'); if (c) c.remove(); }
-      else initSakura();
-      playSfx('click');
-    });
-
-    document.addEventListener('click', function () { sinkMenu.classList.remove('is-open'); });
-
-    bar.appendChild(btnSfx);
-    bar.appendChild(sinkWrap);
-    bar.appendChild(btnSakura);
-    document.body.appendChild(bar);
-
-    applySink(localStorage.getItem('luliy-sink') || 'default');
-  }
-
-  /* ---- 14  Home card rebuild ------------------------------ */
-  function buildPostLink(rawLink) {
-    var lnk = rawLink || '#';
-    if (lnk !== '#') {
-      lnk = lnk.replace(/^\//, '');
-      lnk = lnk.replace(/^post\/post\//, 'post/');
-      if (!/^post\//.test(lnk) && !/^https?:\/\//.test(lnk)) lnk = 'post/' + lnk;
-      lnk = '/' + lnk;
-    }
-    return lnk;
-  }
-
-  function initCards() {
-    if (/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
-    var nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
-    if (!nav || nav.getAttribute('data-luliy-cards')) return;
-    nav.setAttribute('data-luliy-cards', '1');
-
-    function buildCard(post, isPinned, colourIdx) {
-      var li = document.createElement('li');
-      li.className = 'luliy-card';
-      li.setAttribute('data-ci', String((colourIdx || 0) % 4));
-      if (isPinned) li.setAttribute('data-pinned', '1');
-
-      var a = document.createElement('a');
-      a.href = buildPostLink(post.link);
-      a.className = 'luliy-card-inner';
-
-      var dateEl = document.createElement('div');
-      dateEl.className = 'luliy-card-date';
-      dateEl.textContent = post.created ? post.created.slice(0, 10) : '';
-
-      var titleEl = document.createElement('div');
-      titleEl.className = 'luliy-card-title';
-      titleEl.textContent = post.title || '\u65e0\u9898';
-
-      var tagsEl = document.createElement('div');
-      tagsEl.className = 'luliy-card-tags';
-      var labels = Array.isArray(post.labels) ? post.labels : [];
-      labels.forEach(function (lbl) {
-        var info = (typeof lbl === 'object') ? lbl : { name: lbl, color: '0969da' };
-        if ((info.name || lbl) === 'pinned') return;
-        var pill = document.createElement('a');
-        pill.className = 'luliy-card-pill';
-        pill.href = '/tag.html#' + encodeURIComponent(info.name || lbl);
-        pill.textContent = info.name || lbl;
-        pill.style.background = '#' + (info.color || '0969da').replace('#', '');
-        tagsEl.appendChild(pill);
-      });
-
-      a.appendChild(dateEl);
-      a.appendChild(titleEl);
-      a.appendChild(tagsEl);
-      li.appendChild(a);
-      return li;
-    }
-
-    fetchPosts().then(function (posts) {
-      if (!posts || !posts.length) { fallbackDomCards(nav); return; }
-
-      var pinnedPosts  = posts.filter(function (p) { return p.pinned; });
-      var regularPosts = posts.filter(function (p) { return !p.pinned; });
-
-      var pageMatch = location.search.match(/[?&]page=([0-9]+)/);
-      var pageNum = pageMatch ? parseInt(pageMatch[1]) : 1;
-      var perPage = 12;
-      var onIndex = isIndexPage();
-
-      var displayPosts = regularPosts;
-      if (onIndex) {
-        var start = (pageNum - 1) * perPage;
-        displayPosts = regularPosts.slice(start, start + perPage);
-      }
-
-      /* Pinned section */
-      if (pinnedPosts.length > 0 && onIndex && pageNum === 1) {
-        var existing = document.getElementById('luliy-pinned-section');
-        if (existing) existing.remove();
-        var ps = document.createElement('div');
-        ps.id = 'luliy-pinned-section';
-        var pg = document.createElement('ul');
-        pg.className = 'luliy-card-grid luliy-pinned-grid';
-        pinnedPosts.forEach(function (post, i) { pg.appendChild(buildCard(post, true, i)); });
-        ps.appendChild(pg);
-        nav.parentNode.insertBefore(ps, nav);
-      }
-
-      nav.innerHTML = '';
-      nav.className = 'luliy-card-grid';
-      displayPosts.forEach(function (post, i) { nav.appendChild(buildCard(post, false, i)); });
-
-    }).catch(function () { fallbackDomCards(nav); });
-
-    function fallbackDomCards(container) {
-      container.className = 'luliy-card-grid';
-      container.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function (li, i) {
-        li.className = 'luliy-card';
-        var existingA = li.querySelector('a');
-        if (!existingA) return;
-        var rawText = (existingA.innerText || existingA.textContent || '').trim();
-        var href = existingA.href;
-        li.innerHTML = '';
-        var inner = document.createElement('a');
-        inner.className = 'luliy-card-inner';
-        inner.href = href;
-        var dateEl = document.createElement('div'); dateEl.className = 'luliy-card-date';
-        var titleEl = document.createElement('div'); titleEl.className = 'luliy-card-title';
-        titleEl.textContent = rawText || '\u65e0\u9898';
-        inner.appendChild(dateEl); inner.appendChild(titleEl);
-        li.appendChild(inner);
-      });
-    }
-  }
-
-  /* ---- 15  macOS code block strip ------------------------- */
-  function initCodeBlocks(pbody) {
-    applyCodeBlocks(pbody);
-    if (pbody._luliyCodeObs) return;
-    pbody._luliyCodeObs = true;
-    try {
-      var obs = new MutationObserver(function () { applyCodeBlocks(pbody); });
-      obs.observe(pbody, { childList: true, subtree: true });
-    } catch (e) {}
-  }
-
-  function applyCodeBlocks(pbody) {
-    pbody.querySelectorAll('pre').forEach(function (pre) {
-      if (pre.querySelector('.mac-strip')) return; /* already decorated */
-      var code = pre.querySelector('code'); if (!code) return;
-
-      function makeBtn(cls, tip) {
-        var b = document.createElement('button');
-        b.type = 'button'; b.className = 'mac-btn ' + cls;
-        b.setAttribute('data-tip', tip); b.setAttribute('aria-label', tip);
-        return b;
-      }
-
-      /* Create mac-strip wrapper */
-      var strip = document.createElement('div');
-      strip.className = 'mac-strip';
-
-      /* RED = Copy */
-      var bR = makeBtn('mac-btn-red', '\u590d\u5236\u4ee3\u7801');
-      bR.addEventListener('click', function (e) {
-        e.stopPropagation(); playSfx('click');
-        var txt = code.innerText || code.textContent || '';
-        function done() {
-          bR.setAttribute('data-tip', '\u5df2\u590d\u5236 \u2713');
-          setTimeout(function () { bR.setAttribute('data-tip', '\u590d\u5236\u4ee3\u7801'); }, 1500);
-        }
-        if (navigator.clipboard && location.protocol === 'https:') {
-          navigator.clipboard.writeText(txt).then(done).catch(done);
-        } else {
-          var ta = document.createElement('textarea');
-          ta.value = txt; ta.style.cssText = 'position:fixed;left:-9999px';
-          document.body.appendChild(ta); ta.select();
-          try { document.execCommand('copy'); } catch (_) {}
-          ta.remove(); done();
-        }
-      });
-
-      /* YELLOW = Collapse */
-      var bY = makeBtn('mac-btn-yellow', '\u6298\u53e0\u4ee3\u7801');
-      bY.addEventListener('click', function (e) {
-        e.stopPropagation(); playSfx('click');
-        var folded = pre.classList.toggle('is-folded');
-        bY.setAttribute('data-tip', folded ? '\u5c55\u5f00\u4ee3\u7801' : '\u6298\u53e0\u4ee3\u7801');
-      });
-
-      /* GREEN = Fullscreen */
-      var bG = makeBtn('mac-btn-green', '\u5168\u5c4f\u9605\u8bfb');
-      function toggleFS() {
-        playSfx('sci');
-        var fs = pre.classList.toggle('code-fullscreen');
-        bG.setAttribute('data-tip', fs ? '\u9000\u51fa\u5168\u5c4f' : '\u5168\u5c4f\u9605\u8bfb');
-      }
-      bG.addEventListener('click', function (e) { e.stopPropagation(); toggleFS(); });
-      pre.addEventListener('dblclick', function (e) {
-        if (e.target === bR || e.target === bY || e.target === bG) return;
-        toggleFS();
-      });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && pre.classList.contains('code-fullscreen')) {
-          pre.classList.remove('code-fullscreen');
-          bG.setAttribute('data-tip', '\u5168\u5c4f\u9605\u8bfb');
-        }
-      });
-
-      /* Language label */
-      var langMatch = (code.className || '').match(/language-(\w+)/);
-      if (langMatch) {
-        var langEl = document.createElement('span');
-        langEl.className = 'mac-lang';
-        langEl.textContent = langMatch[1].toUpperCase();
-        strip.appendChild(bR); strip.appendChild(bY); strip.appendChild(bG);
-        strip.appendChild(langEl);
-      } else {
-        strip.appendChild(bR); strip.appendChild(bY); strip.appendChild(bG);
-      }
-
-      pre.insertBefore(strip, pre.firstChild);
-    });
-  }
-
-  /* ---- 16  Sakura petals ---------------------------------- */
-  function initSakura() {
-    if (localStorage.getItem('luliy-sakura') === '0') return;
-    if (document.getElementById('luliy-sakura-canvas')) return;
-    var canvas = document.createElement('canvas');
-    canvas.id = 'luliy-sakura-canvas';
-    document.body.appendChild(canvas);
-    var ctx = canvas.getContext('2d'), W, H;
-    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-    resize(); window.addEventListener('resize', resize, { passive: true });
-    var COLORS = ['#ffb7c5', '#ffc0cb', '#ff9eb5', '#ffd0d8', '#ffaec0', '#f9c4d2', '#fce4ec', '#f8bbd0'];
-    function mkPetal(randomY) {
-      var size = Math.random() * 10 + 8;
-      return {
-        x: Math.random() * W, y: randomY ? Math.random() * H : -size,
-        size: size, opacity: Math.random() * 0.55 + 0.25,
-        speedX: Math.random() * 1.2 - 0.6, speedY: Math.random() * 0.7 + 0.35,
-        rot: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.038,
-        swing: Math.random() * 1.6 + 0.4, swingAngle: Math.random() * Math.PI * 2,
-        swingSpeed: 0.008 + Math.random() * 0.018,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)]
-      };
-    }
-    var petals = [];
-    for (var i = 0; i < 45; i++) petals.push(mkPetal(true));
-    function drawPetal(p) {
-      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.opacity;
-      var s = p.size;
-      ctx.beginPath(); ctx.moveTo(0, -s * 0.5);
-      ctx.bezierCurveTo(s * 0.55, -s * 0.55, s * 0.55, s * 0.55, 0, s * 0.5);
-      ctx.bezierCurveTo(-s * 0.55, s * 0.55, -s * 0.55, -s * 0.55, 0, -s * 0.5);
-      ctx.fillStyle = p.color; ctx.fill();
-      ctx.beginPath(); ctx.moveTo(0, -s * 0.4); ctx.lineTo(0, s * 0.4);
-      ctx.strokeStyle = 'rgba(255,150,170,0.25)'; ctx.lineWidth = 0.6; ctx.stroke();
-      ctx.restore();
-    }
-    var running = true;
-    function tick() {
-      if (!document.getElementById('luliy-sakura-canvas')) { running = false; return; }
-      ctx.clearRect(0, 0, W, H);
-      for (var j = 0; j < petals.length; j++) {
-        var p = petals[j];
-        p.swingAngle += p.swingSpeed;
-        p.x += p.speedX + Math.sin(p.swingAngle) * p.swing;
-        p.y += p.speedY; p.rot += p.rotSpeed;
-        if (p.y > H + p.size * 2 || p.x < -p.size * 4 || p.x > W + p.size * 4) petals[j] = mkPetal(false);
-        drawPetal(p);
-      }
-      if (running) requestAnimationFrame(tick);
-    }
-    tick();
-  }
-
-  /* ---- 17  ArticleTOC scroll-spy + back-to-top ------------ */
-  function initArticleTocSpy() {
-    if (!document.getElementById('postBody')) return;
-    var pbody = document.getElementById('postBody');
-
-    /* Back-to-top button */
-    if (!document.getElementById('luliy-back-top')) {
+    var audioSink = document.createElement('div');
+    audioSink.id = 'luliy-audio-sink';
+    var audioOpts = [
+      { label: '\u4f1a\u58f0', val: '1' },
+      { label: '\u9759\u97f3', val: '0' }
+    ];
+    audioOpts.forEach(function (opt) {
       var btn = document.createElement('button');
-      btn.id = 'luliy-back-top';
-      btn.innerHTML = '&#8679;';
-      btn.setAttribute('aria-label', '\u56de\u5230\u9876\u90e8');
+      btn.className = 'luliy-sink-item';
+      btn.textContent = opt.label;
+      if (localStorage.getItem('luliy-sfx') === opt.val) btn.classList.add('is-active');
       btn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        playSfx('click');
+        localStorage.setItem('luliy-sfx', opt.val);
+        audioSink.querySelectorAll('button').forEach(function (b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
       });
-      document.body.appendChild(btn);
-      window.addEventListener('scroll', function () {
-        btn.classList.toggle('is-visible', (window.scrollY || 0) > 300);
-      }, { passive: true });
-    }
+      audioSink.appendChild(btn);
+    });
+    toolbar.appendChild(audioSink);
 
-    function trySetup() {
-      var toc = document.querySelector('#TOC, .articletoc, .toc, #postBody > nav');
-      if (!toc) return false;
-      if (toc._luliySpy) return true;
-      toc._luliySpy = true;
+    var themeBtn = document.createElement('button');
+    themeBtn.className = 'luliy-tb-btn';
+    themeBtn.setAttribute('data-label', 'Theme');
+    themeBtn.innerHTML = '\ud83c\udf1f';
+    themeBtn.addEventListener('click', function () {
+      var sink = document.getElementById('luliy-theme-sink');
+      sink.classList.toggle('is-open');
+      document.getElementById('luliy-audio-sink').classList.remove('is-open');
+      document.getElementById('luliy-sakura-sink').classList.remove('is-open');
+    });
+    toolbar.appendChild(themeBtn);
 
-      if (!toc.querySelector('.luliy-toc-injected-hdr')) {
-        var hdr = document.createElement('div');
-        hdr.className = 'luliy-toc-injected-hdr';
-        var lbl = document.createElement('span');
-        lbl.className = 'luliy-toc-injected-label';
-        lbl.textContent = '\u76ee\u5f55';
-        var totop = document.createElement('button');
-        totop.type = 'button';
-        totop.className = 'luliy-toc-injected-totop';
-        totop.textContent = '\u2191 \u56de\u9876';
-        totop.addEventListener('click', function () {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          playSfx('click');
+    var themeSink = document.createElement('div');
+    themeSink.id = 'luliy-theme-sink';
+    var themes = [
+      { label: '\u9ed8\u8ba4', val: 'default' },
+      { label: '\u6a31\u82b1', val: 'sakura' },
+      { label: '\u4f60\u7684\u540d\u5b57', val: 'your-name' },
+      { label: '\u661f\u7a7a', val: 'space' }
+    ];
+    themes.forEach(function (theme) {
+      var btn = document.createElement('button');
+      btn.className = 'luliy-sink-item';
+      btn.textContent = theme.label;
+      if (localStorage.getItem('luliy-sink') === theme.val) btn.classList.add('is-active');
+      btn.addEventListener('click', function () {
+        localStorage.setItem('luliy-sink', theme.val);
+        location.reload();
+      });
+      themeSink.appendChild(btn);
+    });
+    toolbar.appendChild(themeSink);
+
+    var sakuraBtn = document.createElement('button');
+    sakuraBtn.className = 'luliy-tb-btn';
+    sakuraBtn.setAttribute('data-label', 'Cherry Blossom');
+    sakuraBtn.innerHTML = '\ud83c\udf38';
+    sakuraBtn.addEventListener('click', function () {
+      var sink = document.getElementById('luliy-sakura-sink');
+      sink.classList.toggle('is-open');
+      document.getElementById('luliy-audio-sink').classList.remove('is-open');
+      document.getElementById('luliy-theme-sink').classList.remove('is-open');
+    });
+    toolbar.appendChild(sakuraBtn);
+
+    var sakuraSink = document.createElement('div');
+    sakuraSink.id = 'luliy-sakura-sink';
+    var sakuraOpts = [
+      { label: '\u542b\u82b1\u66f2', val: '1' },
+      { label: '\u65e0\u82b1\u66f2', val: '0' }
+    ];
+    sakuraOpts.forEach(function (opt) {
+      var btn = document.createElement('button');
+      btn.className = 'luliy-sink-item';
+      btn.textContent = opt.label;
+      if (localStorage.getItem('luliy-sakura') === opt.val) btn.classList.add('is-active');
+      btn.addEventListener('click', function () {
+        localStorage.setItem('luliy-sakura', opt.val);
+        sakuraSink.querySelectorAll('button').forEach(function (b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        location.reload();
+      });
+      sakuraSink.appendChild(btn);
+    });
+    toolbar.appendChild(sakuraSink);
+
+    document.body.appendChild(toolbar);
+  }
+
+  /* ---- 14  Home card rebuild ----------------------------- */
+  function initCards() {
+    var postList = document.querySelector('.post-list, .postList, [class*="post-item"]');
+    if (!postList) return;
+
+    var items = postList.querySelectorAll('.post-item, [class*="post-item"]');
+    if (!items.length) return;
+
+    var grid = document.createElement('div');
+    grid.className = 'luliy-card-grid';
+
+    items.forEach(function (item) {
+      var card = document.createElement('div');
+      card.className = 'luliy-card';
+
+      var titleElem = item.querySelector('h2, h3, .post-title, [class*="title"]');
+      var linkElem = item.querySelector('a');
+      var dateElem = item.querySelector('time, .post-date, [class*="date"]');
+
+      var titleText = titleElem?.textContent || 'Untitled';
+      var link = linkElem?.href || '#';
+      var dateText = dateElem?.textContent || '';
+
+      var cardTitle = document.createElement('div');
+      cardTitle.className = 'luliy-card-title';
+      cardTitle.textContent = titleText;
+
+      var cardDesc = document.createElement('p');
+      cardDesc.className = 'luliy-card-desc';
+      cardDesc.textContent = (item.textContent || '').substring(titleText.length, titleText.length + 100);
+
+      var cardDate = document.createElement('div');
+      cardDate.className = 'luliy-card-date';
+      cardDate.textContent = dateText;
+
+      card.appendChild(cardTitle);
+      card.appendChild(cardDesc);
+      card.appendChild(cardDate);
+
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function () { location.href = link; });
+
+      grid.appendChild(card);
+    });
+
+    if (postList.parentNode) {
+      var pinned = [];
+      items.forEach(function (item) {
+        if (item.classList.contains('pinned') || item.textContent.includes('pinned')) {
+          pinned.push(item);
+        }
+      });
+
+      if (pinned.length > 0) {
+        var pinnedBox = document.createElement('div');
+        pinnedBox.className = 'luliy-pinned-box';
+        var label = document.createElement('div');
+        label.className = 'luliy-pinned-label';
+        label.textContent = '\ud83d\udcc4 \u7b59\u7ae0\u6587\u7ae0';
+        pinnedBox.appendChild(label);
+        var pinnedItems = document.createElement('div');
+        pinnedItems.className = 'luliy-pinned-items';
+        pinned.forEach(function (item) {
+          var pItem = document.createElement('div');
+          pItem.className = 'luliy-pinned-item';
+          pItem.innerHTML = item.innerHTML;
+          pinnedItems.appendChild(pItem);
         });
-        hdr.appendChild(lbl); hdr.appendChild(totop);
-        toc.insertBefore(hdr, toc.firstChild);
+        pinnedBox.appendChild(pinnedItems);
+        postList.parentNode.insertBefore(pinnedBox, postList);
       }
 
-      /* Auto-expand TOC panel on article load */
-      setTimeout(function () {
-        /* Case 1: inside a <details> element */
-        var det = toc;
-        while (det && det !== document.body) {
-          if (det.tagName === 'DETAILS') { det.open = true; break; }
-          det = det.parentElement;
-        }
-        /* Case 2: parent/container is hidden */
-        var container = toc.parentElement;
-        if (container) {
-          var cs = window.getComputedStyle(container);
-          if (cs.display === 'none') container.style.display = 'block';
-          if (cs.visibility === 'hidden') container.style.visibility = 'visible';
-        }
-        /* Case 3: a sibling/ancestor toggle button with aria-expanded=false */
-        var root = (toc.parentElement || document.body);
-        root.querySelectorAll('button[aria-expanded="false"], button[aria-controls]').forEach(function (btn) {
-          var ctrl = btn.getAttribute('aria-controls');
-          if (ctrl) {
-            var target = document.getElementById(ctrl);
-            if (target && (target === toc || target.contains(toc) || toc.contains(target))) {
-              btn.click();
-            }
-          }
-        });
-        /* Case 4: ensure the TOC wrapper itself is visible */
-        toc.style.display = '';
-        toc.style.visibility = '';
-      }, 600);
-
-      /* Assign IDs to headings */
-      var allH = Array.from(pbody.querySelectorAll('h1,h2,h3,h4'));
-      allH.forEach(function (h, i) {
-        if (!h.id) {
-          var slug = (h.textContent || '').trim()
-            .toLowerCase()
-            .replace(/[\s\u3000]+/g, '-')
-            .replace(/[^\w\u4e00-\u9fff-]/g, '')
-            .slice(0, 40) || ('h-' + i);
-          var base = slug, n = 1;
-          while (document.getElementById(slug)) slug = base + '-' + (n++);
-          h.id = slug;
-        }
-      });
-
-      var headings = allH.filter(function (h) { return h.id; });
-      var links = Array.from(toc.querySelectorAll('a[href^="#"]'));
-      if (!headings.length || !links.length) return true;
-
-      var lastActiveId = null;
-      function onScroll() {
-        var activeH = null;
-        for (var i = 0; i < headings.length; i++) {
-          if (headings[i].getBoundingClientRect().top <= 110) activeH = headings[i];
-          else break;
-        }
-        if (!activeH && headings.length) activeH = headings[0];
-        var newId = activeH ? activeH.id : null;
-        if (newId === lastActiveId) return;
-        lastActiveId = newId;
-        links.forEach(function (a) { a.classList.remove('active', 'luliy-toc-active'); });
-        if (activeH) {
-          for (var j = 0; j < links.length; j++) {
-            if (links[j].getAttribute('href') === '#' + activeH.id) {
-              links[j].classList.add('active', 'luliy-toc-active'); break;
-            }
-          }
-        }
-      }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      onScroll();
-      return true;
-    }
-
-    if (!trySetup()) {
-      var n = 0;
-      var iv = setInterval(function () {
-        if (trySetup() || ++n > 20) clearInterval(iv);
-      }, 400);
+      postList.parentNode.replaceChild(grid, postList);
     }
   }
 
-  /* ---- 18  Mobile nav hamburger + dropdown ---------------- */
-  function initMobileNav() {
-    if (document.getElementById('luliy-nav-ham')) return;
+  /* ---- 15  macOS code block strip (with proper wrapper) - */
+  function initCodeBlocks(container) {
+    var blocks = (container || document).querySelectorAll('pre');
+    blocks.forEach(function (pre) {
+      if (pre._luliyMacInit) return;
+      pre._luliyMacInit = true;
 
-    var ham = document.createElement('button');
-    ham.id = 'luliy-nav-ham'; ham.type = 'button';
-    ham.setAttribute('aria-label', '\u83dc\u5355');
-    ham.innerHTML = '<span></span><span></span><span></span>';
+      var code = pre.querySelector('code');
+      var lang = code?.className?.match(/language-(\w+)/)?.[1] || '';
+      var titlebar = document.createElement('div');
+      titlebar.className = 'luliy-mac-titlebar';
 
-    var drop = document.createElement('div');
-    drop.id = 'luliy-nav-dropdown';
+      var dots = ['red', 'yellow', 'green'];
+      dots.forEach(function (color) {
+        var dot = document.createElement('div');
+        dot.className = 'luliy-mac-dot ' + color;
+        titlebar.appendChild(dot);
+      });
 
-    /* Populate dropdown from .title-right, skipping "about" */
-    function populateDrop() {
-      var tr = document.querySelector('.title-right');
-      if (!tr) return false;
-      drop.innerHTML = '';
+      var langSpan = document.createElement('span');
+      langSpan.className = 'luliy-mac-lang';
+      langSpan.textContent = lang || 'code';
+      titlebar.appendChild(langSpan);
 
-      /* Search item at top */
-      var searchItem = document.createElement('button');
-      searchItem.className = 'luliy-nav-item'; searchItem.type = 'button';
-      searchItem.textContent = '\uD83D\uDD0D \u641c\u7d22\u6587\u7ae0';
-      searchItem.addEventListener('click', function () {
-        closeDrop();
-        var ol = document.getElementById('luliy-search-overlay');
-        if (ol) {
-          ol.classList.add('is-open');
-          document.body.style.overflow = 'hidden';
-          var inp = document.getElementById('luliy-search-input');
-          if (inp) setTimeout(function () { inp.focus(); }, 100);
+      pre.insertBefore(titlebar, pre.firstChild);
+    });
+  }
+
+  /* ---- 16  Sakura petals -------------------------------  */
+  function initSakura() {
+    var canvas = document.getElementById('luliy-sakura-canvas');
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.id = 'luliy-sakura-canvas';
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      document.body.appendChild(canvas);
+    }
+
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+
+    function Petal() {
+      this.x = Math.random() * canvas.width;
+      this.y = -10;
+      this.vx = (Math.random() - 0.5) * 2;
+      this.vy = Math.random() * 2 + 1;
+      this.size = Math.random() * 3 + 2;
+      this.rot = Math.random() * Math.PI;
+      this.rotVel = (Math.random() - 0.5) * 0.1;
+      this.life = 1;
+    }
+
+    Petal.prototype.update = function () {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.rot += this.rotVel;
+      if (this.y > canvas.height) this.life = 0;
+    };
+
+    Petal.prototype.draw = function (ctx) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rot);
+      ctx.fillStyle = 'rgba(255,182,193,' + this.life * 0.6 + ')';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (Math.random() < 0.02) particles.push(new Petal());
+
+      for (var i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw(ctx);
+        if (particles[i].life <= 0) particles.splice(i, 1);
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', function () {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    animate();
+  }
+
+  /* ---- 17  ArticleTOC scroll-spy + back-to-top + TOC panel */
+  function initArticleTocSpy() {
+    var pbody = document.getElementById('postBody');
+    if (!pbody) return;
+
+    var headings = pbody.querySelectorAll('h1, h2, h3');
+    if (!headings.length) return;
+
+    // Create back-to-top button
+    if (!document.getElementById('luliy-back-top')) {
+      var backTop = document.createElement('button');
+      backTop.id = 'luliy-back-top';
+      backTop.innerHTML = '\u2191';
+      backTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      document.body.appendChild(backTop);
+    }
+
+    // Create TOC panel
+    if (!document.getElementById('luliy-toc-panel')) {
+      var tocPanel = document.createElement('div');
+      tocPanel.id = 'luliy-toc-panel';
+
+      var tocTitle = document.createElement('div');
+      tocTitle.id = 'luliy-toc-title';
+      tocTitle.textContent = '\u4e00\u81f3\u4e8e\u6b23\u8d4f';
+      tocPanel.appendChild(tocTitle);
+
+      var tocList = document.createElement('ul');
+      tocList.id = 'luliy-toc-list';
+
+      headings.forEach(function (h, idx) {
+        if (!h.id) h.id = 'heading-' + idx;
+
+        var level = parseInt(h.tagName[1]);
+        var li = document.createElement('li');
+        li.style.marginLeft = (level - 1) * 12 + 'px';
+
+        var a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.textContent = h.textContent;
+        a.dataset.headingId = h.id;
+
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+
+      tocPanel.appendChild(tocList);
+
+      // Add back-to-top to TOC panel
+      var backBtn = document.createElement('button');
+      backBtn.id = 'luliy-toc-back';
+      backBtn.innerHTML = '\u2191 \u8fd4\u56de\u9876\u90e8';
+      backBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      tocPanel.appendChild(backBtn);
+
+      document.body.appendChild(tocPanel);
+    }
+
+    // Scroll spy
+    var updateSpyOnScroll = function () {
+      var tocLinks = document.querySelectorAll('#luliy-toc-list a');
+      var backTop = document.getElementById('luliy-back-top');
+      var tocPanel = document.getElementById('luliy-toc-panel');
+      var st = window.scrollY || document.documentElement.scrollTop;
+
+      if (st > 200) {
+        if (backTop) backTop.classList.add('is-visible');
+        if (tocPanel) tocPanel.classList.add('is-visible');
+      } else {
+        if (backTop) backTop.classList.remove('is-visible');
+        if (tocPanel) tocPanel.classList.remove('is-visible');
+      }
+
+      var activeHeading = null;
+      headings.forEach(function (h) {
+        var rect = h.getBoundingClientRect();
+        if (rect.top <= 100) activeHeading = h;
+      });
+
+      tocLinks.forEach(function (link) {
+        link.classList.remove('is-active');
+        if (activeHeading && link.dataset.headingId === activeHeading.id) {
+          link.classList.add('is-active');
         }
       });
-      drop.appendChild(searchItem);
+    };
 
-      /* All nav links including about */
-      tr.querySelectorAll('a').forEach(function (a) {
-        if (!a.textContent.trim()) return;
-        var item = document.createElement('a');
-        item.className = 'luliy-nav-item';
-        item.href = a.href;
-        item.textContent = a.textContent.trim();
-        drop.appendChild(item);
+    window.addEventListener('scroll', updateSpyOnScroll, { passive: true });
+    updateSpyOnScroll();
+
+    // Mark post page for navbar transparency
+    document.body.classList.add('luliy-post-page');
+  }
+
+  /* ---- 18  Mobile nav hamburger + dropdown (enhanced) --- */
+  function initMobileNav() {
+    var header = document.querySelector('.Header');
+    if (!header) return;
+
+    var hamBtn = document.createElement('button');
+    hamBtn.id = 'luliy-nav-ham';
+    hamBtn.style.cssText = 'display:none;flex:none;width:40px;height:40px;' +
+      'background:transparent;border:none;cursor:pointer;color:inherit;font-size:20px';
+    hamBtn.innerHTML = '\u2630';
+
+    var dropdown = document.createElement('div');
+    dropdown.id = 'luliy-nav-dropdown';
+    dropdown.style.cssText = 'display:none;position:fixed;top:64px;left:0;right:0;z-index:9998;' +
+      'background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(130,80,223,0.15);' +
+      'padding:12px;flex-direction:column;gap:4px';
+
+    var navLinks = header.querySelectorAll('.Header-item:not(:first-child)');
+    navLinks.forEach(function (link) {
+      var btn = document.createElement('button');
+      btn.style.cssText = 'display:flex;align-items:center;justify-content:flex-start;gap:12px;' +
+        'width:100%;padding:12px 16px;background:transparent;border:none;cursor:pointer;' +
+        'font-size:14px;color:#1e1032;border-radius:8px;transition:all 0.2s';
+      btn.innerHTML = link.innerHTML;
+      btn.addEventListener('mouseover', function () { this.style.background = 'rgba(130,80,223,0.08)'; });
+      btn.addEventListener('mouseout', function () { this.style.background = 'transparent'; });
+      btn.addEventListener('click', function () {
+        var target = link.querySelector('a');
+        if (target) location.href = target.href;
+        dropdown.style.display = 'none';
+        hamBtn.innerHTML = '\u2630';
       });
+      dropdown.appendChild(btn);
+    });
 
-      return true;
-    }
+    header.appendChild(hamBtn);
+    document.body.appendChild(dropdown);
 
-    function openDrop() {
-      populateDrop();
-      drop.classList.add('is-open');
-      ham.classList.add('is-open');
-    }
-    function closeDrop() {
-      drop.classList.remove('is-open');
-      ham.classList.remove('is-open');
-    }
-
-    ham.addEventListener('click', function (e) {
-      e.stopPropagation();
-      drop.classList.contains('is-open') ? closeDrop() : openDrop();
+    hamBtn.addEventListener('click', function () {
+      var isOpen = dropdown.style.display === 'flex';
+      dropdown.style.display = isOpen ? 'none' : 'flex';
+      hamBtn.innerHTML = isOpen ? '\u2630' : '\u00d7';
     });
 
     document.addEventListener('click', function (e) {
-      if (!ham.contains(e.target) && !drop.contains(e.target)) closeDrop();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeDrop();
-    });
-
-    /* Insert ham into header, drop into body */
-    function injectHam() {
-      var header = document.getElementById('header');
-      if (header && !document.getElementById('luliy-nav-ham')) {
-        header.appendChild(ham);
-        document.body.appendChild(drop);
-        return true;
+      if (!e.target.closest('#luliy-nav-ham') && !e.target.closest('#luliy-nav-dropdown')) {
+        dropdown.style.display = 'none';
+        hamBtn.innerHTML = '\u2630';
       }
-      return false;
-    }
-    if (!injectHam()) {
-      var tries = 0;
-      var iv = setInterval(function () {
-        if (injectHam() || ++tries > 20) clearInterval(iv);
-      }, 200);
-    }
+    });
   }
 
-  /* ---- 19  Search overlay --------------------------------- */
+  /* ---- 19  Search overlay -------------------------------- */
   function initSearchOverlay() {
-    if (document.getElementById('luliy-search-overlay')) return;
-
-    /* Create overlay DOM */
     var overlay = document.createElement('div');
     overlay.id = 'luliy-search-overlay';
 
@@ -1095,157 +812,88 @@
 
     var input = document.createElement('input');
     input.id = 'luliy-search-input';
-    input.type = 'search';
-    input.placeholder = '\u641c\u7d22\u6587\u7ae0\u6807\u9898\u3001\u6807\u7b7e...';
-    input.autocomplete = 'off';
+    input.type = 'text';
+    input.placeholder = '\u641c\u7d22\u6587\u7ae0...';
+    box.appendChild(input);
 
     var results = document.createElement('div');
     results.id = 'luliy-search-results';
-
-    box.appendChild(input);
     box.appendChild(results);
+
     overlay.appendChild(box);
     document.body.appendChild(overlay);
 
-    var postsCache = null;
-
-    function openSearch() {
-      overlay.classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-      setTimeout(function () { input.focus(); }, 80);
-      if (!postsCache) {
-        results.innerHTML = '<p style="color:#888;text-align:center;padding:16px">\u52a0\u8f7d\u4e2d...</p>';
-        fetchPosts().then(function (posts) {
-          postsCache = posts;
-          applySearch();
-        }).catch(function () {
-          results.innerHTML = '<p style="color:#e74c3c;text-align:center;padding:16px">\u52a0\u8f7d\u5931\u8d25</p>';
-        });
-      } else {
-        applySearch();
-      }
-    }
-
-    function closeSearch() {
-      overlay.classList.remove('is-open');
-      document.body.style.overflow = '';
-    }
-
-    function applySearch() {
-      if (!postsCache) return;
-      var q = input.value.trim().toLowerCase();
-      var filtered = q
-        ? postsCache.filter(function (p) {
-          return (p.title || '').toLowerCase().includes(q) ||
-            (p.labels || []).some(function (l) {
-              return ((l.name || l) || '').toLowerCase().includes(q);
-            });
-        })
-        : postsCache.slice(0, 12);
-
-      results.innerHTML = '';
-      if (!filtered.length) {
-        results.innerHTML = '<p style="color:#888;text-align:center;padding:20px">\u6682\u65e0\u7ed3\u679c</p>';
-        return;
-      }
-      filtered.slice(0, 24).forEach(function (p) {
-        var item = document.createElement('a');
-        item.className = 'luliy-search-item';
-        item.href = buildPostLink(p.link);
-
-        var t = document.createElement('span');
-        t.className = 'luliy-search-title';
-        t.textContent = p.title || '\u65e0\u9898';
-
-        var d = document.createElement('span');
-        d.className = 'luliy-search-date';
-        d.textContent = (p.created || '').slice(0, 10);
-
-        item.appendChild(t); item.appendChild(d);
-        results.appendChild(item);
+    var searchBtn = document.querySelector('[title*="Search"], [aria-label*="search"]');
+    if (searchBtn) {
+      searchBtn.addEventListener('click', function () {
+        overlay.classList.add('is-open');
+        input.focus();
       });
     }
 
-    input.addEventListener('input', applySearch);
+    var closeSearch = function () { overlay.classList.remove('is-open'); };
     overlay.addEventListener('click', function (e) { if (e.target === overlay) closeSearch(); });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeSearch();
+      if (e.key === 'Escape') closeSearch();
+      if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        overlay.classList.toggle('is-open');
+        if (overlay.classList.contains('is-open')) input.focus();
+      }
     });
 
-    /* Inject desktop search button into nav */
-    function injectSearchBtn() {
-      var tr = document.querySelector('.title-right');
-      if (!tr || document.getElementById('luliy-search-btn')) return false;
-      var btn = document.createElement('button');
-      btn.id = 'luliy-search-btn'; btn.type = 'button';
-      btn.setAttribute('aria-label', '\u641c\u7d22');
-      btn.innerHTML =
-        '<svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">' +
-        '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>' +
-        '</svg>' +
-        '<span>\u641c\u7d22</span>';
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation(); openSearch(); playSfx('click');
-      });
-      tr.insertBefore(btn, tr.firstChild);
-      return true;
-    }
-    if (!injectSearchBtn()) {
-      var tries = 0;
-      var iv = setInterval(function () {
-        if (injectSearchBtn() || ++tries > 20) clearInterval(iv);
-      }, 200);
-    }
+    input.addEventListener('input', function () {
+      var q = input.value.toLowerCase();
+      if (!q) { results.innerHTML = ''; return; }
+
+      fetchPosts().then(function (posts) {
+        var matches = posts.filter(function (p) {
+          return p.title.toLowerCase().includes(q);
+        }).slice(0, 8);
+
+        results.innerHTML = '';
+        if (matches.length === 0) {
+          results.innerHTML = '<p style="color:#888;font-size:13px;padding:12px">\u6ca1\u6709\u627e\u5230\u7b26\u5408\u7684\u6587\u7ae0</p>';
+          return;
+        }
+
+        matches.forEach(function (post) {
+          var item = document.createElement('a');
+          item.className = 'luliy-search-item';
+          item.href = buildPostLink(post.link);
+          item.innerHTML = '<span class="luliy-search-title">' + esc(post.title) + '</span>' +
+            '<span class="luliy-search-date">' + (post.created || '') + '</span>';
+          results.appendChild(item);
+        });
+      }).catch(function () {});
+    });
   }
 
-  /* ---- 20  Homepage bottom gallery banner ----------------- */
+  /* ---- 20  Homepage bottom gallery banner -------------- */
   function initHomeGallery() {
     if (!isIndexPage()) return;
-    /* Wait until card grid has been built */
-    setTimeout(function () {
-      if (document.getElementById('luliy-home-gallery')) return;
-      var content = document.getElementById('content') || document.querySelector('.main');
-      if (!content) return;
+    var gal = document.createElement('div');
+    gal.id = 'luliy-home-gallery';
+    var img = document.createElement('img');
+    img.src = 'https://raw.githubusercontent.com/luliy6/img/refs/heads/main/banner.jpg';
+    img.alt = 'Gallery Banner';
+    gal.appendChild(img);
 
-      var wrap = document.createElement('div');
-      wrap.id = 'luliy-home-gallery';
+    var overlay = document.createElement('div');
+    overlay.id = 'luliy-home-gallery-overlay';
+    var text = document.createElement('div');
+    text.id = 'luliy-home-gallery-text';
+    text.innerHTML = '\ud83c\udf1f \u63a5\u4e0b\u6765\u7684\u65e5\u5b50';
+    overlay.appendChild(text);
+    gal.appendChild(overlay);
 
-      var img = document.createElement('img');
-      img.src = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg';
-      img.alt = 'Gallery';
-      img.loading = 'lazy';
-
-      var ov = document.createElement('div');
-      ov.id = 'luliy-home-gallery-overlay';
-
-      var txt = document.createElement('div');
-      txt.id = 'luliy-home-gallery-text';
-      txt.textContent = '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65';
-
-      ov.appendChild(txt);
-      wrap.appendChild(img);
-      wrap.appendChild(ov);
-      content.appendChild(wrap);
-    }, 800);
+    var main = document.querySelector('#content, .main, .container');
+    if (main) main.appendChild(gal);
   }
 
-  /* ---- 21  Post page init --------------------------------- */
+  /* ---- 21  Post page init ------------------------------ */
   root._luliyInitPost = function () {
-    if (root._luliyPostInited) return;
-    root._luliyPostInited = true;
-
-    /* Mark body for post-page margin CSS */
-    document.body.classList.add('luliy-post-page');
-
     var pbody = document.getElementById('postBody');
-
-    /* External links → new tab */
-    document.querySelectorAll('a[href^="http"]').forEach(function (a) {
-      if (!a.href.includes('luliy6.github.io') && !a.href.includes('luliy.me'))
-        a.target = '_blank';
-    });
-
-    if (pbody) pbody.querySelectorAll('img').forEach(function (img) { img.loading = 'lazy'; });
     if (!pbody) return;
 
     /* Reading time estimate */
@@ -1285,6 +933,17 @@
     initArticleTocSpy();
     setTimeout(function () { initArticleTocSpy(); }, 600);
     setTimeout(function () { initArticleTocSpy(); }, 2000);
+
+    /* Navbar transparency on scroll */
+    var scrollHandler = function () {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      if (st > 0) {
+        document.body.classList.add('is-scrolling-article');
+      } else {
+        document.body.classList.remove('is-scrolling-article');
+      }
+    };
+    window.addEventListener('scroll', scrollHandler, { passive: true });
 
     /* Prev / Next navigation */
     fetchPosts().then(function (posts) {
@@ -1445,7 +1104,6 @@
     initHeroCluster();
     initLightbox();
     initToolbar();
-    initNavTransparency();
     initMobileNav();
     initSearchOverlay();
 
@@ -1455,5 +1113,13 @@
     if (isPost) root._luliyInitPost();
     if (isIndexPage() || isArchivePage() || (!isPost && hasList)) root._luliyInitIndex();
   });
+
+  /* Global helper function */
+  function buildPostLink(link) {
+    if (!link) return '#';
+    if (link.startsWith('http')) return link;
+    if (link.startsWith('/')) return location.origin + link;
+    return location.origin + '/' + link;
+  }
 
 })(window);
