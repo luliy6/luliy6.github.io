@@ -710,8 +710,8 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   margin-right: auto !important;
   margin-left:  auto !important;
   margin-bottom: 0 !important;
-  padding: 0 24px !important;
-  width: 95% !important;
+  padding: 0 20px !important;
+  width: 100% !important;
   max-width: 1040px !important;
   background: transparent !important;
   background-color: transparent !important;
