@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark_colorblind" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js'></script><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js' onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script><script src='https://blog.meekdai.com/Gmeek/plugins/articletoc.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js'></script><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js'></script><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script><meta name='theme-color' content='#8250df'><link rel='apple-touch-icon' href='https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=180'><script>window.addEventListener('load',function(){if(window.Prism){Prism.plugins.autoloader.languages_path='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/';Prism.highlightAll();}if(window.mermaid){mermaid.initialize({startOnLoad:false,securityLevel:'loose',theme:document.documentElement.getAttribute('data-color-mode')==='dark'?'dark':'default'});document.querySelectorAll('pre>code.language-mermaid,code.language-mermaid').forEach(function(code){var block=document.createElement('div');block.className='mermaid';block.textContent=code.textContent.trim();(code.parentElement&&code.parentElement.tagName==='PRE'?code.parentElement:code).replaceWith(block);});if(mermaid.run){mermaid.run({querySelector:'.mermaid'});}else if(mermaid.init){mermaid.init(undefined,document.querySelectorAll('.mermaid'));}}if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}});</script><script src='https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js'></script><script src='https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js'></script><script src='https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js'></script><link rel='stylesheet' href='/enhance.css'><script defer src='/enhance.js'></script>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="> 本文档用中文详细解释 `config.json`、`enhance.css`、`enhance.js` 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。">
+<meta property="og:title" content="Luliy Blog 三件套完整说明书">
+<meta property="og:description" content="> 本文档用中文详细解释 `config.json`、`enhance.css`、`enhance.js` 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://luliy.me/post/Luliy%20Blog%20-san-jian-tao-wan-zheng-shuo-ming-shu.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
+<title>Luliy Blog 三件套完整说明书</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">Luliy Blog 三件套完整说明书</h1>
+<div class="title-right">
+    <a href="https://luliy.me" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/luliy6/luliy6.github.io/issues/28" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><blockquote>
+<p>本文档用中文详细解释 <code class="notranslate">config.json</code>、<code class="notranslate">enhance.css</code>、<code class="notranslate">enhance.js</code> 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。</p>
+</blockquote>
+<hr>
+<h2>📁 三个文件的整体分工</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>文件</th>
+<th>负责什么</th>
+<th>改动频率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">config.json</code></td>
+<td>博客的"控制面板"，所有基础设置在这里</td>
+<td>最常改</td>
+</tr>
+<tr>
+<td><code class="notranslate">enhance.css</code></td>
+<td>博客的"外观设计师"，控制颜色、字体、布局</td>
+<td>偶尔改</td>
+</tr>
+<tr>
+<td><code class="notranslate">enhance.js</code></td>
+<td>博客的"功能工程师"，控制所有交互动效</td>
+<td>较少改</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h1>一、config.json 全字段详解</h1>
+<blockquote>
+<p><strong>新手理解方式：</strong> 把 <code class="notranslate">config.json</code> 想象成一张"博客身份证+设置表"，每个字段就是一个填空题。</p>
+</blockquote>
+<hr>
+<h2>1.1 基础信息字段</h2>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"title"</span>: <span class="pl-s"><span class="pl-pds">"</span>Luliy<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 浏览器标签页显示的名字，也是 SEO 标题。<br>
+<strong>怎么改：</strong> 把 <code class="notranslate">"Luliy"</code> 换成你自己的名字即可。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"subTitle"</span>: <span class="pl-s"><span class="pl-pds">"</span>我将无限进步!<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 副标题（已被 CSS 隐藏不显示，但 SEO 仍会读取）。<br>
+<strong>怎么改：</strong> 写你的 slogan，比如 <code class="notranslate">"热爱生活，记录每一天"</code>。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"avatarUrl"</span>: <span class="pl-s"><span class="pl-pds">"</span>https://avatars.githubusercontent.com/u/177055996?...<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 导航栏头像的图片地址。<br>
+<strong>怎么改：</strong> 换成你自己的头像 URL，格式要是图片直链（.jpg / .png / .webp）。<br>
+<strong>推荐来源：</strong> GitHub 头像链接、图床直链。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"displayTitle"</span>: <span class="pl-s"><span class="pl-pds">"</span>Luliy<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> Gmeek 内部渲染用的显示名，与 <code class="notranslate">title</code> 保持一致即可。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"homeUrl"</span>: <span class="pl-s"><span class="pl-pds">"</span>https://luliy.me<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 博客首页地址，点击 Logo 时跳转的地址。<br>
+<strong>怎么改：</strong> 换成你的域名，比如 <code class="notranslate">"https://你的名字.github.io"</code>。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"email"</span>: <span class="pl-s"><span class="pl-pds">"</span>luliy6@qq.com<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 对外显示的联系邮箱（当前 exlink 已清空，此项为备用）。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"startSite"</span>: <span class="pl-s"><span class="pl-pds">"</span>05/30/2026<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 博客建站日期，enhance.js 里的"运行天数"计时器从这一天开始算。<br>
+<strong>格式：</strong> <code class="notranslate">月/日/年</code>，比如 <code class="notranslate">"01/01/2025"</code>。<br>
+<strong><g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> 重要：</strong> 改错了会导致计时显示负数，请填你真实建站的日期。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"onePageListNum"</span>: <span class="pl-c1">12</span></pre></div>
+<p><strong>作用：</strong> 首页每页显示几篇文章卡片。<br>
+<strong>可选值：</strong> 6、8、10、12、15 均可，数字越大页面越长。</p>
+<hr>
+<h2>1.2 导航页面字段</h2>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"singlePage"</span>: [<span class="pl-s"><span class="pl-pds">"</span>about<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>gallery<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>favorites<span class="pl-pds">"</span></span>]</pre></div>
+<p><strong>作用：</strong> 这里列出的每一项，Gmeek 会在 GitHub Issues 里找同名标签的文章，生成对应的独立页面。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>页面名</th>
+<th>访问方式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">about</code></td>
+<td>点击头像到达，<strong>不显示在导航栏</strong></td>
+<td>enhance.js 的 hero cluster 把头像链接设为 <code class="notranslate">/about</code></td>
+</tr>
+<tr>
+<td><code class="notranslate">gallery</code></td>
+<td>导航栏显示</td>
+<td>相册页</td>
+</tr>
+<tr>
+<td><code class="notranslate">book</code></td>
+<td>导航栏显示</td>
+<td>书单/读书笔记页</td>
+</tr>
+<tr>
+<td><code class="notranslate">favorites</code></td>
+<td>导航栏显示</td>
+<td>收藏夹页（已移除加密）</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>怎么新增：</strong> 先在 GitHub Issues 里建一个打了对应标签的文章，再把标签名加入 <code class="notranslate">singlePage</code> 数组。<br>
+<strong>注意：</strong> 标签名必须是英文小写，和 GitHub Issue 的 Label 完全一致。</p>
+<hr>
+<h2>1.3 图标与外链字段</h2>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"iconList"</span>: { <span class="pl-ii">... </span>}</pre></div>
+<p><strong>作用：</strong> 定义各种 SVG 图标的路径数据（<code class="notranslate">d</code> 属性）。这些图标是 16×16 的 GitHub 风格 SVG。<br>
+<strong>什么时候用：</strong> 当 <code class="notranslate">exlink</code> 里有某个 key，Gmeek 就会从 <code class="notranslate">iconList</code> 里找同名的图标来渲染。<br>
+<strong>当前状态：</strong> <code class="notranslate">exlink</code> 已清空为 <code class="notranslate">{}</code>，所以 <code class="notranslate">iconList</code> 里的图标目前不直接显示在导航栏，但保留备用。</p>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"exlink"</span>: {}</pre></div>
+<p><strong>作用：</strong> 导航栏右侧的外链图标按钮（原本有 GitHub / 邮件 / RSS / Tags）。<br>
+<strong>当前：</strong> 已清空为 <code class="notranslate">{}</code>，因为搜索按钮由 <code class="notranslate">enhance.js</code> 自动注入，避免重复。<br>
+<strong>如果要手动加回 GitHub 图标：</strong></p>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"exlink"</span>: {
+  <span class="pl-ent">"github"</span>: <span class="pl-s"><span class="pl-pds">"</span>https://github.com/你的用户名<span class="pl-pds">"</span></span>
+}</pre></div>
+<p>这样导航栏就会出现 GitHub 图标链接。</p>
+<hr>
+<h2>1.4 主题与外观字段</h2>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"themeMode"</span>: <span class="pl-s"><span class="pl-pds">"</span>manual<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 主题切换模式。</p>
+<ul>
+<li><code class="notranslate">"manual"</code> = 用户手动切换日/夜模式（推荐）</li>
+<li><code class="notranslate">"auto"</code> = 跟随系统自动切换</li>
+<li><code class="notranslate">"dark"</code> / <code class="notranslate">"light"</code> = 强制固定模式</li>
+</ul>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"dayTheme"</span>: <span class="pl-s"><span class="pl-pds">"</span>light<span class="pl-pds">"</span></span>,
+<span class="pl-ent">"nightTheme"</span>: <span class="pl-s"><span class="pl-pds">"</span>dark_colorblind<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 指定日间和夜间使用的 Primer 基础主题。<br>
+<strong>可选值（Gmeek 支持）：</strong> <code class="notranslate">light</code>、<code class="notranslate">dark</code>、<code class="notranslate">dark_dimmed</code>、<code class="notranslate">dark_colorblind</code>、<code class="notranslate">light_colorblind</code><br>
+<strong>建议：</strong> 夜间用 <code class="notranslate">dark_colorblind</code> 颜色对比度更高，对眼睛友好。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"yearColorList"</span>: [<span class="pl-s"><span class="pl-pds">"</span>#bc4c00<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>#0969da<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>#1f883d<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>#A333D0<span class="pl-pds">"</span></span>]</pre></div>
+<p><strong>作用：</strong> 首页贡献热力图（如果启用）的颜色列表，从浅到深对应不同活跃度。<br>
+<strong>怎么改：</strong> 直接换成你喜欢的 4 个色值，格式是 <code class="notranslate">"#十六进制颜色"</code>.</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"commentLabelColor"</span>: <span class="pl-s"><span class="pl-pds">"</span>#006b75<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 评论区 Label 标签的颜色（GitHub Issues 评论样式）。</p>
+<hr>
+<h2>1.5 功能开关字段</h2>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"showPostSource"</span>: <span class="pl-c1">1</span></pre></div>
+<p><strong>作用：</strong> 是否显示文章底部的"查看源码"链接。<code class="notranslate">1</code> = 显示，<code class="notranslate">0</code> = 隐藏。</p>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"needComment"</span>: <span class="pl-c1">1</span></pre></div>
+<p><strong>作用：</strong> 是否开启评论功能（基于 GitHub Issues）。<code class="notranslate">1</code> = 开，<code class="notranslate">0</code> = 关。</p>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"rssSplit"</span>: <span class="pl-s"><span class="pl-pds">"</span>sentence<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> RSS 订阅内容的截断方式。<code class="notranslate">"sentence"</code> = 截取第一句，<code class="notranslate">"paragraph"</code> = 截取第一段。</p>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"urlMode"</span>: <span class="pl-s"><span class="pl-pds">"</span>pinyin<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 文章 URL 的生成规则。<code class="notranslate">"pinyin"</code> = 标题转拼音，<code class="notranslate">"number"</code> = 用 Issue 编号。</p>
+<hr>
+<h2>1.6 头部注入字段（重要！）</h2>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"primerCSS"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;link href='https://mirrors.sustech.edu.cn/.../primer.css' rel='stylesheet' /&gt;<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 加载 GitHub Primer 基础样式库（按钮、布局、颜色变量等）。这是 Gmeek 的基础，<strong>不要删除</strong>。<br>
+<strong>镜像说明：</strong> 当前使用南科大 CDN 镜像，国内访问速度快。</p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"allHead"</span>: <span class="pl-s"><span class="pl-pds">"</span>...<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 注入到每个页面 <code class="notranslate">&lt;head&gt;</code> 里的内容，是整个博客的"插件加载清单"。</p>
+<p><strong>当前加载的内容逐一解释：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>加载项</th>
+<th>作用</th>
+<th>能否删除</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KaTeX CSS + JS</td>
+<td>渲染数学公式，如 <code class="notranslate">$E=mc^2$</code></td>
+<td>不写数学可删</td>
+</tr>
+<tr>
+<td>articletoc.js</td>
+<td>生成文章目录（TOC）</td>
+<td>可删，删后无目录</td>
+</tr>
+<tr>
+<td>GmeekVercount.js</td>
+<td>文章访问量统计</td>
+<td>可删</td>
+</tr>
+<tr>
+<td>Prism CSS + JS</td>
+<td>代码高亮（比 GitHub 默认好看）</td>
+<td>可删，但代码块会失色</td>
+</tr>
+<tr>
+<td>Mermaid.js</td>
+<td>渲染流程图 <code class="notranslate">```mermaid</code></td>
+<td>不用流程图可删</td>
+</tr>
+<tr>
+<td>Chart.js</td>
+<td>渲染图表 <code class="notranslate">```chart</code></td>
+<td>不用图表可删</td>
+</tr>
+<tr>
+<td><code class="notranslate">theme-color</code> meta</td>
+<td>手机浏览器地址栏颜色 <code class="notranslate">#8250df<span class="ml-1 d-inline-block border circle color-border-subtle" style="background-color: #8250df; height: 8px; width: 8px;"></span></code></td>
+<td>可改颜色</td>
+</tr>
+<tr>
+<td><code class="notranslate">apple-touch-icon</code></td>
+<td>iPhone 添加到主屏的图标</td>
+<td>可改</td>
+</tr>
+<tr>
+<td>内联 <code class="notranslate">&lt;script&gt;</code></td>
+<td>初始化 Prism/Mermaid/ServiceWorker</td>
+<td><strong>不要删</strong></td>
+</tr>
+<tr>
+<td>jQuery + jQuery UI</td>
+<td>live2d 小人依赖库</td>
+<td>删掉 live2d 时一起删</td>
+</tr>
+<tr>
+<td>live2d-widget</td>
+<td>页面左下角的 live2d 小人</td>
+<td>不喜欢可删这行</td>
+</tr>
+<tr>
+<td><code class="notranslate">/enhance.css</code></td>
+<td><strong>我们的样式文件</strong></td>
+<td><strong>不要删</strong></td>
+</tr>
+<tr>
+<td><code class="notranslate">/enhance.js</code></td>
+<td><strong>我们的功能文件</strong></td>
+<td><strong>不要删</strong></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>删除 live2d 小人的方法：</strong> 删掉 <code class="notranslate">allHead</code> 里的这三行：</p>
+<pre class="notranslate"><code class="notranslate">&lt;script src='https://cdn.jsdelivr.net/npm/jquery@3.6.0/...'&gt;&lt;/script&gt;
+&lt;script src='https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/...'&gt;&lt;/script&gt;
+&lt;script src='https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js'&gt;&lt;/script&gt;
+</code></pre>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"script"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;script&gt;function luliyWaitPost(){...}&lt;/script&gt;<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 文章页专用的"等待脚本"。它每隔 50ms 检测一次 <code class="notranslate">window._luliyInitPost</code> 是否已经加载好，加载好了就调用它。这是为了防止 enhance.js 还没加载完就被调用。<strong>不要修改。</strong></p>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"indexScript"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;script&gt;function luliyWaitIndex(){...}&lt;/script&gt;<span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 同上，但用于首页，调用的是 <code class="notranslate">window._luliyInitIndex</code>。<strong>不要修改。</strong></p>
+<hr>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"style"</span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 注入到每个页面 <code class="notranslate">&lt;style&gt;</code> 里的 CSS。<strong>已清空</strong>，因为 enhance.css 已经处理了所有样式。如果以后要快速测试某个样式，可以在这里临时写，不用改 enhance.css。</p>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"indexStyle"</span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span></pre></div>
+<p><strong>作用：</strong> 只注入到首页的额外 CSS。同样已清空。</p>
+<hr>
+<h1>二、enhance.css 全节详解</h1>
+<blockquote>
+<p><strong>新手理解方式：</strong> CSS 就像给博客"穿衣服"，每条规则都是说"这个元素要穿什么样的衣服"。<br>
+格式永远是：<code class="notranslate">选择器 { 属性: 值; }</code></p>
+</blockquote>
+<hr>
+<h2>2.1 第 00 节 — 字体导入 <code class="notranslate">@import</code></h2>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-k">@import</span> <span class="pl-en">url</span>(<span class="pl-s">'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap'</span>);
+<span class="pl-k">@import</span> <span class="pl-en">url</span>(<span class="pl-s">'https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css'</span>);</pre></div>
+<p><strong>作用：</strong> 从网上下载两套字体：</p>
+<ul>
+<li><strong>Noto Sans SC</strong>（= 思源黑体的 Google 版本）→ 用于标题</li>
+<li><strong>LXGW WenKai Screen</strong>（霞鹜文楷屏幕版）→ 用于正文</li>
+</ul>
+<p><strong>怎么换字体：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>想用的字体</th>
+<th>替换方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>思源宋体</td>
+<td><code class="notranslate">family=Noto+Serif+SC</code></td>
+</tr>
+<tr>
+<td>更纱黑体</td>
+<td>去 jsDelivr 搜 <code class="notranslate">sarasa-gothic-webfont</code></td>
+</tr>
+<tr>
+<td>自定义字体</td>
+<td>上传 woff2 到图床，用 <code class="notranslate">@font-face</code> 引入</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>国内访问慢的解决方案：</strong> 把 <code class="notranslate">fonts.googleapis.com</code> 换成 <code class="notranslate">fonts.loli.net</code>（国内镜像）。</p>
+<hr>
+<h2>2.2 第 01 节 — CSS 变量与重置</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">:</span><span class="pl-c1">root</span> {
+  <span class="pl-s1">--card-c1</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>8250df</span>;
+  <span class="pl-s1">--card-c2</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>0969da</span>;
+  <span class="pl-s1">--card-c3</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>e05c8a</span>;
+  <span class="pl-s1">--card-c4</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f0b429</span>;
+}</pre></div>
+<p><strong>作用：</strong> 定义"全局色板"。首页文章卡片的顶部彩色边框，按 1→2→3→4 循环使用这 4 个颜色。</p>
+<p><strong>怎么改：</strong> 直接换色值。比如全部换成同色系渐变：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">:</span><span class="pl-c1">root</span> {
+  <span class="pl-s1">--card-c1</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f0b429</span>;
+  <span class="pl-s1">--card-c2</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>ff8c00</span>;
+  <span class="pl-s1">--card-c3</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>ff4500</span>;
+  <span class="pl-s1">--card-c4</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>dc143c</span>;
+}</pre></div>
+<hr>
+<h2>2.3 第 02 节 — 欢迎进入画面</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">luliy-welcome</span> {
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">url</span>(<span class="pl-s">'...static/img/9.jpg'</span>) center <span class="pl-c1">/</span> cover no-repeat;
+}</pre></div>
+<p><strong>可以改的参数：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>CSS 属性</th>
+<th>当前值</th>
+<th>含义</th>
+<th>改成什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>背景图 URL</td>
+<td><code class="notranslate">9.jpg</code></td>
+<td>欢迎画面背景</td>
+<td>换成其他图片直链</td>
+</tr>
+<tr>
+<td><code class="notranslate">transition</code></td>
+<td><code class="notranslate">0.9s</code></td>
+<td>消失动画时长</td>
+<td>改成 <code class="notranslate">0.5s</code> 更快</td>
+</tr>
+<tr>
+<td><code class="notranslate">transform: scale(1.055)</code></td>
+<td>消失时放大比例</td>
+<td>改小=更平滑</td>
+<td></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">luliy-welcome-title</span> {
+  <span class="pl-c1">font-size</span><span class="pl-kos">:</span> <span class="pl-en">clamp</span>(<span class="pl-c1">1.8<span class="pl-smi">rem</span></span><span class="pl-kos">,</span> <span class="pl-c1">5<span class="pl-smi">vw</span></span><span class="pl-kos">,</span> <span class="pl-c1">3.2<span class="pl-smi">rem</span></span>);
+  <span class="pl-c1">letter-spacing</span><span class="pl-kos">:</span> <span class="pl-c1">4<span class="pl-smi">px</span></span>;
+}</pre></div>
+<p><strong><code class="notranslate">clamp(最小值, 响应式值, 最大值)</code></strong> = 字体大小会随屏幕宽度自动缩放，但不会小于 1.8rem，不会大于 3.2rem。<br>
+<strong>改字体大小：</strong> 比如 <code class="notranslate">clamp(1.4rem, 4vw, 2.6rem)</code> 让标题稍微小一点。</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-k">@keyframes</span> welcomeFadeIn {
+  <span class="pl-k">from</span> { <span class="pl-c1">opacity</span><span class="pl-kos">:</span> <span class="pl-c1">0</span>; <span class="pl-c1">transform</span><span class="pl-kos">:</span> <span class="pl-en">translateY</span>(<span class="pl-c1">28<span class="pl-smi">px</span></span>); }
+  <span class="pl-k">to</span>   { <span class="pl-c1">opacity</span><span class="pl-kos">:</span> <span class="pl-c1">1</span>; <span class="pl-c1">transform</span><span class="pl-kos">:</span> <span class="pl-en">translateY</span>(<span class="pl-c1">0</span>); }
+}</pre></div>
+<p><strong>作用：</strong> 欢迎页内容从下方 28px 处淡入。<br>
+<strong>改动画方向：</strong> 改 <code class="notranslate">translateY(28px)</code> 为 <code class="notranslate">translateX(-30px)</code> = 从左侧滑入。</p>
+<hr>
+<h2>2.4 第 03 节 — 全站背景图</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">body</span> {
+  <span class="pl-c1">background-image</span><span class="pl-kos">:</span> <span class="pl-en">url</span>(<span class="pl-s">'...static/img/bg.png'</span>) <span class="pl-k">!important</span>;
+  <span class="pl-c1">background-size</span><span class="pl-kos">:</span> cover <span class="pl-k">!important</span>;
+  <span class="pl-c1">background-attachment</span><span class="pl-kos">:</span> fixed <span class="pl-k">!important</span>;
+}</pre></div>
+<p><strong>可改参数：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>属性</th>
+<th>当前值</th>
+<th>效果</th>
+<th>可选值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">background-image</code></td>
+<td>bg.png</td>
+<td>背景图</td>
+<td>换成任意图片 URL</td>
+</tr>
+<tr>
+<td><code class="notranslate">background-size</code></td>
+<td><code class="notranslate">cover</code></td>
+<td>铺满全屏</td>
+<td><code class="notranslate">contain</code>=完整显示</td>
+</tr>
+<tr>
+<td><code class="notranslate">background-attachment</code></td>
+<td><code class="notranslate">fixed</code></td>
+<td>滚动时背景固定不动（视差效果）</td>
+<td><code class="notranslate">scroll</code>=随页面滚动</td>
+</tr>
+<tr>
+<td><code class="notranslate">background-position</code></td>
+<td><code class="notranslate">center</code></td>
+<td>居中</td>
+<td><code class="notranslate">top</code>、<code class="notranslate">bottom</code>、<code class="notranslate">0 30%</code></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>如果不想用背景图，改成纯色：</strong></p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">body</span> { <span class="pl-c1">background-image</span><span class="pl-kos">:</span> none <span class="pl-k">!important</span>; <span class="pl-c1">background-color</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f5f0ff</span> <span class="pl-k">!important</span>; }</pre></div>
+<hr>
+<h2>2.5 第 04 节 — 文字排版</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">body</span> {
+  <span class="pl-c1">font-family</span><span class="pl-kos">:</span> <span class="pl-s">'LXGW WenKai Screen'</span><span class="pl-kos">,</span> <span class="pl-s">'LXGW WenKai'</span><span class="pl-kos">,</span> <span class="pl-s">'Noto Serif SC'</span><span class="pl-kos">,</span> serif;
+}</pre></div>
+<p><strong>字体书写顺序（优先级从高到低）：</strong> 浏览器会先尝试第一个，找不到就用第二个，以此类推。最后的 <code class="notranslate">serif</code> 是系统兜底。</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">postBody</span> { <span class="pl-c1">font-size</span><span class="pl-kos">:</span> <span class="pl-c1">18<span class="pl-smi">px</span></span>; <span class="pl-c1">line-height</span><span class="pl-kos">:</span> <span class="pl-c1">1.9</span>; }</pre></div>
+<p><strong>可改参数：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>属性</th>
+<th>当前值</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">font-size</code></td>
+<td><code class="notranslate">18px</code></td>
+<td>文章正文字号（14~20px 都合适）</td>
+</tr>
+<tr>
+<td><code class="notranslate">line-height</code></td>
+<td><code class="notranslate">1.9</code></td>
+<td>行间距（1.6~2.0，越大越宽松）</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>h2 的特殊样式解释：</strong></p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">h2</span> {
+  <span class="pl-c1">border-left</span><span class="pl-kos">:</span> <span class="pl-en">var</span>(<span class="pl-s1">--th-h2-bl</span>);   <span class="pl-c">/* 左边彩色竖条 */</span>
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">var</span>(<span class="pl-s1">--th-h2-bg</span>);    <span class="pl-c">/* 淡色背景 */</span>
+  <span class="pl-c1">padding</span><span class="pl-kos">:</span> <span class="pl-c1">5<span class="pl-smi">px</span></span> <span class="pl-c1">12<span class="pl-smi">px</span></span>;              <span class="pl-c">/* 内边距 */</span>
+  <span class="pl-c1">border-radius</span><span class="pl-kos">:</span> <span class="pl-c1">0</span> <span class="pl-c1">8<span class="pl-smi">px</span></span> <span class="pl-c1">8<span class="pl-smi">px</span></span> <span class="pl-c1">0</span>;    <span class="pl-c">/* 右侧圆角 */</span>
+}</pre></div>
+<p>这就是为什么 h2 标题有"竖线+淡色背景"效果。</p>
+<hr>
+<h2>2.6 第 05 节 — 导航栏</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">header</span> {
+  <span class="pl-c1">backdrop-filter</span><span class="pl-kos">:</span> <span class="pl-en">blur</span>(<span class="pl-c1">32<span class="pl-smi">px</span></span>) <span class="pl-en">saturate</span>(<span class="pl-c1">2.4</span>) <span class="pl-en">brightness</span>(<span class="pl-c1">1.08</span>);
+}</pre></div>
+<p><strong>毛玻璃效果三个参数：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>属性</th>
+<th>当前值</th>
+<th>作用</th>
+<th>改大/改小效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">blur()</code></td>
+<td><code class="notranslate">32px</code></td>
+<td>模糊程度</td>
+<td>改大=更朦胧</td>
+</tr>
+<tr>
+<td><code class="notranslate">saturate()</code></td>
+<td><code class="notranslate">2.4</code></td>
+<td>饱和度</td>
+<td>改大=颜色更鲜艳</td>
+</tr>
+<tr>
+<td><code class="notranslate">brightness()</code></td>
+<td><code class="notranslate">1.08</code></td>
+<td>亮度</td>
+<td>改大=更亮</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">header</span> {
+  <span class="pl-c1">min-height</span><span class="pl-kos">:</span> <span class="pl-c1">56<span class="pl-smi">px</span></span>;
+}</pre></div>
+<p><strong>导航栏高度：</strong> 改成 <code class="notranslate">64px</code> 可以让导航栏更高。同时要在 JS 的 <code class="notranslate">initArticleTocSpy()</code> 里把 <code class="notranslate">110</code> 改成对应值，确保 TOC 高亮判断正确。</p>
+<hr>
+<h2>2.7 第 12 节 — 文章面板（4 个主题）</h2>
+<p>这是最核心的视觉部分。4 个主题的文章背景：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* 默认主题：无背景框 */</span>
+<span class="pl-ent">body</span>[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"default"</span>] <span class="pl-kos">#</span><span class="pl-c1">postBody</span> {
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> transparent <span class="pl-k">!important</span>;
+}
+
+<span class="pl-c">/* 樱花主题：粉色毛玻璃 */</span>
+<span class="pl-ent">body</span>[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"sakura"</span>] <span class="pl-kos">#</span><span class="pl-c1">postBody</span> {
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">255</span><span class="pl-kos">,</span><span class="pl-c1">238</span><span class="pl-kos">,</span><span class="pl-c1">245</span><span class="pl-kos">,</span><span class="pl-c1">0.84</span>) <span class="pl-k">!important</span>;
+  <span class="pl-c1">backdrop-filter</span><span class="pl-kos">:</span> <span class="pl-en">blur</span>(<span class="pl-c1">26<span class="pl-smi">px</span></span>) <span class="pl-en">saturate</span>(<span class="pl-c1">1.6</span>) <span class="pl-k">!important</span>;
+  <span class="pl-c1">border</span><span class="pl-kos">:</span> <span class="pl-c1">1<span class="pl-smi">px</span></span> solid <span class="pl-en">rgba</span>(<span class="pl-c1">249</span><span class="pl-kos">,</span><span class="pl-c1">168</span><span class="pl-kos">,</span><span class="pl-c1">201</span><span class="pl-kos">,</span><span class="pl-c1">0.50</span>) <span class="pl-k">!important</span>;
+}</pre></div>
+<p><strong><code class="notranslate">rgba(r, g, b, 透明度)</code>：</strong></p>
+<ul>
+<li>r/g/b = 0~255 的红/绿/蓝分量</li>
+<li>透明度 = 0（全透明）~ 1（不透明）</li>
+<li><code class="notranslate">rgba(255,238,245,0.84)<span class="ml-1 d-inline-block border circle color-border-subtle" style="background-color: rgba(255,238,245,0.84); height: 8px; width: 8px;"></span></code> = 粉白色，84% 不透明</li>
+</ul>
+<p><strong>自定义主题背景的方法：</strong> 比如要改樱花主题的背景色，更偏紫色：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">body</span>[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"sakura"</span>] <span class="pl-kos">#</span><span class="pl-c1">postBody</span> {
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">250</span><span class="pl-kos">,</span><span class="pl-c1">235</span><span class="pl-kos">,</span><span class="pl-c1">255</span><span class="pl-kos">,</span><span class="pl-c1">0.82</span>) <span class="pl-k">!important</span>;  <span class="pl-c">/* 改这里 */</span>
+}</pre></div>
+<p><strong><code class="notranslate">box-shadow</code> 阴影解释：</strong></p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c1">box-shadow</span><span class="pl-kos">:</span> <span class="pl-c1">0</span> <span class="pl-c1">6<span class="pl-smi">px</span></span> <span class="pl-c1">44<span class="pl-smi">px</span></span> <span class="pl-en">rgba</span>(<span class="pl-c1">224</span><span class="pl-kos">,</span><span class="pl-c1">92</span><span class="pl-kos">,</span><span class="pl-c1">138</span><span class="pl-kos">,</span><span class="pl-c1">0.16</span>)
+<span class="pl-c">/*          ↑ ↑   ↑      ↑</span>
+<span class="pl-c">          X Y 模糊   颜色+透明度  */</span></pre></div>
+<hr>
+<h2>2.8 第 13 节 — macOS 代码块</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">mac-strip</span> {
+  <span class="pl-c1">height</span><span class="pl-kos">:</span> <span class="pl-c1">36<span class="pl-smi">px</span></span>;  <span class="pl-c">/* 代码块顶部条的高度 */</span>
+  <span class="pl-c1">padding</span><span class="pl-kos">:</span> <span class="pl-c1">0</span> <span class="pl-c1">14<span class="pl-smi">px</span></span>; <span class="pl-c1">gap</span><span class="pl-kos">:</span> <span class="pl-c1">7<span class="pl-smi">px</span></span>;  <span class="pl-c">/* 三个圆点按钮间距 */</span>
+}
+.<span class="pl-c1">mac-btn</span> {
+  <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">13<span class="pl-smi">px</span></span>; <span class="pl-c1">height</span><span class="pl-kos">:</span> <span class="pl-c1">13<span class="pl-smi">px</span></span>;  <span class="pl-c">/* 圆点大小 */</span>
+}
+.<span class="pl-c1">mac-btn-red</span>    { <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>ff5f57</span>; }  <span class="pl-c">/* 红色=复制 */</span>
+.<span class="pl-c1">mac-btn-yellow</span> { <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>ffbd2e</span>; }  <span class="pl-c">/* 黄色=折叠 */</span>
+.<span class="pl-c1">mac-btn-green</span>  { <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>28c840</span>; }  <span class="pl-c">/* 绿色=全屏 */</span></pre></div>
+<p><strong>改圆点大小：</strong> 把 <code class="notranslate">13px</code> 改成 <code class="notranslate">11px</code> 或 <code class="notranslate">15px</code>。<br>
+<strong>改顶部条高度：</strong> 修改 <code class="notranslate">height: 36px</code>，同时 <code class="notranslate">enhance.css</code> 里 <code class="notranslate">pre { padding-top: 44px }</code> 也要跟着改（要比条的高度大 8px 左右）。</p>
+<hr>
+<h2>2.9 第 15 节 — 4 个主题的颜色变量</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">body</span>[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"sakura"</span>] {
+  <span class="pl-s1">--th-h1</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>7a1040</span>;       <span class="pl-c">/* h1 文字颜色 */</span>
+  <span class="pl-s1">--th-h1-border</span><span class="pl-kos">:</span> <span class="pl-c1">2<span class="pl-smi">px</span></span> solid <span class="pl-en">rgba</span>(<span class="pl-c1">224</span><span class="pl-kos">,</span><span class="pl-c1">92</span><span class="pl-kos">,</span><span class="pl-c1">138</span><span class="pl-kos">,</span><span class="pl-c1">0.35</span>);  <span class="pl-c">/* h1 下划线 */</span>
+  <span class="pl-s1">--th-h2</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>c94070</span>;       <span class="pl-c">/* h2 文字颜色 */</span>
+  <span class="pl-s1">--th-h2-bl</span><span class="pl-kos">:</span> <span class="pl-c1">5<span class="pl-smi">px</span></span> solid <span class="pl-pds"><span class="pl-kos">#</span>f9a8c9</span>;  <span class="pl-c">/* h2 左边竖线颜色 */</span>
+  <span class="pl-s1">--th-h2-bg</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">249</span><span class="pl-kos">,</span><span class="pl-c1">168</span><span class="pl-kos">,</span><span class="pl-c1">201</span><span class="pl-kos">,</span><span class="pl-c1">0.12</span>);  <span class="pl-c">/* h2 背景色 */</span>
+  <span class="pl-s1">--th-strong</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>e05c8a</span>;   <span class="pl-c">/* 加粗文字颜色 */</span>
+}</pre></div>
+<p><strong>修改主题颜色的步骤（以调整樱花主题为例）：</strong></p>
+<ol>
+<li>找到 <code class="notranslate">body[data-luliy-theme="sakura"]</code> 这段</li>
+<li>把 <code class="notranslate">--th-h2</code> 的颜色改成你想要的</li>
+<li>把 <code class="notranslate">--th-h2-bl</code> 的边框颜色改成对应色</li>
+<li>保存，重新部署即可看效果</li>
+</ol>
+<hr>
+<h2>2.10 第 16 节 — 目录 TOC 高亮</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">TOC</span> <span class="pl-ent">a</span>.<span class="pl-c1">luliy-toc-active</span> {
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">130</span><span class="pl-kos">,</span><span class="pl-c1">80</span><span class="pl-kos">,</span><span class="pl-c1">223</span><span class="pl-kos">,</span><span class="pl-c1">0.14</span>) <span class="pl-k">!important</span>;  <span class="pl-c">/* 高亮背景 */</span>
+  <span class="pl-c1">color</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>8250df</span> <span class="pl-k">!important</span>;                      <span class="pl-c">/* 高亮文字颜色 */</span>
+  <span class="pl-c1">border-left</span><span class="pl-kos">:</span> <span class="pl-c1">3<span class="pl-smi">px</span></span> solid <span class="pl-pds"><span class="pl-kos">#</span>8250df</span>;                <span class="pl-c">/* 左边蓝线 */</span>
+  <span class="pl-c1">padding-left</span><span class="pl-kos">:</span> <span class="pl-c1">14<span class="pl-smi">px</span></span> <span class="pl-k">!important</span>;                  <span class="pl-c">/* 缩进 */</span>
+}</pre></div>
+<p><strong>改高亮背景透明度：</strong> 把 <code class="notranslate">0.14</code> 改成 <code class="notranslate">0.25</code> = 更明显的高亮。<br>
+<strong>改高亮颜色：</strong> 把 <code class="notranslate">#8250df<span class="ml-1 d-inline-block border circle color-border-subtle" style="background-color: #8250df; height: 8px; width: 8px;"></span></code> 换成任意颜色，比如 <code class="notranslate">#e05c8a<span class="ml-1 d-inline-block border circle color-border-subtle" style="background-color: #e05c8a; height: 8px; width: 8px;"></span></code>（粉色）。</p>
+<hr>
+<h2>2.11 第 17 节 — 浮动工具栏按钮</h2>
+<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">luliy-tb-btn</span> {
+  <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">42<span class="pl-smi">px</span></span>; <span class="pl-c1">height</span><span class="pl-kos">:</span> <span class="pl-c1">42<span class="pl-smi">px</span></span>;   <span class="pl-c">/* 按钮大小 */</span>
+  <span class="pl-c1">border-radius</span><span class="pl-kos">:</span> <span class="pl-c1">50<span class="pl-smi">%</span></span>;           <span class="pl-c">/* 圆形 */</span>
+  <span class="pl-c1">bottom</span><span class="pl-kos">:</span> <span class="pl-c1">28<span class="pl-smi">px</span></span>; <span class="pl-c1">right</span><span class="pl-kos">:</span> <span class="pl-c1">20<span class="pl-smi">px</span></span>;   <span class="pl-c">/* 位置：右下角 */</span>
+}</pre></div>
+<p><strong>改按钮大小：</strong> 把 <code class="notranslate">42px</code> 改成 <code class="notranslate">48px</code> = 更大的按钮。<br>
+<strong>改位置：</strong> 修改 <code class="notranslate">#luliy-toolbar</code> 的 <code class="notranslate">bottom</code> 和 <code class="notranslate">right</code> 值。</p>
+<hr>
+<h1>三、enhance.js 全模块详解</h1>
+<blockquote>
+<p><strong>新手理解方式：</strong> JavaScript 就像博客的"大脑"，每个 <code class="notranslate">function</code> 函数是一个"技能"，主程序在最后把所有技能都调用一遍。</p>
+</blockquote>
+<hr>
+<h2>3.1 模块 00 — 欢迎进入画面 <code class="notranslate">initWelcomeSplash()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">sessionStorage</span><span class="pl-kos">.</span><span class="pl-en">getItem</span><span class="pl-kos">(</span><span class="pl-s">'luliy-welcomed'</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-s">'1'</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span></pre></div>
+<p><strong>作用：</strong> 检查本次浏览会话里是否已经显示过欢迎画面。如果已经显示过，直接跳过（不重复弹出）。</p>
+<blockquote>
+<p><strong>sessionStorage vs localStorage 的区别：</strong></p>
+<ul>
+<li><code class="notranslate">sessionStorage</code>：关闭标签页/浏览器就清空 → 每次打开新标签页都会看到欢迎画面</li>
+<li><code class="notranslate">localStorage</code>：永久保存 → 只有第一次访问看到<br>
+改成永久只显示一次：把 <code class="notranslate">sessionStorage</code> 全部替换为 <code class="notranslate">localStorage</code></li>
+</ul>
+</blockquote>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">title</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'div'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-s1">title</span><span class="pl-kos">.</span><span class="pl-c1">id</span> <span class="pl-c1">=</span> <span class="pl-s">'luliy-welcome-title'</span><span class="pl-kos">;</span>
+<span class="pl-s1">title</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'欢迎来到 Luliy 的世界'</span><span class="pl-kos">;</span></pre></div>
+<p><strong>改欢迎标题：</strong> 把 <code class="notranslate">'欢迎来到 Luliy 的世界'</code> 换成你想显示的文字。（注意：代码里用了 Unicode 转义，实际效果就是中文字符）</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">btn</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'button'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-s1">btn</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'点击进入'</span><span class="pl-kos">;</span></pre></div>
+<p><strong>改按钮文字：</strong> 把 <code class="notranslate">'点击进入'</code> 换成 <code class="notranslate">'开启旅程'</code> 或任意文字。</p>
+<hr>
+<h2>3.2 模块 01 — 本地存储初始化 <code class="notranslate">initLocalStorage()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">defs</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
+  <span class="pl-s">'luliy-sfx'</span>:    <span class="pl-s">'1'</span><span class="pl-kos">,</span>   <span class="pl-c">// 音效默认开启</span>
+  <span class="pl-s">'luliy-sakura'</span>: <span class="pl-s">'1'</span><span class="pl-kos">,</span>   <span class="pl-c">// 花瓣默认开启</span>
+  <span class="pl-s">'luliy-sink'</span>:   <span class="pl-s">'default'</span>  <span class="pl-c">// 默认主题</span>
+<span class="pl-kos">}</span><span class="pl-kos">;</span></pre></div>
+<p><strong>作用：</strong> 首次访问时，在浏览器里保存用户的偏好设置默认值。<br>
+<strong>改默认主题：</strong> 把 <code class="notranslate">'default'</code> 改成 <code class="notranslate">'sakura'</code>、<code class="notranslate">'your-name'</code> 或 <code class="notranslate">'space'</code>，用户首次访问就看到对应主题。<br>
+<strong>改默认关闭音效：</strong> 把 <code class="notranslate">'luliy-sfx': '1'</code> 改成 <code class="notranslate">'luliy-sfx': '0'</code>。</p>
+<hr>
+<h2>3.3 模块 02 — 阅读进度条 <code class="notranslate">initProgressBar()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">bar</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">width</span> <span class="pl-c1">=</span> <span class="pl-kos">(</span><span class="pl-s1">dh</span> <span class="pl-c1">&gt;</span> <span class="pl-c1">0</span> ? <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">round</span><span class="pl-kos">(</span><span class="pl-s1">st</span> <span class="pl-c1">/</span> <span class="pl-s1">dh</span> <span class="pl-c1">*</span> <span class="pl-c1">100</span><span class="pl-kos">)</span> : <span class="pl-c1">0</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">'%'</span><span class="pl-kos">;</span></pre></div>
+<p><strong>原理：</strong> <code class="notranslate">st</code>(已滚动距离) ÷ <code class="notranslate">dh</code>(总可滚动距离) × 100 = 百分比。<br>
+<strong>改进度条颜色：</strong> 在 <code class="notranslate">enhance.css</code> 里找：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">luliy-progress-bar</span> {
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">linear-gradient</span>(<span class="pl-c1">90<span class="pl-smi">deg</span></span><span class="pl-kos">,</span> <span class="pl-pds"><span class="pl-kos">#</span>8250df</span><span class="pl-kos">,</span> <span class="pl-pds"><span class="pl-kos">#</span>ff6b9d</span><span class="pl-kos">,</span> <span class="pl-pds"><span class="pl-kos">#</span>f0b429</span>);
+}</pre></div>
+<p>改成你想要的渐变颜色。</p>
+<hr>
+<h2>3.4 模块 03 — 动态标签页标题 <code class="notranslate">initDynamicTitle()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">=</span> <span class="pl-s">'👀 别走啊，我还在进步！'</span><span class="pl-kos">;</span>  <span class="pl-c">// 切换走时</span>
+<span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">=</span> <span class="pl-s">'✨ 欢迎回来！ '</span> <span class="pl-c1">+</span> <span class="pl-s1">ori</span><span class="pl-kos">;</span>      <span class="pl-c">// 切换回来时</span></pre></div>
+<p><strong>怎么改：</strong> 直接修改这两行里的文字。emoji 也可以换。</p>
+<hr>
+<h2>3.5 模块 04 — 运行时间计数器 <code class="notranslate">initUptime()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">start</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">Date</span><span class="pl-kos">(</span><span class="pl-s">'2026/05/30 00:00:00'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">getTime</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<p><strong><g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> 重要：</strong> 这里的日期必须和 <code class="notranslate">config.json</code> 里的 <code class="notranslate">startSite</code> 保持一致！<br>
+<strong>格式：</strong> <code class="notranslate">'年/月/日 时:分:秒'</code></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">el</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">'🌱 本站已陪伴你无限进步：'</span> <span class="pl-c1">+</span>
+  <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">floor</span><span class="pl-kos">(</span><span class="pl-s1">d</span> <span class="pl-c1">/</span> <span class="pl-c1">86400000</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">'天 '</span> <span class="pl-c1">+</span> ...</pre></div>
+<p><strong>改显示文字：</strong> 把 <code class="notranslate">'🌱 本站已陪伴你无限进步：'</code> 改成你想要的前缀文字。<br>
+<strong>数字解释：</strong></p>
+<ul>
+<li><code class="notranslate">86400000</code> = 1天的毫秒数（60×60×24×1000）</li>
+<li><code class="notranslate">3600000</code> = 1小时的毫秒数</li>
+<li><code class="notranslate">60000</code> = 1分钟的毫秒数</li>
+</ul>
+<hr>
+<h2>3.6 模块 07 — 网页音效 <code class="notranslate">playSfx(type)</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">function</span> <span class="pl-en">playSfx</span><span class="pl-kos">(</span><span class="pl-s1">type</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">localStorage</span><span class="pl-kos">.</span><span class="pl-en">getItem</span><span class="pl-kos">(</span><span class="pl-s">'luliy-sfx'</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-s">'0'</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+  <span class="pl-c">// type 可以是 'click'、'sci'、'theme'</span>
+<span class="pl-kos">}</span></pre></div>
+<p>音效全部通过 Web Audio API 合成，不依赖任何音频文件。</p>
+<p><strong>三种音效说明：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>type</th>
+<th>触发时机</th>
+<th>声音特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">'click'</code></td>
+<td>点击链接/按钮</td>
+<td>短促的电子音</td>
+</tr>
+<tr>
+<td><code class="notranslate">'sci'</code></td>
+<td>代码块全屏</td>
+<td>上升的科技感音效</td>
+</tr>
+<tr>
+<td><code class="notranslate">'theme'</code></td>
+<td>切换日夜模式</td>
+<td>三音符和弦</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>调整音量：</strong> 找到 <code class="notranslate">g.gain.setValueAtTime(0.04, ...)</code> 里的 <code class="notranslate">0.04</code>，改大 = 更响（最大不超过 0.3，否则会破音）。<br>
+<strong>完全关闭音效功能（不留按钮）：</strong> 把模块 07 里的所有代码替换成 <code class="notranslate">function playSfx() {}</code>，然后在模块 13（工具栏）删除 SFX 按钮部分。</p>
+<hr>
+<h2>3.7 模块 08 — 点击粒子特效 <code class="notranslate">initClickSparks()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">colors</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-s">'#ff6b9d'</span><span class="pl-kos">,</span> <span class="pl-s">'#ffcd3c'</span><span class="pl-kos">,</span> <span class="pl-s">'#6bceff'</span><span class="pl-kos">,</span> <span class="pl-s">'#a78bfa'</span><span class="pl-kos">,</span> <span class="pl-s">'#34d399'</span><span class="pl-kos">]</span><span class="pl-kos">;</span></pre></div>
+<p><strong>改粒子颜色：</strong> 替换这个数组里的颜色，可以加减数量。</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">var</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">12</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span>   <span class="pl-c">// 每次点击产生 12 个粒子</span>
+<span class="pl-k">var</span> <span class="pl-s1">dist</span> <span class="pl-c1">=</span> <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">random</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-c1">50</span> <span class="pl-c1">+</span> <span class="pl-c1">16</span><span class="pl-kos">;</span>  <span class="pl-c">// 飞散距离 16~66px</span></pre></div>
+<p><strong>改粒子数量：</strong> 把 <code class="notranslate">12</code> 改成 <code class="notranslate">6</code>（减少）或 <code class="notranslate">20</code>（增多，但可能卡顿）。<br>
+<strong>改飞散距离：</strong> 把 <code class="notranslate">50 + 16</code> 改成 <code class="notranslate">80 + 20</code> = 粒子飞更远。</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">s</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">width</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">height</span> <span class="pl-c1">=</span> <span class="pl-s">'7px'</span><span class="pl-kos">;</span>  <span class="pl-c">// 粒子大小</span></pre></div>
+<p><strong>改粒子大小：</strong> 把 <code class="notranslate">7px</code> 改成 <code class="notranslate">5px</code>（更小）或 <code class="notranslate">10px</code>（更大）。</p>
+<hr>
+<h2>3.8 模块 09 — 头像英雄区 <code class="notranslate">initHeroCluster()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">cluster</span><span class="pl-kos">.</span><span class="pl-c1">href</span> <span class="pl-c1">=</span> <span class="pl-s">'/about'</span><span class="pl-kos">;</span>
+<span class="pl-s1">cluster</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">=</span> <span class="pl-s">'关于我'</span><span class="pl-kos">;</span></pre></div>
+<p><strong>作用：</strong> 把导航栏头像变成一个链接，点击跳转到 <code class="notranslate">/about</code> 页面。<br>
+<strong>改跳转页面：</strong> 把 <code class="notranslate">'/about'</code> 换成你想要的任意路径。</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">nameEl</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'Luliy'</span><span class="pl-kos">;</span></pre></div>
+<p><strong>改显示名字：</strong> 把 <code class="notranslate">'Luliy'</code> 改成你的名字。这个名字显示在头像右边。</p>
+<hr>
+<h2>3.9 模块 10 — 首页横幅 <code class="notranslate">initHeroBanner()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">banner</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'Remember, this is your world.'</span><span class="pl-kos">;</span></pre></div>
+<p><strong>改横幅文字：</strong> 替换这里的文字，可以写你的 slogan、一句诗、或留空。<br>
+<strong>留空横幅：</strong> <code class="notranslate">banner.textContent = '';</code></p>
+<hr>
+<h2>3.10 模块 13 — 浮动工具栏 + 4 个主题 <code class="notranslate">SINKS</code> 数组</h2>
+<p>这是整个 JS 文件里<strong>最常需要改动</strong>的部分。</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-c1">SINKS</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span>
+  <span class="pl-kos">{</span>
+    <span class="pl-c1">id</span>: <span class="pl-s">'default'</span><span class="pl-kos">,</span>           <span class="pl-c">// 主题 ID（不要改）</span>
+    <span class="pl-c1">label</span>: <span class="pl-s">'默认'</span><span class="pl-kos">,</span>            <span class="pl-c">// 主题菜单里显示的名字（可改）</span>
+    <span class="pl-c1">dot</span>:   <span class="pl-s">'#8250df'</span><span class="pl-kos">,</span>        <span class="pl-c">// 菜单里的小圆点颜色（可改）</span>
+    <span class="pl-c1">theme</span>: <span class="pl-s">'default'</span><span class="pl-kos">,</span>        <span class="pl-c">// 对应 CSS 里的 data-luliy-theme（不要改）</span>
+    <span class="pl-c1">cardPalette</span>: <span class="pl-kos">[</span><span class="pl-s">'#8250df'</span><span class="pl-kos">,</span> <span class="pl-s">'#0969da'</span><span class="pl-kos">,</span> <span class="pl-s">'#ff6b9d'</span><span class="pl-kos">,</span> <span class="pl-s">'#f0b429'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>  <span class="pl-c">// 4色卡片边框</span>
+    <span class="pl-c1">desc</span>: <span class="pl-s">'经典紫调，局演清正'</span>  <span class="pl-c">// 主题描述（可改）</span>
+  <span class="pl-kos">}</span><span class="pl-kos">,</span>
+  ...
+<span class="pl-kos">]</span></pre></div>
+<p><strong>修改主题名称和描述：</strong> 直接改 <code class="notranslate">label</code> 和 <code class="notranslate">desc</code> 字段里的文字。</p>
+<p><strong>修改卡片颜色：</strong> <code class="notranslate">cardPalette</code> 数组的 4 个颜色分别对应第 1、2、3、4 篇卡片的顶部边框颜色，之后循环。</p>
+<p><strong>添加第 5 个主题（高级操作）：</strong></p>
+<ol>
+<li>在 <code class="notranslate">SINKS</code> 数组里新增一项：</li>
+</ol>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-kos">{</span>
+  <span class="pl-c1">id</span>: <span class="pl-s">'ocean'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">label</span>: <span class="pl-s">'深海蔚蓝'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">dot</span>: <span class="pl-s">'#0066cc'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">theme</span>: <span class="pl-s">'ocean'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">cardPalette</span>: <span class="pl-kos">[</span><span class="pl-s">'#0066cc'</span><span class="pl-kos">,</span> <span class="pl-s">'#0099ff'</span><span class="pl-kos">,</span> <span class="pl-s">'#00ccff'</span><span class="pl-kos">,</span> <span class="pl-s">'#006699'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+  <span class="pl-c1">desc</span>: <span class="pl-s">'深海宁静，波光粼粼'</span>
+<span class="pl-kos">}</span></pre></div>
+<ol start="2">
+<li>在 <code class="notranslate">enhance.css</code> 的第 15 节末尾添加：</li>
+</ol>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">body</span>[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"ocean"</span>] {
+  <span class="pl-s1">--th-h1</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>003366</span>; <span class="pl-s1">--th-h1-border</span><span class="pl-kos">:</span> <span class="pl-c1">2<span class="pl-smi">px</span></span> solid <span class="pl-en">rgba</span>(<span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">100</span><span class="pl-kos">,</span><span class="pl-c1">200</span><span class="pl-kos">,</span><span class="pl-c1">0.30</span>);
+  <span class="pl-s1">--th-h2</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>0066cc</span>; <span class="pl-s1">--th-h2-bl</span><span class="pl-kos">:</span> <span class="pl-c1">5<span class="pl-smi">px</span></span> solid <span class="pl-pds"><span class="pl-kos">#</span>00ccff</span>; <span class="pl-s1">--th-h2-bg</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">100</span><span class="pl-kos">,</span><span class="pl-c1">200</span><span class="pl-kos">,</span><span class="pl-c1">0.08</span>);
+  <span class="pl-s1">--th-h3</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>0080ff</span>; <span class="pl-s1">--th-h4</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>4da6ff</span>; <span class="pl-s1">--th-strong</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>00ccff</span>;
+}
+<span class="pl-ent">body</span>[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"ocean"</span>] <span class="pl-kos">#</span><span class="pl-c1">postBody</span> {
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">230</span><span class="pl-kos">,</span><span class="pl-c1">240</span><span class="pl-kos">,</span><span class="pl-c1">255</span><span class="pl-kos">,</span><span class="pl-c1">0.84</span>) <span class="pl-k">!important</span>;
+  <span class="pl-c1">border</span><span class="pl-kos">:</span> <span class="pl-c1">1<span class="pl-smi">px</span></span> solid <span class="pl-en">rgba</span>(<span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">100</span><span class="pl-kos">,</span><span class="pl-c1">200</span><span class="pl-kos">,</span><span class="pl-c1">0.25</span>) <span class="pl-k">!important</span>;
+  <span class="pl-c1">border-top</span><span class="pl-kos">:</span> <span class="pl-c1">3<span class="pl-smi">px</span></span> solid <span class="pl-en">rgba</span>(<span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">150</span><span class="pl-kos">,</span><span class="pl-c1">255</span><span class="pl-kos">,</span><span class="pl-c1">0.65</span>) <span class="pl-k">!important</span>;
+  <span class="pl-c1">border-radius</span><span class="pl-kos">:</span> <span class="pl-c1">20<span class="pl-smi">px</span></span> <span class="pl-k">!important</span>;
+  <span class="pl-c1">padding</span><span class="pl-kos">:</span> <span class="pl-c1">36<span class="pl-smi">px</span></span> <span class="pl-c1">40<span class="pl-smi">px</span></span> <span class="pl-k">!important</span>;
+}</pre></div>
+<hr>
+<h2>3.11 模块 14 — 首页文章卡片重建 <code class="notranslate">initCards()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">perPage</span> <span class="pl-c1">=</span> <span class="pl-c1">12</span><span class="pl-kos">;</span>  <span class="pl-c">// 每页文章数（和 config.json 的 onePageListNum 保持一致）</span></pre></div>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">pinnedPosts</span>  <span class="pl-c1">=</span> <span class="pl-s1">posts</span><span class="pl-kos">.</span><span class="pl-en">filter</span><span class="pl-kos">(</span><span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">p</span><span class="pl-kos">)</span> <span class="pl-kos">{</span> <span class="pl-k">return</span> <span class="pl-s1">p</span><span class="pl-kos">.</span><span class="pl-c1">pinned</span><span class="pl-kos">;</span> <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<p><strong>置顶文章的方法：</strong> 在 GitHub Issues 里给文章打上 <code class="notranslate">pinned</code> 标签，该文章就会出现在首页顶部的特别区域。</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">dateEl</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'div'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-s1">dateEl</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'luliy-card-date'</span><span class="pl-kos">;</span>
+<span class="pl-s1">dateEl</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s1">post</span><span class="pl-kos">.</span><span class="pl-c1">created</span> ? <span class="pl-s1">post</span><span class="pl-kos">.</span><span class="pl-c1">created</span><span class="pl-kos">.</span><span class="pl-en">slice</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c1">10</span><span class="pl-kos">)</span> : <span class="pl-s">''</span><span class="pl-kos">;</span></pre></div>
+<p><strong>日期格式：</strong> <code class="notranslate">.slice(0, 10)</code> 截取前 10 个字符，显示格式为 <code class="notranslate">2026-05-30</code>。<br>
+<strong>改成中文格式：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">d</span> <span class="pl-c1">=</span> <span class="pl-s1">post</span><span class="pl-kos">.</span><span class="pl-c1">created</span> ? <span class="pl-s1">post</span><span class="pl-kos">.</span><span class="pl-c1">created</span><span class="pl-kos">.</span><span class="pl-en">slice</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c1">10</span><span class="pl-kos">)</span> : <span class="pl-s">''</span><span class="pl-kos">;</span>
+<span class="pl-s1">dateEl</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s1">d</span> ? <span class="pl-s1">d</span><span class="pl-kos">.</span><span class="pl-en">replace</span><span class="pl-kos">(</span><span class="pl-pds"><span class="pl-c1">/</span><span class="pl-s">-</span><span class="pl-c1">/</span>g</span><span class="pl-kos">,</span> <span class="pl-s">' 年 '</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">replace</span><span class="pl-kos">(</span><span class="pl-pds"><span class="pl-c1">/</span><span class="pl-s">-</span><span class="pl-c1">/</span></span><span class="pl-kos">,</span> <span class="pl-s">' 月 '</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">' 日'</span> : <span class="pl-s">''</span><span class="pl-kos">;</span></pre></div>
+<hr>
+<h2>3.12 模块 15 — macOS 代码块装饰 <code class="notranslate">applyCodeBlocks()</code></h2>
+<p>三个按钮的功能分别绑定在 <code class="notranslate">bR</code>（红/复制）、<code class="notranslate">bY</code>（黄/折叠）、<code class="notranslate">bG</code>（绿/全屏）上。</p>
+<p><strong>改复制成功提示文字：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">bR</span><span class="pl-kos">.</span><span class="pl-en">setAttribute</span><span class="pl-kos">(</span><span class="pl-s">'data-tip'</span><span class="pl-kos">,</span> <span class="pl-s">'已复制 ✓'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>  <span class="pl-c">// 把这里的文字改掉</span></pre></div>
+<p><strong>改折叠/展开提示：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">bY</span><span class="pl-kos">.</span><span class="pl-en">setAttribute</span><span class="pl-kos">(</span><span class="pl-s">'data-tip'</span><span class="pl-kos">,</span> <span class="pl-s1">folded</span> ? <span class="pl-s">'展开代码'</span> : <span class="pl-s">'折叠代码'</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<hr>
+<h2>3.13 模块 16 — 樱花飘落特效 <code class="notranslate">initSakura()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">var</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">45</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span> <span class="pl-s1">petals</span><span class="pl-kos">.</span><span class="pl-en">push</span><span class="pl-kos">(</span><span class="pl-en">mkPetal</span><span class="pl-kos">(</span><span class="pl-c1">true</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>  <span class="pl-c">// 45片花瓣</span></pre></div>
+<p><strong>改花瓣数量：</strong> 把 <code class="notranslate">45</code> 改成 <code class="notranslate">20</code>（减少，性能更好）或 <code class="notranslate">80</code>（更密集）。<br>
+<strong>手机上减少花瓣数量（节省性能）：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">maxPetals</span> <span class="pl-c1">=</span> <span class="pl-smi">window</span><span class="pl-kos">.</span><span class="pl-c1">innerWidth</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">768</span> ? <span class="pl-c1">20</span> : <span class="pl-c1">45</span><span class="pl-kos">;</span>
+<span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">var</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&lt;</span> <span class="pl-s1">maxPetals</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span> <span class="pl-s1">petals</span><span class="pl-kos">.</span><span class="pl-en">push</span><span class="pl-kos">(</span><span class="pl-en">mkPetal</span><span class="pl-kos">(</span><span class="pl-c1">true</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-c1">COLORS</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-s">'#ffb7c5'</span><span class="pl-kos">,</span> <span class="pl-s">'#ffc0cb'</span><span class="pl-kos">,</span> <span class="pl-s">'#ff9eb5'</span><span class="pl-kos">,</span> <span class="pl-s">'#ffd0d8'</span><span class="pl-kos">,</span> <span class="pl-s">'#ffaec0'</span><span class="pl-kos">,</span> <span class="pl-s">'#f9c4d2'</span><span class="pl-kos">,</span> <span class="pl-s">'#fce4ec'</span><span class="pl-kos">,</span> <span class="pl-s">'#f8bbd0'</span><span class="pl-kos">]</span><span class="pl-kos">;</span></pre></div>
+<p><strong>改花瓣颜色：</strong> 替换数组里的颜色。比如换成蓝色雪花主题：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-c1">COLORS</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-s">'#b3d9ff'</span><span class="pl-kos">,</span> <span class="pl-s">'#cce5ff'</span><span class="pl-kos">,</span> <span class="pl-s">'#99ccff'</span><span class="pl-kos">,</span> <span class="pl-s">'#ddeeff'</span><span class="pl-kos">,</span> <span class="pl-s">'#66b3ff'</span><span class="pl-kos">]</span><span class="pl-kos">;</span></pre></div>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">size</span>: <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">random</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-c1">10</span> <span class="pl-c1">+</span> <span class="pl-c1">8</span><span class="pl-kos">,</span>  <span class="pl-c">// 花瓣大小：8~18px</span>
+<span class="pl-s1">speedY</span>: <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">random</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-c1">0.7</span> <span class="pl-c1">+</span> <span class="pl-c1">0.35</span><span class="pl-kos">,</span>  <span class="pl-c">// 下落速度</span></pre></div>
+<p><strong>改花瓣大小：</strong> <code class="notranslate">Math.random() * 10 + 8</code> → 最小 8px，最大 18px。<br>
+<strong>加快下落：</strong> 把 <code class="notranslate">0.35</code> 改成 <code class="notranslate">0.6</code>（更快）。</p>
+<hr>
+<h2>3.14 模块 17 — TOC 目录滚动高亮 <code class="notranslate">initArticleTocSpy()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">headings</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">.</span><span class="pl-en">getBoundingClientRect</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">top</span> <span class="pl-c1">&lt;=</span> <span class="pl-c1">110</span><span class="pl-kos">)</span> <span class="pl-s1">activeH</span> <span class="pl-c1">=</span> <span class="pl-s1">headings</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">;</span></pre></div>
+<p><strong><code class="notranslate">110</code>：</strong> 表示距离屏幕顶部 110px 以内的标题会被认为是"当前节"。<br>
+<strong>改触发距离：</strong> 如果导航栏改高了，这里的数字也要相应增大。</p>
+<hr>
+<h2>3.15 模块 18 — 手机端汉堡菜单 <code class="notranslate">initMobileNav()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-pds"><span class="pl-c1">/</span><span class="pl-cce">\/</span><span class="pl-s">a</span><span class="pl-s">b</span><span class="pl-s">o</span><span class="pl-s">u</span><span class="pl-s">t</span><span class="pl-cce">\/</span><span class="pl-c1">?</span><span class="pl-cce">$</span><span class="pl-c1">/</span>i</span><span class="pl-kos">.</span><span class="pl-en">test</span><span class="pl-kos">(</span><span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-c1">href</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>  <span class="pl-c">// 跳过 about 链接</span></pre></div>
+<p><strong>作用：</strong> 手机端下拉菜单不显示 "about" 页（因为通过头像点击进入）。<br>
+<strong>如果想把 about 显示在菜单里：</strong> 删掉这一行即可。</p>
+<hr>
+<h2>3.16 模块 19 — 搜索弹窗 <code class="notranslate">initSearchOverlay()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">filtered</span> <span class="pl-c1">=</span> <span class="pl-s1">q</span>
+  ? <span class="pl-s1">postsCache</span><span class="pl-kos">.</span><span class="pl-en">filter</span><span class="pl-kos">(</span><span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">p</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">return</span> <span class="pl-kos">(</span><span class="pl-s1">p</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">||</span> <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">toLowerCase</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">includes</span><span class="pl-kos">(</span><span class="pl-s1">q</span><span class="pl-kos">)</span> <span class="pl-c1">||</span>
+      <span class="pl-kos">(</span><span class="pl-s1">p</span><span class="pl-kos">.</span><span class="pl-c1">labels</span> <span class="pl-c1">||</span> <span class="pl-kos">[</span><span class="pl-kos">]</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">some</span><span class="pl-kos">(</span><span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">l</span><span class="pl-kos">)</span> <span class="pl-kos">{</span> <span class="pl-k">return</span> <span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-s1">l</span><span class="pl-kos">.</span><span class="pl-c1">name</span> <span class="pl-c1">||</span> <span class="pl-s1">l</span><span class="pl-kos">)</span> <span class="pl-c1">||</span> <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">toLowerCase</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">includes</span><span class="pl-kos">(</span><span class="pl-s1">q</span><span class="pl-kos">)</span><span class="pl-kos">;</span> <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-kos">}</span><span class="pl-kos">)</span>
+  : <span class="pl-s1">postsCache</span><span class="pl-kos">.</span><span class="pl-en">slice</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c1">12</span><span class="pl-kos">)</span><span class="pl-kos">;</span>  <span class="pl-c">// 无关键词时显示最新 12 篇</span></pre></div>
+<p><strong>改默认显示数量：</strong> 把 <code class="notranslate">12</code> 改成 <code class="notranslate">8</code> 或 <code class="notranslate">20</code>。<br>
+<strong>搜索逻辑：</strong> 目前支持按标题和标签名搜索。如果想加入日期搜索，在 <code class="notranslate">filter</code> 里加一条：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c1">||</span> <span class="pl-kos">(</span><span class="pl-s1">p</span><span class="pl-kos">.</span><span class="pl-c1">created</span> <span class="pl-c1">||</span> <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">includes</span><span class="pl-kos">(</span><span class="pl-s1">q</span><span class="pl-kos">)</span></pre></div>
+<hr>
+<h2>3.17 模块 21 — 文章页初始化 <code class="notranslate">_luliyInitPost()</code></h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">wc</span> <span class="pl-c1">=</span> <span class="pl-s1">pbody</span><span class="pl-kos">.</span><span class="pl-c1">innerText</span><span class="pl-kos">.</span><span class="pl-c1">length</span><span class="pl-kos">;</span>
+<span class="pl-k">var</span> <span class="pl-s1">rt</span> <span class="pl-c1">=</span> <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">max</span><span class="pl-kos">(</span><span class="pl-c1">1</span><span class="pl-kos">,</span> <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">round</span><span class="pl-kos">(</span><span class="pl-s1">wc</span> <span class="pl-c1">/</span> <span class="pl-c1">300</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>  <span class="pl-c">// 预计阅读时间</span></pre></div>
+<p><strong><code class="notranslate">300</code>：</strong> 表示假设每分钟阅读 300 个字符。中文阅读速度约 300~400 字/分钟，可按需调整。</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">h</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">=</span> <span class="pl-s">'点击复制链接'</span><span class="pl-kos">;</span></pre></div>
+<p><strong>作用：</strong> 文章里的 h1/h2/h3 标题，点击会复制当前锚点链接到剪贴板。</p>
+<hr>
+<h1>四、新手如何理解和改动代码</h1>
+<h2>4.1 看懂 CSS 的技巧</h2>
+<p>CSS 规则的结构永远是：</p>
+<pre class="notranslate"><code class="notranslate">选择器 {
+  属性名: 属性值;
+}
+</code></pre>
+<p><strong>选择器查找技巧：</strong></p>
+<ul>
+<li><code class="notranslate">#名字</code> → ID 选择器，全页唯一</li>
+<li><code class="notranslate">.类名</code> → class 选择器，可重复</li>
+<li><code class="notranslate">body[data-luliy-theme="sakura"]</code> → 带特定属性的元素</li>
+</ul>
+<p><strong>用浏览器调试 CSS：</strong></p>
+<ol>
+<li>打开博客 → 按 <code class="notranslate">F12</code> 打开开发者工具</li>
+<li>点击左上角的"选取元素"箭头</li>
+<li>点击页面上的任意元素</li>
+<li>右侧会显示它的所有 CSS，可以实时修改预览效果</li>
+<li>满意了再把改动同步回 <code class="notranslate">enhance.css</code></li>
+</ol>
+<hr>
+<h2>4.2 看懂 JS 的技巧</h2>
+<p><strong>JS 函数的结构：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">function</span> <span class="pl-en">函数名</span><span class="pl-kos">(</span><span class="pl-s1">参数</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-c">// 做什么事情</span>
+<span class="pl-kos">}</span></pre></div>
+<p><strong><code class="notranslate">document.createElement('div')</code> 是什么意思：</strong><br>
+在 HTML 里创建一个新的 <code class="notranslate">&lt;div&gt;</code> 元素，然后往里面填内容，再插入到页面上。这就是 JS 动态创建 DOM 元素的基本操作。</p>
+<p><strong><code class="notranslate">setTimeout(函数, 毫秒数)</code> 是什么意思：</strong><br>
+等待指定毫秒数后执行某个函数。<code class="notranslate">setTimeout(fn, 800)</code> = 等 0.8 秒后再执行。</p>
+<p><strong><code class="notranslate">localStorage.getItem('key')</code> 是什么意思：</strong><br>
+从浏览器本地存储里读取 key 对应的值。用于记住用户的主题、音效开关等偏好设置，刷新页面后不会丢失。</p>
+<hr>
+<h2>4.3 修改流程推荐</h2>
+<pre class="notranslate"><code class="notranslate">1. 在本地文本编辑器（推荐 VS Code）里修改文件
+2. 先改一个小地方，保存
+3. 提交到 GitHub，等 Actions 跑完（约 1~3 分钟）
+4. 刷新博客查看效果（按 Ctrl+Shift+R 强制刷新，清除缓存）
+5. 满意→继续改；不满意→撤销，再试
+</code></pre>
+<p><strong>推荐 VS Code 插件：</strong></p>
+<ul>
+<li><code class="notranslate">Prettier</code> → 自动格式化 JSON/CSS/JS</li>
+<li><code class="notranslate">CSS Peek</code> → 快速查看 CSS 定义</li>
+<li><code class="notranslate">Live Server</code> → 本地预览（需要在本地有 HTML 文件）</li>
+</ul>
+<hr>
+<h1>五、你可能没想到的功能与扩展</h1>
+<p>以下是当前代码<strong>已经内置</strong>但你可能不知道的功能，以及<strong>可以额外添加</strong>的功能建议。</p>
+<hr>
+<h2>5.1 已内置但容易忽略的功能</h2>
+<h3>✅ 文章标题点击复制锚点</h3>
+<p>在文章里点击任意 h1/h2/h3 标题，会自动把该标题的锚点 URL 复制到剪贴板，方便分享到具体段落。</p>
+<h3>✅ 代码块双击全屏</h3>
+<p>双击代码块（非按钮区域）即可全屏阅读，比点绿色按钮更方便。再次双击或按 <code class="notranslate">ESC</code> 退出。</p>
+<h3>✅ 文章预计阅读时间</h3>
+<p>每篇文章顶部自动显示"预计阅读 X 分钟 | 共 XXX 字"，基于文字数量估算。</p>
+<h3>✅ 赞赏面板（展开式）</h3>
+<p>每篇文章底部有"✨ 和作者无限进步"按钮，点击后展开二维码图片。<br>
+<strong>改二维码图片：</strong> 在 <code class="notranslate">enhance.js</code> 的 <code class="notranslate">_luliyInitPost</code> 模块里找：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s">'&lt;img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg"'</span></pre></div>
+<p>把这个 URL 换成你自己的收款码/联系方式图片地址。</p>
+<h3>✅ 文章上下篇导航</h3>
+<p>文章底部自动显示"← 上一篇"和"下一篇 →"按钮，通过读取 <code class="notranslate">postList.json</code> 实现，无需任何配置。</p>
+<h3>✅ 点击图片放大</h3>
+<p>文章里的所有图片点击后会弹出全屏灯箱（Lightbox），按 <code class="notranslate">ESC</code> 关闭。</p>
+<h3>✅ 归档页自动生成</h3>
+<p>创建一个 GitHub Issue，打上 <code class="notranslate">archive</code> 标签，在 <code class="notranslate">singlePage</code> 加入 <code class="notranslate">"archive"</code>，访问该页面会自动按年份生成所有文章的时间轴列表。</p>
+<h3>✅ 置顶文章</h3>
+<p>给任意 GitHub Issue 同时打上 <code class="notranslate">pinned</code> 标签，该文章会出现在首页顶部的"置顶"区域，与普通卡片区分显示。</p>
+<hr>
+<h2>5.2 建议添加的额外功能</h2>
+<h3>💡 建议 1：文章字数/阅读量展示卡</h3>
+<p>在首页卡片底部也显示文章字数（目前只在文章页内显示）。<br>
+<strong>实现方式：</strong> 在 <code class="notranslate">buildCard()</code> 函数里，读取 <code class="notranslate">post</code> 对象的正文并计算长度，添加进卡片 DOM。</p>
+<h3>💡 建议 2：深色/浅色模式快捷键</h3>
+<p>按 <code class="notranslate">Alt+T</code> 快速切换日夜模式，不用移动鼠标找按钮。<br>
+<strong>实现方式（加到 enhance.js 末尾）：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'keydown'</span><span class="pl-kos">,</span> <span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">altKey</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">key</span> <span class="pl-c1">===</span> <span class="pl-s">'t'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.circle'</span><span class="pl-kos">)</span><span class="pl-kos">?.</span><span class="pl-en">click</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span> <span class="pl-c">// 模拟点击 Primer 的主题按钮</span>
+  <span class="pl-kos">}</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<h3>💡 建议 3：TOC 折叠按钮</h3>
+<p>让 ArticleTOC 目录面板可以手动折叠/展开，避免遮挡文章内容。<br>
+<strong>实现方式：</strong> 在 <code class="notranslate">initArticleTocSpy()</code> 里，给注入的 header 里的按钮加一个折叠事件，toggle TOC 的 <code class="notranslate">max-height</code>。</p>
+<h3>💡 建议 4：文章分享按钮</h3>
+<p>在文章末尾添加"分享到微博/复制链接"按钮。<br>
+<strong>实现方式（加到 <code class="notranslate">_luliyInitPost</code> 的赞赏按钮之前）：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">shareBtn</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'button'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-s1">shareBtn</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'🔗 复制文章链接'</span><span class="pl-kos">;</span>
+<span class="pl-s1">shareBtn</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">cssText</span> <span class="pl-c1">=</span> <span class="pl-s">'padding:8px 20px;border-radius:20px;border:1px solid #8250df;background:transparent;color:#8250df;cursor:pointer;margin-bottom:16px'</span><span class="pl-kos">;</span>
+<span class="pl-s1">shareBtn</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-s1">navigator</span><span class="pl-kos">.</span><span class="pl-c1">clipboard</span><span class="pl-kos">.</span><span class="pl-en">writeText</span><span class="pl-kos">(</span><span class="pl-s1">location</span><span class="pl-kos">.</span><span class="pl-c1">href</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-s1">shareBtn</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'✓ 已复制！'</span><span class="pl-kos">;</span>
+  <span class="pl-en">setTimeout</span><span class="pl-kos">(</span><span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">{</span> <span class="pl-s1">shareBtn</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'🔗 复制文章链接'</span><span class="pl-kos">;</span> <span class="pl-kos">}</span><span class="pl-kos">,</span> <span class="pl-c1">2000</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-s1">pbody</span><span class="pl-kos">.</span><span class="pl-en">insertBefore</span><span class="pl-kos">(</span><span class="pl-s1">shareBtn</span><span class="pl-kos">,</span> <span class="pl-s1">sp</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<h3>💡 建议 5：首页文章搜索框（内联版）</h3>
+<p>除了现有的弹窗搜索，在首页卡片网格上方加一个常驻搜索框，实时过滤当前页的卡片。</p>
+<h3>💡 建议 6：自定义 404 页面提示</h3>
+<p>在 GitHub Pages 的 <code class="notranslate">404.html</code> 里加入友好的提示和返回首页链接，而不是系统默认的空白 404。</p>
+<h3>💡 建议 7：RSS 订阅提示条</h3>
+<p>在首页顶部（banner 下方）添加一个薄薄的提示条：<br>
+"📡 订阅 RSS 获取最新更新 →"，链接到 <code class="notranslate">/rss.xml</code>。</p>
+<h3>💡 建议 8：浏览进度百分比数字</h3>
+<p>让进度条同时在某个角落显示数字百分比（比如"32%"），对长文章特别有用。</p>
+<h3>💡 建议 9：全站 Meta 优化</h3>
+<p>在 <code class="notranslate">allHead</code> 里加上以下标签，改善在微信/QQ/微博分享时的卡片显示效果：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">meta</span> <span class="pl-c1">property</span>='<span class="pl-s">og:title</span>' <span class="pl-c1">content</span>='<span class="pl-s">Luliy の 博客</span>'<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">meta</span> <span class="pl-c1">property</span>='<span class="pl-s">og:description</span>' <span class="pl-c1">content</span>='<span class="pl-s">我将无限进步！</span>'<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">meta</span> <span class="pl-c1">property</span>='<span class="pl-s">og:type</span>' <span class="pl-c1">content</span>='<span class="pl-s">website</span>'<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">meta</span> <span class="pl-c1">name</span>='<span class="pl-s">twitter:card</span>' <span class="pl-c1">content</span>='<span class="pl-s">summary_large_image</span>'<span class="pl-kos">&gt;</span></pre></div>
+<h3>💡 建议 10：欢迎画面增加打字机动效</h3>
+<p>让欢迎标题的字逐字出现，而不是一次性淡入，更有仪式感。<br>
+<strong>实现方式：</strong> 在 <code class="notranslate">initWelcomeSplash()</code> 里，把 <code class="notranslate">title.textContent</code> 改为用 <code class="notranslate">setInterval</code> 逐字追加字符。</p>
+<hr>
+<h2>5.3 性能优化建议</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>优化项</th>
+<th>当前状态</th>
+<th>改进方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>花瓣数量</td>
+<td>45 片</td>
+<td>手机端改为 20 片</td>
+</tr>
+<tr>
+<td>字体加载</td>
+<td>同步 <a class="user-mention notranslate" data-hovercard-type="organization" data-hovercard-url="/orgs/import/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/import">@import</a></td>
+<td>改为 <code class="notranslate">&lt;link rel="preload"&gt;</code> 预加载</td>
+</tr>
+<tr>
+<td>图片加载</td>
+<td><code class="notranslate">loading="lazy"</code> 已开启</td>
+<td>✅ 已优化</td>
+</tr>
+<tr>
+<td>背景图</td>
+<td>每次都加载</td>
+<td>可压缩 bg.png 到 200KB 以内</td>
+</tr>
+<tr>
+<td>live2d</td>
+<td>每页都加载 jQuery + live2d</td>
+<td>网速慢可删除此组件</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h1>六、快速改动速查表</h1>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>我想改…</th>
+<th>在哪里改</th>
+<th>改什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>欢迎画面背景图</td>
+<td><code class="notranslate">enhance.css</code> 第 02 节</td>
+<td><code class="notranslate">url('...9.jpg')</code> → 换 URL</td>
+</tr>
+<tr>
+<td>欢迎画面标题文字</td>
+<td><code class="notranslate">enhance.js</code> 模块 00</td>
+<td><code class="notranslate">title.textContent = '...'</code></td>
+</tr>
+<tr>
+<td>欢迎画面只显示一次（永久）</td>
+<td><code class="notranslate">enhance.js</code> 模块 00</td>
+<td><code class="notranslate">sessionStorage</code> 改 <code class="notranslate">localStorage</code></td>
+</tr>
+<tr>
+<td>博客建站日期</td>
+<td><code class="notranslate">config.json</code> + <code class="notranslate">enhance.js</code></td>
+<td><code class="notranslate">startSite</code> 字段 + <code class="notranslate">new Date('...')</code></td>
+</tr>
+<tr>
+<td>首页文章每页数量</td>
+<td><code class="notranslate">config.json</code> + <code class="notranslate">enhance.js</code></td>
+<td><code class="notranslate">onePageListNum</code> + <code class="notranslate">perPage = 12</code></td>
+</tr>
+<tr>
+<td>全站主题默认选项</td>
+<td><code class="notranslate">enhance.js</code> 模块 01</td>
+<td><code class="notranslate">'luliy-sink': 'default'</code> → 换 ID</td>
+</tr>
+<tr>
+<td>主题颜色（如 h2 颜色）</td>
+<td><code class="notranslate">enhance.css</code> 第 15 节</td>
+<td><code class="notranslate">--th-h2: #颜色</code></td>
+</tr>
+<tr>
+<td>文章背景框颜色</td>
+<td><code class="notranslate">enhance.css</code> 第 12 节</td>
+<td><code class="notranslate">rgba(...)</code> 里的色值</td>
+</tr>
+<tr>
+<td>卡片边框颜色循环</td>
+<td><code class="notranslate">enhance.js</code> SINKS 数组</td>
+<td><code class="notranslate">cardPalette: [...]</code></td>
+</tr>
+<tr>
+<td>导航栏头像跳转页</td>
+<td><code class="notranslate">enhance.js</code> 模块 09</td>
+<td><code class="notranslate">cluster.href = '/about'</code></td>
+</tr>
+<tr>
+<td>首页横幅文字</td>
+<td><code class="notranslate">enhance.js</code> 模块 10</td>
+<td><code class="notranslate">banner.textContent = '...'</code></td>
+</tr>
+<tr>
+<td>花瓣颜色/数量</td>
+<td><code class="notranslate">enhance.js</code> 模块 16</td>
+<td><code class="notranslate">COLORS</code> 数组 + <code class="notranslate">45</code></td>
+</tr>
+<tr>
+<td>赞赏码图片</td>
+<td><code class="notranslate">enhance.js</code> 模块 21</td>
+<td><code class="notranslate">img src="..."</code> URL</td>
+</tr>
+<tr>
+<td>代码块圆点大小</td>
+<td><code class="notranslate">enhance.css</code> 第 13 节</td>
+<td><code class="notranslate">.mac-btn { width: 13px }</code></td>
+</tr>
+<tr>
+<td>TOC 高亮颜色</td>
+<td><code class="notranslate">enhance.css</code> 第 16 节</td>
+<td><code class="notranslate">#8250df<span class="ml-1 d-inline-block border circle color-border-subtle" style="background-color: #8250df; height: 8px; width: 8px;"></span></code> → 换颜色</td>
+</tr>
+<tr>
+<td>点击粒子颜色</td>
+<td><code class="notranslate">enhance.js</code> 模块 08</td>
+<td><code class="notranslate">colors</code> 数组</td>
+</tr>
+<tr>
+<td>手机字体大小</td>
+<td><code class="notranslate">enhance.css</code> 第 26 节</td>
+<td><code class="notranslate">font-size: 16px</code></td>
+</tr>
+<tr>
+<td>新增第 5 个主题</td>
+<td><code class="notranslate">enhance.js</code> SINKS + <code class="notranslate">enhance.css</code> 第 15 节</td>
+<td>按模板新增</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<blockquote>
+<p>📌 <strong>最后的新手建议：</strong> 每次只改一个地方，改完立刻部署看效果，确认没问题再改下一处。不要同时改很多地方，出问题了很难排查。<br>
+遇到问题时，先打开浏览器 <code class="notranslate">F12</code> 控制台看有没有红色报错，90% 的问题能在这里找到原因。</p>
+</blockquote></div>
+<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://luliy.me">Luliy</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if("05/30/2026"!=""){
+    var startSite=new Date("05/30/2026");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行 "+diffDay+" 天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","luliy6/luliy6.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script>function luliyWaitPost(){if(window._luliyInitPost){window._luliyInitPost();}else{setTimeout(luliyWaitPost,50);}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',luliyWaitPost);}else{luliyWaitPost();}</script>
+
+</html>
