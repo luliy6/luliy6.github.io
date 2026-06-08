@@ -1074,7 +1074,7 @@ body[data-luliy-theme="space"] {
   border-radius: 6px !important;
   text-decoration: none !important;
   transition: background 0.18s, color 0.18s, padding-left 0.18s !important;
-  color: #333 !important;
+  color: #fff !important;
   font-size: 12.5px !important;
   line-height: 1.6 !important;
   word-break: break-word !important;
