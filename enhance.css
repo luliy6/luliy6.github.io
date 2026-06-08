@@ -1081,10 +1081,10 @@ body[data-luliy-theme="space"] {
 }
 [data-color-mode="dark"] #TOC a,
 [data-color-mode="dark"] .articletoc a,
-[data-color-mode="dark"] #articleTOC a { color: #ffffff !important; }
+[data-color-mode="dark"] #articleTOC a { color: #fff !important; }
 #TOC a:hover, .articletoc a:hover, .toc a:hover, #articleTOC a:hover {
   background: rgba(130,80,223,0.08) !important;
-  color: #ffffff !important;
+  color: #fff !important;
 }
 [data-color-mode="dark"] #TOC a:hover,
 [data-color-mode="dark"] .articletoc a:hover,
