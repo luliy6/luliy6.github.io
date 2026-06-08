@@ -1074,17 +1074,17 @@ body[data-luliy-theme="space"] {
   border-radius: 6px !important;
   text-decoration: none !important;
   transition: background 0.18s, color 0.18s, padding-left 0.18s !important;
-  color: #fff !important;
+  color: #87CEFA !important;
   font-size: 12.5px !important;
   line-height: 1.6 !important;
   word-break: break-word !important;
 }
 [data-color-mode="dark"] #TOC a,
 [data-color-mode="dark"] .articletoc a,
-[data-color-mode="dark"] #articleTOC a { color: #fff !important; }
+[data-color-mode="dark"] #articleTOC a { color: #87CEFA !important; }
 #TOC a:hover, .articletoc a:hover, .toc a:hover, #articleTOC a:hover {
   background: rgba(130,80,223,0.08) !important;
-  color: #fff !important;
+  color: #87CEFA !important;
 }
 [data-color-mode="dark"] #TOC a:hover,
 [data-color-mode="dark"] .articletoc a:hover,
