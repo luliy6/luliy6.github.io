@@ -1,4 +1,4 @@
-/* enhance.css — Luliy Blog v8
+/* enhance.css — Luliy Blog v8 (Sakura removed)
    Sections:
    01  CSS Variables
    02  Reset + Font assignments
@@ -20,7 +20,7 @@
    18  Prev / Next navigation
    19  Lightbox
    20  Back-to-top
-   21  Sakura / ripple
+   21  Theme ripple
    22  Uptime
    23  Timeline / archive
    24  TOC scroll-spy styling
@@ -31,13 +31,11 @@
    01  CSS Variables
 ══════════════════════════════════════════════════════════ */
 :root {
-  /* Card accent colours — overridden by theme FOUC restore */
   --card-c1: #8250df;
   --card-c2: #0969da;
   --card-c3: #ff6b9d;
   --card-c4: #f0b429;
 
-  /* Article theme defaults (overridden per theme) */
   --th-h1:          #1a0a3a;
   --th-h1-border:   2px solid rgba(130,80,223,0.25);
   --th-h2:          #0f1e4a;
@@ -47,7 +45,6 @@
   --th-h4:          #3a2a5a;
   --th-strong:      #8250df;
 
-  /* Navbar height reference */
   --nav-h: 56px;
 }
 
@@ -57,12 +54,10 @@
 html { scroll-behavior: smooth; }
 *, *::before, *::after { box-sizing: border-box; }
 
-/* Body — 霞鹜文楷 for running text */
 body {
   font-family: 'LXGW WenKai', 'LXGW WenKai Screen', 'LXGW WenKai TC', sans-serif;
 }
 
-/* Headings — 思源黑体 Medium */
 h1, h2, h3, h4, h5, h6,
 .blogTitle, .blogTitle h1, .blogTitle a,
 #luliy-hero-name,
@@ -72,7 +67,6 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 500 !important;
 }
 
-/* Force containers transparent so background shows */
 html,
 #content, .main,
 .container, .container-xl, .container-lg,
@@ -208,7 +202,6 @@ body {
   z-index: 9999 !important;
   box-sizing: border-box !important;
   gap: 8px !important;
-  /* No flex-wrap — single row on desktop */
 }
 [data-color-mode="dark"] #header {
   background: rgba(8,6,18,0.38) !important;
@@ -220,10 +213,8 @@ body {
     0 1px 4px rgba(0,0,0,0.40) !important;
 }
 
-/* Hide Gmeek's original blogTitle/avatar in header */
 #header .blogTitle, #header .avatar, #header .postTitle { display: none !important; }
 
-/* Nav link colour */
 #header a, .title-right a, .title-right button {
   color: rgba(25,15,45,0.88) !important;
   font-family: 'Noto Sans SC', sans-serif;
@@ -238,7 +229,6 @@ body {
 [data-color-mode="dark"] #header a:hover,
 [data-color-mode="dark"] .title-right a:hover { color: #cba6f7 !important; }
 
-/* .title-right — always visible, scrollable when narrow */
 .title-right {
   display: flex !important;
   align-items: center !important;
@@ -252,12 +242,10 @@ body {
 }
 .title-right::-webkit-scrollbar { display: none !important; }
 
-/* Hide "about" page link from navbar — accessible via avatar */
 .title-right a[href="/about"],
 .title-right a[href="about"],
 .title-right a[href="./about"] { display: none !important; }
 
-/* Hide hamburger (not needed — title-right always visible) */
 #luliy-nav-ham { display: none !important; }
 #luliy-nav-dropdown { display: none !important; }
 
@@ -330,7 +318,6 @@ body {
   border-color: rgba(130,80,223,0.28);
   color: rgba(200,195,240,0.80);
 }
-/* Homepage: taller banner to showcase background image */
 body.is-index #luliy-hero-banner {
   min-height: 30vh;
   display: flex !important;
@@ -373,7 +360,6 @@ body.is-index #luliy-hero-banner {
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
   gap: 18px;
 }
-/* Card shell */
 .luliy-card {
   position: relative;
   border-radius: 16px;
@@ -492,7 +478,6 @@ body.is-index #luliy-hero-banner {
 
 /* ══════════════════════════════════════════════════════════
    12  Article panels — 4 themes
-   Layout wrapper (content area below fixed nav)
 ══════════════════════════════════════════════════════════ */
 #content, .main {
   margin: 0 auto !important;
@@ -504,7 +489,6 @@ body.is-index #luliy-hero-banner {
   border: none !important;
   box-sizing: border-box !important;
 }
-/* On index page, banner handles the top spacing */
 body.is-index #content,
 body.is-index .main {
   padding-top: 0 !important;
@@ -534,7 +518,7 @@ body.is-index .main {
 }
 [data-color-mode="dark"] .SideNav-item:hover { background: rgba(130,80,223,0.14) !important; }
 
-/* ── Theme 4 — 默认 (no background panel) ── */
+/* ── Theme 4 — 默认 ── */
 body[data-luliy-theme="default"] #postBody,
 body:not([data-luliy-theme]) #postBody {
   background: transparent !important;
@@ -545,7 +529,6 @@ body:not([data-luliy-theme]) #postBody {
   padding: 24px 0 !important;
   margin-bottom: 48px !important;
 }
-/* Subtle text-shadow for readability without a panel */
 body[data-luliy-theme="default"] #postBody p,
 body[data-luliy-theme="default"] #postBody li,
 body:not([data-luliy-theme]) #postBody p,
@@ -615,9 +598,8 @@ body[data-luliy-theme="aerospace-dark"] #postBody {
 }
 
 /* ══════════════════════════════════════════════════════════
-   13  Typography — day / dark, inherits theme variables
+   13  Typography — day / dark, per-theme vars
 ══════════════════════════════════════════════════════════ */
-/* --- Day mode body text --- */
 #postBody,
 #postBody p, #postBody li, #postBody td, #postBody th,
 #postBody span, #postBody figcaption {
@@ -670,7 +652,6 @@ body[data-luliy-theme="aerospace-dark"] #postBody {
   margin: 1.4em 0;
 }
 
-/* --- Dark mode overrides --- */
 [data-color-mode="dark"] #postBody,
 [data-color-mode="dark"] #postBody p,
 [data-color-mode="dark"] #postBody li,
@@ -689,11 +670,9 @@ body[data-luliy-theme="aerospace-dark"] #postBody {
   background: rgba(130,80,223,0.10) !important;
 }
 
-/* Global */
 ::selection { background: #f0b429; color: #000; }
 a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; }
 
-/* Label tags */
 a.Label {
   display: inline-flex !important; align-items: center !important;
   padding: 1px 8px !important; border-radius: 20px !important;
@@ -732,7 +711,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 [data-color-mode="dark"] #postBody pre:hover {
   box-shadow: 0 10px 40px rgba(0,0,0,0.65), 0 0 55px rgba(130,80,223,0.20) !important;
 }
-/* Day: dark ink; Dark: light lavender */
 #postBody pre code {
   color: #2d2040 !important;
   background: none !important;
@@ -742,7 +720,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 }
 [data-color-mode="dark"] #postBody pre code { color: #cdd6f4 !important; }
 
-/* Inline code */
 #postBody code {
   color: #d73a49 !important;
   background: rgba(130,80,223,0.08) !important;
@@ -757,7 +734,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   background: rgba(130,80,223,0.18) !important;
 }
 
-/* macOS strip */
 .mac-strip {
   position: absolute; top: 0; left: 0; right: 0; height: 38px;
   display: flex; align-items: center; padding: 0 14px; gap: 7px;
@@ -780,7 +756,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 .mac-btn-green  { background: #28c840; }
 .mac-btn-red.is-copied { background: #28c840 !important; }
 
-/* Tooltips on hover */
 .mac-btn::after {
   content: attr(data-tip);
   position: absolute; bottom: 22px; left: 50%;
@@ -800,7 +775,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 }
 [data-color-mode="dark"] .mac-lang { color: rgba(160,140,255,0.65); }
 
-/* Folded code block — only shows the mac strip */
 #postBody pre.is-folded {
   height: 44px !important;
   overflow: hidden !important;
@@ -808,7 +782,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   min-height: 44px !important;
 }
 
-/* Fullscreen code block */
 #postBody pre.code-fullscreen {
   position: fixed !important;
   inset: 0 !important;
@@ -859,7 +832,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 /* ══════════════════════════════════════════════════════════
    16  Theme CSS variables — 4 themes
 ══════════════════════════════════════════════════════════ */
-/* ── Default ── */
 body[data-luliy-theme="default"],
 body:not([data-luliy-theme]) {
   --th-h1: #1a0a3a; --th-h1-border: 2px solid rgba(130,80,223,0.28);
@@ -872,7 +844,6 @@ body:not([data-luliy-theme]) {
   --th-h4: #bac2de; --th-strong: #cba6f7;
 }
 
-/* ── 樱花少女粉 ── */
 body[data-luliy-theme="sakura-pink"] {
   --th-h1: #b83060; --th-h1-border: 2px solid rgba(224,92,138,0.28);
   --th-h2: #b83060; --th-h2-bl: 5px solid #f9a8c9; --th-h2-bg: rgba(249,168,201,0.10);
@@ -885,7 +856,6 @@ body[data-luliy-theme="sakura-pink"] {
   --th-h2-bg: rgba(249,168,201,0.08);
 }
 
-/* ── 你的名字天空蓝 ── */
 body[data-luliy-theme="yourname-blue"] {
   --th-h1: #bf3a14; --th-h1-border: 2px solid rgba(255,112,67,0.30);
   --th-h2: #1a237e; --th-h2-bl: 5px solid #ff7043; --th-h2-bg: rgba(255,112,67,0.06);
@@ -897,7 +867,6 @@ body[data-luliy-theme="yourname-blue"] {
   --th-h2-bl: 5px solid #ff8a65; --th-h2-bg: rgba(255,138,101,0.08);
 }
 
-/* ── 航天暗夜蓝 ── */
 body[data-luliy-theme="aerospace-dark"] {
   --th-h1: #003e7e; --th-h1-border: 2px solid rgba(30,144,255,0.28);
   --th-h2: #005fa3; --th-h2-bl: 5px solid #1e90ff; --th-h2-bg: rgba(30,144,255,0.06);
@@ -948,10 +917,8 @@ body[data-luliy-theme="aerospace-dark"] {
   font-family: 'LXGW WenKai', sans-serif;
 }
 .luliy-tb-btn:hover::after { opacity: 1; }
-.luliy-tb-btn.sfx-off    { opacity: 0.55; }
-.luliy-tb-btn.sakura-off { opacity: 0.45; }
+.luliy-tb-btn.sfx-off { opacity: 0.55; }
 
-/* Sink menu */
 #luliy-sink-menu {
   display: none; flex-direction: column; gap: 2px;
   position: absolute; bottom: 52px; right: 0;
@@ -1061,12 +1028,8 @@ body[data-luliy-theme="aerospace-dark"] {
 #luliy-back-top:hover { transform: translateY(-3px); background: rgba(130,80,223,0.34); }
 
 /* ══════════════════════════════════════════════════════════
-   21  Sakura canvas / theme ripple
+   21  Theme ripple
 ══════════════════════════════════════════════════════════ */
-#luliy-sakura-canvas {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  pointer-events: none; z-index: 1; opacity: 0.50;
-}
 #luliy-theme-ripple {
   position: fixed; border-radius: 50%; transform: scale(0);
   pointer-events: none; z-index: 99998; transition: none;
@@ -1114,7 +1077,6 @@ body[data-luliy-theme="aerospace-dark"] {
 /* ══════════════════════════════════════════════════════════
    24  TOC scroll-spy styling
 ══════════════════════════════════════════════════════════ */
-/* TOC injected header row */
 .luliy-toc-injected-hdr {
   display: flex; align-items: center; justify-content: space-between;
   padding: 6px 10px 10px;
@@ -1140,7 +1102,6 @@ body[data-luliy-theme="aerospace-dark"] {
 [data-color-mode="dark"] .luliy-toc-injected-totop { color: #cba6f7; border-color: rgba(130,80,223,0.35); }
 [data-color-mode="dark"] .luliy-toc-injected-totop:hover { background: rgba(130,80,223,0.20); }
 
-/* TOC active link — highlighted with background */
 #TOC a.luliy-toc-active,
 .articletoc a.luliy-toc-active,
 .toc a.luliy-toc-active,
@@ -1159,12 +1120,11 @@ body[data-luliy-theme="aerospace-dark"] {
   background: rgba(130,80,223,0.22) !important;
 }
 
-/* Ensure TOC doesn't overlap right-side toolbar */
 #TOC, .articletoc, .toc {
   max-height: calc(100vh - 160px);
   overflow-y: auto;
   scrollbar-width: thin;
-  right: 68px !important; /* push left of floating toolbar */
+  right: 68px !important;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1181,11 +1141,9 @@ body[data-luliy-theme="aerospace-dark"] {
     overflow: visible !important;
   }
 
-  /* Hero cluster — compact on mobile */
   #luliy-hero-cluster { gap: 6px !important; }
-  #luliy-hero-info    { display: none !important; } /* hide name+clock on very small screens */
+  #luliy-hero-info    { display: none !important; }
 
-  /* Always show nav items — scrollable */
   .title-right {
     gap: 4px !important;
     overflow-x: auto !important;
@@ -1197,7 +1155,6 @@ body[data-luliy-theme="aerospace-dark"] {
     white-space: nowrap !important;
   }
 
-  /* Content area */
   #content, .main {
     padding: calc(var(--nav-h) + 10px) 12px 0 12px !important;
     width: 98% !important;
@@ -1206,14 +1163,11 @@ body[data-luliy-theme="aerospace-dark"] {
     padding-top: 0 !important;
   }
 
-  /* Hero banner */
   #luliy-hero-banner { font-size: 12px !important; padding: 12px 16px !important; }
   body.is-index #luliy-hero-banner { min-height: 22vh !important; }
 
-  /* Cards */
   .luliy-card-grid { grid-template-columns: 1fr !important; }
 
-  /* Article panel */
   body[data-luliy-theme="sakura-pink"] #postBody,
   body[data-luliy-theme="yourname-blue"] #postBody,
   body[data-luliy-theme="aerospace-dark"] #postBody {
@@ -1221,21 +1175,17 @@ body[data-luliy-theme="aerospace-dark"] {
     border-radius: 12px !important;
   }
 
-  /* Typography */
   #postBody          { font-size: 16px !important; line-height: 1.82 !important; }
   #postBody h1       { font-size: 1.45rem !important; }
   #postBody h2       { font-size: 1.18rem !important; }
   #postBody pre      { font-size: 13px !important; }
 
-  /* Toolbar & back-to-top */
   #luliy-toolbar  { right: 10px; bottom: 20px; }
   #luliy-back-top { right: 14px; bottom: 120px; }
   .luliy-tb-btn::after { display: none; }
 
-  /* Prev/next */
   .luliy-prevnext { flex-direction: column; }
 
-  /* Welcome screen */
   .luliy-welcome-title { font-size: clamp(1.6rem, 8vw, 2.8rem) !important; }
   .luliy-welcome-btn   { padding: 12px 32px !important; font-size: 14px !important; }
 }

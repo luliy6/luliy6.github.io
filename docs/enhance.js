@@ -1,4 +1,4 @@
-/* enhance.js - Luliy Blog v6
+/* enhance.js - Luliy Blog v6 (Sakura removed)
    Modules:
    01  localStorage init
    02  Progress bar
@@ -11,12 +11,12 @@
    09  Compact hero cluster
    10  Tag page search toolbar
    11  Image lightbox
-   12  Floating toolbar (sfx / sink / sakura)  — bg removed, theme+skin merged
+   12  Floating toolbar (sfx / sink)  — bg removed, theme+skin merged
    13  Favorites lock (SHA-256)
    14  Home card rebuild - rounded-rect cards with gradient border
    15  macOS code block buttons
-   16  Sakura petals
-   17  ArticleTOC scroll-spy + back-to-top (replaces custom floating TOC)
+   16  Sakura petals  ← REMOVED
+   17  ArticleTOC scroll-spy + back-to-top
    18  Post page init
    19  Index page init
    20  Main entry
@@ -80,7 +80,7 @@
     var defs = {
       'luliy-sfx': '1',
       'luliy-particles': '1',
-      'luliy-sakura': '1',
+      // 'luliy-sakura': '1',  ← REMOVED
       'luliy-sink': 'default'
     };
     Object.keys(defs).forEach(function(k){ if (localStorage.getItem(k) === null) localStorage.setItem(k, defs[k]); });
@@ -263,7 +263,6 @@
     banner.textContent = 'Remember, this is your world.';
     content.parentNode.insertBefore(banner, content);
 
-    /* Scroll-fold: slides up and fades as page scrolls down */
     var bannerH = 0;
     function getBannerH() { bannerH = banner.offsetHeight || 56; }
     getBannerH();
@@ -319,7 +318,6 @@
   }
 
   /* ---- 12  Floating toolbar ------------------------------ */
-  /* ---- Unified SINK — one button replaces article-theme + reading-skin + bg */
   var SINKS = [
     {
       id: 'default', label: '\u9ed8\u8ba4', dot: '#8250df',
@@ -358,22 +356,17 @@
     SINKS.forEach(function(x) { if (x.id === id) s = x; });
     if (!s) s = SINKS[0];
     localStorage.setItem('luliy-sink', s.id);
-    /* skin */
     if (s.skin === 'default') document.body.removeAttribute('data-skin');
     else document.body.setAttribute('data-skin', s.skin);
-    /* theme */
     document.body.setAttribute('data-luliy-theme', s.theme || 'default');
-    /* card palette CSS vars */
     document.documentElement.style.setProperty('--card-c1', s.cardPalette[0]);
     document.documentElement.style.setProperty('--card-c2', s.cardPalette[1]);
     document.documentElement.style.setProperty('--card-c3', s.cardPalette[2]);
     document.documentElement.style.setProperty('--card-c4', s.cardPalette[3]);
-    /* update menu active state */
     document.querySelectorAll('.luliy-sink-opt').forEach(function(b) {
       b.classList.toggle('is-active', b.getAttribute('data-sink') === s.id);
     });
   }
-  /* Legacy shims */
   function applyTheme() {}
   function applySkin() {}
 
@@ -416,28 +409,13 @@
     sinkMenu.addEventListener('click', function(e) { e.stopPropagation(); });
     sinkWrap.appendChild(sinkMenu); sinkWrap.appendChild(btnSink);
 
-    /* Sakura toggle */
-    var btnSakura = document.createElement('button'); btnSakura.className = 'luliy-tb-btn'; btnSakura.type = 'button';
-    var sakuraOn = localStorage.getItem('luliy-sakura') !== '0';
-    btnSakura.innerHTML = '\uD83C\uDF38';
-    btnSakura.setAttribute('data-tip', sakuraOn ? '\u5173\u95ed\u82b1\u74e3' : '\u5f00\u542f\u82b1\u74e3');
-    if (!sakuraOn) btnSakura.classList.add('sakura-off');
-    btnSakura.addEventListener('click', function() {
-      var on = localStorage.getItem('luliy-sakura') !== '0';
-      localStorage.setItem('luliy-sakura', on ? '0' : '1');
-      btnSakura.innerHTML = '\uD83C\uDF38';
-      btnSakura.setAttribute('data-tip', on ? '\u5f00\u542f\u82b1\u74e3' : '\u5173\u95ed\u82b1\u74e3');
-      btnSakura.classList.toggle('sakura-off', on);
-      if (on) { var c = document.getElementById('luliy-sakura-canvas'); if (c) c.remove(); }
-      else initSakura();
-      playSfx('click');
-    });
+    // Sakura toggle removed
 
     document.addEventListener('click', function() { sinkMenu.classList.remove('is-open'); });
 
     bar.appendChild(btnSfx);
     bar.appendChild(sinkWrap);
-    bar.appendChild(btnSakura);
+    // bar.appendChild(btnSakura); ← removed
     document.body.appendChild(bar);
 
     applySink(localStorage.getItem('luliy-sink') || 'default');
@@ -468,16 +446,12 @@
   var LOCK_KEY  = 'luliy-unlocked-favorites';
 
   function isFavoritesPost() {
-    /* Check body/post attributes */
     var attr = (document.body.getAttribute('data-labels') || '') +
       ((document.getElementById('postBody') && document.getElementById('postBody').getAttribute('data-labels')) || '');
     if (/favorites?/i.test(attr)) return true;
-    /* Check labels on the page */
     var found = false;
     document.querySelectorAll('.Label, a.Label').forEach(function(el){ if (/favorites?/i.test(el.textContent)) found = true; });
-    /* Check URL and title */
     if (!found) found = /favorites?/i.test(document.title + location.href);
-    /* Check nav links — any link whose text contains "Favourite/Favorites" */
     if (!found) {
       document.querySelectorAll('#header a, .title-right a, nav a').forEach(function(a) {
         if (/favou?ri/i.test(a.textContent)) found = true;
@@ -486,7 +460,6 @@
     return found;
   }
   function initLock() {
-    /* Global lock: runs on every page (post and index) */
     if (sessionStorage.getItem(LOCK_KEY) === '1') return;
     function check(n) {
       if (isFavoritesPost()) { showLock(); return; }
@@ -522,13 +495,11 @@
 
   /* ---- 14  Home card rebuild — Hex grid layout ------------ */
   function initCards() {
-    /* Do not run on the tag page — it uses .SideNav for label listing */
     if (/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
     var nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
 
-    /* Build a single rounded-rect card element */
     function buildCard(post, isPinned, colourIdx) {
       var li = document.createElement('li');
       li.className = 'luliy-card';
@@ -548,17 +519,14 @@
       })();
       a.className = 'luliy-card-inner';
 
-      /* Date — top center, small gray */
       var dateEl = document.createElement('div');
       dateEl.className = 'luliy-card-date';
       dateEl.textContent = post.created ? post.created.slice(0, 10) : '';
 
-      /* Title — center bold, core visual */
       var titleEl = document.createElement('div');
       titleEl.className = 'luliy-card-title';
       titleEl.textContent = post.title || '\u65e0\u9898';
 
-      /* Tags — bottom rounded-pill row */
       var tagsEl = document.createElement('div');
       tagsEl.className = 'luliy-card-tags';
       var labels = Array.isArray(post.labels) ? post.labels : [];
@@ -583,11 +551,9 @@
     fetchPosts().then(function(posts) {
       if (!posts || !posts.length) { fallbackDomCards(nav); return; }
 
-      /* Separate pinned and regular */
       var pinnedPosts  = posts.filter(function(p){ return p.pinned; });
       var regularPosts = posts.filter(function(p){ return !p.pinned; });
 
-      /* Pagination (only regular posts paginate) */
       var pageMatch = location.search.match(/[?&]page=([0-9]+)/);
       var pageNum = pageMatch ? parseInt(pageMatch[1]) : 1;
       var perPage = 12;
@@ -599,7 +565,6 @@
         displayPosts = regularPosts.slice(start, start + perPage);
       }
 
-      /* Insert pinned section above the card grid (only page 1) */
       if (pinnedPosts.length > 0 && isIndex && pageNum === 1) {
         var existing = document.getElementById('luliy-pinned-section');
         if (existing) existing.remove();
@@ -612,18 +577,15 @@
         pinnedPosts.forEach(function(post, i){ pg.appendChild(buildCard(post, true, i)); });
         ps.appendChild(pg);
 
-        /* Insert before the nav (card grid) */
         nav.parentNode.insertBefore(ps, nav);
       }
 
-      /* Rebuild main card grid — hex layout */
       nav.innerHTML = '';
       nav.className = 'luliy-card-grid';
       displayPosts.forEach(function(post, i){ nav.appendChild(buildCard(post, false, i)); });
 
     }).catch(function(){ fallbackDomCards(nav); });
 
-    /* Fallback: use existing DOM items as simple hex wrappers */
     function fallbackDomCards(container) {
       container.className = 'luliy-card-grid';
       container.querySelectorAll('li.SideNav-item, .SideNav-item').forEach(function(li, i) {
@@ -695,67 +657,19 @@
     });
   }
 
-  /* ---- 16  Sakura petals --------------------------------- */
-  function initSakura() {
-    if (localStorage.getItem('luliy-sakura') === '0') return;
-    if (document.getElementById('luliy-sakura-canvas')) return;
-    var canvas = document.createElement('canvas'); canvas.id = 'luliy-sakura-canvas';
-    document.body.appendChild(canvas);
-    var ctx = canvas.getContext('2d'), W, H;
-    function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-    resize(); window.addEventListener('resize', resize, {passive: true});
-    var COLORS = ['#ffb7c5','#ffc0cb','#ff9eb5','#ffd0d8','#ffaec0','#f9c4d2','#fce4ec','#f8bbd0'];
-    function mkPetal(randomY) {
-      var size = Math.random() * 10 + 8;
-      return { x:Math.random()*W, y:randomY?Math.random()*H:-size, size:size,
-        opacity:Math.random()*0.55+0.25, speedX:Math.random()*1.2-0.6, speedY:Math.random()*0.7+0.35,
-        rot:Math.random()*Math.PI*2, rotSpeed:(Math.random()-0.5)*0.038,
-        swing:Math.random()*1.6+0.4, swingAngle:Math.random()*Math.PI*2, swingSpeed:0.008+Math.random()*0.018,
-        color:COLORS[Math.floor(Math.random()*COLORS.length)] };
-    }
-    var petals = []; for (var i = 0; i < 45; i++) petals.push(mkPetal(true));
-    function drawPetal(p) {
-      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.opacity;
-      var s = p.size;
-      ctx.beginPath(); ctx.moveTo(0,-s*0.5);
-      ctx.bezierCurveTo(s*0.55,-s*0.55, s*0.55,s*0.55, 0,s*0.5);
-      ctx.bezierCurveTo(-s*0.55,s*0.55, -s*0.55,-s*0.55, 0,-s*0.5);
-      ctx.fillStyle = p.color; ctx.fill();
-      ctx.beginPath(); ctx.moveTo(0,-s*0.4); ctx.lineTo(0,s*0.4);
-      ctx.strokeStyle = 'rgba(255,150,170,0.25)'; ctx.lineWidth = 0.6; ctx.stroke();
-      ctx.restore();
-    }
-    var running = true;
-    function tick() {
-      if (!document.getElementById('luliy-sakura-canvas')) { running = false; return; }
-      ctx.clearRect(0,0,W,H);
-      for (var i = 0; i < petals.length; i++) {
-        var p = petals[i];
-        p.swingAngle += p.swingSpeed; p.x += p.speedX + Math.sin(p.swingAngle)*p.swing; p.y += p.speedY; p.rot += p.rotSpeed;
-        if (p.y > H+p.size*2 || p.x < -p.size*4 || p.x > W+p.size*4) petals[i] = mkPetal(false);
-        drawPetal(p);
-      }
-      if (running) requestAnimationFrame(tick);
-    }
-    tick();
-  }
+  // 16  Sakura petals — completely removed
 
   /* ---- 17  ArticleTOC scroll-spy + back-to-top ----------- */
-  /* Replaces the old custom floating TOC panel.
-     Finds the ArticleTOC generated by articletoc.js plugin,
-     injects a header row (label + back-to-top) and adds scroll-spy. */
   function initArticleTocSpy() {
     if (!document.getElementById('postBody')) return;
     var pbody = document.getElementById('postBody');
 
     function trySetup() {
-      /* ArticleTOC can be #TOC, .articletoc, .toc, or any nav inside postBody */
       var toc = document.querySelector('#TOC, .articletoc, .toc, #postBody > nav');
       if (!toc) return false;
       if (toc._luliySpy) return true;
       toc._luliySpy = true;
 
-      /* Inject header row if not already there */
       if (!toc.querySelector('.luliy-toc-injected-hdr')) {
         var hdr = document.createElement('div');
         hdr.className = 'luliy-toc-injected-hdr';
@@ -778,7 +692,6 @@
         toc.insertBefore(hdr, toc.firstChild);
       }
 
-      /* Assign ids to headings that lack them */
       var allH = Array.from(pbody.querySelectorAll('h1,h2,h3,h4'));
       allH.forEach(function(h, i) {
         if (!h.id) {
@@ -823,7 +736,6 @@
       return true;
     }
 
-    /* articletoc.js may run after us - retry a few times */
     if (!trySetup()) {
       var n = 0, iv = setInterval(function(){
         if (trySetup() || ++n > 20) clearInterval(iv);
@@ -836,7 +748,6 @@
     if (root._luliyPostInited) return; root._luliyPostInited = true;
     var pbody = document.getElementById('postBody');
 
-    /* External links open in new tab */
     document.querySelectorAll('a[href^="http"]').forEach(function(a){
       if (!a.href.includes('luliy6.github.io') && !a.href.includes('luliy.indevs.in')) a.target = '_blank';
     });
@@ -844,7 +755,6 @@
     if (pbody) pbody.querySelectorAll('img').forEach(function(img){ img.loading = 'lazy'; });
     if (!pbody) return;
 
-    /* Reading time */
     if (!document.getElementById('luliy-readmeta')) {
       var wc = pbody.innerText.length;
       var rt = document.createElement('p'); rt.id = 'luliy-readmeta';
@@ -853,7 +763,6 @@
       pbody.insertBefore(rt, pbody.firstChild);
     }
 
-    /* Heading copy-link */
     pbody.querySelectorAll('h1,h2,h3').forEach(function(h) {
       if (h._luliyCopy) return; h._luliyCopy = true; h.style.cursor = 'pointer'; h.title = '\u70b9\u51fb\u590d\u5236\u94fe\u63a5';
       h.addEventListener('click', function() {
@@ -864,35 +773,28 @@
       });
     });
 
-    /* macOS code blocks */
     initCodeBlocks(pbody);
     setTimeout(function(){ initCodeBlocks(pbody); }, 800);
     setTimeout(function(){ initCodeBlocks(pbody); }, 2000);
 
-    /* ArticleTOC scroll-spy - try now + retry after plugin settles */
     initArticleTocSpy();
     setTimeout(function(){ initArticleTocSpy(); }, 600);
     setTimeout(function(){ initArticleTocSpy(); }, 2000);
 
-    /* ---- Prev / Next navigation -------------------------- */
     fetchPosts().then(function(posts) {
-      /* Remove pinned posts from navigation sequence */
       var navPosts = posts.filter(function(p){ return !p.pinned; });
 
-      /* Normalize current URL for flexible matching */
       var curPath = location.pathname;
       var curNorm = curPath.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '');
 
       var idx = -1;
       navPosts.forEach(function(p, i) {
         if (!p.link) return;
-        /* Normalize: strip leading slash, strip .html, strip trailing slash, strip leading 'post/' to get the slug */
         function normLink(s) {
           return s.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '').replace(/^post\//, '');
         }
         var lnkSlug = normLink(p.link);
         var curSlug = normLink(curNorm);
-        /* Match by slug OR by full path */
         if (lnkSlug === curSlug ||
             lnkSlug === curNorm ||
             p.link === curNorm ||
@@ -903,10 +805,10 @@
         }
       });
 
-      if (idx < 0) return; /* current post not found in list */
+      if (idx < 0) return;
 
-      var prevPost = navPosts[idx + 1] || null; /* older */
-      var nextPost = navPosts[idx - 1] || null; /* newer */
+      var prevPost = navPosts[idx + 1] || null;
+      var nextPost = navPosts[idx - 1] || null;
 
       if (!prevPost && !nextPost) return;
 
@@ -915,17 +817,15 @@
 
       function mkNavLink(post, labelText, align) {
         if (!post) {
-          /* Empty placeholder to keep layout balanced */
           var empty = document.createElement('div');
           empty.style.flex = '1';
           return empty;
         }
         var a = document.createElement('a');
-        /* Ensure link always starts with /post/ without doubling */
         var lnk = post.link || '#';
         if (lnk !== '#') {
-          lnk = lnk.replace(/^\//, '');          /* strip leading slash */
-          lnk = lnk.replace(/^post\/post\//, 'post/'); /* fix double post/ */
+          lnk = lnk.replace(/^\//, '');
+          lnk = lnk.replace(/^post\/post\//, 'post/');
           if (!/^post\//.test(lnk) && !/^https?:\/\//.test(lnk)) lnk = 'post/' + lnk;
           lnk = '/' + lnk;
         }
@@ -942,12 +842,11 @@
       pbody.appendChild(nav);
     }).catch(function(){});
 
-    /* Appreciation panel */
     var sp = document.createElement('div'); sp.style.cssText = 'margin-top:50px;text-align:center';
     var spb = document.createElement('button'); spb.innerHTML = '\u2728 \u548c\u4f5c\u8005\u65e0\u9650\u8fdb\u6b65';
     spb.style.cssText = 'padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#f0b429,#ff6b9d);color:#fff;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(240,180,41,0.3);transition:transform 0.3s';
     var qr = document.createElement('div');
-    qr.innerHTML = '<p style="font-size:13px;color:#888;margin:10px 0">\u65e0\u9650\u8fdb\u6b65\uff0c\u8fdb\u6b65\u6709\u4f60\uff01</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="\u8d5b\u8d4f\u7801" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
+    qr.innerHTML = '<p style="font-size:13px;color:#888;margin:10px 0">\u65e0\u9650\u8fdb\u6b65\uff0c\u8fdb\u6b65\u6709\u4f60\uff01</p><img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg" alt="\u8d5e\u8d4f\u7801" style="width:180px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1)">';
     qr.style.cssText = 'height:0;overflow:hidden;transition:height 0.4s ease,opacity 0.4s ease;opacity:0';
     spb.addEventListener('mouseover', function(){ spb.style.transform = 'translateY(-2px)'; });
     spb.addEventListener('mouseout', function(){ spb.style.transform = ''; });
@@ -983,7 +882,6 @@
   /* ---- 20  Main entry ------------------------------------ */
   initLocalStorage();
 
-  /* Restore sink immediately (prevent FOUC) */
   (function() {
     var savedSinkId = localStorage.getItem('luliy-sink') || 'default';
     var sinkDefs = {
@@ -1007,14 +905,7 @@
     else document.addEventListener('DOMContentLoaded', applyFouc);
   })();
 
-
-  /* Particles removed — static background image used instead */
-
-  /* Sakura */
-  if (localStorage.getItem('luliy-sakura') !== '0') {
-    if (document.body) initSakura();
-    else document.addEventListener('DOMContentLoaded', initSakura);
-  }
+  // Sakura init removed
 
   ready(function() {
     initProgressBar();
