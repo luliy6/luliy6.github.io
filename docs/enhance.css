@@ -357,7 +357,9 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 .title-right {
   display: flex !important;
   align-items: center !important;
-  gap: 5px !important;
+  gap: 6px !important;
+  flex: 1 !important;
+  justify-content: center !important;
   flex-shrink: 1 !important;
   flex-wrap: wrap !important;
   z-index: 10000 !important;
@@ -365,8 +367,8 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 }
 .title-right a {
   white-space: nowrap !important;
-  font-size: 13px !important;
-  padding: 4px 8px !important;
+  font-size: 15px !important;
+  padding: 5px 11px !important;
   border-radius: 8px !important;
   text-decoration: none !important;
   transition: background 0.18s, color 0.18s !important;
@@ -376,6 +378,24 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 }
 [data-color-mode="dark"] .title-right a:hover {
   background: rgba(130,80,223,0.22) !important;
+}
+
+/* Hide RSS button from nav */
+.title-right a[href*="rss"],
+.title-right a[href*="RSS"],
+.title-right a[href$=".xml"],
+.title-right a[href*="feed"],
+.title-right a svg.octicon-rss,
+.title-right a:has(svg[data-icon*="rss"]) { display: none !important; }
+
+/* Navbar transparent when scrolled (article pages) */
+#header.header-scrolled {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
 }
 
 /* Search button in nav */
@@ -726,15 +746,33 @@ body.luliy-post-page .main {
 }
 [data-color-mode="dark"] .SideNav-item:hover { background: rgba(130,80,223,0.14) !important; }
 
-/* ── Default: NO article background box ─────────────────── */
+/* ── Default: 50% iOS26 liquid glass background ─────────── */
 body[data-luliy-theme="default"] #postBody,
 body:not([data-luliy-theme]) #postBody {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 24px 0 !important;
+  background: rgba(255,255,255,0.50) !important;
+  backdrop-filter: blur(40px) saturate(2.2) brightness(1.06) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(2.2) brightness(1.06) !important;
+  border: 1px solid rgba(255,255,255,0.65) !important;
+  border-top: 2px solid rgba(255,255,255,0.80) !important;
+  border-radius: 22px !important;
+  padding: 36px 40px !important;
+  margin-bottom: 48px !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.90) inset,
+    0 8px 40px rgba(0,0,0,0.10),
+    0 2px 8px rgba(0,0,0,0.06) !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="default"] #postBody,
+[data-color-mode="dark"] body:not([data-luliy-theme]) #postBody {
+  background: rgba(14,10,28,0.50) !important;
+  backdrop-filter: blur(40px) saturate(2.2) brightness(0.96) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(2.2) brightness(0.96) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  border-top-color: rgba(255,255,255,0.15) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.06) inset,
+    0 8px 40px rgba(0,0,0,0.45),
+    0 2px 8px rgba(0,0,0,0.30) !important;
 }
 
 /* ── Sakura: cherry blossom girl — pink frosted glass ────── */
@@ -1036,7 +1074,7 @@ body[data-luliy-theme="space"] {
    17  Floating toolbar + sink menu
 ══════════════════════════════════════════════════════════ */
 #luliy-toolbar {
-  position: fixed; bottom: 28px; right: 20px;
+  position: fixed; top: 76px; right: 20px; bottom: auto;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   z-index: 9990;
 }
@@ -1076,7 +1114,7 @@ body[data-luliy-theme="space"] {
 /* Sink menu */
 #luliy-sink-menu {
   display: none; flex-direction: column; gap: 2px;
-  position: absolute; bottom: 52px; right: 0;
+  position: absolute; top: 52px; bottom: auto; right: 0;
   background: rgba(255,255,255,0.97);
   border: 1px solid rgba(130,80,223,0.20);
   border-radius: 14px; padding: 8px;
@@ -1164,7 +1202,7 @@ body[data-luliy-theme="space"] {
    20  Back-to-top
 ══════════════════════════════════════════════════════════ */
 #luliy-back-top {
-  position: fixed; bottom: 130px; right: 22px;
+  position: fixed; bottom: 28px; right: 22px;
   width: 40px; height: 40px; border-radius: 50%;
   background: rgba(130,80,223,0.22);
   backdrop-filter: blur(14px);
@@ -1344,8 +1382,8 @@ body[data-luliy-theme="space"] {
     border-radius: 14px !important;
   }
 
-  #luliy-toolbar { right: 10px; bottom: 18px; }
-  #luliy-back-top { right: 14px; bottom: 118px; }
+  #luliy-toolbar { right: 10px; top: 66px; bottom: auto; }
+  #luliy-back-top { right: 14px; bottom: 14px; }
   .luliy-tb-btn::after { display: none; }
 
   #luliy-home-gallery { height: 140px; border-radius: 14px; }

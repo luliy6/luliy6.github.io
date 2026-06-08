@@ -517,6 +517,16 @@
     });
   }
 
+  /* ---- Nav transparency on scroll (article pages) --------- */
+  function initNavTransparency() {
+    var header = document.getElementById('header');
+    if (!header) return;
+    window.addEventListener('scroll', function () {
+      var st = window.scrollY || window.pageYOffset || 0;
+      header.classList.toggle('header-scrolled', st > 100);
+    }, { passive: true });
+  }
+
   function initToolbar() {
     if (document.getElementById('luliy-toolbar')) return;
     var bar = document.createElement('div');
@@ -902,6 +912,37 @@
         toc.insertBefore(hdr, toc.firstChild);
       }
 
+      /* Auto-expand TOC panel on article load */
+      setTimeout(function () {
+        /* Case 1: inside a <details> element */
+        var det = toc;
+        while (det && det !== document.body) {
+          if (det.tagName === 'DETAILS') { det.open = true; break; }
+          det = det.parentElement;
+        }
+        /* Case 2: parent/container is hidden */
+        var container = toc.parentElement;
+        if (container) {
+          var cs = window.getComputedStyle(container);
+          if (cs.display === 'none') container.style.display = 'block';
+          if (cs.visibility === 'hidden') container.style.visibility = 'visible';
+        }
+        /* Case 3: a sibling/ancestor toggle button with aria-expanded=false */
+        var root = (toc.parentElement || document.body);
+        root.querySelectorAll('button[aria-expanded="false"], button[aria-controls]').forEach(function (btn) {
+          var ctrl = btn.getAttribute('aria-controls');
+          if (ctrl) {
+            var target = document.getElementById(ctrl);
+            if (target && (target === toc || target.contains(toc) || toc.contains(target))) {
+              btn.click();
+            }
+          }
+        });
+        /* Case 4: ensure the TOC wrapper itself is visible */
+        toc.style.display = '';
+        toc.style.visibility = '';
+      }, 600);
+
       /* Assign IDs to headings */
       var allH = Array.from(pbody.querySelectorAll('h1,h2,h3,h4'));
       allH.forEach(function (h, i) {
@@ -988,10 +1029,8 @@
       });
       drop.appendChild(searchItem);
 
-      /* singlePage links (excluding about) */
+      /* All nav links including about */
       tr.querySelectorAll('a').forEach(function (a) {
-        var href = (a.getAttribute('href') || '').replace(/\/$/, '');
-        if (/\/about$|\/about\.html$/i.test(href)) return;
         if (!a.textContent.trim()) return;
         var item = document.createElement('a');
         item.className = 'luliy-nav-item';
@@ -1406,6 +1445,7 @@
     initHeroCluster();
     initLightbox();
     initToolbar();
+    initNavTransparency();
     initMobileNav();
     initSearchOverlay();
 
