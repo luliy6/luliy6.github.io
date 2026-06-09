@@ -1669,7 +1669,7 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
     font-size: 13px !important;
   }
 
-  #content, .main { padding: 0 12px !important; }
+  #content, .main { padding: 0 px !important; }
   body.luliy-post-page #content { margin-top: 64px !important; }
   #luliy-hero-banner { margin-top: 64px; font-size: 12px; padding: 12px 16px; }
 
@@ -1687,6 +1687,17 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
     padding: 20px 16px !important;
     border-radius: 14px !important;
   }
+  
+  body[data-luliy-theme="default"] #postBody,
+body:not([data-luliy-theme]) #postBody,
+body[data-luliy-theme="sakura"] #postBody,
+body[data-luliy-theme="your-name"] #postBody,
+body[data-luliy-theme="space"] #postBody {
+  padding: 20px 16px !important;
+  border-radius: 0 !important;   /* 去掉圆角才能真正贴边 */
+  margin: 0 !important;
+  width: 100% !important;
+}
 
   #luliy-back-top { right: 14px; bottom: 94px; }
 
