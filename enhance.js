@@ -19,8 +19,8 @@
    16  Sakura petals
    17  ArticleTOC scroll-spy + back-to-top
    18  Mobile nav hamburger + dropdown
-   19  Search overlay
-   20  Homepage bottom gallery banner
+   19  [Removed] Search overlay
+   20  Homepage bottom gallery banner (lazy load + zoomable)
    21  Post page init
    22  Index page init
    23  Main entry
@@ -141,7 +141,8 @@
     var defs = {
       'luliy-sfx':    '1',
       'luliy-sakura': '1',
-      'luliy-sink':   'default'
+      'luliy-sink':   'default',
+      'luliy-bg':     ''
     };
     Object.keys(defs).forEach(function (k) {
       if (localStorage.getItem(k) === null) localStorage.setItem(k, defs[k]);
@@ -464,6 +465,30 @@
     root._luliyLightboxOpen = open;
   }
 
+
+  /* ---- Background picker helper -------------------------------- */
+  function showBgPicker() {
+    var cur = localStorage.getItem('luliy-bg') || '';
+    var url = window.prompt(
+      '\u8bf7\u7c98\u8d34\u80cc\u666f\u56fe\u7247\u94fe\u63a5\uff08\u7559\u7a7a\u5219\u6062\u590d\u9ed8\u8ba4\u80cc\u666f\uff09\uff1a',
+      cur
+    );
+    if (url === null) return; // cancelled
+    url = url.trim();
+    if (url === '') {
+      localStorage.removeItem('luliy-bg');
+      document.body.style.setProperty(
+        'background-image',
+        'url("https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png")',
+        'important'
+      );
+    } else {
+      localStorage.setItem('luliy-bg', url);
+      document.body.style.setProperty('background-image', 'url("' + url + '")', 'important');
+    }
+    playSfx('click');
+  }
+
   /* ---- 13  Floating toolbar + unified sink (4 themes) ----- */
 
   /* ── 4 Sinks / Themes ───────────────────────────────────── */
@@ -587,6 +612,7 @@
       dot.className = 'luliy-sink-dot'; dot.style.background = s.dot;
       row._ico.replaceWith(dot); row._dot = dot;
       row._bdg.style.opacity = '0';
+      row.classList.add('luliy-ctrl-row'); /* shared row style */
       row.addEventListener('click', function (e) {
         e.stopPropagation();
         applySink(s.id);
@@ -596,6 +622,40 @@
       panel.appendChild(row);
     });
 
+    /* Day / Night theme preview cards */
+    var previewWrap = document.createElement('div');
+    previewWrap.className = 'luliy-ctrl-theme-preview';
+
+    var THEME_PALETTES = {
+      'default':   { day: ['rgba(255,255,255,0.90)', '#8250df', '#1e1032'],  night: ['rgba(14,10,28,0.90)', '#cba6f7', '#cdd6f4'] },
+      'sakura':    { day: ['rgba(255,238,245,0.92)', '#e05c8a', '#7a1040'],  night: ['rgba(42,10,28,0.88)',  '#f9a8c9', '#ffc5d0'] },
+      'your-name': { day: ['rgba(230,244,255,0.92)', '#1a59a4', '#0d2b6b'],  night: ['rgba(4,14,52,0.90)',   '#93c5fd', '#c0e4ff'] },
+      'space':     { day: ['rgba(2,8,36,0.88)',      '#00e5ff', '#c8e8ff'],  night: ['rgba(1,4,22,0.92)',    '#00e5ff', '#b8d8f0'] }
+    };
+
+    function mkPreviewCard(label, bg, accent, textColor) {
+      var card = document.createElement('div');
+      card.className = 'luliy-ctrl-preview-card ' + label.toLowerCase();
+      card.style.background = bg;
+      card.style.color = textColor;
+      card.style.borderColor = accent + '44';
+      var dot = document.createElement('span');
+      dot.className = 'preview-dot';
+      dot.style.background = accent;
+      var lbl = document.createElement('span');
+      lbl.className = 'preview-label';
+      lbl.textContent = label === 'day' ? '\u767d\u5929' : '\u591c\u665a';  /* 白天 / 夜晚 */
+      card.appendChild(dot);
+      card.appendChild(lbl);
+      return card;
+    }
+
+    var previewDay   = mkPreviewCard('day',   'rgba(255,255,255,0.90)', '#8250df', '#1e1032');
+    var previewNight = mkPreviewCard('night', 'rgba(14,10,28,0.90)',   '#cba6f7', '#cdd6f4');
+    previewWrap.appendChild(previewDay);
+    previewWrap.appendChild(previewNight);
+    panel.appendChild(previewWrap);
+
     function syncThemeRows() {
       var cur = localStorage.getItem('luliy-sink') || 'default';
       panel.querySelectorAll('[data-sink]').forEach(function (r) {
@@ -603,6 +663,16 @@
         r.classList.toggle('is-active', active);
         if (r._bdg) r._bdg.style.opacity = active ? '1' : '0';
       });
+      /* Update preview cards for active theme */
+      var pal = THEME_PALETTES[cur] || THEME_PALETTES['default'];
+      previewDay.style.background   = pal.day[0];
+      previewDay.style.color        = pal.day[2];
+      previewDay.style.borderColor  = pal.day[1] + '44';
+      previewDay.querySelector('.preview-dot').style.background = pal.day[1];
+      previewNight.style.background  = pal.night[0];
+      previewNight.style.color       = pal.night[2];
+      previewNight.style.borderColor = pal.night[1] + '44';
+      previewNight.querySelector('.preview-dot').style.background = pal.night[1];
     }
 
     panel.appendChild(mkSep());
@@ -622,6 +692,17 @@
     });
     panel.appendChild(sakuraRow);
 
+    /* BG */
+    panel.appendChild(mkSep());
+    var bgRow = mkRow('\uD83D\uDDBC', '\u80cc\u666f\u56fe\u7247', '\u66F4\u6362');
+    bgRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.classList.remove('is-open');
+      ctrlBtn.classList.remove('is-open');
+      setTimeout(showBgPicker, 80);
+    });
+    panel.appendChild(bgRow);
+
     /* Toggle open / close */
     ctrlBtn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -635,8 +716,11 @@
     });
     panel.addEventListener('click', function (e) { e.stopPropagation(); });
 
-    bar.appendChild(ctrlBtn);
-    bar.appendChild(panel);
+    var ctrlWrap = document.createElement('div');
+    ctrlWrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:flex-end';
+    ctrlWrap.appendChild(ctrlBtn);
+    ctrlWrap.appendChild(panel);
+    bar.appendChild(ctrlWrap);
     document.body.appendChild(bar);
     applySink(localStorage.getItem('luliy-sink') || 'default');
   }
@@ -845,7 +929,36 @@
     });
   }
 
-  /* ---- 16  Sakura petals ---------------------------------- */
+  /* ---- 16  Sakura petals (16 petals, seasonal, wind-aware) -- */
+  /* Season config — auto-detected from current month */
+  var SEASON_CONFIG = (function () {
+    var m = new Date().getMonth(); // 0–11
+    if (m >= 2 && m <= 4) return {
+      name: 'spring',
+      colors: ['#ffb7c5', '#ffc0cb', '#ff9eb5', '#ffd0d8', '#ffaec0', '#f9c4d2', '#fce4ec', '#f8bbd0'],
+      count: 16, speedY: [0.35, 0.80], sizeRange: [8, 18],
+      wind: 0.55, opacity: [0.25, 0.80]
+    };
+    if (m >= 5 && m <= 7) return {
+      name: 'summer',
+      colors: ['#a8edbc', '#7de3a0', '#56d98a', '#34c770', '#b2f0c8', '#90e8b0', '#c8f5d8', '#6ad990'],
+      count: 16, speedY: [0.28, 0.55], sizeRange: [6, 14],
+      wind: 0.20, opacity: [0.20, 0.55]
+    };
+    if (m >= 8 && m <= 10) return {
+      name: 'autumn',
+      colors: ['#ff9966', '#ff6644', '#ff8833', '#ffaa44', '#cc5522', '#ff7744', '#ffcc66', '#dd6633'],
+      count: 16, speedY: [0.45, 0.95], sizeRange: [9, 20],
+      wind: 0.80, opacity: [0.28, 0.72]
+    };
+    return {
+      name: 'winter',
+      colors: ['#e8f4fd', '#d0eaf8', '#ffffff', '#c8e4f4', '#ddf0ff', '#eef8ff', '#f0f8ff', '#d8ecf8'],
+      count: 16, speedY: [0.18, 0.40], sizeRange: [5, 12],
+      wind: 0.12, opacity: [0.20, 0.50]
+    };
+  })();
+
   function initSakura() {
     if (localStorage.getItem('luliy-sakura') === '0') return;
     if (document.getElementById('luliy-sakura-canvas')) return;
@@ -855,21 +968,29 @@
     var ctx = canvas.getContext('2d'), W, H;
     function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
     resize(); window.addEventListener('resize', resize, { passive: true });
-    var COLORS = ['#ffb7c5', '#ffc0cb', '#ff9eb5', '#ffd0d8', '#ffaec0', '#f9c4d2', '#fce4ec', '#f8bbd0'];
+    var S = SEASON_CONFIG;
+    var COLORS = S.colors;
+    var WIND = S.wind;           /* horizontal drift */
+    var COUNT = S.count;         /* 16 petals */
     function mkPetal(randomY) {
-      var size = Math.random() * 10 + 8;
+      var sMin = S.sizeRange[0], sMax = S.sizeRange[1];
+      var size = Math.random() * (sMax - sMin) + sMin;
+      var vMin = S.speedY[0], vMax = S.speedY[1];
+      var oMin = S.opacity[0], oMax = S.opacity[1];
       return {
         x: Math.random() * W, y: randomY ? Math.random() * H : -size,
-        size: size, opacity: Math.random() * 0.55 + 0.25,
-        speedX: Math.random() * 1.2 - 0.6, speedY: Math.random() * 0.7 + 0.35,
+        size: size, opacity: Math.random() * (oMax - oMin) + oMin,
+        speedX: (Math.random() * 0.8 - 0.4) + WIND * 0.5,
+        speedY: Math.random() * (vMax - vMin) + vMin,
         rot: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.038,
         swing: Math.random() * 1.6 + 0.4, swingAngle: Math.random() * Math.PI * 2,
         swingSpeed: 0.008 + Math.random() * 0.018,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)]
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        windPhase: Math.random() * Math.PI * 2  /* individual wind phase */
       };
     }
     var petals = [];
-    for (var i = 0; i < 45; i++) petals.push(mkPetal(true));
+    for (var i = 0; i < COUNT; i++) petals.push(mkPetal(true));
     function drawPetal(p) {
       ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.opacity;
       var s = p.size;
@@ -888,7 +1009,9 @@
       for (var j = 0; j < petals.length; j++) {
         var p = petals[j];
         p.swingAngle += p.swingSpeed;
-        p.x += p.speedX + Math.sin(p.swingAngle) * p.swing;
+        if (p.windPhase !== undefined) p.windPhase += 0.005;
+        var windGust = p.windPhase !== undefined ? Math.sin(p.windPhase) * WIND * 0.4 : 0;
+        p.x += p.speedX + Math.sin(p.swingAngle) * p.swing + windGust;
         p.y += p.speedY; p.rot += p.rotSpeed;
         if (p.y > H + p.size * 2 || p.x < -p.size * 4 || p.x > W + p.size * 4) petals[j] = mkPetal(false);
         drawPetal(p);
@@ -1063,24 +1186,6 @@
     function populateDrop() {
       drop.innerHTML = '';
 
-      /* ── 🔍 Search ───────────────────────────────────────── */
-      var searchItem = document.createElement('button');
-      searchItem.className = 'luliy-nav-item luliy-drop-toggle';
-      searchItem.type = 'button';
-      searchItem.textContent = '\uD83D\uDD0D \u641c\u7d22\u6587\u7ae0';
-      searchItem.addEventListener('click', function () {
-        closeDrop();
-        var ol = document.getElementById('luliy-search-overlay');
-        if (ol) {
-          ol.classList.add('is-open');
-          document.body.style.overflow = 'hidden';
-          var inp = document.getElementById('luliy-search-input');
-          if (inp) setTimeout(function () { inp.focus(); }, 100);
-        }
-      });
-      drop.appendChild(searchItem);
-      drop.appendChild(makeSep());
-
       /* ── 🔊 SFX toggle ───────────────────────────────────── */
       var sfxOn = localStorage.getItem('luliy-sfx') !== '0';
       var sfxItem = document.createElement('button');
@@ -1109,6 +1214,18 @@
         playSfx('click');
       });
       drop.appendChild(sakuraItem);
+
+      /* ── 🖼 Background changer ───────────────────────────── */
+      var bgItem = document.createElement('button');
+      bgItem.id = 'luliy-bg-btn';
+      bgItem.className = 'luliy-nav-item luliy-drop-toggle';
+      bgItem.type = 'button';
+      bgItem.textContent = '\uD83D\uDDBC \u80cc\u666f\u56fe\u7247\u00b7\u66F4\u6362';
+      bgItem.addEventListener('click', function () {
+        closeDrop();
+        setTimeout(showBgPicker, 80);
+      });
+      drop.appendChild(bgItem);
 
       /* ── 📋 TOC (only on article pages) ─────────────────── */
       if (document.getElementById('postBody')) {
@@ -1198,122 +1315,6 @@
     }
   }
 
-  /* ---- 19  Search overlay --------------------------------- */
-  function initSearchOverlay() {
-    if (document.getElementById('luliy-search-overlay')) return;
-
-    /* Create overlay DOM */
-    var overlay = document.createElement('div');
-    overlay.id = 'luliy-search-overlay';
-
-    var box = document.createElement('div');
-    box.id = 'luliy-search-box';
-
-    var input = document.createElement('input');
-    input.id = 'luliy-search-input';
-    input.type = 'search';
-    input.placeholder = '\u641c\u7d22\u6587\u7ae0\u6807\u9898\u3001\u6807\u7b7e...';
-    input.autocomplete = 'off';
-
-    var results = document.createElement('div');
-    results.id = 'luliy-search-results';
-
-    box.appendChild(input);
-    box.appendChild(results);
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
-
-    var postsCache = null;
-
-    function openSearch() {
-      overlay.classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-      setTimeout(function () { input.focus(); }, 80);
-      if (!postsCache) {
-        results.innerHTML = '<p style="color:#888;text-align:center;padding:16px">\u52a0\u8f7d\u4e2d...</p>';
-        fetchPosts().then(function (posts) {
-          postsCache = posts;
-          applySearch();
-        }).catch(function () {
-          results.innerHTML = '<p style="color:#e74c3c;text-align:center;padding:16px">\u52a0\u8f7d\u5931\u8d25</p>';
-        });
-      } else {
-        applySearch();
-      }
-    }
-
-    function closeSearch() {
-      overlay.classList.remove('is-open');
-      document.body.style.overflow = '';
-    }
-
-    function applySearch() {
-      if (!postsCache) return;
-      var q = input.value.trim().toLowerCase();
-      var filtered = q
-        ? postsCache.filter(function (p) {
-          return (p.title || '').toLowerCase().includes(q) ||
-            (p.labels || []).some(function (l) {
-              return ((l.name || l) || '').toLowerCase().includes(q);
-            });
-        })
-        : postsCache.slice(0, 12);
-
-      results.innerHTML = '';
-      if (!filtered.length) {
-        results.innerHTML = '<p style="color:#888;text-align:center;padding:20px">\u6682\u65e0\u7ed3\u679c</p>';
-        return;
-      }
-      filtered.slice(0, 24).forEach(function (p) {
-        var item = document.createElement('a');
-        item.className = 'luliy-search-item';
-        item.href = buildPostLink(p.link);
-
-        var t = document.createElement('span');
-        t.className = 'luliy-search-title';
-        t.textContent = p.title || '\u65e0\u9898';
-
-        var d = document.createElement('span');
-        d.className = 'luliy-search-date';
-        d.textContent = (p.created || '').slice(0, 10);
-
-        item.appendChild(t); item.appendChild(d);
-        results.appendChild(item);
-      });
-    }
-
-    input.addEventListener('input', applySearch);
-    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeSearch(); });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeSearch();
-    });
-
-    /* Inject desktop search button into nav */
-    function injectSearchBtn() {
-      var tr = document.querySelector('.title-right');
-      if (!tr || document.getElementById('luliy-search-btn')) return false;
-      var btn = document.createElement('button');
-      btn.id = 'luliy-search-btn'; btn.type = 'button';
-      btn.setAttribute('aria-label', '\u641c\u7d22');
-      btn.innerHTML =
-        '<svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">' +
-        '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>' +
-        '</svg>' +
-        '<span>\u641c\u7d22</span>';
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation(); openSearch(); playSfx('click');
-      });
-      tr.insertBefore(btn, tr.firstChild);
-      return true;
-    }
-    if (!injectSearchBtn()) {
-      var tries = 0;
-      var iv = setInterval(function () {
-        if (injectSearchBtn() || ++tries > 20) clearInterval(iv);
-      }, 200);
-    }
-  }
-
   /* ---- 20  Homepage bottom gallery banner ----------------- */
   function initHomeGallery() {
     if (!isIndexPage()) return;
@@ -1342,6 +1343,12 @@
       wrap.appendChild(img);
       wrap.appendChild(ov);
       content.appendChild(wrap);
+
+      /* Lightbox: click gallery banner to zoom */
+      wrap.style.cursor = 'zoom-in';
+      wrap.addEventListener('click', function () {
+        if (root._luliyLightboxOpen) root._luliyLightboxOpen(img.src, '\u753b\u5eca');
+      });
     }, 800);
   }
 
@@ -1540,6 +1547,18 @@
     else document.addEventListener('DOMContentLoaded', applyFouc);
   })();
 
+  /* Restore saved background image immediately (prevent flash) */
+  (function () {
+    var savedBg = localStorage.getItem('luliy-bg');
+    if (!savedBg) return;
+    function applyBg() {
+      if (!document.body) return;
+      document.body.style.setProperty('background-image', 'url("' + savedBg + '")', 'important');
+    }
+    if (document.body) applyBg();
+    else document.addEventListener('DOMContentLoaded', applyBg);
+  })();
+
   /* Welcome splash (before DOM ready, append after body exists) */
   if (document.body) initWelcomeSplash();
   else document.addEventListener('DOMContentLoaded', initWelcomeSplash);
@@ -1563,7 +1582,6 @@
     initToolbar();
     initNavTransparency();
     initMobileNav();
-    initSearchOverlay();
 
     var isPost    = !!document.getElementById('postBody');
     var hasList   = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
