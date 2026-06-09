@@ -10,9 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="> 本文档用中文详细解释 `config.json`、`enhance.css`、`enhance.js` 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。">
+<meta name="description" content="# 🌸 Luliy Blog 三件套完整说明书
+
+> 本文档用中文详细解释 `config.json`、`enhance.css`、`enhance.js` 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。">
 <meta property="og:title" content="Luliy Blog 三件套完整说明书">
-<meta property="og:description" content="> 本文档用中文详细解释 `config.json`、`enhance.css`、`enhance.js` 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。">
+<meta property="og:description" content="# 🌸 Luliy Blog 三件套完整说明书
+
+> 本文档用中文详细解释 `config.json`、`enhance.css`、`enhance.js` 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://luliy.me/post/Luliy%20Blog%20-san-jian-tao-wan-zheng-shuo-ming-shu.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
@@ -83,7 +87,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><blockquote>
+<div class="markdown-body" id="postBody"><h1>🌸 Luliy Blog 三件套完整说明书</h1>
+<blockquote>
 <p>本文档用中文详细解释 <code class="notranslate">config.json</code>、<code class="notranslate">enhance.css</code>、<code class="notranslate">enhance.js</code> 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。</p>
 </blockquote>
 <hr>
@@ -99,17 +104,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <tbody>
 <tr>
 <td><code class="notranslate">config.json</code></td>
-<td>博客的"控制面板"，所有基础设置在这里</td>
+<td>博客的”控制面板”，所有基础设置在这里</td>
 <td>最常改</td>
 </tr>
 <tr>
 <td><code class="notranslate">enhance.css</code></td>
-<td>博客的"外观设计师"，控制颜色、字体、布局</td>
+<td>博客的”外观设计师”，控制颜色、字体、布局</td>
 <td>偶尔改</td>
 </tr>
 <tr>
 <td><code class="notranslate">enhance.js</code></td>
-<td>博客的"功能工程师"，控制所有交互动效</td>
+<td>博客的”功能工程师”，控制所有交互动效</td>
 <td>较少改</td>
 </tr>
 </tbody>
@@ -117,7 +122,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <hr>
 <h1>一、config.json 全字段详解</h1>
 <blockquote>
-<p><strong>新手理解方式：</strong> 把 <code class="notranslate">config.json</code> 想象成一张"博客身份证+设置表"，每个字段就是一个填空题。</p>
+<p><strong>新手理解方式：</strong> 把 <code class="notranslate">config.json</code> 想象成一张”博客身份证+设置表”，每个字段就是一个填空题。</p>
 </blockquote>
 <hr>
 <h2>1.1 基础信息字段</h2>
@@ -145,7 +150,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p><strong>作用：</strong> 对外显示的联系邮箱（当前 exlink 已清空，此项为备用）。</p>
 <hr>
 <div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"startSite"</span>: <span class="pl-s"><span class="pl-pds">"</span>05/30/2026<span class="pl-pds">"</span></span></pre></div>
-<p><strong>作用：</strong> 博客建站日期，enhance.js 里的"运行天数"计时器从这一天开始算。<br>
+<p><strong>作用：</strong> 博客建站日期，enhance.js 里的”运行天数”计时器从这一天开始算。<br>
 <strong>格式：</strong> <code class="notranslate">月/日/年</code>，比如 <code class="notranslate">"01/01/2025"</code>。<br>
 <strong><g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> 重要：</strong> 改错了会导致计时显示负数，请填你真实建站的日期。</p>
 <hr>
@@ -228,7 +233,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <hr>
 <h2>1.5 功能开关字段</h2>
 <div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"showPostSource"</span>: <span class="pl-c1">1</span></pre></div>
-<p><strong>作用：</strong> 是否显示文章底部的"查看源码"链接。<code class="notranslate">1</code> = 显示，<code class="notranslate">0</code> = 隐藏。</p>
+<p><strong>作用：</strong> 是否显示文章底部的”查看源码”链接。<code class="notranslate">1</code> = 显示，<code class="notranslate">0</code> = 隐藏。</p>
 <div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"needComment"</span>: <span class="pl-c1">1</span></pre></div>
 <p><strong>作用：</strong> 是否开启评论功能（基于 GitHub Issues）。<code class="notranslate">1</code> = 开，<code class="notranslate">0</code> = 关。</p>
 <div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"rssSplit"</span>: <span class="pl-s"><span class="pl-pds">"</span>sentence<span class="pl-pds">"</span></span></pre></div>
@@ -242,7 +247,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <strong>镜像说明：</strong> 当前使用南科大 CDN 镜像，国内访问速度快。</p>
 <hr>
 <div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"allHead"</span>: <span class="pl-s"><span class="pl-pds">"</span>...<span class="pl-pds">"</span></span></pre></div>
-<p><strong>作用：</strong> 注入到每个页面 <code class="notranslate">&lt;head&gt;</code> 里的内容，是整个博客的"插件加载清单"。</p>
+<p><strong>作用：</strong> 注入到每个页面 <code class="notranslate">&lt;head&gt;</code> 里的内容，是整个博客的”插件加载清单”。</p>
 <p><strong>当前加载的内容逐一解释：</strong></p>
 <markdown-accessiblity-table><table role="table">
 <thead>
@@ -275,12 +280,12 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </tr>
 <tr>
 <td>Mermaid.js</td>
-<td>渲染流程图 <code class="notranslate">```mermaid</code></td>
+<td>渲染流程图 ````mermaid`</td>
 <td>不用流程图可删</td>
 </tr>
 <tr>
 <td>Chart.js</td>
-<td>渲染图表 <code class="notranslate">```chart</code></td>
+<td>渲染图表 ````chart`</td>
 <td>不用图表可删</td>
 </tr>
 <tr>
@@ -327,7 +332,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </code></pre>
 <hr>
 <div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"script"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;script&gt;function luliyWaitPost(){...}&lt;/script&gt;<span class="pl-pds">"</span></span></pre></div>
-<p><strong>作用：</strong> 文章页专用的"等待脚本"。它每隔 50ms 检测一次 <code class="notranslate">window._luliyInitPost</code> 是否已经加载好，加载好了就调用它。这是为了防止 enhance.js 还没加载完就被调用。<strong>不要修改。</strong></p>
+<p><strong>作用：</strong> 文章页专用的”等待脚本”。它每隔 50ms 检测一次 <code class="notranslate">window._luliyInitPost</code> 是否已经加载好，加载好了就调用它。这是为了防止 enhance.js 还没加载完就被调用。<strong>不要修改。</strong></p>
 <div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ent">"indexScript"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;script&gt;function luliyWaitIndex(){...}&lt;/script&gt;<span class="pl-pds">"</span></span></pre></div>
 <p><strong>作用：</strong> 同上，但用于首页，调用的是 <code class="notranslate">window._luliyInitIndex</code>。<strong>不要修改。</strong></p>
 <hr>
@@ -338,7 +343,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <hr>
 <h1>二、enhance.css 全节详解</h1>
 <blockquote>
-<p><strong>新手理解方式：</strong> CSS 就像给博客"穿衣服"，每条规则都是说"这个元素要穿什么样的衣服"。<br>
+<p><strong>新手理解方式：</strong> CSS 就像给博客”穿衣服”，每条规则都是说”这个元素要穿什么样的衣服”。<br>
 格式永远是：<code class="notranslate">选择器 { 属性: 值; }</code></p>
 </blockquote>
 <hr>
@@ -382,7 +387,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
   <span class="pl-s1">--card-c3</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>e05c8a</span>;
   <span class="pl-s1">--card-c4</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f0b429</span>;
 }</pre></div>
-<p><strong>作用：</strong> 定义"全局色板"。首页文章卡片的顶部彩色边框，按 1→2→3→4 循环使用这 4 个颜色。</p>
+<p><strong>作用：</strong> 定义”全局色板”。首页文章卡片的顶部彩色边框，按 1→2→3→4 循环使用这 4 个颜色。</p>
 <p><strong>怎么改：</strong> 直接换色值。比如全部换成同色系渐变：</p>
 <div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">:</span><span class="pl-c1">root</span> {
   <span class="pl-s1">--card-c1</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f0b429</span>;
@@ -520,7 +525,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
   <span class="pl-c1">padding</span><span class="pl-kos">:</span> <span class="pl-c1">5<span class="pl-smi">px</span></span> <span class="pl-c1">12<span class="pl-smi">px</span></span>;              <span class="pl-c">/* 内边距 */</span>
   <span class="pl-c1">border-radius</span><span class="pl-kos">:</span> <span class="pl-c1">0</span> <span class="pl-c1">8<span class="pl-smi">px</span></span> <span class="pl-c1">8<span class="pl-smi">px</span></span> <span class="pl-c1">0</span>;    <span class="pl-c">/* 右侧圆角 */</span>
 }</pre></div>
-<p>这就是为什么 h2 标题有"竖线+淡色背景"效果。</p>
+<p>这就是为什么 h2 标题有”竖线+淡色背景”效果。</p>
 <hr>
 <h2>2.6 第 05 节 — 导航栏</h2>
 <div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">header</span> {
@@ -642,7 +647,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <hr>
 <h1>三、enhance.js 全模块详解</h1>
 <blockquote>
-<p><strong>新手理解方式：</strong> JavaScript 就像博客的"大脑"，每个 <code class="notranslate">function</code> 函数是一个"技能"，主程序在最后把所有技能都调用一遍。</p>
+<p><strong>新手理解方式：</strong> JavaScript 就像博客的”大脑”，每个 <code class="notranslate">function</code> 函数是一个”技能”，主程序在最后把所有技能都调用一遍。</p>
 </blockquote>
 <hr>
 <h2>3.1 模块 00 — 欢迎进入画面 <code class="notranslate">initWelcomeSplash()</code></h2>
@@ -788,7 +793,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
   <span class="pl-c1">cardPalette</span>: <span class="pl-kos">[</span><span class="pl-s">'#0066cc'</span><span class="pl-kos">,</span> <span class="pl-s">'#0099ff'</span><span class="pl-kos">,</span> <span class="pl-s">'#00ccff'</span><span class="pl-kos">,</span> <span class="pl-s">'#006699'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
   <span class="pl-c1">desc</span>: <span class="pl-s">'深海宁静，波光粼粼'</span>
 <span class="pl-kos">}</span></pre></div>
-<ol start="2">
+<ol>
 <li>在 <code class="notranslate">enhance.css</code> 的第 15 节末尾添加：</li>
 </ol>
 <div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">body</span>[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"ocean"</span>] {
@@ -839,12 +844,12 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <hr>
 <h2>3.14 模块 17 — TOC 目录滚动高亮 <code class="notranslate">initArticleTocSpy()</code></h2>
 <div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">headings</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">.</span><span class="pl-en">getBoundingClientRect</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">top</span> <span class="pl-c1">&lt;=</span> <span class="pl-c1">110</span><span class="pl-kos">)</span> <span class="pl-s1">activeH</span> <span class="pl-c1">=</span> <span class="pl-s1">headings</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">;</span></pre></div>
-<p><strong><code class="notranslate">110</code>：</strong> 表示距离屏幕顶部 110px 以内的标题会被认为是"当前节"。<br>
+<p><strong><code class="notranslate">110</code>：</strong> 表示距离屏幕顶部 110px 以内的标题会被认为是”当前节”。<br>
 <strong>改触发距离：</strong> 如果导航栏改高了，这里的数字也要相应增大。</p>
 <hr>
 <h2>3.15 模块 18 — 手机端汉堡菜单 <code class="notranslate">initMobileNav()</code></h2>
 <div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-pds"><span class="pl-c1">/</span><span class="pl-cce">\/</span><span class="pl-s">a</span><span class="pl-s">b</span><span class="pl-s">o</span><span class="pl-s">u</span><span class="pl-s">t</span><span class="pl-cce">\/</span><span class="pl-c1">?</span><span class="pl-cce">$</span><span class="pl-c1">/</span>i</span><span class="pl-kos">.</span><span class="pl-en">test</span><span class="pl-kos">(</span><span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-c1">href</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>  <span class="pl-c">// 跳过 about 链接</span></pre></div>
-<p><strong>作用：</strong> 手机端下拉菜单不显示 "about" 页（因为通过头像点击进入）。<br>
+<p><strong>作用：</strong> 手机端下拉菜单不显示 “about” 页（因为通过头像点击进入）。<br>
 <strong>如果想把 about 显示在菜单里：</strong> 删掉这一行即可。</p>
 <hr>
 <h2>3.16 模块 19 — 搜索弹窗 <code class="notranslate">initSearchOverlay()</code></h2>
@@ -881,7 +886,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p><strong>用浏览器调试 CSS：</strong></p>
 <ol>
 <li>打开博客 → 按 <code class="notranslate">F12</code> 打开开发者工具</li>
-<li>点击左上角的"选取元素"箭头</li>
+<li>点击左上角的”选取元素”箭头</li>
 <li>点击页面上的任意元素</li>
 <li>右侧会显示它的所有 CSS，可以实时修改预览效果</li>
 <li>满意了再把改动同步回 <code class="notranslate">enhance.css</code></li>
@@ -922,20 +927,20 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <h3>✅ 代码块双击全屏</h3>
 <p>双击代码块（非按钮区域）即可全屏阅读，比点绿色按钮更方便。再次双击或按 <code class="notranslate">ESC</code> 退出。</p>
 <h3>✅ 文章预计阅读时间</h3>
-<p>每篇文章顶部自动显示"预计阅读 X 分钟 | 共 XXX 字"，基于文字数量估算。</p>
+<p>每篇文章顶部自动显示”预计阅读 X 分钟 | 共 XXX 字”，基于文字数量估算。</p>
 <h3>✅ 赞赏面板（展开式）</h3>
-<p>每篇文章底部有"✨ 和作者无限进步"按钮，点击后展开二维码图片。<br>
+<p>每篇文章底部有”✨ 和作者无限进步”按钮，点击后展开二维码图片。<br>
 <strong>改二维码图片：</strong> 在 <code class="notranslate">enhance.js</code> 的 <code class="notranslate">_luliyInitPost</code> 模块里找：</p>
 <div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s">'&lt;img src="https://raw.githubusercontent.com/luliy6/img/refs/heads/main/me.jpg"'</span></pre></div>
 <p>把这个 URL 换成你自己的收款码/联系方式图片地址。</p>
 <h3>✅ 文章上下篇导航</h3>
-<p>文章底部自动显示"← 上一篇"和"下一篇 →"按钮，通过读取 <code class="notranslate">postList.json</code> 实现，无需任何配置。</p>
+<p>文章底部自动显示”← 上一篇”和”下一篇 →”按钮，通过读取 <code class="notranslate">postList.json</code> 实现，无需任何配置。</p>
 <h3>✅ 点击图片放大</h3>
 <p>文章里的所有图片点击后会弹出全屏灯箱（Lightbox），按 <code class="notranslate">ESC</code> 关闭。</p>
 <h3>✅ 归档页自动生成</h3>
 <p>创建一个 GitHub Issue，打上 <code class="notranslate">archive</code> 标签，在 <code class="notranslate">singlePage</code> 加入 <code class="notranslate">"archive"</code>，访问该页面会自动按年份生成所有文章的时间轴列表。</p>
 <h3>✅ 置顶文章</h3>
-<p>给任意 GitHub Issue 同时打上 <code class="notranslate">pinned</code> 标签，该文章会出现在首页顶部的"置顶"区域，与普通卡片区分显示。</p>
+<p>给任意 GitHub Issue 同时打上 <code class="notranslate">pinned</code> 标签，该文章会出现在首页顶部的”置顶”区域，与普通卡片区分显示。</p>
 <hr>
 <h2>5.2 建议添加的额外功能</h2>
 <h3>💡 建议 1：文章字数/阅读量展示卡</h3>
@@ -953,7 +958,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>让 ArticleTOC 目录面板可以手动折叠/展开，避免遮挡文章内容。<br>
 <strong>实现方式：</strong> 在 <code class="notranslate">initArticleTocSpy()</code> 里，给注入的 header 里的按钮加一个折叠事件，toggle TOC 的 <code class="notranslate">max-height</code>。</p>
 <h3>💡 建议 4：文章分享按钮</h3>
-<p>在文章末尾添加"分享到微博/复制链接"按钮。<br>
+<p>在文章末尾添加”分享到微博/复制链接”按钮。<br>
 <strong>实现方式（加到 <code class="notranslate">_luliyInitPost</code> 的赞赏按钮之前）：</strong></p>
 <div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">shareBtn</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'button'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 <span class="pl-s1">shareBtn</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'🔗 复制文章链接'</span><span class="pl-kos">;</span>
@@ -970,9 +975,9 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>在 GitHub Pages 的 <code class="notranslate">404.html</code> 里加入友好的提示和返回首页链接，而不是系统默认的空白 404。</p>
 <h3>💡 建议 7：RSS 订阅提示条</h3>
 <p>在首页顶部（banner 下方）添加一个薄薄的提示条：<br>
-"📡 订阅 RSS 获取最新更新 →"，链接到 <code class="notranslate">/rss.xml</code>。</p>
+“📡 订阅 RSS 获取最新更新 →”，链接到 <code class="notranslate">/rss.xml</code>。</p>
 <h3>💡 建议 8：浏览进度百分比数字</h3>
-<p>让进度条同时在某个角落显示数字百分比（比如"32%"），对长文章特别有用。</p>
+<p>让进度条同时在某个角落显示数字百分比（比如”32%”），对长文章特别有用。</p>
 <h3>💡 建议 9：全站 Meta 优化</h3>
 <p>在 <code class="notranslate">allHead</code> 里加上以下标签，改善在微信/QQ/微博分享时的卡片显示效果：</p>
 <div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">meta</span> <span class="pl-c1">property</span>='<span class="pl-s">og:title</span>' <span class="pl-c1">content</span>='<span class="pl-s">Luliy の 博客</span>'<span class="pl-kos">&gt;</span>
@@ -1127,6 +1132,669 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <blockquote>
 <p>📌 <strong>最后的新手建议：</strong> 每次只改一个地方，改完立刻部署看效果，确认没问题再改下一处。不要同时改很多地方，出问题了很难排查。<br>
 遇到问题时，先打开浏览器 <code class="notranslate">F12</code> 控制台看有没有红色报错，90% 的问题能在这里找到原因。</p>
+</blockquote>
+<hr>
+<h1>七、常见问题与排查手册</h1>
+<blockquote>
+<p><strong>看报错的方法：</strong> 打开博客 → 按 <code class="notranslate">F12</code>（或右键→检查） → 点击”Console（控制台）“标签 → 红色文字就是错误信息。</p>
+</blockquote>
+<hr>
+<h2>7.1 样式问题</h2>
+<h3>❌ 问题：文章文字颜色在夜间模式看不清</h3>
+<p><strong>原因：</strong> 某个 CSS 规则强制设置了深色文字，但没有配对夜间模式的覆盖规则。</p>
+<p><strong>排查步骤：</strong></p>
+<ol>
+<li>按 <code class="notranslate">F12</code> → 点击选取元素工具 → 点那段看不清的文字</li>
+<li>右侧样式面板里找到 <code class="notranslate">color</code> 属性，看哪条规则生效</li>
+<li>在 <code class="notranslate">enhance.css</code> 里找到对应选择器，在下方加一条夜间覆盖：</li>
+</ol>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* 假设你找到了这条规则 */</span>
+.某个选择器 { col<span class="pl-c1">or</span><span class="pl-kos">:</span> <span class="pl-kos">#</span>333; }
+
+<span class="pl-c">/* 在下面补上夜间覆盖 */</span>
+[<span class="pl-c1">data-color-mode</span><span class="pl-c1">=</span><span class="pl-s">"dark"</span>] .某个选择器 { <span class="pl-c1">color</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>e0e0e0</span> <span class="pl-k">!important</span>; }</pre></div>
+<hr>
+<h3>❌ 问题：enhance.css 没有生效，样式看起来是旧版的</h3>
+<p><strong>可能原因及解决方案：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>可能原因</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浏览器缓存</td>
+<td>按 <code class="notranslate">Ctrl+Shift+R</code>（Windows）或 <code class="notranslate">Cmd+Shift+R</code>（Mac）强制刷新</td>
+</tr>
+<tr>
+<td>GitHub Actions 还没跑完</td>
+<td>等 1~3 分钟，刷新仓库的 Actions 页面查看状态</td>
+</tr>
+<tr>
+<td><code class="notranslate">allHead</code> 里 enhance.css 路径写错</td>
+<td>确认是 <code class="notranslate">/enhance.css</code>（根路径），不是 <code class="notranslate">enhance.css</code></td>
+</tr>
+<tr>
+<td><code class="notranslate">!important</code> 优先级冲突</td>
+<td>在你的新规则后面也加 <code class="notranslate">!important</code></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h3>❌ 问题：导航栏按钮在手机上被挤出去了/看不全</h3>
+<p><strong>原因：</strong> 手机屏幕宽度不够，<code class="notranslate">.title-right</code> 里的元素太多。</p>
+<p><strong>已有的解决方案：</strong> 当屏幕宽度 ≤ 768px 时，CSS 会自动隐藏 <code class="notranslate">.title-right</code>，显示汉堡菜单按钮（三条横线）。如果还是看不全，可能是 <code class="notranslate">768px</code> 这个断点需要调大：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* enhance.css 第 26 节，找到这一行 */</span>
+<span class="pl-k">@media</span> (<span class="pl-c1">max-width</span><span class="pl-kos">:</span> <span class="pl-c1">768<span class="pl-smi">px</span></span>) {
+<span class="pl-c">/* 改成 */</span>
+<span class="pl-k">@media</span> (<span class="pl-c1">max-width</span><span class="pl-kos">:</span> <span class="pl-c1">900<span class="pl-smi">px</span></span>) {  <span class="pl-c">/* 适用于平板横屏 */</span></pre></div>
+<hr>
+<h3>❌ 问题：文章正文与导航栏重叠（文章顶部被遮住了）</h3>
+<p><strong>原因：</strong> 文章页的 <code class="notranslate">margin-top</code> 不够，被固定定位的导航栏（56px 高）盖住了。</p>
+<p><strong>解决方案：</strong> 确认 <code class="notranslate">enhance.js</code> 的 <code class="notranslate">_luliyInitPost</code> 里有执行：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">body</span><span class="pl-kos">.</span><span class="pl-c1">classList</span><span class="pl-kos">.</span><span class="pl-en">add</span><span class="pl-kos">(</span><span class="pl-s">'luliy-post-page'</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<p>并且 <code class="notranslate">enhance.css</code> 里有：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">body</span>.<span class="pl-c1">luliy-post-page</span> <span class="pl-kos">#</span><span class="pl-c1">content</span> { <span class="pl-c1">margin-top</span><span class="pl-kos">:</span> <span class="pl-c1">72<span class="pl-smi">px</span></span> <span class="pl-k">!important</span>; }</pre></div>
+<p>如果导航栏改高了（比如改成 64px），这里的 <code class="notranslate">72px</code> 也要对应增大（<code class="notranslate">64 + 16 = 80px</code>）。</p>
+<hr>
+<h3>❌ 问题：欢迎画面背景图不显示（一片黑）</h3>
+<p><strong>可能原因：</strong></p>
+<ol>
+<li>图片 URL 无法访问 → 在浏览器新标签页里粘贴图片 URL，看能否直接打开</li>
+<li>GitHub Raw 链接访问被限速 → 把图片上传到图床（如 SM.MS、Imgur），用图床直链代替</li>
+<li>URL 里有特殊字符（中文、空格）→ 把文件名改成英文</li>
+</ol>
+<p><strong>测试图片 URL 是否有效：</strong></p>
+<pre class="notranslate"><code class="notranslate">直接在浏览器地址栏输入：
+https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg
+如果图片正常显示，说明 URL 没问题。
+</code></pre>
+<hr>
+<h3>❌ 问题：4 个主题切换后，卡片颜色没有变化</h3>
+<p><strong>原因：</strong> FOUC（首次渲染闪烁）防止代码没有正确恢复主题，或者 <code class="notranslate">applySink()</code> 没有被调用。</p>
+<p><strong>排查：</strong></p>
+<ol>
+<li>按 <code class="notranslate">F12</code> → Console → 输入 <code class="notranslate">localStorage.getItem('luliy-sink')</code> 回车</li>
+<li>如果返回的值不是 <code class="notranslate">'default'</code>、<code class="notranslate">'sakura'</code>、<code class="notranslate">'your-name'</code>、<code class="notranslate">'space'</code> 之一，说明存储了一个无效值</li>
+<li>执行修复：<code class="notranslate">localStorage.setItem('luliy-sink', 'default')</code> 然后刷新</li>
+</ol>
+<hr>
+<h2>7.2 功能问题</h2>
+<h3>❌ 问题：首页卡片不显示，或者显示的是旧版的 SideNav 样式</h3>
+<p><strong>原因：</strong> <code class="notranslate">postList.json</code> 还没生成，或者 <code class="notranslate">fetchPosts()</code> 请求失败，JS 回落到了旧版 DOM 渲染。</p>
+<p><strong>排查步骤：</strong></p>
+<ol>
+<li>访问 <code class="notranslate">https://你的域名/postList.json</code>，看是否能打开</li>
+<li>如果 404 → 说明 Gmeek 的 GitHub Actions 还没生成这个文件，需要先发布至少一篇文章并触发一次 Actions</li>
+<li>如果能打开但内容是 <code class="notranslate">{}</code>（空对象）→ 检查文章是否打了正确标签</li>
+</ol>
+<hr>
+<h3>❌ 问题：搜索弹窗打开后搜不到东西</h3>
+<p><strong>原因：</strong> 搜索功能依赖 <code class="notranslate">postList.json</code>，问题同上。</p>
+<p><strong>另一个可能原因：</strong> 搜索关键词是中文，但 <code class="notranslate">postList.json</code> 里的标题是英文（或反过来）。搜索是大小写不敏感的，但必须是文本包含关系，不支持拼音搜索。</p>
+<hr>
+<h3>❌ 问题：代码块的 macOS 三色圆点按钮没出现</h3>
+<p><strong>可能原因：</strong></p>
+<ol>
+<li><code class="notranslate">enhance.js</code> 加载时间比 Prism.js 代码高亮早，代码块还没渲染好</li>
+</ol>
+<ul>
+<li>已有兜底：JS 里有 <code class="notranslate">setTimeout(fn, 800)</code> 和 <code class="notranslate">setTimeout(fn, 2200)</code> 两个延迟执行</li>
+<li>如果还是不出现，可以把 2200 改成 3500</li>
+</ul>
+<ol>
+<li>这篇文章里没有代码块 → 正常，不会生成按钮</li>
+<li>Prism.js 把 <code class="notranslate">&lt;pre&gt;</code> 结构重写了，导致检测失效 → 在 <code class="notranslate">applyCodeBlocks</code> 里改判断条件</li>
+</ol>
+<hr>
+<h3>❌ 问题：TOC 目录点击标题后跳转位置不准，偏上或偏下</h3>
+<p><strong>原因：</strong> 目录锚点跳转没有考虑固定导航栏的高度（56px），导致标题被遮住。</p>
+<p><strong>解决方案（加入 enhance.css）：</strong></p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* 让所有带 id 的标题，向上预留 72px 的空白，防止被导航栏遮住 */</span>
+<span class="pl-kos">#</span><span class="pl-c1">postBody</span> [<span class="pl-c1">id</span>]::<span class="pl-c1">before</span> {
+  <span class="pl-c1">content</span><span class="pl-kos">:</span> <span class="pl-s">''</span>;
+  <span class="pl-c1">display</span><span class="pl-kos">:</span> block;
+  <span class="pl-c1">height</span><span class="pl-kos">:</span> <span class="pl-c1">72<span class="pl-smi">px</span></span>;
+  <span class="pl-c1">margin-top</span><span class="pl-kos">:</span> <span class="pl-c1">-72<span class="pl-smi">px</span></span>;
+  <span class="pl-c1">pointer-events</span><span class="pl-kos">:</span> none;
+}</pre></div>
+<hr>
+<h3>❌ 问题：点击音效在 iOS Safari 上没有声音</h3>
+<p><strong>原因：</strong> iOS 强制要求音频必须由用户的直接手势触发，<code class="notranslate">click</code> 事件里的 <code class="notranslate">AudioContext</code> 在某些情况下会被阻止。</p>
+<p><strong>解决方案：</strong> 在 <code class="notranslate">initSfxEvents()</code> 里，把音效触发改为在用户第一次 <code class="notranslate">touchstart</code> 时预热 AudioContext：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'touchstart'</span><span class="pl-kos">,</span> <span class="pl-k">function</span> <span class="pl-en">warmup</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-en">getACtx</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span> <span class="pl-c">// 预热</span>
+  <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">removeEventListener</span><span class="pl-kos">(</span><span class="pl-s">'touchstart'</span><span class="pl-kos">,</span> <span class="pl-s1">warmup</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span><span class="pl-kos">,</span> <span class="pl-kos">{</span> <span class="pl-c1">once</span>: <span class="pl-c1">true</span> <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<hr>
+<h3>❌ 问题：花瓣飘落特效导致页面卡顿</h3>
+<p><strong>原因：</strong> 低端设备处理 45 个花瓣的 Canvas 动画有压力。</p>
+<p><strong>解决方案：</strong> 在 <code class="notranslate">initSakura()</code> 开头加设备检测：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">function</span> <span class="pl-en">initSakura</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">localStorage</span><span class="pl-kos">.</span><span class="pl-en">getItem</span><span class="pl-kos">(</span><span class="pl-s">'luliy-sakura'</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-s">'0'</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+  <span class="pl-c">// 低端设备自动关闭花瓣</span>
+  <span class="pl-k">var</span> <span class="pl-s1">isLowEnd</span> <span class="pl-c1">=</span> <span class="pl-s1">navigator</span><span class="pl-kos">.</span><span class="pl-c1">hardwareConcurrency</span> <span class="pl-c1">&lt;=</span> <span class="pl-c1">2</span> <span class="pl-c1">||</span>
+                 <span class="pl-kos">(</span><span class="pl-s1">navigator</span><span class="pl-kos">.</span><span class="pl-c1">deviceMemory</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-s1">navigator</span><span class="pl-kos">.</span><span class="pl-c1">deviceMemory</span> <span class="pl-c1">&lt;=</span> <span class="pl-c1">2</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">isLowEnd</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+  <span class="pl-c">// ... 后续代码不变</span>
+<span class="pl-kos">}</span></pre></div>
+<hr>
+<h2>7.3 JSON 配置问题</h2>
+<h3>❌ 问题：改了 config.json 但博客没有变化</h3>
+<p><strong>最常见原因：</strong> JSON 格式写错了，导致 Gmeek 解析失败，使用了旧的缓存配置。</p>
+<p><strong>JSON 格式验证方法：</strong></p>
+<ol>
+<li>把整个 <code class="notranslate">config.json</code> 内容复制</li>
+<li>打开 <a href="https://jsonlint.com" rel="nofollow">https://jsonlint.com</a>（JSON 格式检验工具）</li>
+<li>粘贴进去，点击 “Validate JSON”</li>
+<li>绿色 = 格式正确，红色 = 有语法错误（会标出第几行）</li>
+</ol>
+<p><strong>最常犯的 JSON 错误：</strong></p>
+<div class="highlight highlight-source-json"><pre class="notranslate"><span class="pl-ii">// ❌ 错误：最后一个元素后面多了逗号</span>
+<span class="pl-ent">"singlePage"</span>: [<span class="pl-s"><span class="pl-pds">"</span>about<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>gallery<span class="pl-pds">"</span></span><span class="pl-ii">,</span>]
+<span class="pl-ii">//                                ↑ 这个逗号不能有</span>
+
+<span class="pl-ii">// ✅ 正确</span>
+<span class="pl-ent">"singlePage"</span>: [<span class="pl-s"><span class="pl-pds">"</span>about<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>gallery<span class="pl-pds">"</span></span>]
+
+<span class="pl-ii">// ❌ 错误：字符串用了单引号</span>
+<span class="pl-ii">'title': 'Luliy'</span>
+
+<span class="pl-ii">// ✅ 正确：必须用双引号</span>
+<span class="pl-ent">"title"</span>: <span class="pl-s"><span class="pl-pds">"</span>Luliy<span class="pl-pds">"</span></span>
+
+<span class="pl-ii">// ❌ 错误：含有注释（JSON 不支持注释）</span>
+{
+  <span class="pl-ent">"title"</span>: <span class="pl-s"><span class="pl-pds">"</span>Luliy<span class="pl-pds">"</span></span> <span class="pl-ii">// 博客名</span>
+}
+
+<span class="pl-ii">// ✅ 正确：删掉所有注释</span>
+{
+  <span class="pl-ent">"title"</span>: <span class="pl-s"><span class="pl-pds">"</span>Luliy<span class="pl-pds">"</span></span>
+}</pre></div>
+<hr>
+<h3>❌ 问题：singlePage 里加了新页面但导航栏没显示</h3>
+<p><strong>原因：</strong> Gmeek 的 singlePage 需要对应的 GitHub Issue 存在并且打了同名标签。</p>
+<p><strong>完整步骤（以新增 <code class="notranslate">favorites</code> 页为例）：</strong></p>
+<ol>
+<li>进入你的 GitHub 仓库 → Issues → Labels</li>
+<li>创建新标签，名称填 <code class="notranslate">favorites</code>（必须和 config.json 里的拼写完全一致）</li>
+<li>创建一个新 Issue，打上 <code class="notranslate">favorites</code> 标签，内容就是收藏夹页的 Markdown 内容</li>
+<li>触发 GitHub Actions 重新构建</li>
+<li>导航栏里就会出现 “favorites” 链接（链接显示文字由 Gmeek 决定，可以在 <code class="notranslate">enhance.js</code> 的 <code class="notranslate">initMobileNav</code> 里用 JS 改显示文字）</li>
+</ol>
+<hr>
+<h1>八、部署与更新流程详解</h1>
+<h2>8.1 Gmeek 的工作机制（新手必读）</h2>
+<pre class="notranslate"><code class="notranslate">你 → 修改 config.json/enhance.css/enhance.js
+       ↓ 推送到 GitHub
+Gmeek GitHub Actions 自动运行
+       ↓ 读取你的 Issues 作为文章内容
+       ↓ 读取 config.json 作为配置
+       ↓ 把 enhance.css 和 enhance.js 放到网站根目录
+       ↓ 生成 HTML 文件（index.html、post/*.html 等）
+       ↓ 部署到 GitHub Pages
+你的博客网站更新完成（约 1~3 分钟）
+</code></pre>
+<p><strong>关键理解：</strong> Gmeek 的”文章”全部来自 GitHub Issues。一个 Issue = 一篇文章。Issue 的 Label = 文章的标签/分类。</p>
+<hr>
+<h2>8.2 更新文件的推荐流程</h2>
+<h3>方案 A：直接在 GitHub 网页上编辑（最简单）</h3>
+<ol>
+<li>打开 <a href="https://github.com/luliy6/luliy6.github.io">https://github.com/luliy6/luliy6.github.io</a></li>
+<li>点击要修改的文件（如 <code class="notranslate">enhance.css</code>）</li>
+<li>点击右上角的铅笔 ✏️ 图标进入编辑模式</li>
+<li>改完后点击右上角 “Commit changes”</li>
+<li>等 1~3 分钟，Actions 自动运行完毕</li>
+</ol>
+<p><strong>优点：</strong> 不需要安装任何工具，随时随地改<br>
+<strong>缺点：</strong> 没有语法高亮，改大文件不方便</p>
+<hr>
+<h3>方案 B：使用 VS Code + Git（推荐长期使用）</h3>
+<p><strong>第一次设置：</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 1. 安装 Git（去 https://git-scm.com 下载）</span>
+<span class="pl-c"><span class="pl-c">#</span> 2. 克隆你的仓库到本地</span>
+git clone https://github.com/luliy6/luliy6.github.io.git
+<span class="pl-c1">cd</span> luliy6.github.io
+
+<span class="pl-c"><span class="pl-c">#</span> 3. 用 VS Code 打开</span>
+code <span class="pl-c1">.</span></pre></div>
+<p><strong>每次修改的流程：</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 1. 先拉取最新代码（避免冲突）</span>
+git pull
+
+<span class="pl-c"><span class="pl-c">#</span> 2. 修改文件...</span>
+
+<span class="pl-c"><span class="pl-c">#</span> 3. 添加修改</span>
+git add <span class="pl-c1">.</span>
+
+<span class="pl-c"><span class="pl-c">#</span> 4. 提交（引号里写修改说明）</span>
+git commit -m <span class="pl-s"><span class="pl-pds">"</span>更新：调整樱花主题颜色<span class="pl-pds">"</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> 5. 推送到 GitHub</span>
+git push</pre></div>
+<p><strong>VS Code 用户界面操作（不用命令行）：</strong></p>
+<ul>
+<li>左侧第三个图标（源代码管理）→ 可以看到所有改动 → 输入提交消息 → 点”√”提交 → 点”…“→”推送”</li>
+</ul>
+<hr>
+<h2>8.3 触发 GitHub Actions 重新构建</h2>
+<p>有时候只改了 config.json，需要手动触发全站重新构建：</p>
+<ol>
+<li>进入仓库 → 点击 “Actions” 标签</li>
+<li>左侧找到你的构建 workflow（通常叫 “Gmeek” 或 “pages build”）</li>
+<li>右侧点击 “Run workflow” → 选 main 分支 → 点绿色按钮</li>
+<li>等待运行完成（绿色✅ = 成功，红色❌ = 失败需要查看日志）</li>
+</ol>
+<hr>
+<h2>8.4 如何回滚（改坏了怎么办）</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 查看提交历史</span>
+git log --oneline
+
+<span class="pl-c"><span class="pl-c">#</span> 结果示例：</span>
+<span class="pl-c"><span class="pl-c">#</span> a3f2b1c 更新：调整樱花主题颜色   ← 最新（坏掉的）</span>
+<span class="pl-c"><span class="pl-c">#</span> 8d4e5f6 更新：修改欢迎画面文字   ← 上一个（好的）</span>
+<span class="pl-c"><span class="pl-c">#</span> 2c1a9b8 初始提交</span>
+
+<span class="pl-c"><span class="pl-c">#</span> 回滚到上一个好的版本（只回滚本地）</span>
+git checkout 8d4e5f6 -- enhance.css  <span class="pl-c"><span class="pl-c">#</span> 只回滚特定文件</span>
+
+<span class="pl-c"><span class="pl-c">#</span> 或者完全回滚到上一次提交</span>
+git revert HEAD
+
+<span class="pl-c"><span class="pl-c">#</span> 推送回滚</span>
+git push</pre></div>
+<p><strong>GitHub 网页端回滚：</strong></p>
+<ol>
+<li>仓库页面 → “commits”</li>
+<li>找到你想回到的那次提交 → 点右边的 <code class="notranslate">&lt;&gt;</code> 图标（Browse files）</li>
+<li>找到出问题的文件 → 复制它的内容</li>
+<li>粘贴覆盖当前版本 → 重新提交</li>
+</ol>
+<hr>
+<h1>九、可直接复制使用的代码片段</h1>
+<blockquote>
+<p>以下每一段代码都可以直接复制粘贴，<strong>完整注明了放在哪里</strong>。</p>
+</blockquote>
+<hr>
+<h2>9.1 [CSS] 给文章加”打印友好”样式</h2>
+<p>粘贴到 <code class="notranslate">enhance.css</code> 末尾：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-k">@media</span> print {
+  <span class="pl-kos">#</span><span class="pl-c1">header</span><span class="pl-kos">,</span> <span class="pl-kos">#</span><span class="pl-c1">luliy-toolbar</span><span class="pl-kos">,</span> <span class="pl-kos">#</span><span class="pl-c1">luliy-back-top</span><span class="pl-kos">,</span> 
+  <span class="pl-kos">#</span><span class="pl-c1">luliy-sakura-canvas</span><span class="pl-kos">,</span> .<span class="pl-c1">luliy-prevnext</span><span class="pl-kos">,</span>
+  .<span class="pl-c1">luliy-tb-btn</span><span class="pl-kos">,</span> <span class="pl-kos">#</span><span class="pl-c1">luliy-progress-bar</span> { <span class="pl-c1">display</span><span class="pl-kos">:</span> none <span class="pl-k">!important</span>; }
+  <span class="pl-ent">body</span> { <span class="pl-c1">background</span><span class="pl-kos">:</span> white <span class="pl-k">!important</span>; <span class="pl-c1">background-image</span><span class="pl-kos">:</span> none <span class="pl-k">!important</span>; }
+  <span class="pl-kos">#</span><span class="pl-c1">postBody</span> { 
+    <span class="pl-c1">backdrop-filter</span><span class="pl-kos">:</span> none <span class="pl-k">!important</span>; 
+    <span class="pl-c1">background</span><span class="pl-kos">:</span> white <span class="pl-k">!important</span>;
+    <span class="pl-c1">border</span><span class="pl-kos">:</span> none <span class="pl-k">!important</span>;
+    <span class="pl-c1">box-shadow</span><span class="pl-kos">:</span> none <span class="pl-k">!important</span>;
+  }
+  <span class="pl-ent">a</span>[<span class="pl-c1">href</span>]::<span class="pl-c1">after</span> { <span class="pl-c1">content</span><span class="pl-kos">:</span> <span class="pl-s">" ("</span> <span class="pl-en">attr</span>(href) <span class="pl-s">")"</span>; <span class="pl-c1">font-size</span><span class="pl-kos">:</span> <span class="pl-c1">0.8<span class="pl-smi">em</span></span>; <span class="pl-c1">color</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>666</span>; }
+}</pre></div>
+<hr>
+<h2>9.2 [CSS] 文章里的引用块加左侧装饰线变体（橙色警告风格）</h2>
+<p>粘贴到 <code class="notranslate">enhance.css</code> 里 <code class="notranslate">#postBody blockquote</code> 规则的<strong>后面</strong>：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* 在引用块第一行加 ⚠️ 前缀的特殊样式 */</span>
+<span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">blockquote</span><span class="pl-kos">:</span><span class="pl-c1">has</span>(<span class="pl-ent">strong</span><span class="pl-kos">:</span><span class="pl-c1">first-child</span>)<span class="pl-kos">,</span>
+<span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">blockquote</span>.<span class="pl-c1">warning</span> {
+  <span class="pl-c1">border-left-color</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f0b429</span> <span class="pl-k">!important</span>;
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">240</span><span class="pl-kos">,</span><span class="pl-c1">180</span><span class="pl-kos">,</span><span class="pl-c1">41</span><span class="pl-kos">,</span><span class="pl-c1">0.07</span>) <span class="pl-k">!important</span>;
+}
+<span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">blockquote</span><span class="pl-kos">:</span><span class="pl-c1">has</span>(<span class="pl-ent">strong</span><span class="pl-kos">:</span><span class="pl-c1">first-child</span>) <span class="pl-ent">strong</span><span class="pl-kos">:</span><span class="pl-c1">first-child</span>::<span class="pl-c1">before</span> {
+  <span class="pl-c1">content</span><span class="pl-kos">:</span> <span class="pl-s">'⚠️ '</span>;
+}</pre></div>
+<hr>
+<h2>9.3 [CSS] 文章里的外链显示小图标（区分内外链）</h2>
+<p>粘贴到 <code class="notranslate">enhance.css</code> 里 <code class="notranslate">#postBody a</code> 规则的后面：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* 覆盖全局的 a[target="_blank"]::after，让文章里的外链更明显 */</span>
+<span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">a</span>[<span class="pl-c1">target</span><span class="pl-c1">=</span><span class="pl-s">"_blank"</span>]::<span class="pl-c1">after</span> {
+  <span class="pl-c1">content</span><span class="pl-kos">:</span> <span class="pl-s">' ↗'</span>;
+  <span class="pl-c1">font-size</span><span class="pl-kos">:</span> <span class="pl-c1">0.72<span class="pl-smi">em</span></span>;
+  <span class="pl-c1">color</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">130</span><span class="pl-kos">,</span><span class="pl-c1">80</span><span class="pl-kos">,</span><span class="pl-c1">223</span><span class="pl-kos">,</span><span class="pl-c1">0.60</span>);
+  <span class="pl-c1">text-decoration</span><span class="pl-kos">:</span> none;
+}</pre></div>
+<hr>
+<h2>9.4 [CSS] 平滑的图片悬浮放大效果</h2>
+<p>粘贴到 <code class="notranslate">enhance.css</code> 的 <code class="notranslate">#postBody img</code> 规则后面：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">img</span> {
+  <span class="pl-c1">transition</span><span class="pl-kos">:</span> transform <span class="pl-c1">0.3<span class="pl-smi">s</span></span> ease<span class="pl-kos">,</span> box-shadow <span class="pl-c1">0.3<span class="pl-smi">s</span></span> ease <span class="pl-k">!important</span>;
+}
+<span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">img</span><span class="pl-kos">:</span><span class="pl-c1">hover</span> {
+  <span class="pl-c1">transform</span><span class="pl-kos">:</span> <span class="pl-en">scale</span>(<span class="pl-c1">1.02</span>) <span class="pl-k">!important</span>;
+  <span class="pl-c1">box-shadow</span><span class="pl-kos">:</span> <span class="pl-c1">0</span> <span class="pl-c1">12<span class="pl-smi">px</span></span> <span class="pl-c1">40<span class="pl-smi">px</span></span> <span class="pl-en">rgba</span>(<span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">0</span><span class="pl-kos">,</span><span class="pl-c1">0.25</span>) <span class="pl-k">!important</span>;
+}</pre></div>
+<hr>
+<h2>9.5 [CSS] 文章内的有序列表加彩色数字样式</h2>
+<p>粘贴到 <code class="notranslate">enhance.css</code> 末尾：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">ol</span> {
+  <span class="pl-c1">counter-reset</span><span class="pl-kos">:</span> luliy-ol;
+  <span class="pl-c1">list-style</span><span class="pl-kos">:</span> none;
+  <span class="pl-c1">padding-left</span><span class="pl-kos">:</span> <span class="pl-c1">0</span>;
+}
+<span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">ol</span> <span class="pl-ent">li</span> {
+  <span class="pl-c1">counter-increment</span><span class="pl-kos">:</span> luliy-ol;
+  <span class="pl-c1">position</span><span class="pl-kos">:</span> relative;
+  <span class="pl-c1">padding-left</span><span class="pl-kos">:</span> <span class="pl-c1">2.2<span class="pl-smi">em</span></span>;
+  <span class="pl-c1">margin-bottom</span><span class="pl-kos">:</span> <span class="pl-c1">0.5<span class="pl-smi">em</span></span>;
+}
+<span class="pl-kos">#</span><span class="pl-c1">postBody</span> <span class="pl-ent">ol</span> <span class="pl-ent">li</span>::<span class="pl-c1">before</span> {
+  <span class="pl-c1">content</span><span class="pl-kos">:</span> <span class="pl-en">counter</span>(luliy-ol);
+  <span class="pl-c1">position</span><span class="pl-kos">:</span> absolute;
+  <span class="pl-c1">left</span><span class="pl-kos">:</span> <span class="pl-c1">0</span>;
+  <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">1.6<span class="pl-smi">em</span></span>; <span class="pl-c1">height</span><span class="pl-kos">:</span> <span class="pl-c1">1.6<span class="pl-smi">em</span></span>;
+  <span class="pl-c1">border-radius</span><span class="pl-kos">:</span> <span class="pl-c1">50<span class="pl-smi">%</span></span>;
+  <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">var</span>(<span class="pl-s1">--th-strong</span><span class="pl-kos">,</span> <span class="pl-pds"><span class="pl-kos">#</span>8250df</span>);
+  <span class="pl-c1">color</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>fff</span>;
+  <span class="pl-c1">font-size</span><span class="pl-kos">:</span> <span class="pl-c1">12<span class="pl-smi">px</span></span>; <span class="pl-c1">font-weight</span><span class="pl-kos">:</span> <span class="pl-c1">700</span>;
+  <span class="pl-c1">display</span><span class="pl-kos">:</span> flex; <span class="pl-c1">align-items</span><span class="pl-kos">:</span> center; <span class="pl-c1">justify-content</span><span class="pl-kos">:</span> center;
+  <span class="pl-c1">top</span><span class="pl-kos">:</span> <span class="pl-c1">3<span class="pl-smi">px</span></span>;
+  <span class="pl-c1">font-family</span><span class="pl-kos">:</span> <span class="pl-s">'Noto Sans SC'</span><span class="pl-kos">,</span> sans-serif;
+}</pre></div>
+<hr>
+<h2>9.6 [CSS] 首页的卡片网格改为两列（平板专用）</h2>
+<p>粘贴到 <code class="notranslate">enhance.css</code> 第 26 节的响应式媒体查询里：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-k">@media</span> (<span class="pl-c1">min-width</span><span class="pl-kos">:</span> <span class="pl-c1">600<span class="pl-smi">px</span></span>) <span class="pl-c1">and</span> (<span class="pl-c1">max-width</span><span class="pl-kos">:</span> <span class="pl-c1">900<span class="pl-smi">px</span></span>) {
+  .<span class="pl-c1">luliy-card-grid</span> {
+    <span class="pl-c1">grid-template-columns</span><span class="pl-kos">:</span> <span class="pl-en">repeat</span>(<span class="pl-c1">2</span><span class="pl-kos">,</span> <span class="pl-c1">1<span class="pl-smi">fr</span></span>) <span class="pl-k">!important</span>;
+  }
+}</pre></div>
+<hr>
+<h2>9.7 [CSS] 夜间模式下给代码块加彩色行号</h2>
+<p>粘贴到 <code class="notranslate">enhance.css</code> 末尾：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* 需要 Prism.js 的 line-numbers 插件，如果没开启这段不会生效 */</span>
+[<span class="pl-c1">data-color-mode</span><span class="pl-c1">=</span><span class="pl-s">"dark"</span>] .<span class="pl-c1">line-numbers</span> .<span class="pl-c1">line-numbers-rows</span> {
+  <span class="pl-c1">border-right</span><span class="pl-kos">:</span> <span class="pl-c1">1<span class="pl-smi">px</span></span> solid <span class="pl-en">rgba</span>(<span class="pl-c1">130</span><span class="pl-kos">,</span><span class="pl-c1">80</span><span class="pl-kos">,</span><span class="pl-c1">223</span><span class="pl-kos">,</span><span class="pl-c1">0.30</span>) <span class="pl-k">!important</span>;
+}
+[<span class="pl-c1">data-color-mode</span><span class="pl-c1">=</span><span class="pl-s">"dark"</span>] .<span class="pl-c1">line-numbers-rows</span> <span class="pl-c1">&gt;</span> <span class="pl-ent">span</span>::<span class="pl-c1">before</span> {
+  <span class="pl-c1">color</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">130</span><span class="pl-kos">,</span><span class="pl-c1">80</span><span class="pl-kos">,</span><span class="pl-c1">223</span><span class="pl-kos">,</span><span class="pl-c1">0.45</span>) <span class="pl-k">!important</span>;
+}</pre></div>
+<hr>
+<h2>9.8 [JS] 让首页横幅文字随机从列表里选一句</h2>
+<p>在 <code class="notranslate">enhance.js</code> 的 <code class="notranslate">initHeroBanner()</code> 函数里，把：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">banner</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'Remember, this is your world.'</span><span class="pl-kos">;</span></pre></div>
+<p>替换为：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">quotes</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span>
+  <span class="pl-s">'Remember, this is your world.'</span><span class="pl-kos">,</span>
+  <span class="pl-s">'我将无限进步。'</span><span class="pl-kos">,</span>
+  <span class="pl-s">'你的名字，刻在时间里。'</span><span class="pl-kos">,</span>
+  <span class="pl-s">'每一天都是新的起点。'</span><span class="pl-kos">,</span>
+  <span class="pl-s">'静静地，做一个有趣的人。'</span><span class="pl-kos">,</span>
+  <span class="pl-s">'代码是诗，文字是歌。'</span>
+<span class="pl-kos">]</span><span class="pl-kos">;</span>
+<span class="pl-s1">banner</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s1">quotes</span><span class="pl-kos">[</span><span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">floor</span><span class="pl-kos">(</span><span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">random</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-s1">quotes</span><span class="pl-kos">.</span><span class="pl-c1">length</span><span class="pl-kos">)</span><span class="pl-kos">]</span><span class="pl-kos">;</span></pre></div>
+<hr>
+<h2>9.9 [JS] 在文章顶部显示”最后更新时间”</h2>
+<p>在 <code class="notranslate">enhance.js</code> 的 <code class="notranslate">_luliyInitPost</code> 函数里，紧接在 <code class="notranslate">var pbody = ...</code> 之后加入：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// 显示文章最后更新时间</span>
+<span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">pbody</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-c1">!</span><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'luliy-updated'</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">var</span> <span class="pl-s1">scripts</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">querySelectorAll</span><span class="pl-kos">(</span><span class="pl-s">'script[type="application/json"]'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-c">// 尝试从 Gmeek 的 meta 里读取更新时间</span>
+  <span class="pl-k">var</span> <span class="pl-s1">lastMod</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">lastModified</span><span class="pl-kos">;</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">lastMod</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">var</span> <span class="pl-s1">updEl</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'p'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">updEl</span><span class="pl-kos">.</span><span class="pl-c1">id</span> <span class="pl-c1">=</span> <span class="pl-s">'luliy-updated'</span><span class="pl-kos">;</span>
+    <span class="pl-k">var</span> <span class="pl-s1">d</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">Date</span><span class="pl-kos">(</span><span class="pl-s1">lastMod</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">updEl</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">'🕐 最后更新：'</span> <span class="pl-c1">+</span> <span class="pl-s1">d</span><span class="pl-kos">.</span><span class="pl-en">getFullYear</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">' 年 '</span> <span class="pl-c1">+</span>
+      <span class="pl-kos">(</span><span class="pl-s1">d</span><span class="pl-kos">.</span><span class="pl-en">getMonth</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-c1">+</span><span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">' 月 '</span> <span class="pl-c1">+</span> <span class="pl-s1">d</span><span class="pl-kos">.</span><span class="pl-en">getDate</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">' 日'</span><span class="pl-kos">;</span>
+    <span class="pl-s1">updEl</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">cssText</span> <span class="pl-c1">=</span> <span class="pl-s">'color:#888;font-size:12px;margin-bottom:1rem;'</span><span class="pl-kos">;</span>
+    <span class="pl-s1">pbody</span><span class="pl-kos">.</span><span class="pl-en">insertBefore</span><span class="pl-kos">(</span><span class="pl-s1">updEl</span><span class="pl-kos">,</span> <span class="pl-s1">pbody</span><span class="pl-kos">.</span><span class="pl-c1">firstChild</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-kos">}</span>
+<span class="pl-kos">}</span></pre></div>
+<hr>
+<h2>9.10 [JS] 按 Alt+1/2/3/4 快速切换主题</h2>
+<p>在 <code class="notranslate">enhance.js</code> 的 <code class="notranslate">initToolbar()</code> 函数末尾（<code class="notranslate">applySink(...)</code> 那行后面）加入：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'keydown'</span><span class="pl-kos">,</span> <span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-c1">!</span><span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">altKey</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+  <span class="pl-k">var</span> <span class="pl-s1">map</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span> <span class="pl-s">'1'</span>: <span class="pl-s">'default'</span><span class="pl-kos">,</span> <span class="pl-s">'2'</span>: <span class="pl-s">'sakura'</span><span class="pl-kos">,</span> <span class="pl-s">'3'</span>: <span class="pl-s">'your-name'</span><span class="pl-kos">,</span> <span class="pl-s">'4'</span>: <span class="pl-s">'space'</span> <span class="pl-kos">}</span><span class="pl-kos">;</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">map</span><span class="pl-kos">[</span><span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">key</span><span class="pl-kos">]</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-en">applySink</span><span class="pl-kos">(</span><span class="pl-s1">map</span><span class="pl-kos">[</span><span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">key</span><span class="pl-kos">]</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-en">playSfx</span><span class="pl-kos">(</span><span class="pl-s">'theme'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-c">// 短暂提示</span>
+    <span class="pl-k">var</span> <span class="pl-s1">tip</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'div'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">tip</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'主题已切换：'</span> <span class="pl-c1">+</span> <span class="pl-s1">map</span><span class="pl-kos">[</span><span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">key</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+    <span class="pl-s1">tip</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">cssText</span> <span class="pl-c1">=</span> <span class="pl-s">'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);'</span> <span class="pl-c1">+</span>
+      <span class="pl-s">'background:rgba(20,16,40,0.9);color:#fff;padding:8px 20px;border-radius:20px;'</span> <span class="pl-c1">+</span>
+      <span class="pl-s">'font-size:13px;z-index:99999;pointer-events:none;transition:opacity 0.5s;'</span><span class="pl-kos">;</span>
+    <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">body</span><span class="pl-kos">.</span><span class="pl-en">appendChild</span><span class="pl-kos">(</span><span class="pl-s1">tip</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-en">setTimeout</span><span class="pl-kos">(</span><span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">{</span> <span class="pl-s1">tip</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">opacity</span><span class="pl-c1">=</span><span class="pl-s">'0'</span><span class="pl-kos">;</span> <span class="pl-kos">}</span><span class="pl-kos">,</span> <span class="pl-c1">1200</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-en">setTimeout</span><span class="pl-kos">(</span><span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">{</span> <span class="pl-s1">tip</span><span class="pl-kos">.</span><span class="pl-en">remove</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span> <span class="pl-kos">}</span><span class="pl-kos">,</span> <span class="pl-c1">1800</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-kos">}</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<hr>
+<h2>9.11 [JS] 文章里的表格超宽时加横向滚动</h2>
+<p>在 <code class="notranslate">enhance.js</code> 的 <code class="notranslate">_luliyInitPost</code> 函数里，找到 <code class="notranslate">initCodeBlocks(pbody)</code> 那一行，在它之后加入：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// 给超宽表格加滚动容器</span>
+<span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">pbody</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-s1">pbody</span><span class="pl-kos">.</span><span class="pl-en">querySelectorAll</span><span class="pl-kos">(</span><span class="pl-s">'table'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">forEach</span><span class="pl-kos">(</span><span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-s1">table</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">table</span><span class="pl-kos">.</span><span class="pl-c1">parentElement</span><span class="pl-kos">.</span><span class="pl-c1">classList</span><span class="pl-kos">.</span><span class="pl-en">contains</span><span class="pl-kos">(</span><span class="pl-s">'luliy-table-wrap'</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+    <span class="pl-k">var</span> <span class="pl-s1">wrap</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'div'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">wrap</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'luliy-table-wrap'</span><span class="pl-kos">;</span>
+    <span class="pl-s1">wrap</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">cssText</span> <span class="pl-c1">=</span> <span class="pl-s">'overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5em 0;border-radius:12px;'</span><span class="pl-kos">;</span>
+    <span class="pl-s1">table</span><span class="pl-kos">.</span><span class="pl-c1">parentNode</span><span class="pl-kos">.</span><span class="pl-en">insertBefore</span><span class="pl-kos">(</span><span class="pl-s1">wrap</span><span class="pl-kos">,</span> <span class="pl-s1">table</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">wrap</span><span class="pl-kos">.</span><span class="pl-en">appendChild</span><span class="pl-kos">(</span><span class="pl-s1">table</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">table</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">margin</span> <span class="pl-c1">=</span> <span class="pl-s">'0'</span><span class="pl-kos">;</span>  <span class="pl-c">// 移除表格自身的外边距</span>
+  <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span></pre></div>
+<hr>
+<h2>9.12 [JSON] 给博客加网站 Manifest（支持”添加到主屏”）</h2>
+<p>在 <code class="notranslate">config.json</code> 的 <code class="notranslate">allHead</code> 字段里，在最开头加入（在第一个 <code class="notranslate">&lt;link</code> 之前）：</p>
+<pre class="notranslate"><code class="notranslate">&lt;link rel='manifest' href='/manifest.json'&gt;
+</code></pre>
+<p>然后在仓库根目录新建 <code class="notranslate">manifest.json</code> 文件，内容：</p>
+<div class="highlight highlight-source-json"><pre class="notranslate">{
+  <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>Luliy の 博客<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"short_name"</span>: <span class="pl-s"><span class="pl-pds">"</span>Luliy<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"start_url"</span>: <span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"display"</span>: <span class="pl-s"><span class="pl-pds">"</span>standalone<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"background_color"</span>: <span class="pl-s"><span class="pl-pds">"</span>#1e1032<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"theme_color"</span>: <span class="pl-s"><span class="pl-pds">"</span>#8250df<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"icons"</span>: [
+    {
+      <span class="pl-ent">"src"</span>: <span class="pl-s"><span class="pl-pds">"</span>https://avatars.githubusercontent.com/u/177055996?v=4&amp;size=192<span class="pl-pds">"</span></span>,
+      <span class="pl-ent">"sizes"</span>: <span class="pl-s"><span class="pl-pds">"</span>192x192<span class="pl-pds">"</span></span>,
+      <span class="pl-ent">"type"</span>: <span class="pl-s"><span class="pl-pds">"</span>image/png<span class="pl-pds">"</span></span>
+    },
+    {
+      <span class="pl-ent">"src"</span>: <span class="pl-s"><span class="pl-pds">"</span>https://avatars.githubusercontent.com/u/177055996?v=4&amp;size=512<span class="pl-pds">"</span></span>,
+      <span class="pl-ent">"sizes"</span>: <span class="pl-s"><span class="pl-pds">"</span>512x512<span class="pl-pds">"</span></span>,
+      <span class="pl-ent">"type"</span>: <span class="pl-s"><span class="pl-pds">"</span>image/png<span class="pl-pds">"</span></span>
+    }
+  ]
+}</pre></div>
+<p>效果：用户在手机浏览器里可以把博客”安装”到主屏，像 App 一样打开，有全屏体验。</p>
+<hr>
+<h1>十、进阶改造思路（有编程基础后可尝试）</h1>
+<hr>
+<h2>10.1 给文章卡片加封面图</h2>
+<p><strong>思路：</strong> 在 GitHub Issue 的正文第一行放一张图片（<code class="notranslate">![封面](https://图片链接)</code>），<code class="notranslate">fetchPosts()</code> 拿到 body 后提取第一张图 URL，赋值给卡片的背景图。</p>
+<p><strong>在 <code class="notranslate">buildCard()</code> 函数里的 <code class="notranslate">luliy-card-inner</code> 部分加入：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// 如果 post.body 里有图片，提取并显示</span>
+<span class="pl-k">var</span> <span class="pl-s1">imgMatch</span> <span class="pl-c1">=</span> <span class="pl-kos">(</span><span class="pl-s1">post</span><span class="pl-kos">.</span><span class="pl-c1">body</span> <span class="pl-c1">||</span> <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">match</span><span class="pl-kos">(</span><span class="pl-pds"><span class="pl-c1">/</span><span class="pl-s">!</span><span class="pl-cce">\[</span>.<span class="pl-c1">*</span>?<span class="pl-cce">\]</span><span class="pl-cce">\(</span><span class="pl-kos">(</span><span class="pl-s">h</span><span class="pl-s">t</span><span class="pl-s">t</span><span class="pl-s">p</span><span class="pl-s">s</span><span class="pl-c1">?</span><span class="pl-s">:</span><span class="pl-cce">\/</span><span class="pl-cce">\/</span><span class="pl-kos">[</span><span class="pl-c1">^</span><span class="pl-c1">)</span><span class="pl-kos">]</span><span class="pl-c1">+</span><span class="pl-kos">)</span><span class="pl-cce">\)</span><span class="pl-c1">/</span></span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">imgMatch</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">var</span> <span class="pl-s1">thumbEl</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'div'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-s1">thumbEl</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'luliy-card-thumb'</span><span class="pl-kos">;</span>
+  <span class="pl-s1">thumbEl</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">cssText</span> <span class="pl-c1">=</span>
+    <span class="pl-s">'width:100%;height:120px;border-radius:10px 10px 0 0;overflow:hidden;'</span> <span class="pl-c1">+</span>
+    <span class="pl-s">'background:url('</span> <span class="pl-c1">+</span> <span class="pl-s1">imgMatch</span><span class="pl-kos">[</span><span class="pl-c1">1</span><span class="pl-kos">]</span> <span class="pl-c1">+</span> <span class="pl-s">') center/cover no-repeat;flex-shrink:0;'</span><span class="pl-kos">;</span>
+  <span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-en">insertBefore</span><span class="pl-kos">(</span><span class="pl-s1">thumbEl</span><span class="pl-kos">,</span> <span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-c1">firstChild</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span></pre></div>
+<p>然后在 <code class="notranslate">enhance.css</code> 里给 <code class="notranslate">.luliy-card-inner</code> 加 <code class="notranslate">padding-top:0</code>（当有封面图时）。</p>
+<hr>
+<h2>10.2 把搜索升级为模糊搜索（支持拼音）</h2>
+<p>当前搜索使用 <code class="notranslate">String.includes()</code> 做精确子串匹配。要支持拼音搜索需要引入第三方库。</p>
+<p><strong>方案：</strong> 在 <code class="notranslate">allHead</code> 里加载 <a href="https://github.com/zh-lx/pinyin-pro">pinyin-pro</a>：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">script</span> <span class="pl-c1">src</span>='<span class="pl-s">https://cdn.jsdelivr.net/npm/pinyin-pro@3/dist/index.js</span>'<span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">script</span><span class="pl-kos">&gt;</span></pre></div>
+<p>然后在 <code class="notranslate">applySearch()</code> 里，把搜索条件改为同时匹配拼音：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">titlePinyin</span> <span class="pl-c1">=</span> <span class="pl-s1">pinyinPro</span><span class="pl-kos">.</span><span class="pl-en">pinyin</span><span class="pl-kos">(</span><span class="pl-s1">p</span><span class="pl-kos">.</span><span class="pl-c1">title</span><span class="pl-kos">,</span> <span class="pl-kos">{</span> <span class="pl-c1">toneType</span>: <span class="pl-s">'none'</span><span class="pl-kos">,</span> <span class="pl-c1">separator</span>: <span class="pl-s">''</span> <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">return</span> <span class="pl-s1">titlePinyin</span><span class="pl-kos">.</span><span class="pl-en">includes</span><span class="pl-kos">(</span><span class="pl-s1">q</span><span class="pl-kos">)</span> <span class="pl-c1">||</span> <span class="pl-kos">(</span><span class="pl-s1">p</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">||</span> <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">toLowerCase</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">includes</span><span class="pl-kos">(</span><span class="pl-s1">q</span><span class="pl-kos">)</span> <span class="pl-c1">||</span> ...</pre></div>
+<hr>
+<h2>10.3 添加文章字数和阅读量的统计徽章</h2>
+<p><strong>方案：</strong> 在首页卡片的标签行（<code class="notranslate">luliy-card-tags</code>）下方加一行统计信息，用 <code class="notranslate">postList.json</code> 里的 body 字段计算字数，用 GmeekVercount 读取访问量。</p>
+<p><strong>简单版（只做字数）：</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// 在 buildCard() 里，生成 tagsEl 之后加入</span>
+<span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">post</span><span class="pl-kos">.</span><span class="pl-c1">body</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">var</span> <span class="pl-s1">statEl</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'div'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-s1">statEl</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">cssText</span> <span class="pl-c1">=</span> <span class="pl-s">'font-size:10px;color:#aaa;margin-top:4px;'</span><span class="pl-kos">;</span>
+  <span class="pl-s1">statEl</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'约 '</span> <span class="pl-c1">+</span> <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">ceil</span><span class="pl-kos">(</span><span class="pl-s1">post</span><span class="pl-kos">.</span><span class="pl-c1">body</span><span class="pl-kos">.</span><span class="pl-c1">length</span> <span class="pl-c1">/</span> <span class="pl-c1">300</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">' 分钟阅读'</span><span class="pl-kos">;</span>
+  <span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-en">appendChild</span><span class="pl-kos">(</span><span class="pl-s1">statEl</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span></pre></div>
+<hr>
+<h2>10.4 给欢迎画面加打字机动效</h2>
+<p>把 <code class="notranslate">initWelcomeSplash()</code> 里的：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">title</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'欢迎来到 Luliy 的世界'</span><span class="pl-kos">;</span></pre></div>
+<p>替换为：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">fullText</span> <span class="pl-c1">=</span> <span class="pl-s">'欢迎来到 Luliy 的世界'</span><span class="pl-kos">;</span>
+<span class="pl-k">var</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span>
+<span class="pl-k">function</span> <span class="pl-en">typeNext</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">i</span> <span class="pl-c1">&lt;=</span> <span class="pl-s1">fullText</span><span class="pl-kos">.</span><span class="pl-c1">length</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-s1">title</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s1">fullText</span><span class="pl-kos">.</span><span class="pl-en">slice</span><span class="pl-kos">(</span><span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-s1">i</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">;</span>
+    <span class="pl-en">setTimeout</span><span class="pl-kos">(</span><span class="pl-s1">typeNext</span><span class="pl-kos">,</span> <span class="pl-c1">80</span> <span class="pl-c1">+</span> <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">random</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">*</span> <span class="pl-c1">40</span><span class="pl-kos">)</span><span class="pl-kos">;</span> <span class="pl-c">// 每字间隔 80~120ms，模拟真实打字</span>
+  <span class="pl-kos">}</span>
+<span class="pl-kos">}</span>
+<span class="pl-en">typeNext</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<hr>
+<h2>10.5 自动生成文章目录（即使主题不提供 TOC）</h2>
+<p>ArticleTOC 插件可能在某些页面不生成 TOC。以下代码让 enhance.js 自己生成一个最小化的 TOC：</p>
+<p>在 <code class="notranslate">initArticleTocSpy()</code> 函数开头，把”找不到就返回”的逻辑改为：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">toc</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'#TOC, .articletoc, .toc'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-c1">!</span><span class="pl-s1">toc</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-c">// 自己生成最小 TOC</span>
+  <span class="pl-k">var</span> <span class="pl-s1">headings</span> <span class="pl-c1">=</span> <span class="pl-v">Array</span><span class="pl-kos">.</span><span class="pl-en">from</span><span class="pl-kos">(</span><span class="pl-s1">pbody</span><span class="pl-kos">.</span><span class="pl-en">querySelectorAll</span><span class="pl-kos">(</span><span class="pl-s">'h2, h3'</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">headings</span><span class="pl-kos">.</span><span class="pl-c1">length</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">2</span><span class="pl-kos">)</span> <span class="pl-k">return</span> <span class="pl-c1">false</span><span class="pl-kos">;</span> <span class="pl-c">// 少于 2 个标题不生成</span>
+  <span class="pl-s1">toc</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'nav'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-s1">toc</span><span class="pl-kos">.</span><span class="pl-c1">id</span> <span class="pl-c1">=</span> <span class="pl-s">'TOC'</span><span class="pl-kos">;</span>
+  <span class="pl-s1">toc</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">cssText</span> <span class="pl-c1">=</span>
+    <span class="pl-s">'position:fixed;top:90px;right:24px;width:180px;max-height:60vh;'</span> <span class="pl-c1">+</span>
+    <span class="pl-s">'overflow-y:auto;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);'</span> <span class="pl-c1">+</span>
+    <span class="pl-s">'border:1px solid rgba(130,80,223,0.18);border-radius:14px;padding:10px;'</span> <span class="pl-c1">+</span>
+    <span class="pl-s">'z-index:900;font-size:12px;box-shadow:0 4px 20px rgba(0,0,0,0.10);'</span><span class="pl-kos">;</span>
+  <span class="pl-s1">headings</span><span class="pl-kos">.</span><span class="pl-en">forEach</span><span class="pl-kos">(</span><span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-s1">h</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">var</span> <span class="pl-s1">a</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'a'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-c1">href</span> <span class="pl-c1">=</span> <span class="pl-s">'#'</span> <span class="pl-c1">+</span> <span class="pl-kos">(</span><span class="pl-s1">h</span><span class="pl-kos">.</span><span class="pl-c1">id</span> <span class="pl-c1">||</span> <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s1">h</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span><span class="pl-kos">;</span>
+    <span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">cssText</span> <span class="pl-c1">=</span> <span class="pl-s">'display:block;padding:3px 6px;color:#555;text-decoration:none;border-radius:4px;'</span> <span class="pl-c1">+</span>
+      <span class="pl-kos">(</span><span class="pl-s1">h</span><span class="pl-kos">.</span><span class="pl-c1">tagName</span> <span class="pl-c1">===</span> <span class="pl-s">'H3'</span> ? <span class="pl-s">'padding-left:16px;'</span> : <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-s1">toc</span><span class="pl-kos">.</span><span class="pl-en">appendChild</span><span class="pl-kos">(</span><span class="pl-s1">a</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">body</span><span class="pl-kos">.</span><span class="pl-en">appendChild</span><span class="pl-kos">(</span><span class="pl-s1">toc</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span>
+<span class="pl-c">// 后续 spy 代码正常执行...</span></pre></div>
+<hr>
+<h2>10.6 夜间模式自动跟随系统时间</h2>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// 加到 enhance.js 的 ready() 函数里</span>
+<span class="pl-k">function</span> <span class="pl-en">autoThemeByTime</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">localStorage</span><span class="pl-kos">.</span><span class="pl-en">getItem</span><span class="pl-kos">(</span><span class="pl-s">'luliy-auto-theme'</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-s">'0'</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+  <span class="pl-k">var</span> <span class="pl-s1">hour</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">Date</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">getHours</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-k">var</span> <span class="pl-s1">shouldDark</span> <span class="pl-c1">=</span> <span class="pl-s1">hour</span> <span class="pl-c1">&gt;=</span> <span class="pl-c1">21</span> <span class="pl-c1">||</span> <span class="pl-s1">hour</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">7</span><span class="pl-kos">;</span> <span class="pl-c">// 21点到7点自动夜间模式</span>
+  <span class="pl-k">var</span> <span class="pl-s1">current</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">documentElement</span><span class="pl-kos">.</span><span class="pl-en">getAttribute</span><span class="pl-kos">(</span><span class="pl-s">'data-color-mode'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">shouldDark</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-s1">current</span> <span class="pl-c1">!==</span> <span class="pl-s">'dark'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">documentElement</span><span class="pl-kos">.</span><span class="pl-en">setAttribute</span><span class="pl-kos">(</span><span class="pl-s">'data-color-mode'</span><span class="pl-kos">,</span> <span class="pl-s">'dark'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">documentElement</span><span class="pl-kos">.</span><span class="pl-en">setAttribute</span><span class="pl-kos">(</span><span class="pl-s">'data-light-theme'</span><span class="pl-kos">,</span> <span class="pl-s">'light'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">documentElement</span><span class="pl-kos">.</span><span class="pl-en">setAttribute</span><span class="pl-kos">(</span><span class="pl-s">'data-dark-theme'</span><span class="pl-kos">,</span> <span class="pl-s">'dark_colorblind'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-c1">!</span><span class="pl-s1">shouldDark</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-s1">current</span> <span class="pl-c1">!==</span> <span class="pl-s">'light'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">documentElement</span><span class="pl-kos">.</span><span class="pl-en">setAttribute</span><span class="pl-kos">(</span><span class="pl-s">'data-color-mode'</span><span class="pl-kos">,</span> <span class="pl-s">'light'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-kos">}</span>
+<span class="pl-kos">}</span>
+<span class="pl-en">autoThemeByTime</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<hr>
+<h1>十一、文件结构与维护建议</h1>
+<h2>11.1 三文件与 GitHub 仓库的对应关系</h2>
+<pre class="notranslate"><code class="notranslate">你的 GitHub 仓库 (luliy6.github.io)
+│
+├── config.json          ← 博客配置（直接在根目录）
+├── enhance.css          ← 样式增强（直接在根目录）
+├── enhance.js           ← 功能增强（直接在根目录）
+├── static/
+│   └── img/
+│       ├── bg.png       ← 全站背景图
+│       └── 9.jpg        ← 欢迎画面背景图
+└── .github/
+    └── workflows/       ← GitHub Actions 自动构建脚本（不要改）
+</code></pre>
+<p><strong>enhance.css 和 enhance.js 的路径：</strong> 在 <code class="notranslate">allHead</code> 里写的是 <code class="notranslate">/enhance.css</code> 和 <code class="notranslate">/enhance.js</code>，意思是网站根路径。对应仓库里的根目录文件。</p>
+<hr>
+<h2>11.2 版本管理建议</h2>
+<p><strong>建议用 Git commit 消息记录每次改动，方便回溯：</strong></p>
+<pre class="notranslate"><code class="notranslate">✨ 新增：樱花主题代码高亮配色
+🎨 调整：首页卡片间距从 18px 改为 14px
+🐛 修复：手机端导航栏按钮溢出问题
+🗑️ 删除：移除 live2d 小人（影响加载速度）
+📝 更新：欢迎画面文字改为中文
+</code></pre>
+<hr>
+<h2>11.3 定期需要检查更新的组件</h2>
+<p>以下依赖库的版本写死在 <code class="notranslate">allHead</code> 里，偶尔检查一下是否有新版本：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>库名</th>
+<th>当前版本</th>
+<th>检查地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KaTeX</td>
+<td>0.16.9</td>
+<td><a href="https://katex.org" rel="nofollow">https://katex.org</a></td>
+</tr>
+<tr>
+<td>Prism.js</td>
+<td>1.29.0</td>
+<td><a href="https://prismjs.com" rel="nofollow">https://prismjs.com</a></td>
+</tr>
+<tr>
+<td>Mermaid</td>
+<td>11 (latest)</td>
+<td><a href="https://mermaid.js.org" rel="nofollow">https://mermaid.js.org</a></td>
+</tr>
+<tr>
+<td>Chart.js</td>
+<td>4.4.1</td>
+<td><a href="https://www.chartjs.org" rel="nofollow">https://www.chartjs.org</a></td>
+</tr>
+<tr>
+<td>jQuery</td>
+<td>3.6.0</td>
+<td><a href="https://jquery.com" rel="nofollow">https://jquery.com</a></td>
+</tr>
+<tr>
+<td>Primer CSS</td>
+<td>21.0.7</td>
+<td><a href="https://primer.style" rel="nofollow">https://primer.style</a></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>更新方法：</strong> 把 <code class="notranslate">allHead</code> 里对应链接中的版本号换成新版本号，比如 <code class="notranslate">prismjs@1.29.0</code> → <code class="notranslate">prismjs@1.30.0</code>。</p>
+<hr>
+<h2>11.4 备份建议</h2>
+<p><strong>强烈建议定期备份以下三个文件：</strong></p>
+<ol>
+<li><code class="notranslate">config.json</code> → 包含所有个人设置</li>
+<li><code class="notranslate">enhance.css</code> → 大量定制样式</li>
+<li><code class="notranslate">enhance.js</code> → 大量定制功能</li>
+</ol>
+<p><strong>方法：</strong> 在仓库里新建 <code class="notranslate">backup/</code> 文件夹，定期把这三个文件复制进去，并加上日期命名：</p>
+<pre class="notranslate"><code class="notranslate">backup/
+  ├── config_20260601.json
+  ├── enhance_20260601.css
+  └── enhance_20260601.js
+</code></pre>
+<hr>
+<blockquote>
+<p>📌 <strong>终极新手建议总结：</strong></p>
+<ol>
+<li><strong>改之前先备份</strong>：把要改的文件内容复制一份存到记事本，改坏了还能粘回去</li>
+<li><strong>一次只改一处</strong>：改完立刻刷新看效果，确认没问题再改下一处</li>
+<li><strong>善用 F12</strong>：浏览器开发者工具是你最好的朋友，可以实时预览改动效果</li>
+<li><strong>JSON 格式验证</strong>：每次改完 config.json，去 jsonlint.com 验证一下格式</li>
+<li><strong>强制刷新</strong>：看不到最新效果时，按 <code class="notranslate">Ctrl+Shift+R</code> 清除缓存</li>
+<li><strong>不要怕出错</strong>：Git 有完整历史，任何改动都能回滚，大胆试验！</li>
+</ol>
 </blockquote></div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 
