@@ -1,6 +1,6 @@
-/* enhance.js - Luliy Blog v8
+/* enhance.js - Luliy Blog v9
    Modules:
-   00  Welcome splash
+   00  Welcome splash (animation sequence)
    01  localStorage init
    02  Progress bar
    03  Dynamic title
@@ -9,24 +9,59 @@
    06  Static background (particles removed)
    07  Web Audio SFX
    08  Click sparks
-   09  Hero cluster (avatar + name + clock)
+   09  Hero cluster (avatar + name + clock) + homepage nav button
    10  Hero banner (homepage scroll-fold)
    11  Tag page search toolbar
    12  Image lightbox
-   13  Floating toolbar + unified sink (4 themes)
-   14  Home card rebuild
-   15  macOS code block strip (with proper wrapper)
-   16  Sakura petals
+   13  Floating toolbar + unified sink (6 themes) + reading prefs
+   14  Home card rebuild (year grouping + relative dates + multi-level pin)
+   15  macOS code block strip (+ line numbers)
+   16  Sakura petals + shooting stars
    17  ArticleTOC scroll-spy + back-to-top
    18  Mobile nav hamburger + dropdown
-   19  [Removed] Search overlay
-   20  Homepage bottom gallery banner (lazy load + zoomable)
+   19  Favorites page front-end lock
+   20  Homepage bottom gallery banner (grid + custom images)
    21  Post page init
    22  Index page init
-   23  Main entry
+   23  Music player (floating, custom playlist)
+   24  Main entry
 */
 (function (root) {
   'use strict';
+
+  /* ════════════════════════════════════════════════════════
+     SITE OPTIONS — edit these to customise
+  ════════════════════════════════════════════════════════ */
+  var LULIY_OPTS = {
+    /* Homepage bottom gallery: 1 image = banner, 2+ = grid.
+       Users can append their own via the ✎ button (saved in localStorage). */
+    galleryImages: [
+      'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg'
+    ],
+    galleryText: '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65',          /* 我将无限进步 */
+
+    /* Welcome splash animation sequence — lines fade in one by one */
+    welcomeSequence: [
+      '\u6b22\u8fce\u6765\u5230 Luliy \u7684\u4e16\u754c',          /* 欢迎来到 Luliy 的世界 */
+      '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65\uff01',                 /* 我将无限进步！ */
+      '\u613f\u4f60\u5728\u8fd9\u91cc\u6709\u6240\u6536\u83b7 \u2727' /* 愿你在这里有所收获 ✧ */
+    ],
+
+    /* Music playlist — replace src with your own hosted mp3 links.
+       The first track is a placeholder demo; swap in a real space-
+       themed soundtrack URL of your own. */
+    musicTracks: [
+      { name: '\u661f\u9645\u6f2b\u6e38\u00b7\u793a\u4f8b\u66f2\u76ee', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' }
+    ],
+
+    /* Favorites page lock — SHA-256 of the password (121383).
+       NOTE: this is a front-end gate (deterrent), not true encryption:
+       the page source is still publicly readable. */
+    favoritesHash: 'c9c9ed97be82f3ed62e9d127e4df48397549f81ba53a07f5639b68987552ce21',
+    favoritesPathMatch: /favorites/i,
+
+    homeUrl: '/'
+  };
 
   /* ---- Utilities ------------------------------------------ */
   function ready(fn) {
@@ -57,6 +92,13 @@
             var p = data[k] || {};
             if (typeof p === 'string') p = { postTitle: p };
             var rawLabels = p.labels || p.tags || [];
+            /* Multi-level pinning: 'pinned' = level 1; 'pinned-2', 'pinned-3'
+               sort higher. Lower number = higher position. */
+            var pinLevel = 0;
+            rawLabels.forEach(function (lbl) {
+              var m = /^pinned(?:-(\d+))?$/.exec(lbl);
+              if (m) pinLevel = Math.max(pinLevel, m[1] ? parseInt(m[1], 10) : 1);
+            });
             var labels = rawLabels.map(function (lbl) {
               return {
                 name: lbl,
@@ -68,7 +110,8 @@
               link:  p.postUrl  || p.link  || p.url  || ('post/' + k + '.html'),
               created: p.createdDate || p.created || p.date || '',
               labels: labels,
-              pinned: rawLabels.indexOf('pinned') >= 0
+              pinned: pinLevel > 0,
+              pinLevel: pinLevel
             };
           });
       }
@@ -84,7 +127,21 @@
     return tryNext(tryUrls).then(norm);
   }
 
-  /* ---- 00  Welcome splash ---------------------------------- */
+  /* Relative time: 今天 / 3天前 / 2个月前 / 1年前 */
+  function relativeTime(dateStr) {
+    if (!dateStr) return '';
+    var t = new Date(String(dateStr).slice(0, 10).replace(/-/g, '/')).getTime();
+    if (isNaN(t)) return '';
+    var d = Date.now() - t;
+    if (d < 0) return '';
+    var days = Math.floor(d / 86400000);
+    if (days === 0) return '\u4eca\u5929';
+    if (days < 30) return days + '\u5929\u524d';
+    if (days < 365) return Math.floor(days / 30) + '\u4e2a\u6708\u524d';
+    return Math.floor(days / 365) + '\u5e74\u524d';
+  }
+
+  /* ---- 00  Welcome splash (animation sequence) ------------- */
   function initWelcomeSplash() {
     if (sessionStorage.getItem('luliy-welcomed') === '1') return;
 
@@ -94,25 +151,35 @@
     var inner = document.createElement('div');
     inner.id = 'luliy-welcome-inner';
 
+    var seq = LULIY_OPTS.welcomeSequence || [];
     var title = document.createElement('div');
     title.id = 'luliy-welcome-title';
-    title.textContent = '\u6b22\u8fce\u6765\u5230 Luliy \u7684\u4e16\u754c';
+    title.className = 'luliy-welcome-seq';
+    title.textContent = seq[0] || '\u6b22\u8fce';
+    title.style.animationDelay = '0.2s';
+    inner.appendChild(title);
 
-    var sub = document.createElement('div');
-    sub.id = 'luliy-welcome-sub';
-    sub.textContent = '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65\uff01';
+    /* Subsequent lines fade in one after another */
+    for (var i = 1; i < seq.length; i++) {
+      var line = document.createElement('div');
+      line.className = 'luliy-welcome-seq' + (i === 1 ? '' : ' luliy-welcome-extra');
+      if (i === 1) line.id = 'luliy-welcome-sub';
+      line.textContent = seq[i];
+      line.style.animationDelay = (0.2 + i * 0.55) + 's';
+      inner.appendChild(line);
+    }
 
     var btn = document.createElement('button');
     btn.id = 'luliy-welcome-btn';
+    btn.className = 'luliy-welcome-seq';
+    btn.style.animationDelay = (0.2 + seq.length * 0.55) + 's';
     btn.textContent = '\u70b9\u51fb\u8fdb\u5165';
+    inner.appendChild(btn);
 
     var hint = document.createElement('div');
     hint.id = 'luliy-welcome-hint';
     hint.textContent = '\u25bc  ENTER';
 
-    inner.appendChild(title);
-    inner.appendChild(sub);
-    inner.appendChild(btn);
     splash.appendChild(inner);
     splash.appendChild(hint);
     document.body.appendChild(splash);
@@ -139,10 +206,13 @@
   /* ---- 01  localStorage init ------------------------------ */
   function initLocalStorage() {
     var defs = {
-      'luliy-sfx':    '1',
-      'luliy-sakura': '1',
-      'luliy-sink':   'default',
-      'luliy-bg':     ''
+      'luliy-sfx':      '1',
+      'luliy-sakura':   '1',
+      'luliy-sink':     'default',
+      'luliy-bg':       '',
+      'luliy-fontsize': '18',
+      'luliy-sans':     '0',
+      'luliy-music':    ''
     };
     Object.keys(defs).forEach(function (k) {
       if (localStorage.getItem(k) === null) localStorage.setItem(k, defs[k]);
@@ -320,8 +390,18 @@
 
   /* ---- 09  Hero cluster (avatar + name + clock in header) - */
   function initHeroCluster() {
+    function injectHomeBtn(header) {
+      var tr = header.querySelector('.title-right');
+      if (!tr || document.getElementById('luliy-nav-home')) return;
+      var home = document.createElement('a');
+      home.id = 'luliy-nav-home';
+      home.href = LULIY_OPTS.homeUrl || '/';
+      home.textContent = '\uD83C\uDFE0 \u4e3b\u9875';   /* 🏠 主页 */
+      tr.insertBefore(home, tr.firstChild);
+    }
     function tryBuild() {
       var header = document.getElementById('header'); if (!header) return false;
+      injectHomeBtn(header);
       if (document.getElementById('luliy-hero-cluster')) return true;
       var av = header.querySelector('img.avatar, img[src*="avatar"]');
       if (!av) return false;
@@ -489,9 +569,20 @@
     playSfx('click');
   }
 
-  /* ---- 13  Floating toolbar + unified sink (4 themes) ----- */
+  /* ---- Reading preferences (font size + sans-serif) -------- */
+  function applyReadingPrefs() {
+    var pbody = document.getElementById('postBody');
+    if (!pbody) return;
+    var px = parseInt(localStorage.getItem('luliy-fontsize') || '18', 10) || 18;
+    px = Math.min(24, Math.max(14, px));
+    pbody.style.setProperty('font-size', px + 'px', 'important');
+    document.body.classList.toggle('luliy-sans', localStorage.getItem('luliy-sans') === '1');
+  }
+  root._luliyApplyReadingPrefs = applyReadingPrefs;
 
-  /* ── 4 Sinks / Themes ───────────────────────────────────── */
+  /* ---- 13  Floating toolbar + unified sink (6 themes) ----- */
+
+  /* ── 6 Sinks / Themes ───────────────────────────────────── */
   var SINKS = [
     {
       id: 'default',
@@ -524,6 +615,22 @@
       theme: 'space',
       cardPalette: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'],
       desc:  '\u6df1\u591c\u661f\u6d77\uff0c\u5b87\u5b99\u65c5\u8005'
+    },
+    {
+      id: 'sunset',
+      label: '\u65e5\u843d\u9ec4\u660f',                 /* 日落黄昏 */
+      dot:   '#ff7e5f',
+      theme: 'sunset',
+      cardPalette: ['#ff7e5f', '#feb47b', '#e0566e', '#6a3093'],
+      desc:  '\u6a58\u7ea2\u665a\u971e\uff0c\u6e29\u67d4\u9ec4\u660f'  /* 橘红晚霞，温柔黄昏 */
+    },
+    {
+      id: 'mono',
+      label: '\u6781\u7b80\u9ed1\u767d',                 /* 极简黑白 */
+      dot:   '#222222',
+      theme: 'mono',
+      cardPalette: ['#222222', '#555555', '#888888', '#bbbbbb'],
+      desc:  '\u53bb\u8272\u7559\u767d\uff0c\u4e13\u6ce8\u9605\u8bfb'  /* 去色留白，专注阅读 */
     }
   ];
 
@@ -630,7 +737,9 @@
       'default':   { day: ['rgba(255,255,255,0.90)', '#8250df', '#1e1032'],  night: ['rgba(14,10,28,0.90)', '#cba6f7', '#cdd6f4'] },
       'sakura':    { day: ['rgba(255,238,245,0.92)', '#e05c8a', '#7a1040'],  night: ['rgba(42,10,28,0.88)',  '#f9a8c9', '#ffc5d0'] },
       'your-name': { day: ['rgba(230,244,255,0.92)', '#1a59a4', '#0d2b6b'],  night: ['rgba(4,14,52,0.90)',   '#93c5fd', '#c0e4ff'] },
-      'space':     { day: ['rgba(2,8,36,0.88)',      '#00e5ff', '#c8e8ff'],  night: ['rgba(1,4,22,0.92)',    '#00e5ff', '#b8d8f0'] }
+      'space':     { day: ['rgba(2,8,36,0.88)',      '#00e5ff', '#c8e8ff'],  night: ['rgba(1,4,22,0.92)',    '#00e5ff', '#b8d8f0'] },
+      'sunset':    { day: ['rgba(255,243,234,0.92)', '#e0566e', '#6b2230'],  night: ['rgba(40,14,26,0.90)',  '#feb47b', '#ffd9c0'] },
+      'mono':      { day: ['rgba(255,255,255,0.94)', '#222222', '#111111'],  night: ['rgba(16,16,16,0.92)',  '#dddddd', '#e8e8e8'] }
     };
 
     function mkPreviewCard(label, bg, accent, textColor) {
@@ -703,6 +812,60 @@
     });
     panel.appendChild(bgRow);
 
+    /* ── Reading settings (article pages only) ───────────── */
+    if (document.getElementById('postBody')) {
+      panel.appendChild(mkSep());
+      panel.appendChild(mkSec('\u9605\u8bfb\u8bbe\u7f6e'));   /* 阅读设置 */
+
+      /* Font size row: A-  18px  A+ */
+      var fsRow = document.createElement('div');
+      fsRow.className = 'luliy-ctrl-row';
+      fsRow.style.cursor = 'default';
+      var fsLbl = document.createElement('span');
+      fsLbl.className = 'luliy-ctrl-lbl';
+      fsLbl.textContent = '\uD83D\uDD24 \u5b57\u53f7';        /* 🔤 字号 */
+      var fsCtrls = document.createElement('span');
+      fsCtrls.style.cssText = 'display:flex;align-items:center;gap:6px';
+      function mkFsBtn(txt) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = txt;
+        b.className = 'luliy-fs-btn';
+        return b;
+      }
+      var fsMinus = mkFsBtn('A-');
+      var fsVal = document.createElement('span');
+      fsVal.className = 'luliy-ctrl-badge';
+      var fsPlus = mkFsBtn('A+');
+      fsCtrls.appendChild(fsMinus); fsCtrls.appendChild(fsVal); fsCtrls.appendChild(fsPlus);
+      fsRow.appendChild(fsLbl); fsRow.appendChild(fsCtrls);
+      panel.appendChild(fsRow);
+
+      function curFs() { return parseInt(localStorage.getItem('luliy-fontsize') || '18', 10) || 18; }
+      function setFs(px) {
+        px = Math.min(24, Math.max(14, px));
+        localStorage.setItem('luliy-fontsize', String(px));
+        applyReadingPrefs();
+        fsVal.textContent = px + 'px';
+      }
+      fsVal.textContent = curFs() + 'px';
+      fsMinus.addEventListener('click', function (e) { e.stopPropagation(); setFs(curFs() - 1); playSfx('click'); });
+      fsPlus.addEventListener('click',  function (e) { e.stopPropagation(); setFs(curFs() + 1); playSfx('click'); });
+
+      /* Sans-serif toggle */
+      var sansOn  = localStorage.getItem('luliy-sans') === '1';
+      var sansRow = mkRow('\u270d', '\u9ed1\u4f53\u6a21\u5f0f', sansOn ? '\u5f00\u542f' : '\u5173\u95ed'); /* ✍ 黑体模式 */
+      sansRow.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var on = localStorage.getItem('luliy-sans') === '1';
+        localStorage.setItem('luliy-sans', on ? '0' : '1');
+        sansRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
+        applyReadingPrefs();
+        playSfx('click');
+      });
+      panel.appendChild(sansRow);
+    }
+
     /* Toggle open / close */
     ctrlBtn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -755,7 +918,20 @@
 
       var dateEl = document.createElement('div');
       dateEl.className = 'luliy-card-date';
-      dateEl.textContent = post.created ? post.created.slice(0, 10) : '';
+      var absDate = post.created ? post.created.slice(0, 10) : '';
+      var relDate = relativeTime(post.created);
+      /* Relative time display, absolute date on hover */
+      dateEl.textContent = relDate ? (relDate + ' \u00b7 ' + absDate) : absDate;
+      dateEl.title = absDate;
+
+      /* Multi-level pin badge: 📌 / 📌2 / 📌3 ... */
+      if (isPinned && post.pinLevel) {
+        var pin = document.createElement('span');
+        pin.className = 'luliy-card-pinbadge';
+        pin.textContent = '\uD83D\uDCCC' + (post.pinLevel > 1 ? post.pinLevel : '');
+        pin.title = '\u7f6e\u9876\u7ea7\u522b ' + post.pinLevel;
+        li.appendChild(pin);
+      }
 
       var titleEl = document.createElement('div');
       titleEl.className = 'luliy-card-title';
@@ -766,7 +942,7 @@
       var labels = Array.isArray(post.labels) ? post.labels : [];
       labels.forEach(function (lbl) {
         var info = (typeof lbl === 'object') ? lbl : { name: lbl, color: '0969da' };
-        if ((info.name || lbl) === 'pinned') return;
+        if (/^pinned(-\d+)?$/.test(info.name || lbl)) return;
         var pill = document.createElement('a');
         pill.className = 'luliy-card-pill';
         pill.href = '/tag.html#' + encodeURIComponent(info.name || lbl);
@@ -788,6 +964,12 @@
       var pinnedPosts  = posts.filter(function (p) { return p.pinned; });
       var regularPosts = posts.filter(function (p) { return !p.pinned; });
 
+      /* Multi-level pin sort: higher pinLevel first, then newest first */
+      pinnedPosts.sort(function (a, b) {
+        if ((b.pinLevel || 1) !== (a.pinLevel || 1)) return (b.pinLevel || 1) - (a.pinLevel || 1);
+        return String(b.created).localeCompare(String(a.created));
+      });
+
       var pageMatch = location.search.match(/[?&]page=([0-9]+)/);
       var pageNum = pageMatch ? parseInt(pageMatch[1]) : 1;
       var perPage = 12;
@@ -799,12 +981,16 @@
         displayPosts = regularPosts.slice(start, start + perPage);
       }
 
-      /* Pinned section */
+      /* Pinned section — fixed area, always above the regular grid */
       if (pinnedPosts.length > 0 && onIndex && pageNum === 1) {
         var existing = document.getElementById('luliy-pinned-section');
         if (existing) existing.remove();
         var ps = document.createElement('div');
         ps.id = 'luliy-pinned-section';
+        var psTitle = document.createElement('div');
+        psTitle.className = 'luliy-pinned-title';
+        psTitle.textContent = '\uD83D\uDCCC \u7f6e\u9876\u63a8\u8350';   /* 📌 置顶推荐 */
+        ps.appendChild(psTitle);
         var pg = document.createElement('ul');
         pg.className = 'luliy-card-grid luliy-pinned-grid';
         pinnedPosts.forEach(function (post, i) { pg.appendChild(buildCard(post, true, i)); });
@@ -814,7 +1000,20 @@
 
       nav.innerHTML = '';
       nav.className = 'luliy-card-grid';
-      displayPosts.forEach(function (post, i) { nav.appendChild(buildCard(post, false, i)); });
+
+      /* Card grouping — insert a year divider whenever the year changes */
+      var lastYear = null;
+      displayPosts.forEach(function (post, i) {
+        var y = (post.created || '').slice(0, 4);
+        if (y && y !== lastYear) {
+          lastYear = y;
+          var divider = document.createElement('li');
+          divider.className = 'luliy-card-yeardiv';
+          divider.innerHTML = '<span>' + esc(y) + '</span>';
+          nav.appendChild(divider);
+        }
+        nav.appendChild(buildCard(post, false, i));
+      });
 
     }).catch(function () { fallbackDomCards(nav); });
 
@@ -839,7 +1038,23 @@
     }
   }
 
-  /* ---- 15  macOS code block strip ------------------------- */
+  /* ---- 15  macOS code block strip (+ line numbers) --------- */
+  /* One global Escape handler for all fullscreen code blocks
+     (previously each <pre> registered its own document listener). */
+  var _codeEscBound = false;
+  function bindCodeEscape() {
+    if (_codeEscBound) return;
+    _codeEscBound = true;
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      document.querySelectorAll('pre.code-fullscreen').forEach(function (pre) {
+        pre.classList.remove('code-fullscreen');
+        var g = pre.querySelector('.mac-btn-green');
+        if (g) g.setAttribute('data-tip', '\u5168\u5c4f\u9605\u8bfb');
+      });
+    });
+  }
+
   function initCodeBlocks(pbody) {
     applyCodeBlocks(pbody);
     if (pbody._luliyCodeObs) return;
@@ -906,12 +1121,21 @@
         if (e.target === bR || e.target === bY || e.target === bG) return;
         toggleFS();
       });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && pre.classList.contains('code-fullscreen')) {
-          pre.classList.remove('code-fullscreen');
-          bG.setAttribute('data-tip', '\u5168\u5c4f\u9605\u8bfb');
-        }
-      });
+      bindCodeEscape();
+
+      /* ── Line numbers gutter (blocks with 2+ lines) ─────── */
+      var rawTxt = (code.textContent || '').replace(/\n$/, '');
+      var lineCount = rawTxt.split('\n').length;
+      if (lineCount > 1 && !pre.querySelector('.luliy-lineno')) {
+        var gutter = document.createElement('span');
+        gutter.className = 'luliy-lineno';
+        gutter.setAttribute('aria-hidden', 'true');
+        var nums = '';
+        for (var ln = 1; ln <= lineCount; ln++) nums += ln + '\n';
+        gutter.textContent = nums;
+        pre.insertBefore(gutter, code);
+        pre.classList.add('has-lineno');
+      }
 
       /* Language label */
       var langMatch = (code.className || '').match(/language-(\w+)/);
@@ -929,7 +1153,7 @@
     });
   }
 
-  /* ---- 16  Sakura petals (16 petals, seasonal, wind-aware) -- */
+  /* ---- 16  Sakura petals + shooting stars (seasonal) ------ */
   /* Season config — auto-detected from current month */
   var SEASON_CONFIG = (function () {
     var m = new Date().getMonth(); // 0–11
@@ -991,17 +1215,54 @@
     }
     var petals = [];
     for (var i = 0; i < COUNT; i++) petals.push(mkPetal(true));
-    function drawPetal(p) {
-      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.opacity;
-      var s = p.size;
-      ctx.beginPath(); ctx.moveTo(0, -s * 0.5);
-      ctx.bezierCurveTo(s * 0.55, -s * 0.55, s * 0.55, s * 0.55, 0, s * 0.5);
-      ctx.bezierCurveTo(-s * 0.55, s * 0.55, -s * 0.55, -s * 0.55, 0, -s * 0.5);
-      ctx.fillStyle = p.color; ctx.fill();
-      ctx.beginPath(); ctx.moveTo(0, -s * 0.4); ctx.lineTo(0, s * 0.4);
-      ctx.strokeStyle = 'rgba(255,150,170,0.25)'; ctx.lineWidth = 0.6; ctx.stroke();
+
+    /* ── Shooting stars — occasional meteors across the sky ──
+       More frequent on the space theme; subtle elsewhere. */
+    var meteors = [];
+    var nextMeteorAt = Date.now() + 2500;
+    function meteorInterval() {
+      var isSpace = document.body && document.body.getAttribute('data-luliy-theme') === 'space';
+      return isSpace ? (2000 + Math.random() * 4000) : (6000 + Math.random() * 9000);
+    }
+    function mkMeteor() {
+      var fromLeft = Math.random() < 0.5;
+      return {
+        x: fromLeft ? Math.random() * W * 0.4 : W * 0.4 + Math.random() * W * 0.6,
+        y: Math.random() * H * 0.35,
+        vx: (fromLeft ? 1 : -1) * (7 + Math.random() * 6),
+        vy: 4 + Math.random() * 3,
+        len: 90 + Math.random() * 110,
+        life: 1,
+        decay: 0.012 + Math.random() * 0.012
+      };
+    }
+    function drawMeteor(m) {
+      var dx = m.vx, dy = m.vy;
+      var mag = Math.sqrt(dx * dx + dy * dy) || 1;
+      var tx = m.x - dx / mag * m.len, ty = m.y - dy / mag * m.len;
+      var grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
+      var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark' ||
+        (document.body && document.body.getAttribute('data-luliy-theme') === 'space');
+      var head = isDark ? '255,255,255' : '255,250,230';
+      grad.addColorStop(0, 'rgba(' + head + ',' + (0.95 * m.life) + ')');
+      grad.addColorStop(0.3, 'rgba(180,210,255,' + (0.45 * m.life) + ')');
+      grad.addColorStop(1, 'rgba(180,210,255,0)');
+      ctx.save();
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+      ctx.globalAlpha = m.life;
+      ctx.fillStyle = 'rgba(' + head + ',0.95)';
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, 1.6, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
+
     var running = true;
     function tick() {
       if (!document.getElementById('luliy-sakura-canvas')) { running = false; return; }
@@ -1016,8 +1277,32 @@
         if (p.y > H + p.size * 2 || p.x < -p.size * 4 || p.x > W + p.size * 4) petals[j] = mkPetal(false);
         drawPetal(p);
       }
+      /* Spawn + advance meteors */
+      if (Date.now() >= nextMeteorAt) {
+        meteors.push(mkMeteor());
+        nextMeteorAt = Date.now() + meteorInterval();
+      }
+      for (var k = meteors.length - 1; k >= 0; k--) {
+        var m = meteors[k];
+        m.x += m.vx; m.y += m.vy; m.life -= m.decay;
+        if (m.life <= 0 || m.y > H + 50 || m.x < -200 || m.x > W + 200) { meteors.splice(k, 1); continue; }
+        drawMeteor(m);
+      }
       if (running) requestAnimationFrame(tick);
     }
+
+    function drawPetal(p) {
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.opacity;
+      var s = p.size;
+      ctx.beginPath(); ctx.moveTo(0, -s * 0.5);
+      ctx.bezierCurveTo(s * 0.55, -s * 0.55, s * 0.55, s * 0.55, 0, s * 0.5);
+      ctx.bezierCurveTo(-s * 0.55, s * 0.55, -s * 0.55, -s * 0.55, 0, -s * 0.5);
+      ctx.fillStyle = p.color; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(0, -s * 0.4); ctx.lineTo(0, s * 0.4);
+      ctx.strokeStyle = 'rgba(255,150,170,0.25)'; ctx.lineWidth = 0.6; ctx.stroke();
+      ctx.restore();
+    }
+
     tick();
   }
 
@@ -1243,6 +1528,42 @@
           if (tocVisible) closeDrop();
         });
         drop.appendChild(tocItem);
+
+        /* ── 🔤 Font size A- / A+ ──────────────────────────── */
+        var fsItem = document.createElement('div');
+        fsItem.className = 'luliy-nav-item luliy-drop-toggle';
+        fsItem.style.cursor = 'default';
+        var fsMinus = document.createElement('button');
+        fsMinus.type = 'button'; fsMinus.className = 'luliy-fs-btn'; fsMinus.textContent = 'A-';
+        var fsTxt = document.createElement('span');
+        var fsPlus = document.createElement('button');
+        fsPlus.type = 'button'; fsPlus.className = 'luliy-fs-btn'; fsPlus.textContent = 'A+';
+        function mobCurFs() { return parseInt(localStorage.getItem('luliy-fontsize') || '18', 10) || 18; }
+        function mobSetFs(px) {
+          px = Math.min(24, Math.max(14, px));
+          localStorage.setItem('luliy-fontsize', String(px));
+          if (root._luliyApplyReadingPrefs) root._luliyApplyReadingPrefs();
+          fsTxt.textContent = '\u5b57\u53f7 ' + px + 'px';
+        }
+        fsTxt.textContent = '\u5b57\u53f7 ' + mobCurFs() + 'px';
+        fsMinus.addEventListener('click', function (e) { e.stopPropagation(); mobSetFs(mobCurFs() - 1); });
+        fsPlus.addEventListener('click',  function (e) { e.stopPropagation(); mobSetFs(mobCurFs() + 1); });
+        fsItem.appendChild(fsMinus); fsItem.appendChild(fsTxt); fsItem.appendChild(fsPlus);
+        drop.appendChild(fsItem);
+
+        /* ── ✍ Sans-serif toggle ──────────────────────────── */
+        var sansOn2 = localStorage.getItem('luliy-sans') === '1';
+        var sansItem = document.createElement('button');
+        sansItem.className = 'luliy-nav-item luliy-drop-toggle';
+        sansItem.type = 'button';
+        sansItem.textContent = '\u270d \u9ed1\u4f53\u00b7' + (sansOn2 ? '\u5f00\u542f' : '\u5173\u95ed');
+        sansItem.addEventListener('click', function () {
+          var on = localStorage.getItem('luliy-sans') === '1';
+          localStorage.setItem('luliy-sans', on ? '0' : '1');
+          sansItem.textContent = '\u270d \u9ed1\u4f53\u00b7' + (!on ? '\u5f00\u542f' : '\u5173\u95ed');
+          if (root._luliyApplyReadingPrefs) root._luliyApplyReadingPrefs();
+        });
+        drop.appendChild(sansItem);
       }
 
       drop.appendChild(makeSep());
@@ -1315,41 +1636,268 @@
     }
   }
 
-  /* ---- 20  Homepage bottom gallery banner ----------------- */
+  /* ---- 20  Homepage bottom gallery banner ------------------
+     · 1 image  → full-width banner
+     · 2+ images → responsive grid
+     · ✎ button → add custom image URLs (stored in localStorage)
+     · click any image → lightbox zoom                          */
+  function getGalleryImages() {
+    var imgs = (LULIY_OPTS.galleryImages || []).slice();
+    try {
+      var custom = JSON.parse(localStorage.getItem('luliy-gallery') || '[]');
+      if (Array.isArray(custom)) imgs = imgs.concat(custom);
+    } catch (e) {}
+    return imgs.filter(Boolean);
+  }
+
   function initHomeGallery() {
     if (!isIndexPage()) return;
     /* Wait until card grid has been built */
-    setTimeout(function () {
-      if (document.getElementById('luliy-home-gallery')) return;
-      var content = document.getElementById('content') || document.querySelector('.main');
-      if (!content) return;
+    setTimeout(buildGallery, 800);
+  }
 
-      var wrap = document.createElement('div');
-      wrap.id = 'luliy-home-gallery';
+  function buildGallery() {
+    var old = document.getElementById('luliy-home-gallery');
+    if (old) old.remove();
+    var content = document.getElementById('content') || document.querySelector('.main');
+    if (!content) return;
 
+    var imgs = getGalleryImages();
+    if (!imgs.length) return;
+
+    var wrap = document.createElement('div');
+    wrap.id = 'luliy-home-gallery';
+    if (imgs.length > 1) wrap.classList.add('is-grid');
+
+    imgs.forEach(function (src, i) {
+      var cell = document.createElement('div');
+      cell.className = 'luliy-gallery-cell';
       var img = document.createElement('img');
-      img.src = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg';
-      img.alt = 'Gallery';
+      img.src = src;
+      img.alt = 'Gallery ' + (i + 1);
       img.loading = 'lazy';
+      img.addEventListener('error', function () { cell.style.display = 'none'; });
+      cell.appendChild(img);
+      cell.style.cursor = 'zoom-in';
+      cell.addEventListener('click', function () {
+        if (root._luliyLightboxOpen) root._luliyLightboxOpen(src, '\u753b\u5eca');
+      });
+      wrap.appendChild(cell);
+    });
 
+    /* Overlay caption (single-image banner only) */
+    if (imgs.length === 1) {
       var ov = document.createElement('div');
       ov.id = 'luliy-home-gallery-overlay';
-
       var txt = document.createElement('div');
       txt.id = 'luliy-home-gallery-text';
-      txt.textContent = '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65';
-
+      txt.textContent = LULIY_OPTS.galleryText || '';
       ov.appendChild(txt);
-      wrap.appendChild(img);
       wrap.appendChild(ov);
-      content.appendChild(wrap);
+    }
 
-      /* Lightbox: click gallery banner to zoom */
-      wrap.style.cursor = 'zoom-in';
-      wrap.addEventListener('click', function () {
-        if (root._luliyLightboxOpen) root._luliyLightboxOpen(img.src, '\u753b\u5eca');
+    /* ✎ Edit button: add / reset custom images */
+    var edit = document.createElement('button');
+    edit.id = 'luliy-gallery-edit';
+    edit.type = 'button';
+    edit.title = '\u6dfb\u52a0\u81ea\u5b9a\u4e49\u56fe\u7247';   /* 添加自定义图片 */
+    edit.textContent = '\u270e';
+    edit.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var url = window.prompt(
+        '\u7c98\u8d34\u56fe\u7247\u94fe\u63a5\u6dfb\u52a0\u5230\u753b\u5eca\uff08\u8f93\u5165 reset \u6e05\u7a7a\u81ea\u5b9a\u4e49\u56fe\u7247\uff09\uff1a', '');
+      if (url === null) return;
+      url = url.trim();
+      var custom = [];
+      try { custom = JSON.parse(localStorage.getItem('luliy-gallery') || '[]'); } catch (_) {}
+      if (!Array.isArray(custom)) custom = [];
+      if (url.toLowerCase() === 'reset') custom = [];
+      else if (url) custom.push(url);
+      localStorage.setItem('luliy-gallery', JSON.stringify(custom));
+      buildGallery();
+      playSfx('click');
+    });
+    wrap.appendChild(edit);
+
+    content.appendChild(wrap);
+  }
+
+  /* ---- 19  Favorites page front-end lock --------------------
+     Hides the favorites page behind a password prompt.
+     NOTE: this is a deterrent only — page content still exists in
+     the public HTML source. Do not store true secrets here.      */
+  function initFavoritesLock() {
+    if (!LULIY_OPTS.favoritesPathMatch.test(location.pathname)) return;
+    if (sessionStorage.getItem('luliy-fav-unlocked') === '1') return;
+
+    var pbody = document.getElementById('postBody');
+    if (!pbody) return;
+
+    pbody.classList.add('luliy-locked');
+
+    var gate = document.createElement('div');
+    gate.id = 'luliy-fav-gate';
+    gate.innerHTML =
+      '<div id="luliy-fav-gate-card">' +
+      '<div id="luliy-fav-gate-icon">\uD83D\uDD12</div>' +
+      '<div id="luliy-fav-gate-title">\u79c1\u5bc6\u6536\u85cf</div>' +          /* 私密收藏 */
+      '<div id="luliy-fav-gate-sub">\u8bf7\u8f93\u5165\u5bc6\u7801\u67e5\u770b\u6b64\u9875\u9762</div>' + /* 请输入密码查看此页面 */
+      '<input id="luliy-fav-gate-input" type="password" inputmode="numeric" ' +
+      'placeholder="\u5bc6\u7801" autocomplete="off">' +
+      '<button id="luliy-fav-gate-btn" type="button">\u89e3\u9501</button>' +     /* 解锁 */
+      '<div id="luliy-fav-gate-err"></div>' +
+      '</div>';
+    document.body.appendChild(gate);
+
+    var input = gate.querySelector('#luliy-fav-gate-input');
+    var btn   = gate.querySelector('#luliy-fav-gate-btn');
+    var err   = gate.querySelector('#luliy-fav-gate-err');
+
+    function sha256Hex(str) {
+      if (root.crypto && root.crypto.subtle) {
+        return root.crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+          .then(function (buf) {
+            return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+              return ('0' + b.toString(16)).slice(-2);
+            }).join('');
+          });
+      }
+      /* crypto.subtle requires https / localhost — GitHub Pages is https */
+      return Promise.reject(new Error('no-subtle'));
+    }
+
+    function unlock() {
+      sessionStorage.setItem('luliy-fav-unlocked', '1');
+      pbody.classList.remove('luliy-locked');
+      gate.classList.add('is-leaving');
+      playSfx('sci');
+      setTimeout(function () { gate.remove(); }, 500);
+    }
+
+    function attempt() {
+      var v = (input.value || '').trim();
+      if (!v) return;
+      sha256Hex(v).then(function (hex) {
+        if (hex === LULIY_OPTS.favoritesHash) unlock();
+        else {
+          err.textContent = '\u5bc6\u7801\u9519\u8bef\uff0c\u8bf7\u91cd\u8bd5';   /* 密码错误，请重试 */
+          input.value = '';
+          gate.querySelector('#luliy-fav-gate-card').classList.remove('shake');
+          void gate.offsetWidth;
+          gate.querySelector('#luliy-fav-gate-card').classList.add('shake');
+        }
+      }).catch(function () {
+        err.textContent = '\u5f53\u524d\u73af\u5883\u4e0d\u652f\u6301\u52a0\u5bc6\u9a8c\u8bc1';
       });
-    }, 800);
+    }
+
+    btn.addEventListener('click', attempt);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(); });
+    setTimeout(function () { input.focus(); }, 300);
+  }
+
+  /* ---- 23  Music player (floating, custom playlist) ---------
+     Default playlist from LULIY_OPTS.musicTracks; users add their
+     own mp3 links via the ＋ button (saved in localStorage).      */
+  function getMusicTracks() {
+    var list = (LULIY_OPTS.musicTracks || []).slice();
+    try {
+      var custom = JSON.parse(localStorage.getItem('luliy-music') || '[]');
+      if (Array.isArray(custom)) list = list.concat(custom);
+    } catch (e) {}
+    return list.filter(function (t) { return t && t.src; });
+  }
+
+  function initMusicPlayer() {
+    if (document.getElementById('luliy-music')) return;
+
+    var tracks = getMusicTracks();
+    var idx = 0, audio = new Audio();
+    audio.preload = 'none';
+    audio.volume = 0.55;
+
+    var box = document.createElement('div');
+    box.id = 'luliy-music';
+    box.innerHTML =
+      '<button id="luliy-music-toggle" type="button" title="\u97f3\u4e50" aria-label="\u97f3\u4e50">\uD83C\uDFB5</button>' +
+      '<div id="luliy-music-panel">' +
+      '  <div id="luliy-music-name">--</div>' +
+      '  <div id="luliy-music-ctrls">' +
+      '    <button id="luliy-music-play" type="button" aria-label="\u64ad\u653e">\u25b6</button>' +
+      '    <button id="luliy-music-next" type="button" aria-label="\u4e0b\u4e00\u9996">\u23ed</button>' +
+      '    <button id="luliy-music-add"  type="button" aria-label="\u6dfb\u52a0" title="\u6dfb\u52a0\u97f3\u4e50\u94fe\u63a5">\uff0b</button>' +
+      '  </div>' +
+      '</div>';
+    document.body.appendChild(box);
+
+    var toggle = box.querySelector('#luliy-music-toggle');
+    var nameEl = box.querySelector('#luliy-music-name');
+    var playBtn = box.querySelector('#luliy-music-play');
+    var nextBtn = box.querySelector('#luliy-music-next');
+    var addBtn  = box.querySelector('#luliy-music-add');
+
+    function refreshName() {
+      tracks = getMusicTracks();
+      if (!tracks.length) { nameEl.textContent = '\u6682\u65e0\u66f2\u76ee\uff0c\u70b9 \uff0b \u6dfb\u52a0'; return; }
+      if (idx >= tracks.length) idx = 0;
+      nameEl.textContent = tracks[idx].name || ('\u66f2\u76ee ' + (idx + 1));
+      nameEl.title = tracks[idx].src;
+    }
+    refreshName();
+
+    function load(i) {
+      tracks = getMusicTracks();
+      if (!tracks.length) return false;
+      idx = ((i % tracks.length) + tracks.length) % tracks.length;
+      audio.src = tracks[idx].src;
+      refreshName();
+      return true;
+    }
+
+    function play() {
+      if (!audio.src && !load(idx)) return;
+      audio.play().then(function () {
+        playBtn.textContent = '\u23f8';
+        toggle.classList.add('is-playing');
+      }).catch(function () {
+        nameEl.textContent = '\u64ad\u653e\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u94fe\u63a5';
+      });
+    }
+    function pause() {
+      audio.pause();
+      playBtn.textContent = '\u25b6';
+      toggle.classList.remove('is-playing');
+    }
+
+    playBtn.addEventListener('click', function () { audio.paused ? play() : pause(); });
+    nextBtn.addEventListener('click', function () { if (load(idx + 1)) play(); });
+    audio.addEventListener('ended', function () { if (load(idx + 1)) play(); });
+
+    addBtn.addEventListener('click', function () {
+      var url = window.prompt(
+        '\u7c98\u8d34\u97f3\u4e50\u76f4\u94fe\uff08mp3 \u7b49\uff0c\u8f93\u5165 reset \u6e05\u7a7a\u81ea\u5b9a\u4e49\u66f2\u76ee\uff09\uff1a', '');
+      if (url === null) return;
+      url = url.trim();
+      var custom = [];
+      try { custom = JSON.parse(localStorage.getItem('luliy-music') || '[]'); } catch (_) {}
+      if (!Array.isArray(custom)) custom = [];
+      if (url.toLowerCase() === 'reset') custom = [];
+      else if (url) {
+        var nm = window.prompt('\u66f2\u76ee\u540d\u79f0\uff1a', '\u6211\u7684\u97f3\u4e50') || '\u6211\u7684\u97f3\u4e50';
+        custom.push({ name: nm, src: url });
+      }
+      localStorage.setItem('luliy-music', JSON.stringify(custom));
+      refreshName();
+      playSfx('click');
+    });
+
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      box.classList.toggle('is-open');
+    });
+    document.addEventListener('click', function (e) {
+      if (!box.contains(e.target)) box.classList.remove('is-open');
+    });
   }
 
   /* ---- 21  Post page init --------------------------------- */
@@ -1370,6 +1918,12 @@
 
     if (pbody) pbody.querySelectorAll('img').forEach(function (img) { img.loading = 'lazy'; });
     if (!pbody) return;
+
+    /* Reading preferences (font size + sans-serif) */
+    applyReadingPrefs();
+
+    /* Favorites page front-end lock */
+    initFavoritesLock();
 
     /* Reading time estimate */
     if (!document.getElementById('luliy-readmeta')) {
@@ -1522,7 +2076,7 @@
     }
   };
 
-  /* ---- 23  Main entry ------------------------------------- */
+  /* ---- 24  Main entry ------------------------------------- */
   initLocalStorage();
 
   /* Restore theme immediately to prevent FOUC */
@@ -1532,7 +2086,9 @@
       'default':   { theme: 'default',   c: ['#8250df', '#0969da', '#ff6b9d', '#f0b429'] },
       'sakura':    { theme: 'sakura',     c: ['#e05c8a', '#f9a8c9', '#c94070', '#ffb7c5'] },
       'your-name': { theme: 'your-name',  c: ['#1a59a4', '#4a9de0', '#f4a738', '#60b8ff'] },
-      'space':     { theme: 'space',      c: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'] }
+      'space':     { theme: 'space',      c: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'] },
+      'sunset':    { theme: 'sunset',     c: ['#ff7e5f', '#feb47b', '#e0566e', '#6a3093'] },
+      'mono':      { theme: 'mono',       c: ['#222222', '#555555', '#888888', '#bbbbbb'] }
     };
     var def = themePalettes[savedId] || themePalettes['default'];
     function applyFouc() {
@@ -1582,6 +2138,7 @@
     initToolbar();
     initNavTransparency();
     initMobileNav();
+    initMusicPlayer();
 
     var isPost    = !!document.getElementById('postBody');
     var hasList   = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
