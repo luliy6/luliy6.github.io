@@ -1,4 +1,4 @@
-/* enhance.css - Luliy Blog v8
+/* enhance.css - Luliy Blog v9
    Sections:
    00  Font imports
    01  CSS Variables + Reset
@@ -9,31 +9,28 @@
    06  Hero cluster
    07  Hero banner
    08  Progress bar
-   09  Cards (home grid)
-   10  Date badge
-   11  Pinned section
+   09  Cards (home grid) + theme skins + starfield + shimmer + year dividers
+   10  Date badge + relative time tooltip
+   11  Pinned section + multi-level
    12  Article reading panels (theme-specific)
-   13  Code blocks (day + dark)
-   14  Tables (day + dark)
+   13  Code blocks (day + dark) + line numbers
+   14  Tables (day + dark) + fixed headers via .table-wrap
    15  Article theme CSS variables (4 themes)
    16  TOC scroll-spy + active highlight
-   17  Floating toolbar + ctrl dropdown panel
+   17  Floating toolbar + ctrl dropdown panel + font controls + blog header
    18  Prev/next navigation
    19  Lightbox
    20  Back-to-top
    21  Sakura canvas / theme ripple
    22  Uptime
    23  Timeline / archive
-   24  Homepage bottom gallery banner
+   24  Homepage bottom gallery banner + grid mode
    25  Search overlay
    26  Responsive (mobile)
 */
 
 /* ══════════════════════════════════════════════════════════
    00  Font imports
-   思源黑体 (Noto Sans SC) for headings
-   霞鹜文楷 Screen (LXGW WenKai) for body
-   霞鹜文楷等宽 (LXGW WenKai Mono) for code
 ══════════════════════════════════════════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
@@ -47,7 +44,6 @@
   --card-c3: #e05c8a;
   --card-c4: #f0b429;
 
-  /* Article theme defaults (overridden per theme) */
   --th-h1:         #1a0a3a;
   --th-h1-border:  2px solid rgba(130,80,223,0.25);
   --th-h2:         #0f1e4a;
@@ -61,7 +57,6 @@
 html { scroll-behavior: smooth; zoom: 1.1; }
 *, *::before, *::after { box-sizing: border-box; }
 
-/* Force page containers transparent so bg shows through */
 html,
 #content, .main,
 .container, .container-xl, .container-lg,
@@ -76,7 +71,7 @@ html,
 #luliy-welcome {
   position: fixed; inset: 0; z-index: 999999;
   background:
-    url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/ChatGPT%20Image%20Jun%209%2C%202026%2C%2009_54_26%20PM.png')
+    url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg')
     center / cover no-repeat;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
@@ -85,17 +80,35 @@ html,
   will-change: opacity, transform;
   overflow: hidden;
 }
+/* Dark vignette overlay */
 #luliy-welcome::before {
- display: none; /* 直接隐藏这个叠加层 */
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,20,0.28) 0%,
+    rgba(0,0,20,0.52) 55%,
+    rgba(0,0,20,0.72) 100%
   );
 }
+/* Animated gradient colour wash */
+#luliy-welcome::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  animation: splashColorShift 7s ease-in-out infinite alternate;
+}
+@keyframes splashColorShift {
+  0%   { background: linear-gradient(135deg, rgba(130,80,223,0.22) 0%, rgba(240,180,41,0.08) 100%); }
+  33%  { background: linear-gradient(180deg, rgba(224,92,138,0.18) 0%, rgba(130,80,223,0.22) 100%); }
+  66%  { background: linear-gradient(225deg, rgba(0,150,255,0.14) 0%, rgba(130,80,223,0.26) 100%); }
+  100% { background: linear-gradient(315deg, rgba(240,180,41,0.16) 0%, rgba(224,92,138,0.14) 100%); }
+}
+
 #luliy-welcome.is-leaving {
   opacity: 0;
   transform: scale(1.055);
   pointer-events: none;
 }
 #luliy-welcome-inner {
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
   text-align: center;
   padding: 24px 40px;
   animation: welcomeFadeIn 1.4s cubic-bezier(.4,0,.2,1) both;
@@ -114,7 +127,21 @@ html,
   margin: 0 0 12px;
   letter-spacing: 4px;
   line-height: 1.25;
+  min-height: 1.3em;
 }
+/* Typewriter cursor */
+#luliy-welcome-title.is-typing::after {
+  content: '|';
+  display: inline;
+  animation: welcomeCursorBlink 0.65s step-end infinite;
+  color: rgba(255,255,255,0.85);
+  margin-left: 2px;
+}
+@keyframes welcomeCursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 #luliy-welcome-sub {
   font-size: 1rem;
   color: rgba(255,255,255,0.70);
@@ -122,6 +149,7 @@ html,
   letter-spacing: 3px;
   font-style: italic;
   font-family: 'LXGW WenKai Screen', 'LXGW WenKai', serif;
+  transition: opacity 0.6s, transform 0.6s;
 }
 #luliy-welcome-btn {
   padding: 14px 52px;
@@ -147,19 +175,31 @@ html,
 #luliy-welcome-hint {
   position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
   color: rgba(255,255,255,0.45); font-size: 11px; letter-spacing: 3px;
-  white-space: nowrap;
+  white-space: nowrap; z-index: 2;
   animation: welcomePulse 2.4s ease infinite;
 }
 @keyframes welcomePulse {
   0%,100% { opacity: 0.45; transform: translateX(-50%) translateY(0); }
   50%      { opacity: 0.90; transform: translateX(-50%) translateY(5px); }
 }
+/* Floating ambient particles */
+.luliy-welcome-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: welcomeParticleFloat 4s ease-in-out infinite;
+}
+@keyframes welcomeParticleFloat {
+  0%, 100% { transform: translateY(0)   scale(1);   opacity: 0.35; }
+  50%       { transform: translateY(-22px) scale(1.4); opacity: 0.75; }
+}
 
 /* ══════════════════════════════════════════════════════════
-   03  Background image — fixed, full viewport
+   03  Background image
 ══════════════════════════════════════════════════════════ */
 body {
-  background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/ChatGPT%20Image%20Jun%209%2C%202026%2C%2009_54_26%20PM.png') !important;
+  background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png') !important;
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;
@@ -168,15 +208,11 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════
-   04  Typography — fonts + day/night colours
+   04  Typography
 ══════════════════════════════════════════════════════════ */
-
-/* Body text: 霞鹜文楷 Screen (regular) */
 body {
   font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'Noto Serif SC', serif;
 }
-
-/* Headings: 思源黑体 Medium */
 #postBody h1, #postBody h2, #postBody h3,
 #postBody h4, #postBody h5, #postBody h6,
 .luliy-card-title, #luliy-hero-name,
@@ -188,14 +224,13 @@ body {
 #postBody h1 { font-weight: 700 !important; }
 #postBody h2 { font-weight: 600 !important; }
 
-/* Code: 霞鹜文楷等宽 (LXGW WenKai Mono) */
 code, pre, kbd, samp,
 #postBody code, #postBody pre,
 .mac-lang, .luliy-date-badge {
   font-family: 'LXGW WenKai Mono', 'LXGW WenKai Screen', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
-/* ── Day mode: article text ─────────────────────────────── */
+/* ── Day mode: article text ──────────────────────────────── */
 #postBody,
 #postBody p, #postBody li, #postBody td, #postBody th,
 #postBody span, #postBody blockquote, #postBody figcaption {
@@ -232,7 +267,7 @@ code, pre, kbd, samp,
 #postBody hr  { border: 0; height: 2px; background: rgba(130,80,223,0.2); margin: 2em 0; }
 #postBody     { font-size: 18px; line-height: 1.9; max-width: 100%; }
 
-/* ── Dark mode: article text ────────────────────────────── */
+/* ── Dark mode: article text ──────────────────────────────── */
 [data-color-mode="dark"] #postBody,
 [data-color-mode="dark"] #postBody p,
 [data-color-mode="dark"] #postBody li,
@@ -255,7 +290,7 @@ code, pre, kbd, samp,
 }
 [data-color-mode="dark"] #postBody strong { color: var(--th-strong, #cba6f7) !important; }
 
-/* Space theme forces light text even in day mode */
+/* Space theme forces light text */
 body[data-luliy-theme="space"] #postBody,
 body[data-luliy-theme="space"] #postBody p,
 body[data-luliy-theme="space"] #postBody li,
@@ -271,11 +306,10 @@ body[data-luliy-theme="space"] #postBody blockquote {
   border-left-color: rgba(0,200,255,0.50) !important;
 }
 
-/* Global selections & external link indicator */
 ::selection { background: #f0b429; color: #000; }
 a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; }
 
-/* ── Label tags ─────────────────────────────────────────── */
+/* ── Label tags ──────────────────────────────────────────── */
 a.Label {
   display: inline-flex !important; align-items: center !important;
   padding: 1px 8px !important; border-radius: 20px !important;
@@ -326,7 +360,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
     0 1px 4px rgba(0,0,0,0.40) !important;
 }
 
-/* Nav text — full contrast on all viewports */
 #header a, .title-right a, .title-right button {
   color: rgba(8,3,16,1.0) !important;
   font-weight: 700;
@@ -340,15 +373,12 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 [data-color-mode="dark"] #header a:hover,
 [data-color-mode="dark"] .title-right a:hover { color: #cba6f7 !important; }
 
-/* Hide original blogTitle/avatar in header (hero cluster replaces them) */
 #header .blogTitle, #header .avatar, #header .postTitle { display: none !important; }
 
-/* Hide "about" from nav bar — accessed via avatar only */
 .title-right a[href="/about"],
 .title-right a[href="/about.html"],
 .title-right a[href*="/about"] { display: none !important; }
 
-/* .title-right — desktop: visible; mobile: hidden */
 .title-right {
   display: flex !important;
   align-items: center !important;
@@ -375,7 +405,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   background: rgba(130,80,223,0.22) !important;
 }
 
-/* Hide RSS button from nav */
 .title-right a[href*="rss"],
 .title-right a[href*="RSS"],
 .title-right a[href$=".xml"],
@@ -383,7 +412,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 .title-right a svg.octicon-rss,
 .title-right a:has(svg[data-icon*="rss"]) { display: none !important; }
 
-/* Navbar transparent when scrolled (article pages) */
 #header.header-scrolled {
   background: transparent !important;
   backdrop-filter: none !important;
@@ -393,8 +421,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   box-shadow: none !important;
 }
 
-
-/* Hamburger button — hidden on desktop */
 #luliy-nav-ham {
   display: none;
   flex-direction: column;
@@ -416,7 +442,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 #luliy-nav-ham.is-open span:nth-child(2) { opacity: 0; }
 #luliy-nav-ham.is-open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
-/* Mobile dropdown nav panel */
 #luliy-nav-dropdown {
   display: none;
   position: fixed;
@@ -462,7 +487,7 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 .luliy-nav-item:hover { background: rgba(130,80,223,0.10) !important; color: #8250df !important; }
 
 /* ══════════════════════════════════════════════════════════
-   06  Hero cluster (avatar + name + clock in header)
+   06  Hero cluster
 ══════════════════════════════════════════════════════════ */
 #luliy-hero-cluster {
   display: flex !important; align-items: center !important; gap: 10px !important;
@@ -495,7 +520,7 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 [data-color-mode="dark"] #luliy-avatar-clock { color: rgba(180,175,220,0.60); }
 
 /* ══════════════════════════════════════════════════════════
-   07  Hero banner (scroll-fold on homepage)
+   07  Hero banner
 ══════════════════════════════════════════════════════════ */
 #luliy-hero-banner {
   margin: 72px auto 0 auto;
@@ -532,7 +557,7 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   09  Cards — frosted glass
+   09  Cards — frosted glass + theme skins + starfield + shimmer
 ══════════════════════════════════════════════════════════ */
 #luliy-pinned-section,
 .luliy-card-grid {
@@ -550,7 +575,32 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   gap: 18px;
 }
 
-/* Card shell */
+/* ── Year divider (spans full grid width) ─────────────────── */
+li.luliy-year-divider {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 2px 8px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 17px; font-weight: 800;
+  color: #8250df;
+  letter-spacing: 1px;
+  list-style: none;
+}
+li.luliy-year-divider::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(130,80,223,0.35), transparent);
+}
+[data-color-mode="dark"] li.luliy-year-divider { color: #cba6f7; }
+[data-color-mode="dark"] li.luliy-year-divider::after { background: linear-gradient(to right, rgba(203,166,247,0.35), transparent); }
+body[data-luliy-theme="sakura"] li.luliy-year-divider { color: #c94070; }
+body[data-luliy-theme="sakura"] li.luliy-year-divider::after { background: linear-gradient(to right, rgba(201,64,112,0.35), transparent); }
+body[data-luliy-theme="your-name"] li.luliy-year-divider { color: #1a59a4; }
+body[data-luliy-theme="your-name"] li.luliy-year-divider::after { background: linear-gradient(to right, rgba(26,89,164,0.35), transparent); }
+body[data-luliy-theme="space"] li.luliy-year-divider { color: #00e5ff; }
+body[data-luliy-theme="space"] li.luliy-year-divider::after { background: linear-gradient(to right, rgba(0,229,255,0.35), transparent); }
+
+/* ── Card shell ──────────────────────────────────────────── */
 .luliy-card {
   position: relative;
   border-radius: 16px;
@@ -567,16 +617,15 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   cursor: pointer;
   animation: luliy-cardIn 0.38s cubic-bezier(.4,0,.2,1) both;
 }
-/* Accent colours cycling */
 .luliy-card:nth-child(4n+1) { border-top-color: var(--card-c1) !important; }
 .luliy-card:nth-child(4n+2) { border-top-color: var(--card-c2) !important; }
 .luliy-card:nth-child(4n+3) { border-top-color: var(--card-c3) !important; }
 .luliy-card:nth-child(4n+0) { border-top-color: var(--card-c4) !important; }
 
 .luliy-card:hover {
-  transform: translateY(-6px) !important;
+  transform: translateY(-7px) scale(1.01) !important;
   box-shadow:
-    0 18px 48px rgba(0,0,0,0.20),
+    0 20px 52px rgba(0,0,0,0.22),
     0 0 0 1.5px rgba(255,255,255,0.50) inset !important;
 }
 [data-color-mode="dark"] .luliy-card {
@@ -586,19 +635,127 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 [data-color-mode="dark"] .luliy-card:hover {
   background: rgba(26,20,50,0.82) !important;
   border-color: rgba(255,255,255,0.20) !important;
-  box-shadow: 0 18px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08) inset !important;
+  box-shadow: 0 20px 52px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08) inset !important;
 }
 
-/* Inner link */
+/* ── Hover shimmer overlay (all themes) ───────────────────── */
+.luliy-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.22) 0%, transparent 45%, rgba(255,255,255,0.07) 100%);
+  opacity: 0;
+  transition: opacity 0.28s;
+  pointer-events: none;
+  z-index: 2;
+}
+.luliy-card:hover::after { opacity: 1; }
+
+/* ── Sakura theme card background ─────────────────────────── */
+body[data-luliy-theme="sakura"] .luliy-card {
+  background: rgba(255,234,246,0.80) !important;
+  border-color: rgba(249,168,201,0.52) !important;
+  box-shadow: 0 4px 24px rgba(224,92,138,0.13), 0 1px 0 rgba(255,255,255,0.80) inset !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="sakura"] .luliy-card {
+  background: rgba(58,12,34,0.76) !important;
+  border-color: rgba(249,168,201,0.22) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.42), 0 0 0 1px rgba(249,168,201,0.10) inset !important;
+}
+body[data-luliy-theme="sakura"] .luliy-card:hover {
+  background: rgba(255,225,242,0.92) !important;
+  box-shadow: 0 20px 52px rgba(224,92,138,0.24), 0 0 0 1.5px rgba(249,168,201,0.50) inset !important;
+}
+body[data-luliy-theme="sakura"] .luliy-card::after {
+  background: linear-gradient(135deg, rgba(249,168,201,0.30) 0%, transparent 45%, rgba(255,200,220,0.10) 100%);
+}
+body[data-luliy-theme="sakura"] .luliy-card-title { color: #7a1040 !important; }
+[data-color-mode="dark"] body[data-luliy-theme="sakura"] .luliy-card-title { color: #f9a8c9 !important; }
+body[data-luliy-theme="sakura"] .luliy-card:hover .luliy-card-title { color: #c94070 !important; }
+body[data-luliy-theme="sakura"] .luliy-card-date { color: rgba(201,64,112,0.62) !important; }
+
+/* ── Your Name theme card background ─────────────────────── */
+body[data-luliy-theme="your-name"] .luliy-card {
+  background: rgba(226,243,255,0.80) !important;
+  border-color: rgba(100,180,255,0.48) !important;
+  box-shadow: 0 4px 24px rgba(26,89,164,0.13), 0 1px 0 rgba(255,255,255,0.80) inset !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="your-name"] .luliy-card {
+  background: rgba(6,18,58,0.76) !important;
+  border-color: rgba(100,180,255,0.22) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.42) !important;
+}
+body[data-luliy-theme="your-name"] .luliy-card:hover {
+  background: rgba(212,237,255,0.94) !important;
+  box-shadow: 0 20px 52px rgba(26,89,164,0.22), 0 0 0 1.5px rgba(100,180,255,0.40) inset !important;
+}
+body[data-luliy-theme="your-name"] .luliy-card::after {
+  background: linear-gradient(135deg, rgba(100,180,255,0.25) 0%, transparent 45%, rgba(244,167,56,0.08) 100%);
+}
+body[data-luliy-theme="your-name"] .luliy-card-title { color: #0d2b6b !important; }
+[data-color-mode="dark"] body[data-luliy-theme="your-name"] .luliy-card-title { color: #93c5fd !important; }
+body[data-luliy-theme="your-name"] .luliy-card:hover .luliy-card-title { color: #1a59a4 !important; }
+body[data-luliy-theme="your-name"] .luliy-card-date { color: rgba(26,89,164,0.60) !important; }
+
+/* ── Space theme card: deep cosmos with starfield ─────────── */
+body[data-luliy-theme="space"] .luliy-card {
+  background: rgba(4,10,42,0.88) !important;
+  border-color: rgba(0,229,255,0.22) !important;
+  box-shadow: 0 4px 24px rgba(0,50,120,0.38), 0 0 0 1px rgba(0,229,255,0.06) inset !important;
+}
+/* Starfield via radial-gradients */
+body[data-luliy-theme="space"] .luliy-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(circle at  8% 15%, rgba(255,255,255,0.88) 0, rgba(255,255,255,0.88) 1px,   transparent 1.5px),
+    radial-gradient(circle at 26% 42%, rgba(255,255,255,0.62) 0, rgba(255,255,255,0.62) 0.8px,  transparent 1.3px),
+    radial-gradient(circle at 63%  8%, rgba(255,255,255,0.92) 0, rgba(255,255,255,0.92) 1px,   transparent 1.5px),
+    radial-gradient(circle at 88% 24%, rgba(200,220,255,0.72) 0, rgba(200,220,255,0.72) 0.8px,  transparent 1.3px),
+    radial-gradient(circle at 47% 55%, rgba(255,255,255,0.52) 0, rgba(255,255,255,0.52) 0.6px,  transparent 1.0px),
+    radial-gradient(circle at 15% 78%, rgba(255,255,255,0.78) 0, rgba(255,255,255,0.78) 1px,   transparent 1.5px),
+    radial-gradient(circle at 72% 67%, rgba(200,240,255,0.68) 0, rgba(200,240,255,0.68) 0.8px,  transparent 1.3px),
+    radial-gradient(circle at 33% 88%, rgba(255,255,255,0.82) 0, rgba(255,255,255,0.82) 1px,   transparent 1.5px),
+    radial-gradient(circle at 92% 85%, rgba(255,255,255,0.62) 0, rgba(255,255,255,0.62) 0.8px,  transparent 1.3px),
+    radial-gradient(circle at 55% 30%, rgba(0,229,255,0.55)   0, rgba(0,229,255,0.55)   1.2px,  transparent 2.0px),
+    radial-gradient(circle at 78% 45%, rgba(255,255,255,0.72) 0, rgba(255,255,255,0.72) 0.8px,  transparent 1.3px),
+    radial-gradient(circle at 42% 73%, rgba(200,220,255,0.62) 0, rgba(200,220,255,0.62) 0.6px,  transparent 1.0px),
+    radial-gradient(circle at 68% 92%, rgba(255,255,255,0.88) 0, rgba(255,255,255,0.88) 1px,   transparent 1.5px),
+    radial-gradient(circle at  5% 55%, rgba(0,200,255,0.42)   0, rgba(0,200,255,0.42)   1px,   transparent 1.8px),
+    radial-gradient(circle at 38% 18%, rgba(255,255,255,0.68) 0, rgba(255,255,255,0.68) 0.8px,  transparent 1.3px),
+    radial-gradient(circle at 83%  6%, rgba(180,200,255,0.58) 0, rgba(180,200,255,0.58) 0.7px,  transparent 1.2px),
+    radial-gradient(circle at 52% 97%, rgba(255,255,255,0.48) 0, rgba(255,255,255,0.48) 0.6px,  transparent 1.0px),
+    radial-gradient(circle at 18% 62%, rgba(0,229,255,0.38)   0, rgba(0,229,255,0.38)   0.9px,  transparent 1.6px),
+    radial-gradient(circle at 96% 48%, rgba(255,255,255,0.72) 0, rgba(255,255,255,0.72) 1px,   transparent 1.5px),
+    radial-gradient(circle at 61% 79%, rgba(200,220,255,0.52) 0, rgba(200,220,255,0.52) 0.7px,  transparent 1.2px),
+    radial-gradient(circle at 22% 30%, rgba(255,255,255,0.45) 0, rgba(255,255,255,0.45) 0.6px,  transparent 1.0px),
+    radial-gradient(circle at 74% 21%, rgba(0,229,255,0.48)   0, rgba(0,229,255,0.48)   1px,   transparent 1.8px),
+    radial-gradient(circle at 48% 12%, rgba(255,255,255,0.75) 0, rgba(255,255,255,0.75) 0.8px,  transparent 1.3px);
+}
+body[data-luliy-theme="space"] .luliy-card:hover {
+  background: rgba(6,14,52,0.94) !important;
+  box-shadow: 0 20px 52px rgba(0,50,180,0.42), 0 0 32px rgba(0,229,255,0.16), 0 0 0 1px rgba(0,229,255,0.22) inset !important;
+}
+body[data-luliy-theme="space"] .luliy-card::after {
+  background: linear-gradient(135deg, rgba(0,229,255,0.16) 0%, transparent 45%, rgba(130,80,223,0.10) 100%);
+  z-index: 2;
+}
+body[data-luliy-theme="space"] .luliy-card-title { color: #c8e8ff !important; }
+body[data-luliy-theme="space"] .luliy-card:hover .luliy-card-title { color: #00e5ff !important; }
+body[data-luliy-theme="space"] .luliy-card-date { color: rgba(0,229,255,0.58) !important; }
+
+/* ── Card inner — always above pseudo-elements ────────────── */
 .luliy-card-inner {
   display: flex; flex-direction: column; gap: 8px;
   padding: 16px 18px 14px;
   min-height: 110px;
   text-decoration: none !important; color: inherit;
   height: 100%;
+  position: relative; z-index: 1;
 }
 
-/* Title */
 .luliy-card-title {
   font-size: 15px; font-weight: 600;
   color: #111 !important;
@@ -610,7 +767,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 .luliy-card:hover .luliy-card-title { color: #8250df !important; }
 [data-color-mode="dark"] .luliy-card:hover .luliy-card-title { color: #cba6f7 !important; }
 
-/* Tags row */
 .luliy-card-tags {
   display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto;
 }
@@ -626,7 +782,6 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 }
 .luliy-card-pill:hover { opacity: 1; transform: translateY(-1px); }
 
-/* Card entrance animation */
 @keyframes luliy-cardIn {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -639,7 +794,7 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 .luliy-card:nth-child(n+7) { animation-delay: 0.27s; }
 
 /* ══════════════════════════════════════════════════════════
-   10  Date badge
+   10  Date badge + relative time
 ══════════════════════════════════════════════════════════ */
 .luliy-card-date {
   display: block;
@@ -648,11 +803,23 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   letter-spacing: 0.4px;
   color: #777 !important;
   padding: 2px 0;
+  cursor: default;
+  position: relative;
 }
 [data-color-mode="dark"] .luliy-card-date { color: rgba(200,195,240,0.65) !important; }
+/* Tooltip showing the absolute date on hover */
+.luliy-card-date[title]:hover::after {
+  content: attr(title);
+  position: absolute; bottom: 120%; left: 0;
+  background: rgba(20,10,40,0.88); color: #fff;
+  font-size: 10px; white-space: nowrap;
+  padding: 3px 8px; border-radius: 6px;
+  pointer-events: none; z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
 
 /* ══════════════════════════════════════════════════════════
-   11  Pinned section
+   11  Pinned section + multi-level
 ══════════════════════════════════════════════════════════ */
 #luliy-pinned-section { margin-bottom: 28px; }
 .luliy-pinned-grid {
@@ -669,15 +836,23 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   border-color: rgba(240,180,41,0.24) !important;
 }
 
-/* ══════════════════════════════════════════════════════════
-   12  Article reading panels — theme-specific
-   Default → no background box (text directly on bg)
-   Sakura  → pink frosted glass (cherry blossom girl)
-   Your Name → sky-blue frosted glass
-   Space   → deep space glass (always dark)
-══════════════════════════════════════════════════════════ */
+/* Multi-level pinned top border colors */
+.luliy-card[data-pinned-level="1"] { border-top: 3.5px solid #f0b429 !important; }
+.luliy-card[data-pinned-level="2"] { border-top: 3.5px solid #ff9966 !important; }
+.luliy-card[data-pinned-level="3"] { border-top: 3.5px solid #b0b0b8 !important; }
 
-/* Layout */
+/* Pinned badge (emoji) absolute positioned in top-right */
+.luliy-pinned-badge {
+  position: absolute; top: 9px; right: 11px;
+  font-size: 14px; line-height: 1;
+  z-index: 3;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.22));
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════
+   12  Article reading panels
+══════════════════════════════════════════════════════════ */
 #content, .main {
   margin-top: 16px !important;
   margin-right: auto !important;
@@ -691,13 +866,11 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   border: none !important;
   box-sizing: border-box !important;
 }
-/* Post pages need extra top margin to clear fixed header */
 body.luliy-post-page #content,
 body.luliy-post-page .main {
   margin-top: 72px !important;
 }
 
-/* Misc */
 .subTitle { display: none !important; }
 .avatar { cursor: pointer; }
 .archive-page #postBody { max-width: 700px; }
@@ -719,7 +892,7 @@ body.luliy-post-page .main {
 }
 [data-color-mode="dark"] .SideNav-item:hover { background: rgba(130,80,223,0.14) !important; }
 
-/* ── Default: 50% iOS26 liquid glass background ─────────── */
+/* Default */
 body[data-luliy-theme="default"] #postBody,
 body:not([data-luliy-theme]) #postBody {
   background: rgba(255,255,255,0.50) !important;
@@ -748,7 +921,7 @@ body:not([data-luliy-theme]) #postBody {
     0 2px 8px rgba(0,0,0,0.30) !important;
 }
 
-/* ── Sakura: cherry blossom girl — pink frosted glass ────── */
+/* Sakura */
 body[data-luliy-theme="sakura"] #postBody {
   background: rgba(255,238,245,0.84) !important;
   backdrop-filter: blur(26px) saturate(1.6) !important;
@@ -765,7 +938,7 @@ body[data-luliy-theme="sakura"] #postBody {
   border-color: rgba(249,168,201,0.22) !important;
 }
 
-/* ── Your Name: sky blue frosted glass ───────────────────── */
+/* Your Name */
 body[data-luliy-theme="your-name"] #postBody {
   background: rgba(230,244,255,0.84) !important;
   backdrop-filter: blur(26px) saturate(1.6) !important;
@@ -782,7 +955,7 @@ body[data-luliy-theme="your-name"] #postBody {
   border-color: rgba(26,89,164,0.32) !important;
 }
 
-/* ── Space: deep space dark glass ────────────────────────── */
+/* Space */
 body[data-luliy-theme="space"] #postBody {
   background: rgba(2,8,36,0.75) !important;
   backdrop-filter: blur(26px) saturate(2) !important;
@@ -794,14 +967,13 @@ body[data-luliy-theme="space"] #postBody {
   margin-bottom: 48px !important;
   box-shadow: 0 6px 44px rgba(0,80,180,0.30), 0 0 80px rgba(0,200,255,0.08) !important;
 }
-/* Space: day mode is still dark (it's space) */
 [data-color-mode="dark"] body[data-luliy-theme="space"] #postBody {
   background: rgba(1,4,22,0.85) !important;
   border-color: rgba(0,200,255,0.28) !important;
 }
 
 /* ══════════════════════════════════════════════════════════
-   13  Code blocks — day=light / dark=dark
+   13  Code blocks + line numbers
 ══════════════════════════════════════════════════════════ */
 #postBody pre {
   position: relative;
@@ -828,12 +1000,39 @@ body[data-luliy-theme="space"] #postBody pre {
 body[data-luliy-theme="space"] #postBody pre:hover {
   box-shadow: 0 10px 40px rgba(0,0,0,0.65), 0 0 55px rgba(130,80,223,0.22) !important;
 }
-/* Code text colour */
 #postBody pre code { color: #2d2040 !important; background: none !important; padding: 0 !important; font-weight: normal !important; }
 [data-color-mode="dark"] #postBody pre code,
 body[data-luliy-theme="space"] #postBody pre code { color: #cdd6f4 !important; }
 
-/* macOS title strip */
+/* ── Line number gutter ───────────────────────────────────── */
+#postBody pre.has-line-nums {
+  padding-left: 54px !important;
+}
+#postBody .line-nums-gutter {
+  position: absolute;
+  top: 44px; left: 0; bottom: 0;
+  width: 46px;
+  padding: 0 8px 0 0;
+  text-align: right;
+  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.65;
+  color: rgba(130,80,223,0.40);
+  border-right: 1px solid rgba(130,80,223,0.14);
+  user-select: none;
+  white-space: pre;
+  overflow: hidden;
+  background: inherit;
+  border-radius: 0 0 0 14px;
+  pointer-events: none;
+}
+[data-color-mode="dark"] #postBody .line-nums-gutter,
+body[data-luliy-theme="space"] #postBody .line-nums-gutter {
+  color: rgba(160,140,255,0.38);
+  border-right-color: rgba(130,80,223,0.22);
+}
+
+/* macOS strip */
 .mac-strip {
   position: absolute; top: 0; left: 0; right: 0; height: 36px;
   display: flex; align-items: center; padding: 0 14px; gap: 7px;
@@ -868,11 +1067,8 @@ body[data-luliy-theme="space"] .mac-strip {
 [data-color-mode="dark"] .mac-lang,
 body[data-luliy-theme="space"] .mac-lang { color: rgba(160,140,255,0.70); }
 
-/* Folded state */
 pre.is-folded { max-height: 40px !important; overflow: hidden !important; }
 pre.is-folded > code { visibility: hidden; }
-
-/* Fullscreen */
 pre.code-fullscreen {
   position: fixed !important; inset: 0 !important; z-index: 99990 !important;
   border-radius: 0 !important; margin: 0 !important; overflow: auto !important;
@@ -880,8 +1076,22 @@ pre.code-fullscreen {
 }
 
 /* ══════════════════════════════════════════════════════════
-   14  Tables — day / dark
+   14  Tables + fixed headers via .table-wrap
 ══════════════════════════════════════════════════════════ */
+/* Scrollable wrapper with sticky header */
+.table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 60vh;
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5em 0;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.08), 0 0 0 1px rgba(130,80,223,0.14);
+}
+.table-wrap table { margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+.table-wrap thead { position: sticky; top: 0; z-index: 3; }
+.table-wrap thead tr { position: sticky; top: 0; z-index: 3; }
+
 #postBody table {
   width: 100%; border-collapse: separate; border-spacing: 0;
   border-radius: 12px; overflow: hidden; margin: 1.5em 0;
@@ -920,44 +1130,30 @@ body[data-luliy-theme="space"] #postBody td { color: #cdd6f4 !important; border-
 [data-color-mode="dark"] #postBody tbody tr:hover { background: rgba(130,80,223,0.15) !important; }
 
 /* ══════════════════════════════════════════════════════════
-   15  Article theme CSS variables — 4 themes
-
-   Theme 1: Default  — classic purple (no bg box)
-   Theme 2: Sakura   — cherry blossom girl (少女樱花)
-   Theme 3: Your Name — sky blue + golden (你的名字·天空蓝)
-   Theme 4: Space    — space travel deep night blue (太空旅行·深夜蓝)
+   15  Article theme CSS variables
 ══════════════════════════════════════════════════════════ */
-
-/* 1  Default */
 body[data-luliy-theme="default"],
 body:not([data-luliy-theme]) {
   --th-h1: #1a0a3a; --th-h1-border: 2px solid rgba(130,80,223,0.28);
   --th-h2: #8250df; --th-h2-bl: 5px solid #8250df; --th-h2-bg: rgba(130,80,223,0.06);
   --th-h3: #6030b0; --th-h4: #7040c8; --th-strong: #8250df;
 }
-
-/* 2  Sakura — cherry blossom girl */
 body[data-luliy-theme="sakura"] {
   --th-h1: #7a1040; --th-h1-border: 2px solid rgba(224,92,138,0.35);
   --th-h2: #c94070; --th-h2-bl: 5px solid #f9a8c9; --th-h2-bg: rgba(249,168,201,0.12);
   --th-h3: #d45c7e; --th-h4: #e07098; --th-strong: #e05c8a;
 }
-
-/* 3  Your Name — sky blue + golden */
 body[data-luliy-theme="your-name"] {
   --th-h1: #0d2b6b; --th-h1-border: 2px solid rgba(26,89,164,0.38);
   --th-h2: #1a59a4; --th-h2-bl: 5px solid #f4a738; --th-h2-bg: rgba(26,89,164,0.08);
   --th-h3: #2062a8; --th-h4: #2878c8; --th-strong: #f4a738;
 }
-
-/* 4  Space — deep night blue */
 body[data-luliy-theme="space"] {
   --th-h1: #00c8ff; --th-h1-border: 2px solid rgba(0,200,255,0.35);
   --th-h2: #4a9de0; --th-h2-bl: 5px solid #00e5ff; --th-h2-bg: rgba(0,100,200,0.10);
   --th-h3: #70b8f0; --th-h4: #90ccff; --th-strong: #00e5ff;
 }
 
-/* Dark mode overrides */
 [data-color-mode="dark"] body[data-luliy-theme="default"],
 [data-color-mode="dark"] body:not([data-luliy-theme]) {
   --th-h1: #cba6f7; --th-h2: #b4befe; --th-h3: #cdd6f4; --th-h4: #bac2de; --th-strong: #cba6f7;
@@ -968,21 +1164,17 @@ body[data-luliy-theme="space"] {
 [data-color-mode="dark"] body[data-luliy-theme="your-name"] {
   --th-h1: #60a5fa; --th-h2: #93c5fd; --th-h3: #a8d5ff; --th-h4: #c0e4ff; --th-strong: #f4a738;
 }
-/* space is always light on dark bg — same variables */
 [data-color-mode="dark"] body[data-luliy-theme="space"] {
   --th-h1: #40d8ff; --th-h2: #60e0ff; --th-h3: #80eaff; --th-strong: #00e5ff;
 }
 
 /* ══════════════════════════════════════════════════════════
-   16  TOC scroll-spy + active highlight — FIXED outside article
-   TOC is moved to document.body via JS, positioned below toolbar
+   16  TOC scroll-spy + active highlight
 ══════════════════════════════════════════════════════════ */
-
-/* ── Base: force fixed, right side, below toolbar ─────────── */
 #TOC, .articletoc, .toc, .ArticleTOC, #articleTOC,
 [id*="articleTOC"], [class*="ArticleTOC"] {
   position: fixed !important;
-  top: 130px !important;   /* below ctrl pill btn: 76px + ~44px + gap */
+  top: 130px !important;
   right: 20px !important;
   left: auto !important;
   bottom: 20px !important;
@@ -991,7 +1183,6 @@ body[data-luliy-theme="space"] {
   overflow-y: auto !important;
   overflow-x: hidden !important;
   z-index: 8900 !important;
-  /* Glass card matching toolbar aesthetic */
   background: rgba(255,255,255,0.96) !important;
   backdrop-filter: blur(28px) saturate(1.8) !important;
   -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
@@ -1000,7 +1191,6 @@ body[data-luliy-theme="space"] {
   box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 1px 0 rgba(255,255,255,0.70) inset !important;
   padding: 0 !important;
   margin: 0 !important;
-  /* Smooth scrollbar */
   scrollbar-width: thin;
   scrollbar-color: rgba(130,80,223,0.30) transparent;
 }
@@ -1014,10 +1204,7 @@ body[data-luliy-theme="space"] {
   box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.05) inset !important;
 }
 
-/* ── TOC inner details/summary toggle (articletoc.js style) ─ */
-#TOC details, .articletoc details, #articleTOC details {
-  width: 100% !important;
-}
+#TOC details, .articletoc details, #articleTOC details { width: 100% !important; }
 #TOC details > summary,
 .articletoc details > summary,
 #articleTOC details > summary {
@@ -1040,7 +1227,6 @@ body[data-luliy-theme="space"] {
 }
 #TOC details > summary::-webkit-details-marker { display: none !important; }
 
-/* ── TOC links base ──────────────────────────────────────── */
 #TOC a, .articletoc a, .toc a, #articleTOC a {
   display: block !important;
   padding: 4px 12px !important;
@@ -1054,10 +1240,10 @@ body[data-luliy-theme="space"] {
 }
 [data-color-mode="dark"] #TOC a,
 [data-color-mode="dark"] .articletoc a,
-[data-color-mode="dark"] #articleTOC a { color: #333 !important; }
+[data-color-mode="dark"] #articleTOC a { color: #cdd6f4 !important; }
 #TOC a:hover, .articletoc a:hover, .toc a:hover, #articleTOC a:hover {
   background: rgba(130,80,223,0.08) !important;
-  color: #333 !important;
+  color: #8250df !important;
 }
 [data-color-mode="dark"] #TOC a:hover,
 [data-color-mode="dark"] .articletoc a:hover,
@@ -1066,7 +1252,6 @@ body[data-luliy-theme="space"] {
   background: rgba(130,80,223,0.18) !important;
 }
 
-/* ── Active TOC item — highlighted ──────────────────────── */
 #TOC a.active, #TOC a.luliy-toc-active,
 .articletoc a.active, .articletoc a.luliy-toc-active,
 .toc a.active, .toc a.luliy-toc-active,
@@ -1088,7 +1273,6 @@ body[data-luliy-theme="space"] {
   text-shadow: 0 0 8px rgba(203,166,247,0.60) !important;
 }
 
-/* ── Injected header row (目录 + 回顶 button) ─────────────── */
 .luliy-toc-injected-hdr {
   display: flex !important; align-items: center !important;
   justify-content: space-between !important;
@@ -1119,21 +1303,17 @@ body[data-luliy-theme="space"] {
   color: #cba6f7; border-color: rgba(130,80,223,0.40);
 }
 
-/* ── Narrow screens: TOC as right-side overlay ───────────── */
 @media (max-width: 1399px) {
   #TOC, .articletoc, .toc, #articleTOC {
     width: 210px !important;
     font-size: 12px !important;
   }
 }
-/* ── Very narrow: hide fixed TOC (< 900px), toggled via dropdown ─ */
 @media (max-width: 899px) {
-  /* Hidden by default — dropdown toggle adds .toc-visible */
   #TOC:not(.toc-visible), .articletoc:not(.toc-visible),
   .toc:not(.toc-visible), #articleTOC:not(.toc-visible) {
     display: none !important;
   }
-  /* When revealed via dropdown */
   #TOC.toc-visible, .articletoc.toc-visible,
   .toc.toc-visible, #articleTOC.toc-visible {
     display: block !important;
@@ -1147,8 +1327,7 @@ body[data-luliy-theme="space"] {
   }
 }
 
-/* ── TOC adapts to article theme ─────────────────────────── */
-/* Sakura */
+/* Sakura TOC */
 body[data-luliy-theme="sakura"] #TOC,
 body[data-luliy-theme="sakura"] .articletoc,
 body[data-luliy-theme="sakura"] #articleTOC {
@@ -1156,28 +1335,19 @@ body[data-luliy-theme="sakura"] #articleTOC {
   border-color: rgba(201,64,112,0.28) !important;
   box-shadow: 0 8px 32px rgba(201,64,112,0.18), 0 1px 0 rgba(255,255,255,0.80) inset !important;
 }
-body[data-luliy-theme="sakura"] .luliy-toc-injected-label {
-  color: #c94070 !important;
-}
-body[data-luliy-theme="sakura"] .luliy-toc-injected-totop {
-  color: #c94070 !important; border-color: rgba(201,64,112,0.35) !important;
-}
+body[data-luliy-theme="sakura"] .luliy-toc-injected-label { color: #c94070 !important; }
+body[data-luliy-theme="sakura"] .luliy-toc-injected-totop { color: #c94070 !important; border-color: rgba(201,64,112,0.35) !important; }
 body[data-luliy-theme="sakura"] #TOC a:hover,
-body[data-luliy-theme="sakura"] .articletoc a:hover {
-  background: rgba(201,64,112,0.10) !important; color: #c94070 !important;
-}
+body[data-luliy-theme="sakura"] .articletoc a:hover { background: rgba(201,64,112,0.10) !important; color: #c94070 !important; }
 body[data-luliy-theme="sakura"] #TOC a.active,
 body[data-luliy-theme="sakura"] #TOC a.luliy-toc-active,
 body[data-luliy-theme="sakura"] .articletoc a.active,
 body[data-luliy-theme="sakura"] .articletoc a.luliy-toc-active {
-  background: rgba(201,64,112,0.13) !important;
-  color: #c94070 !important; border-left-color: #c94070 !important;
+  background: rgba(201,64,112,0.13) !important; color: #c94070 !important; border-left-color: #c94070 !important;
 }
-body[data-luliy-theme="sakura"] .luliy-toc-injected-hdr {
-  border-bottom-color: rgba(201,64,112,0.18) !important;
-}
+body[data-luliy-theme="sakura"] .luliy-toc-injected-hdr { border-bottom-color: rgba(201,64,112,0.18) !important; }
 
-/* Your Name */
+/* Your Name TOC */
 body[data-luliy-theme="your-name"] #TOC,
 body[data-luliy-theme="your-name"] .articletoc,
 body[data-luliy-theme="your-name"] #articleTOC {
@@ -1185,28 +1355,19 @@ body[data-luliy-theme="your-name"] #articleTOC {
   border-color: rgba(26,89,164,0.28) !important;
   box-shadow: 0 8px 32px rgba(26,89,164,0.16), 0 1px 0 rgba(255,255,255,0.80) inset !important;
 }
-body[data-luliy-theme="your-name"] .luliy-toc-injected-label {
-  color: #1a59a4 !important;
-}
-body[data-luliy-theme="your-name"] .luliy-toc-injected-totop {
-  color: #1a59a4 !important; border-color: rgba(26,89,164,0.35) !important;
-}
+body[data-luliy-theme="your-name"] .luliy-toc-injected-label { color: #1a59a4 !important; }
+body[data-luliy-theme="your-name"] .luliy-toc-injected-totop { color: #1a59a4 !important; border-color: rgba(26,89,164,0.35) !important; }
 body[data-luliy-theme="your-name"] #TOC a:hover,
-body[data-luliy-theme="your-name"] .articletoc a:hover {
-  background: rgba(74,157,224,0.12) !important; color: #1a59a4 !important;
-}
+body[data-luliy-theme="your-name"] .articletoc a:hover { background: rgba(74,157,224,0.12) !important; color: #1a59a4 !important; }
 body[data-luliy-theme="your-name"] #TOC a.active,
 body[data-luliy-theme="your-name"] #TOC a.luliy-toc-active,
 body[data-luliy-theme="your-name"] .articletoc a.active,
 body[data-luliy-theme="your-name"] .articletoc a.luliy-toc-active {
-  background: rgba(26,89,164,0.13) !important;
-  color: #1a59a4 !important; border-left-color: #1a59a4 !important;
+  background: rgba(26,89,164,0.13) !important; color: #1a59a4 !important; border-left-color: #1a59a4 !important;
 }
-body[data-luliy-theme="your-name"] .luliy-toc-injected-hdr {
-  border-bottom-color: rgba(26,89,164,0.18) !important;
-}
+body[data-luliy-theme="your-name"] .luliy-toc-injected-hdr { border-bottom-color: rgba(26,89,164,0.18) !important; }
 
-/* Space */
+/* Space TOC */
 body[data-luliy-theme="space"] #TOC,
 body[data-luliy-theme="space"] .articletoc,
 body[data-luliy-theme="space"] #articleTOC {
@@ -1214,42 +1375,57 @@ body[data-luliy-theme="space"] #articleTOC {
   border-color: rgba(0,229,255,0.32) !important;
   box-shadow: 0 8px 32px rgba(0,229,255,0.12), 0 0 0 1px rgba(0,229,255,0.08) inset !important;
 }
-body[data-luliy-theme="space"] .luliy-toc-injected-label {
-  color: #00e5ff !important;
-}
-body[data-luliy-theme="space"] .luliy-toc-injected-totop {
-  color: #00c8ff !important; border-color: rgba(0,229,255,0.38) !important;
-}
+body[data-luliy-theme="space"] .luliy-toc-injected-label { color: #00e5ff !important; }
+body[data-luliy-theme="space"] .luliy-toc-injected-totop { color: #00c8ff !important; border-color: rgba(0,229,255,0.38) !important; }
 body[data-luliy-theme="space"] #TOC a,
-body[data-luliy-theme="space"] .articletoc a {
-  color: #b8d8f0 !important;
-}
+body[data-luliy-theme="space"] .articletoc a { color: #b8d8f0 !important; }
 body[data-luliy-theme="space"] #TOC a:hover,
-body[data-luliy-theme="space"] .articletoc a:hover {
-  background: rgba(0,229,255,0.10) !important; color: #00e5ff !important;
-}
+body[data-luliy-theme="space"] .articletoc a:hover { background: rgba(0,229,255,0.10) !important; color: #00e5ff !important; }
 body[data-luliy-theme="space"] #TOC a.active,
 body[data-luliy-theme="space"] #TOC a.luliy-toc-active,
 body[data-luliy-theme="space"] .articletoc a.active,
 body[data-luliy-theme="space"] .articletoc a.luliy-toc-active {
-  background: rgba(0,229,255,0.15) !important;
-  color: #00e5ff !important; border-left-color: #00e5ff !important;
-  font-weight: 700 !important;
+  background: rgba(0,229,255,0.15) !important; color: #00e5ff !important; border-left-color: #00e5ff !important; font-weight: 700 !important;
 }
-body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
-  border-bottom-color: rgba(0,229,255,0.18) !important;
-}
+body[data-luliy-theme="space"] .luliy-toc-injected-hdr { border-bottom-color: rgba(0,229,255,0.18) !important; }
 
 /* ══════════════════════════════════════════════════════════
-   17  Floating toolbar + ctrl dropdown panel
+   17  Floating toolbar + ctrl panel + font controls + blog header
 ══════════════════════════════════════════════════════════ */
 #luliy-toolbar {
   position: fixed; top: 76px; right: 20px;
   display: flex; flex-direction: column; align-items: flex-end;
   z-index: 9990;
+  gap: 6px;
 }
 
-/* ── Pill trigger button ──────────────────────────────── */
+/* ── Home button ─────────────────────────────────────────── */
+#luliy-home-btn {
+  display: flex;
+  align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,0.40);
+  color: rgba(20,10,40,0.88); font-size: 15px;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.14), 0 1px 0 rgba(255,255,255,0.55) inset;
+  transition: transform 0.22s, background 0.22s, box-shadow 0.22s;
+}
+[data-color-mode="dark"] #luliy-home-btn {
+  background: rgba(18,14,36,0.72);
+  border-color: rgba(130,80,223,0.36);
+  color: rgba(220,215,255,0.92);
+  box-shadow: 0 3px 14px rgba(0,0,0,0.50);
+}
+#luliy-home-btn:hover {
+  transform: scale(1.12);
+  background: rgba(255,255,255,0.36);
+  box-shadow: 0 6px 20px rgba(130,80,223,0.26), 0 1px 0 rgba(255,255,255,0.70) inset;
+}
+
+/* ── Pill trigger button ──────────────────────────────────── */
 #luliy-ctrl-btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 7px 16px; border-radius: 20px;
@@ -1279,18 +1455,16 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
   border-color: rgba(130,80,223,0.45);
   box-shadow: 0 8px 24px rgba(130,80,223,0.28);
 }
-[data-color-mode="dark"] #luliy-ctrl-btn.is-open {
-  background: rgba(130,80,223,0.26);
-}
+[data-color-mode="dark"] #luliy-ctrl-btn.is-open { background: rgba(130,80,223,0.26); }
 
-/* ── Ctrl dropdown panel ──────────────────────────────── */
+/* ── Ctrl dropdown panel ──────────────────────────────────── */
 #luliy-ctrl-panel {
   display: none; flex-direction: column;
   position: absolute; top: calc(100% + 8px); right: 0;
-  min-width: 226px;
+  min-width: 238px;
   background: rgba(255,255,255,0.97);
   border: 1px solid rgba(130,80,223,0.18);
-  border-radius: 18px; padding: 10px 8px;
+  border-radius: 18px; padding: 0 8px 10px;
   box-shadow: 0 18px 52px rgba(0,0,0,0.22), 0 1px 0 rgba(255,255,255,0.80) inset;
   backdrop-filter: blur(22px) saturate(1.8);
   -webkit-backdrop-filter: blur(22px) saturate(1.8);
@@ -1304,6 +1478,35 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
   box-shadow: 0 18px 52px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05) inset;
 }
 #luliy-ctrl-panel.is-open { display: flex; }
+
+/* Blog identity header inside panel */
+.luliy-ctrl-blog-hdr {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid rgba(130,80,223,0.12);
+  margin-bottom: 6px;
+  text-decoration: none;
+  transition: background 0.16s;
+  border-radius: 12px 12px 0 0;
+}
+.luliy-ctrl-blog-hdr:hover { background: rgba(130,80,223,0.06); }
+[data-color-mode="dark"] .luliy-ctrl-blog-hdr:hover { background: rgba(130,80,223,0.14); }
+.luliy-ctrl-blog-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1.5px solid rgba(130,80,223,0.35);
+  object-fit: cover; flex-shrink: 0;
+}
+.luliy-ctrl-blog-name {
+  font-size: 13px; font-weight: 800; color: #1e1032;
+  font-family: 'Noto Sans SC', sans-serif; letter-spacing: 0.3px;
+}
+[data-color-mode="dark"] .luliy-ctrl-blog-name { color: #e8e4ff; }
+.luliy-ctrl-blog-sub {
+  font-size: 10px; color: rgba(130,80,223,0.75);
+  font-family: 'LXGW WenKai Mono', monospace;
+  letter-spacing: 0.3px;
+}
+[data-color-mode="dark"] .luliy-ctrl-blog-sub { color: rgba(203,166,247,0.70); }
 
 /* Separator */
 .luliy-ctrl-sep {
@@ -1322,7 +1525,7 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
 }
 [data-color-mode="dark"] .luliy-ctrl-sec { color: #cba6f7; }
 
-/* Row buttons — shared style for SFX / Sakura / BG rows */
+/* Row buttons */
 .luliy-ctrl-row {
   display: flex; align-items: center; justify-content: space-between;
   gap: 8px; padding: 8px 10px; border-radius: 10px;
@@ -1354,7 +1557,7 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
 }
 [data-color-mode="dark"] .luliy-ctrl-badge { color: #cba6f7; background: rgba(130,80,223,0.20); }
 
-/* Theme rows (sink opts) inside ctrl panel */
+/* Theme sink rows */
 .luliy-sink-opt {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 10px; border-radius: 10px; border: none;
@@ -1371,10 +1574,9 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
 [data-color-mode="dark"] .luliy-sink-name { color: #cdd6f4; }
 .luliy-sink-opt.is-active .luliy-sink-name { color: #8250df; }
 [data-color-mode="dark"] .luliy-sink-opt.is-active .luliy-sink-name { color: #cba6f7; }
-/* checkmark badge on active theme row */
 .luliy-sink-opt .luliy-ctrl-badge { margin-left: auto; }
 
-/* ── Theme day/night preview cards ───────────────────────── */
+/* Day/night preview cards */
 .luliy-ctrl-theme-preview {
   display: flex; gap: 6px;
   padding: 4px 10px 8px;
@@ -1386,10 +1588,7 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
   line-height: 1.5; transition: transform 0.2s, box-shadow 0.2s;
   cursor: default;
 }
-.luliy-ctrl-preview-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.14);
-}
+.luliy-ctrl-preview-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.14); }
 .luliy-ctrl-preview-card .preview-dot {
   width: 8px; height: 8px; border-radius: 50%;
   margin: 0 auto 3px; display: block;
@@ -1398,20 +1597,53 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
   font-size: 9px; color: inherit; opacity: 0.75; display: block;
   letter-spacing: 0.5px; text-transform: uppercase;
 }
-/* day card */
 .luliy-ctrl-preview-card.day {
   background: rgba(255,255,255,0.92);
   border-color: rgba(130,80,223,0.16);
   color: #1e1032;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.90) inset;
 }
-/* night card */
 .luliy-ctrl-preview-card.night {
   background: rgba(14,10,28,0.88);
   border-color: rgba(130,80,223,0.26);
   color: #cdd6f4;
   box-shadow: 0 2px 8px rgba(0,0,0,0.30);
 }
+
+/* ── Font controls ───────────────────────────────────────── */
+.luliy-ctrl-font-row {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 10px 8px;
+}
+.luliy-font-adj-btn {
+  flex: 1; padding: 5px 6px; border-radius: 8px;
+  border: 1px solid rgba(130,80,223,0.24);
+  background: transparent; cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 800; font-size: 12px;
+  color: #8250df;
+  transition: background 0.16s, transform 0.1s;
+}
+.luliy-font-adj-btn:hover { background: rgba(130,80,223,0.10); transform: scale(1.05); }
+.luliy-font-adj-btn:active { background: rgba(130,80,223,0.18); transform: scale(0.96); }
+[data-color-mode="dark"] .luliy-font-adj-btn { color: #cba6f7; border-color: rgba(130,80,223,0.36); }
+.luliy-font-size-disp {
+  min-width: 36px; text-align: center;
+  font-size: 11px; font-weight: 700; color: #8250df;
+  font-family: 'LXGW WenKai Mono', monospace;
+}
+[data-color-mode="dark"] .luliy-font-size-disp { color: #cba6f7; }
+.luliy-font-fam-btn {
+  flex: 1.4; padding: 5px 6px; border-radius: 8px;
+  border: 1px solid rgba(130,80,223,0.24);
+  background: transparent; cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 11px; font-weight: 700;
+  color: #8250df; white-space: nowrap;
+  transition: background 0.16s;
+}
+.luliy-font-fam-btn:hover { background: rgba(130,80,223,0.10); }
+[data-color-mode="dark"] .luliy-font-fam-btn { color: #cba6f7; border-color: rgba(130,80,223,0.36); }
 
 /* ══════════════════════════════════════════════════════════
    18  Prev / Next navigation
@@ -1527,7 +1759,7 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
 }
 
 /* ══════════════════════════════════════════════════════════
-   24  Homepage bottom gallery banner
+   24  Homepage bottom gallery banner + grid mode
 ══════════════════════════════════════════════════════════ */
 #luliy-home-gallery {
   max-width: 1040px; width: 95%;
@@ -1537,19 +1769,21 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
   position: relative;
   box-shadow: 0 8px 40px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.15);
   flex-shrink: 0;
+  transition: height 0.4s ease;
 }
-#luliy-home-gallery img {
+#luliy-home-gallery img.gallery-banner-img {
   width: 100%; height: 100%; object-fit: cover;
   display: block;
   transition: transform 0.7s cubic-bezier(.4,0,.2,1);
 }
-#luliy-home-gallery:hover img { transform: scale(1.04); }
+#luliy-home-gallery:hover img.gallery-banner-img { transform: scale(1.04); }
 #luliy-home-gallery-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(to top, rgba(0,0,20,0.60) 0%, rgba(0,0,20,0.10) 60%, transparent 100%);
   display: flex; align-items: flex-end;
   padding: 22px 28px;
   pointer-events: none;
+  transition: opacity 0.3s;
 }
 #luliy-home-gallery-text {
   color: #fff;
@@ -1559,14 +1793,71 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
   letter-spacing: 2px;
 }
 
+/* Gallery action buttons */
+.luliy-gallery-action-btn {
+  position: absolute;
+  bottom: 12px;
+  background: rgba(0,0,0,0.48);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: #fff; font-size: 11px; font-weight: 700;
+  padding: 5px 13px; border-radius: 20px;
+  cursor: pointer; letter-spacing: 0.5px;
+  transition: background 0.2s, transform 0.15s;
+  z-index: 2;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.luliy-gallery-action-btn:hover { background: rgba(0,0,0,0.70); transform: translateY(-1px); }
+#luliy-gallery-toggle-btn { right: 14px; }
+#luliy-gallery-edit-btn   { right: 82px; }
+
+/* Grid mode */
+#luliy-home-gallery.is-grid {
+  height: auto;
+  padding: 14px;
+  overflow: visible;
+}
+#luliy-home-gallery.is-grid img.gallery-banner-img { display: none; }
+#luliy-home-gallery.is-grid #luliy-home-gallery-overlay { opacity: 0; pointer-events: none; }
+.luliy-gallery-grid {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+#luliy-home-gallery.is-grid .luliy-gallery-grid { display: grid; }
+.luliy-gallery-grid-item {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 10px;
+  cursor: zoom-in;
+  position: relative;
+}
+.luliy-gallery-grid-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  margin: 0 !important;
+  border-radius: 10px;
+  transition: transform 0.42s ease;
+}
+.luliy-gallery-grid-item:hover img { transform: scale(1.08); }
+.luliy-gallery-grid-item::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0);
+  transition: background 0.25s;
+  border-radius: 10px;
+}
+.luliy-gallery-grid-item:hover::after { background: rgba(0,0,0,0.12); }
+
 /* ══════════════════════════════════════════════════════════
    26  Responsive (mobile)
 ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Show hamburger (for sfx/theme/sakura/TOC dropdown) */
   #luliy-nav-ham { display: flex !important; }
 
-  /* Keep .title-right visible in navbar — centered, compact */
   .title-right {
     display: flex !important;
     flex: 1 !important;
@@ -1579,15 +1870,10 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
     font-size: 12px !important;
     padding: 4px 7px !important;
   }
-  /* Toolbar hidden on mobile — sfx/theme/sakura/TOC live in dropdown */
   #luliy-toolbar { display: none !important; }
 
-  /* Mobile dropdown: items centered */
-  #luliy-nav-dropdown {
-    align-items: stretch !important;
-  }
+  #luliy-nav-dropdown { align-items: stretch !important; }
   .luliy-nav-item { text-align: center !important; }
-  /* Toggle items: show as pill badge style */
   .luliy-drop-toggle {
     font-size: 13px !important;
     padding: 10px 16px !important;
@@ -1635,7 +1921,8 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
   #luliy-home-gallery { height: 140px; border-radius: 14px; }
   #luliy-home-gallery-text { font-size: 14px; }
 
-  /* ── Article reading: full-width on mobile ─────────────────── */
+  .luliy-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
   body.luliy-post-page #content,
   body.luliy-post-page .main {
     width: 100% !important;
@@ -1648,7 +1935,6 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
     padding: 20px 15px !important;
     margin-bottom: 0 !important;
   }
-  /* All themes: remove rounded corners on mobile */
   body[data-luliy-theme="default"] #postBody,
   body:not([data-luliy-theme]) #postBody,
   body[data-luliy-theme="sakura"] #postBody,
@@ -1658,7 +1944,6 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
     padding: 20px 15px !important;
   }
 
-  /* ── Tables: horizontal scroll on mobile ──────────────────── */
   #postBody table {
     display: block !important;
     overflow-x: auto !important;
@@ -1667,11 +1952,8 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
     max-width: 100% !important;
   }
   #postBody table td,
-  #postBody table th {
-    white-space: nowrap !important;
-  }
+  #postBody table th { white-space: nowrap !important; }
 
-  /* ── Background button ─────────────────────────────────────── */
   #luliy-bg-btn {
     display: inline-flex !important; align-items: center !important; gap: 5px !important;
     padding: 10px 16px !important; border-radius: 10px !important;
@@ -1684,5 +1966,4 @@ body[data-luliy-theme="space"] .luliy-toc-injected-hdr {
   #luliy-bg-btn:hover { background: rgba(130,80,223,0.09) !important; }
   [data-color-mode="dark"] #luliy-bg-btn { color: #e0daf8 !important; }
   [data-color-mode="dark"] #luliy-bg-btn:hover { background: rgba(130,80,223,0.18) !important; }
-
 }
