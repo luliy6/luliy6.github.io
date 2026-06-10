@@ -1729,6 +1729,7 @@
   function initFavoritesLock() {
     if (!LULIY_OPTS.favoritesPathMatch.test(location.pathname)) return;
     if (sessionStorage.getItem('luliy-fav-unlocked') === '1') return;
+    if (document.getElementById('luliy-fav-gate')) return;
 
     var pbody = document.getElementById('postBody');
     if (!pbody) return;
@@ -2139,6 +2140,7 @@
     initNavTransparency();
     initMobileNav();
     initMusicPlayer();
+    initFavoritesLock();   /* safety net — also called in post init */
 
     var isPost    = !!document.getElementById('postBody');
     var hasList   = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
