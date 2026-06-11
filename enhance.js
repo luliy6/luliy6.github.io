@@ -196,21 +196,30 @@
     document.body.style.overflow = 'hidden';
 
     function enter() {
+      if (splash._luliyLeaving) return;
+      splash._luliyLeaving = true;
       sessionStorage.setItem('luliy-welcomed', '1');
+      /* Immediately stop intercepting clicks — don't wait for the animation */
+      splash.style.pointerEvents = 'none';
       splash.classList.add('is-leaving');
       document.body.style.overflow = '';
-      setTimeout(function () { if (splash.parentNode) splash.remove(); }, 950);
+      document.removeEventListener('keydown', kHandler);
+      setTimeout(function () { if (splash.parentNode) splash.remove(); }, 700);
     }
 
+    /* Whole overlay is clickable to dismiss (not just the button) */
+    splash.addEventListener('click', function () { enter(); });
     btn.addEventListener('click', function (e) { e.stopPropagation(); enter(); });
 
     var kHandler = function (e) {
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
-        document.removeEventListener('keydown', kHandler);
         enter();
       }
     };
     document.addEventListener('keydown', kHandler);
+
+    /* Safety net: auto-dismiss after 8s so it can never permanently block the page */
+    setTimeout(function () { if (!splash._luliyLeaving) enter(); }, 8000);
   }
 
   /* ---- 01  localStorage init ------------------------------ */
@@ -3092,6 +3101,46 @@
 
     if (isPost) root._luliyInitPost();
     if (isIndexPage() || isArchivePage() || (!isPost && hasList)) root._luliyInitIndex();
+
+    /* ── Click-blocker watchdog ───────────────────────────────
+       Safety net: neutralise any leftover full-viewport fixed
+       overlay (high z-index, transparent / off-screen) that would
+       silently intercept clicks on the navbar / TOC / buttons.    */
+    initClickBlockerWatchdog();
   });
+
+  function initClickBlockerWatchdog() {
+    function sweep() {
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var els = document.querySelectorAll('body > div, body > section, body > a');
+      els.forEach(function (el) {
+        /* Never touch our own interactive overlays or known UI */
+        var id = el.id || '';
+        if (/luliy-(toolbar|ctrl|search-bar|lightbox|fav-gate|nav-dropdown|back-top|search-fab|resume|linktip|music)/.test(id)) return;
+        var cs = window.getComputedStyle(el);
+        if (cs.position !== 'fixed') return;
+        if (cs.pointerEvents === 'none') return;
+        var r = el.getBoundingClientRect();
+        /* Covers most of the viewport? */
+        var coversX = r.left <= 4 && r.right >= vw - 4;
+        var coversY = r.top <= 4 && r.bottom >= vh - 4;
+        if (!coversX || !coversY) return;
+        /* If it's effectively invisible (transparent / faded), it must
+           not be eating clicks — force click-through. */
+        var op = parseFloat(cs.opacity);
+        var leaving = el.classList.contains('is-leaving');
+        if (op < 0.05 || leaving || cs.visibility === 'hidden' || cs.display === 'none') {
+          el.style.pointerEvents = 'none';
+        }
+      });
+    }
+    /* Run a few times after load to catch late-appearing overlays */
+    sweep();
+    setTimeout(sweep, 500);
+    setTimeout(sweep, 1500);
+    setTimeout(sweep, 3500);
+    /* Also sweep whenever the user tries (and fails) to interact */
+    document.addEventListener('pointerdown', function () { setTimeout(sweep, 0); }, { passive: true });
+  }
 
 })(window);
