@@ -662,6 +662,9 @@
 
   /* ---- Nav transparency on scroll (article pages) --------- */
   function initNavTransparency() {
+    /* Only apply scroll-fade on article pages — not on homepage/index
+       where transparent nav makes links invisible over content.       */
+    if (!document.getElementById('postBody')) return;
     var header = document.getElementById('header');
     if (!header) return;
     window.addEventListener('scroll', function () {
@@ -2076,16 +2079,23 @@
       /* Progressive reveal: blur dissolves + content slides up section by section */
       pbody.classList.remove('luliy-locked');
       pbody.classList.add('luliy-unlocking');
-      /* Stagger immediate children for a cascading reveal */
       var kids = Array.prototype.slice.call(pbody.children);
-      kids.forEach(function (el, i) {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(24px)';
-        el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1)';
-        el.style.transitionDelay = (i * 0.07) + 's';
-      });
+      /* First rAF: apply the hidden starting state */
       requestAnimationFrame(function () {
-        kids.forEach(function (el) { el.style.opacity = ''; el.style.transform = ''; });
+        kids.forEach(function (el, i) {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(24px)';
+          el.style.transition = 'none';
+        });
+        /* Second rAF: browser has painted opacity:0, now enable transitions */
+        requestAnimationFrame(function () {
+          kids.forEach(function (el, i) {
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1)';
+            el.style.transitionDelay = (i * 0.07) + 's';
+            el.style.opacity = '';
+            el.style.transform = '';
+          });
+        });
       });
       gate.classList.add('is-leaving');
       setTimeout(function () {
@@ -2607,22 +2617,30 @@
       clearMarks();
       if (!term) { countEl.textContent = '0/0'; return; }
       var lower = term.toLowerCase();
-      var walker = document.createTreeWalker(pbody, NodeFilter.SHOW_TEXT, {
-        acceptNode: function (node) {
-          if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-          var p = node.parentElement;
-          while (p && p !== pbody) {
-            var tag = p.tagName;
-            if (tag === 'CODE' || tag === 'PRE' || tag === 'SCRIPT' || tag === 'STYLE' ||
-                p.classList.contains('katex') || p.classList.contains('mermaid') ||
-                p.classList.contains('luliy-series') || p.classList.contains('luliy-lineno'))
-              return NodeFilter.FILTER_REJECT;
-            p = p.parentElement;
+      /* Walk BOTH element and text nodes so FILTER_REJECT prunes whole subtrees. */
+      var SKIP_TAGS = { CODE:1, PRE:1, SCRIPT:1, STYLE:1, NOSCRIPT:1, SVG:1, MATH:1 };
+      var SKIP_CLASS = ['katex','mermaid','luliy-series','luliy-lineno',
+                        'luliy-toc','toc','articletoc','TOC'];
+      var walker = document.createTreeWalker(
+        pbody,
+        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: function (node) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              if (SKIP_TAGS[node.tagName]) return NodeFilter.FILTER_REJECT;
+              for (var ci = 0; ci < SKIP_CLASS.length; ci++) {
+                if (node.classList && node.classList.contains(SKIP_CLASS[ci]))
+                  return NodeFilter.FILTER_REJECT;
+              }
+              return NodeFilter.FILTER_SKIP;  /* descend into allowed elements */
+            }
+            /* Text node */
+            if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+            return node.nodeValue.toLowerCase().indexOf(lower) >= 0
+              ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
           }
-          return node.nodeValue.toLowerCase().indexOf(lower) >= 0
-            ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
         }
-      });
+      );
       var nodes = [], n;
       while ((n = walker.nextNode())) nodes.push(n);
       nodes.forEach(function (node) {
@@ -2890,7 +2908,8 @@
       var t = e.changedTouches[0];
       var dx = t.clientX - x0, dy = t.clientY - y0;
       x0 = y0 = null;
-      if (Math.abs(dx) < 90 || Math.abs(dy) > 60) return;   /* horizontal only */
+      /* Require: large horizontal distance AND ratio > 3:1 horizontal vs vertical */
+      if (Math.abs(dx) < 120 || Math.abs(dy) > Math.abs(dx) * 0.4) return;
       var sel = dx > 0 ? '.luliy-prevnext a:first-child' : '.luliy-prevnext a:last-child';
       var link = document.querySelector(sel);
       if (link && link.href) {
@@ -2902,26 +2921,36 @@
 
   /* ---- 26  View Transitions (cross-page fade) ------------- */
   function initViewTransitions() {
-    if (!document.startViewTransition) return;   /* progressive enhancement */
+    if (!document.startViewTransition) return;
     if (prefersReduce()) return;
     document.addEventListener('click', function (e) {
       var a = e.target.closest('a');
       if (!a) return;
       var href = a.getAttribute('href');
-      if (!href || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      if (!href || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       if (a.hasAttribute('download')) return;
-      /* Same-origin internal navigation only */
+      /* Skip pure hash / in-page anchor links entirely */
+      if (href.charAt(0) === '#') return;
       var url;
       try { url = new URL(a.href, location.href); } catch (_) { return; }
       if (url.origin !== location.origin) return;
-      if (url.pathname === location.pathname && url.hash) return;   /* in-page anchor */
+      /* Skip same-page navigation (hash jumps, TOC) */
+      if (url.pathname === location.pathname) return;
       e.preventDefault();
-      document.startViewTransition(function () {
-        return new Promise(function (res) {
-          /* small delay lets the fade-out paint */
-          setTimeout(function () { location.href = url.href; res(); }, 10);
+      var dest = url.href;
+      /* Use View Transition — location change happens inside the callback */
+      try {
+        var vt = document.startViewTransition(function () {
+          location.href = dest;
+          /* Return a never-resolving promise — the navigation itself ends the transition */
+          return new Promise(function () {});
         });
-      });
+        /* Safety timeout: if transition stalls > 1s, navigate anyway */
+        setTimeout(function () { location.href = dest; }, 1000);
+      } catch (err) {
+        /* Fallback if startViewTransition throws */
+        location.href = dest;
+      }
     });
   }
 
