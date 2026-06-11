@@ -1,30 +1,33 @@
-/* enhance.js - Luliy Blog v9
+/* enhance.js - Luliy Blog v10
    Modules:
    00  Welcome splash (animation sequence)
    01  localStorage init
    02  Progress bar
    03  Dynamic title
    04  Uptime counter
-   05  Dark-mode ripple
+   05  Dark-mode ripple (from click origin)
    06  Static background (particles removed)
    07  Web Audio SFX
    08  Click sparks
-   09  Hero cluster (avatar + name + clock) + homepage nav button
+   09  Hero cluster (avatar + name + clock)
    10  Hero banner (homepage scroll-fold)
    11  Tag page search toolbar
    12  Image lightbox
-   13  Floating toolbar + unified sink (6 themes) + reading prefs
-   14  Home card rebuild (year grouping + relative dates + multi-level pin)
+   13  Floating toolbar + unified sink (6 themes) + reading prefs + music + ambient + extras
+   14  Home card rebuild (grid/list toggle + year grouping + skeleton)
    15  macOS code block strip (+ line numbers)
    16  Sakura petals + shooting stars
-   17  ArticleTOC scroll-spy + back-to-top
-   18  Mobile nav hamburger + dropdown
-   19  Favorites page front-end lock
+   17  ArticleTOC scroll-spy + reading progress ring (back-to-top)
+   18  Mobile nav hamburger + dropdown + swipe gestures
+   19  Favorites page front-end lock (progressive reveal)
    20  Homepage bottom gallery banner (grid + custom images)
-   21  Post page init
-   22  Index page init
-   23  Music player (floating, custom playlist)
-   24  Main entry
+   21  Post page init (series nav + scroll memory + in-page search)
+   22  Index page init (archive: timeline + calendar)
+   23  Tag cloud page
+   24  In-page article search overlay
+   25  Mouse trail (theme cursor) + fireflies
+   26  View Transitions (cross-page fade)
+   27  Main entry
 */
 (function (root) {
   'use strict';
@@ -59,6 +62,13 @@
        the page source is still publicly readable. */
     favoritesHash: 'c9c9ed97be82f3ed62e9d127e4df48397549f81ba53a07f5639b68987552ce21',
     favoritesPathMatch: /favorites/i,
+
+    /* Ambient / white-noise tracks — loop & layer over music.
+       Replace src with your own hosted loops (rain / waves / cafe…). */
+    ambientTracks: [
+      { name: '\u96e8\u58f0', src: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_4c5b8b3b8e.mp3?filename=light-rain-ambient-114354.mp3' },
+      { name: '\u6d77\u6d6a', src: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_3e8e3f4e5a.mp3?filename=ocean-waves-112762.mp3' }
+    ],
 
     homeUrl: '/'
   };
@@ -206,13 +216,18 @@
   /* ---- 01  localStorage init ------------------------------ */
   function initLocalStorage() {
     var defs = {
-      'luliy-sfx':      '1',
-      'luliy-sakura':   '1',
-      'luliy-sink':     'default',
-      'luliy-bg':       '',
-      'luliy-fontsize': '18',
-      'luliy-sans':     '0',
-      'luliy-music':    ''
+      'luliy-sfx':       '1',
+      'luliy-sakura':    '1',
+      'luliy-sink':      'default',
+      'luliy-bg':        '',
+      'luliy-fontsize':  '18',
+      'luliy-sans':      '0',
+      'luliy-music':     '',
+      'luliy-cardview':  'grid',   /* grid | list */
+      'luliy-trail':     '0',      /* mouse trail off by default */
+      'luliy-firefly':   '0',      /* fireflies off by default */
+      'luliy-focus':     '0',      /* focus reading mode */
+      'luliy-reduce':    '0'       /* reduce motion override */
     };
     Object.keys(defs).forEach(function (k) {
       if (localStorage.getItem(k) === null) localStorage.setItem(k, defs[k]);
@@ -270,14 +285,19 @@
     upd(); setInterval(upd, 1000);
   }
 
-  /* ---- 05  Dark-mode theme ripple ------------------------- */
+  /* ---- 05  Dark-mode theme ripple (from click origin) ----- */
   function initThemeRipple() {
-    function ripple() {
+    function ripple(ox, oy) {
       playSfx('theme');
       var old = document.getElementById('luliy-theme-ripple');
       if (old) old.remove();
-      var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-      var maxR = Math.sqrt(cx * cx + cy * cy) * 2.2;
+      /* Use click coordinates as the ripple center; fall back to screen center */
+      var cx = (typeof ox === 'number') ? ox : window.innerWidth / 2;
+      var cy = (typeof oy === 'number') ? oy : window.innerHeight / 2;
+      /* Max radius = distance to the farthest corner */
+      var dx = Math.max(cx, window.innerWidth - cx);
+      var dy = Math.max(cy, window.innerHeight - cy);
+      var maxR = Math.sqrt(dx * dx + dy * dy) * 1.05;
       var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark';
       var el = document.createElement('div');
       el.id = 'luliy-theme-ripple';
@@ -294,16 +314,17 @@
       el.style.opacity = '0';
       setTimeout(function () { el.remove(); }, 700);
     }
+    root._luliyThemeRipple = ripple;
     document.addEventListener('click', function (e) {
       var b = e.target.closest('button');
       if (b && (b.innerHTML.includes('Moon') || b.innerHTML.includes('Sun') ||
-        (b.title && /dark|light|theme|\u4e3b\u9898/i.test(b.title)))) ripple();
+        (b.title && /dark|light|theme|\u4e3b\u9898/i.test(b.title)))) ripple(e.clientX, e.clientY);
     });
     setTimeout(function () {
       document.querySelectorAll('.title-right .circle').forEach(function (el) {
         if (el._luliyRipple) return;
         el._luliyRipple = true;
-        el.addEventListener('click', ripple);
+        el.addEventListener('click', function (e) { ripple(e.clientX, e.clientY); });
       });
     }, 800);
   }
@@ -1011,6 +1032,109 @@
       playSfx('click');
     });
 
+    /* ── 🌧 Ambient soundscapes (loop & layer over music) ──── */
+    var _ambientAudios = {};   /* name -> Audio */
+    var ambList = LULIY_OPTS.ambientTracks || [];
+    if (ambList.length) {
+      panel.appendChild(mkSep());
+      panel.appendChild(mkSec('\uD83C\uDF27 \u73af\u5883\u97f3'));   /* 🌧 环境音 */
+      var ambWrap = document.createElement('div');
+      ambWrap.className = 'luliy-ambient-wrap';
+      ambList.forEach(function (amb) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'luliy-ambient-chip';
+        chip.textContent = amb.name;
+        chip.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var a = _ambientAudios[amb.name];
+          if (a && !a.paused) {
+            a.pause();
+            chip.classList.remove('is-on');
+          } else {
+            if (!a) {
+              a = new Audio(amb.src);
+              a.loop = true; a.volume = 0.4;
+              _ambientAudios[amb.name] = a;
+            }
+            a.play().then(function () { chip.classList.add('is-on'); }).catch(function () {});
+          }
+          playSfx('click');
+        });
+        ambWrap.appendChild(chip);
+      });
+      panel.appendChild(ambWrap);
+    }
+
+    /* ── ⚙ Extras: card view / cursor trail / fireflies / focus / reduce-motion ── */
+    panel.appendChild(mkSep());
+    panel.appendChild(mkSec('\u2728 \u4e2a\u6027\u5316'));   /* ✨ 个性化 */
+
+    /* Card view (grid/list) — only meaningful on list pages */
+    var cardViewRow = mkRow('\uD83D\uDD33', '\u5361\u7247\u89c6\u56fe',
+      localStorage.getItem('luliy-cardview') === 'list' ? '\u5217\u8868' : '\u7f51\u683c');
+    cardViewRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var cur = localStorage.getItem('luliy-cardview') === 'list' ? 'grid' : 'list';
+      localStorage.setItem('luliy-cardview', cur);
+      cardViewRow._bdg.textContent = cur === 'list' ? '\u5217\u8868' : '\u7f51\u683c';
+      applyCardView();
+      playSfx('click');
+    });
+    panel.appendChild(cardViewRow);
+
+    /* Mouse trail toggle */
+    var trailRow = mkRow('\u2728', '\u9f20\u6807\u62d6\u5c3e',
+      localStorage.getItem('luliy-trail') === '1' ? '\u5f00\u542f' : '\u5173\u95ed');
+    trailRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var on = localStorage.getItem('luliy-trail') === '1';
+      localStorage.setItem('luliy-trail', on ? '0' : '1');
+      trailRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
+      if (!on) initMouseTrail(); else stopMouseTrail();
+      playSfx('click');
+    });
+    panel.appendChild(trailRow);
+
+    /* Fireflies toggle (dark mode) */
+    var fireflyRow = mkRow('\uD83E\uDD9F', '\u8424\u706b\u866b',
+      localStorage.getItem('luliy-firefly') === '1' ? '\u5f00\u542f' : '\u5173\u95ed');
+    fireflyRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var on = localStorage.getItem('luliy-firefly') === '1';
+      localStorage.setItem('luliy-firefly', on ? '0' : '1');
+      fireflyRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
+      if (!on) initFireflies(); else stopFireflies();
+      playSfx('click');
+    });
+    panel.appendChild(fireflyRow);
+
+    /* Reduce-motion override */
+    var reduceRow = mkRow('\uD83C\uDF00', '\u51cf\u5f31\u52a8\u6548',
+      localStorage.getItem('luliy-reduce') === '1' ? '\u5f00\u542f' : '\u5173\u95ed');
+    reduceRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var on = localStorage.getItem('luliy-reduce') === '1';
+      localStorage.setItem('luliy-reduce', on ? '0' : '1');
+      reduceRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
+      applyReduceMotion();
+      playSfx('click');
+    });
+    panel.appendChild(reduceRow);
+
+    /* Focus reading mode (article pages only) */
+    if (document.getElementById('postBody')) {
+      var focusRow = mkRow('\uD83D\uDCD6', '\u4e13\u6ce8\u9605\u8bfb',
+        document.body.classList.contains('luliy-focus-mode') ? '\u5f00\u542f' : '\u5173\u95ed');
+      focusRow.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var on = document.body.classList.toggle('luliy-focus-mode');
+        focusRow._bdg.textContent = on ? '\u5f00\u542f' : '\u5173\u95ed';
+        playSfx('click');
+      });
+      panel.appendChild(focusRow);
+    }
+
     /* Toggle open / close */
     ctrlBtn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -1050,6 +1174,9 @@
     var nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
+
+    /* Show skeleton placeholders while postList.json loads */
+    showCardSkeleton(nav);
 
     function buildCard(post, isPinned, colourIdx) {
       var li = document.createElement('li');
@@ -1165,6 +1292,8 @@
         }
         nav.appendChild(buildCard(post, false, i));
       });
+
+      applyCardView();
 
     }).catch(function () { fallbackDomCards(nav); });
 
@@ -1943,10 +2072,29 @@
 
     function unlock() {
       sessionStorage.setItem('luliy-fav-unlocked', '1');
-      pbody.classList.remove('luliy-locked');
-      gate.classList.add('is-leaving');
       playSfx('sci');
-      setTimeout(function () { gate.remove(); }, 500);
+      /* Progressive reveal: blur dissolves + content slides up section by section */
+      pbody.classList.remove('luliy-locked');
+      pbody.classList.add('luliy-unlocking');
+      /* Stagger immediate children for a cascading reveal */
+      var kids = Array.prototype.slice.call(pbody.children);
+      kids.forEach(function (el, i) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(24px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1)';
+        el.style.transitionDelay = (i * 0.07) + 's';
+      });
+      requestAnimationFrame(function () {
+        kids.forEach(function (el) { el.style.opacity = ''; el.style.transform = ''; });
+      });
+      gate.classList.add('is-leaving');
+      setTimeout(function () {
+        gate.remove();
+        pbody.classList.remove('luliy-unlocking');
+        kids.forEach(function (el) {
+          el.style.transition = ''; el.style.transitionDelay = '';
+        });
+      }, 900);
     }
 
     function attempt() {
@@ -2077,7 +2225,26 @@
       nav.appendChild(mkNavLink(prevPost, '\u2B05 \u4e0a\u4e00\u7bc7', 'left'));
       nav.appendChild(mkNavLink(nextPost, '\u4e0b\u4e00\u7bc7 \u27A1', 'right'));
       pbody.appendChild(nav);
+
+      /* Series navigation (same-tag prev/next with progress) */
+      initSeriesNav(pbody, posts, idx, navPosts);
     }).catch(function () {});
+
+    /* In-page search (Ctrl/Cmd+F) */
+    initInPageSearch();
+
+    /* External link favicon hover preview */
+    initLinkPreview();
+    setTimeout(initLinkPreview, 1500);
+
+    /* Scroll position memory */
+    initScrollMemory();
+
+    /* Reading progress ring on back-to-top button */
+    setTimeout(initProgressRing, 100);
+
+    /* Mobile swipe between posts */
+    initSwipeNav();
 
     /* Support / appreciation panel */
     var sp = document.createElement('div');
@@ -2111,35 +2278,14 @@
     initCards();
     initHeroBanner();
     initHomeGallery();
+    setTimeout(initCardViewToggle, 900);
 
     if (isArchivePage()) {
       var pb = document.getElementById('postBody');
       if (pb) {
         pb.innerHTML = '<p style="color:#888;font-size:14px">\u6b63\u5728\u52a0\u8f7d\u5f52\u6863...</p>';
         fetchPosts().then(function (posts) {
-          var byY = {};
-          posts.forEach(function (p) {
-            var y = (p.created || '\u672a\u77e5').slice(0, 4);
-            if (!byY[y]) byY[y] = [];
-            byY[y].push(p);
-          });
-          var years = Object.keys(byY).sort(function (a, b) { return b - a; });
-          var html =
-            '<h1 style="border-bottom:2px solid rgba(240,180,41,0.4);padding-bottom:10px;margin-bottom:30px">' +
-            '\uD83D\uDCC5 \u6587\u7ae0\u5f52\u6863</h1>';
-          years.forEach(function (y) {
-            html += '<div class="tl-year">' + y + ' \u5e74</div><ul class="tl-list">';
-            byY[y].forEach(function (p) {
-              var md = (p.created || '').slice(5, 10).replace('-', '/');
-              html +=
-                '<li class="tl-item">' +
-                '<a href="' + esc(buildPostLink(p.link)) + '">' + esc(p.title) + '</a>' +
-                '<span class="tl-date">' + md + '</span>' +
-                '</li>';
-            });
-            html += '</ul>';
-          });
-          pb.innerHTML = html;
+          renderArchive(pb, posts);
         }).catch(function () {
           pb.innerHTML = '<p style="color:#e74c3c">\u5f52\u6863\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u5237\u65b0\u91cd\u8bd5\u3002</p>';
         });
@@ -2147,7 +2293,691 @@
     }
   };
 
-  /* ---- 24  Main entry ------------------------------------- */
+  /* ---- 22b  Archive: timeline + calendar views ------------ */
+  function renderArchive(pb, posts) {
+    var view = localStorage.getItem('luliy-archive-view') || 'timeline';
+
+    function renderTimeline() {
+      var byY = {};
+      posts.forEach(function (p) {
+        var y = (p.created || '\u672a\u77e5').slice(0, 4);
+        if (!byY[y]) byY[y] = [];
+        byY[y].push(p);
+      });
+      var years = Object.keys(byY).sort(function (a, b) { return b - a; });
+      var html = '';
+      years.forEach(function (y) {
+        html += '<div class="tl-year">' + esc(y) + ' \u5e74 <span class="tl-count">' + byY[y].length + ' \u7bc7</span></div><ul class="tl-list">';
+        byY[y].sort(function (a, b) { return String(b.created).localeCompare(String(a.created)); });
+        byY[y].forEach(function (p) {
+          var md = (p.created || '').slice(5, 10).replace('-', '/');
+          html +=
+            '<li class="tl-item">' +
+            '<span class="tl-dot"></span>' +
+            '<a href="' + esc(buildPostLink(p.link)) + '">' + esc(p.title) + '</a>' +
+            '<span class="tl-date">' + md + '</span>' +
+            '</li>';
+        });
+        html += '</ul>';
+      });
+      return html;
+    }
+
+    function renderCalendar() {
+      /* Map yyyy-mm-dd -> [posts] */
+      var byDay = {};
+      posts.forEach(function (p) {
+        var d = (p.created || '').slice(0, 10);
+        if (!d) return;
+        (byDay[d] = byDay[d] || []).push(p);
+      });
+      /* Group available months */
+      var months = {};
+      Object.keys(byDay).forEach(function (d) { months[d.slice(0, 7)] = true; });
+      var mList = Object.keys(months).sort(function (a, b) { return b.localeCompare(a); });
+
+      var html = '';
+      mList.forEach(function (ym) {
+        var parts = ym.split('-'), Y = +parts[0], M = +parts[1];
+        var first = new Date(Y, M - 1, 1);
+        var startDow = first.getDay();   /* 0=Sun */
+        var days = new Date(Y, M, 0).getDate();
+        html += '<div class="cal-month"><div class="cal-mhead">' + Y + ' \u5e74 ' + M + ' \u6708</div>';
+        html += '<div class="cal-grid"><span class="cal-dow">\u65e5</span><span class="cal-dow">\u4e00</span>' +
+          '<span class="cal-dow">\u4e8c</span><span class="cal-dow">\u4e09</span><span class="cal-dow">\u56db</span>' +
+          '<span class="cal-dow">\u4e94</span><span class="cal-dow">\u516d</span>';
+        for (var b = 0; b < startDow; b++) html += '<span class="cal-cell cal-empty"></span>';
+        for (var dd = 1; dd <= days; dd++) {
+          var key = ym + '-' + (dd < 10 ? '0' + dd : dd);
+          var dayPosts = byDay[key];
+          if (dayPosts && dayPosts.length) {
+            var link = buildPostLink(dayPosts[0].link);
+            var titles = dayPosts.map(function (p) { return p.title; }).join(' / ');
+            html += '<a class="cal-cell cal-has" href="' + esc(link) + '" title="' + esc(titles) + '">' +
+              dd + '<span class="cal-badge">' + dayPosts.length + '</span></a>';
+          } else {
+            html += '<span class="cal-cell">' + dd + '</span>';
+          }
+        }
+        html += '</div></div>';
+      });
+      return html || '<p style="color:#888">\u6682\u65e0\u65e5\u671f\u6570\u636e</p>';
+    }
+
+    function paint() {
+      var html =
+        '<div class="luliy-archive-head">' +
+        '<h1>\uD83D\uDCC5 \u6587\u7ae0\u5f52\u6863</h1>' +
+        '<div class="luliy-archive-tabs">' +
+        '<button type="button" data-av="timeline" class="' + (view === 'timeline' ? 'is-active' : '') + '">\u65f6\u95f4\u8f74</button>' +
+        '<button type="button" data-av="calendar" class="' + (view === 'calendar' ? 'is-active' : '') + '">\u65e5\u5386</button>' +
+        '</div></div>' +
+        '<div class="luliy-archive-body">' + (view === 'calendar' ? renderCalendar() : renderTimeline()) + '</div>';
+      pb.innerHTML = html;
+      pb.querySelectorAll('.luliy-archive-tabs button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          view = btn.getAttribute('data-av');
+          localStorage.setItem('luliy-archive-view', view);
+          paint();
+          playSfx('click');
+        });
+      });
+    }
+    paint();
+  }
+
+  /* ════════════════════════════════════════════════════════
+     NEW MODULES (v10)
+  ════════════════════════════════════════════════════════ */
+
+  /* ---- Card view (grid / list) ---------------------------- */
+  function applyCardView() {
+    var view = localStorage.getItem('luliy-cardview') === 'list' ? 'list' : 'grid';
+    document.querySelectorAll('.luliy-card-grid').forEach(function (g) {
+      g.classList.toggle('luliy-card-list', view === 'list');
+    });
+    /* Update toggle button if present */
+    var tb = document.getElementById('luliy-cardview-toggle');
+    if (tb) tb.setAttribute('data-view', view);
+  }
+
+  function initCardViewToggle() {
+    if (!isIndexPage()) return;
+    if (document.getElementById('luliy-cardview-toggle')) return;
+    var content = document.getElementById('content') || document.querySelector('.main');
+    if (!content) return;
+    var nav = document.querySelector('.luliy-card-grid');
+    if (!nav) return;
+
+    var bar = document.createElement('div');
+    bar.id = 'luliy-cardview-bar';
+    var toggle = document.createElement('button');
+    toggle.id = 'luliy-cardview-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('data-view', localStorage.getItem('luliy-cardview') === 'list' ? 'list' : 'grid');
+    toggle.innerHTML =
+      '<span class="cv-grid" title="\u7f51\u683c\u89c6\u56fe">\u2317</span>' +
+      '<span class="cv-list" title="\u5217\u8868\u89c6\u56fe">\u2630</span>';
+    toggle.addEventListener('click', function () {
+      var cur = localStorage.getItem('luliy-cardview') === 'list' ? 'grid' : 'list';
+      localStorage.setItem('luliy-cardview', cur);
+      applyCardView();
+      playSfx('click');
+    });
+    bar.appendChild(toggle);
+    nav.parentNode.insertBefore(bar, nav);
+    applyCardView();
+  }
+
+  /* ---- Reduce motion ------------------------------------- */
+  function prefersReduce() {
+    if (localStorage.getItem('luliy-reduce') === '1') return true;
+    try {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) { return false; }
+  }
+  function applyReduceMotion() {
+    document.body.classList.toggle('luliy-reduce-motion', prefersReduce());
+    if (prefersReduce()) { stopMouseTrail(); stopFireflies(); }
+  }
+
+  /* ---- 17b  Reading progress ring (merged into back-top) -- */
+  function initProgressRing() {
+    var btn = document.getElementById('luliy-back-top');
+    if (!btn || btn._luliyRing) return;
+    btn._luliyRing = true;
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'luliy-ring');
+    svg.setAttribute('viewBox', '0 0 44 44');
+    var bg = document.createElementNS(NS, 'circle');
+    bg.setAttribute('class', 'luliy-ring-bg');
+    bg.setAttribute('cx', '22'); bg.setAttribute('cy', '22'); bg.setAttribute('r', '20');
+    var fg = document.createElementNS(NS, 'circle');
+    fg.setAttribute('class', 'luliy-ring-fg');
+    fg.setAttribute('cx', '22'); fg.setAttribute('cy', '22'); fg.setAttribute('r', '20');
+    var circ = 2 * Math.PI * 20;
+    fg.style.strokeDasharray = circ;
+    fg.style.strokeDashoffset = circ;
+    svg.appendChild(bg); svg.appendChild(fg);
+    btn.insertBefore(svg, btn.firstChild);
+
+    function update() {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      var dh = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var pct = dh > 0 ? Math.min(1, st / dh) : 0;
+      fg.style.strokeDashoffset = circ * (1 - pct);
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+
+  /* ---- 21b  Series nav (same-tag prev/next) --------------- */
+  function initSeriesNav(pbody, posts, curIdx, navPosts) {
+    /* Find the dominant non-pinned tag of the current post, then
+       collect the chronological series it belongs to.              */
+    var cur = navPosts[curIdx];
+    if (!cur || !cur.labels || !cur.labels.length) return;
+    var curTags = cur.labels
+      .map(function (l) { return (l.name || l).toString(); })
+      .filter(function (n) { return !/^pinned(-\d+)?$/.test(n); });
+    if (!curTags.length) return;
+
+    /* Pick the tag that yields the largest series (>=2 posts) */
+    var best = null, bestList = [];
+    curTags.forEach(function (tag) {
+      var list = navPosts.filter(function (p) {
+        return (p.labels || []).some(function (l) { return (l.name || l) === tag; });
+      }).sort(function (a, b) { return String(a.created).localeCompare(String(b.created)); });
+      if (list.length >= 2 && list.length > bestList.length) { best = tag; bestList = list; }
+    });
+    if (!best || bestList.length < 2) return;
+
+    var pos = -1;
+    bestList.forEach(function (p, i) { if (p === cur) pos = i; });
+    if (pos < 0) return;
+
+    var box = document.createElement('div');
+    box.className = 'luliy-series';
+    var head = document.createElement('div');
+    head.className = 'luliy-series-head';
+    head.innerHTML = '\uD83D\uDCDA \u7cfb\u5217\uff1a<b>' + esc(best) + '</b> ' +
+      '<span class="luliy-series-prog">' + (pos + 1) + ' / ' + bestList.length + '</span>';
+    box.appendChild(head);
+
+    /* Progress dots */
+    var dots = document.createElement('div');
+    dots.className = 'luliy-series-dots';
+    bestList.forEach(function (p, i) {
+      var d = document.createElement('a');
+      d.className = 'luliy-series-dot' + (i === pos ? ' is-current' : '');
+      d.href = buildPostLink(p.link);
+      d.title = (i + 1) + '. ' + p.title;
+      dots.appendChild(d);
+    });
+    box.appendChild(dots);
+
+    /* Compact list of the series */
+    var ul = document.createElement('ul');
+    ul.className = 'luliy-series-list';
+    bestList.forEach(function (p, i) {
+      var li = document.createElement('li');
+      li.className = (i === pos ? 'is-current' : '');
+      if (i === pos) {
+        li.innerHTML = '<span class="ls-num">' + (i + 1) + '</span><span class="ls-cur">' + esc(p.title) + '</span>';
+      } else {
+        li.innerHTML = '<span class="ls-num">' + (i + 1) + '</span>' +
+          '<a href="' + esc(buildPostLink(p.link)) + '">' + esc(p.title) + '</a>';
+      }
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+
+    pbody.insertBefore(box, pbody.firstChild);
+  }
+
+  /* ---- 21c  Scroll position memory ------------------------ */
+  function initScrollMemory() {
+    var pbody = document.getElementById('postBody');
+    if (!pbody) return;
+    var key = 'luliy-scroll:' + location.pathname;
+
+    /* Restore prompt */
+    var saved = parseFloat(sessionStorage.getItem(key) || '0');
+    if (saved > 0.05 && saved < 0.95) {
+      var dh = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var targetY = Math.round(saved * dh);
+      var tip = document.createElement('div');
+      tip.className = 'luliy-resume';
+      tip.innerHTML = '\u4e0a\u6b21\u8bfb\u5230 ' + Math.round(saved * 100) + '%\uff0c<b>\u7ee7\u7eed\u9605\u8bfb \u2193</b>';
+      document.body.appendChild(tip);
+      requestAnimationFrame(function () { tip.classList.add('is-in'); });
+      var hide = function () { tip.classList.remove('is-in'); setTimeout(function () { tip.remove(); }, 400); };
+      tip.addEventListener('click', function () {
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+        hide();
+      });
+      setTimeout(hide, 6000);
+    }
+
+    /* Save throttled */
+    var t = null;
+    window.addEventListener('scroll', function () {
+      if (t) return;
+      t = setTimeout(function () {
+        t = null;
+        var st = window.scrollY || document.documentElement.scrollTop;
+        var dh = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        if (dh > 0) sessionStorage.setItem(key, String(st / dh));
+      }, 500);
+    }, { passive: true });
+  }
+
+  /* ---- 24  In-page article search overlay ----------------- */
+  function initInPageSearch() {
+    var pbody = document.getElementById('postBody');
+    if (!pbody) return;
+    if (document.getElementById('luliy-search-bar')) return;
+
+    var bar = document.createElement('div');
+    bar.id = 'luliy-search-bar';
+    bar.innerHTML =
+      '<i class="luliy-search-icon">\uD83D\uDD0D</i>' +
+      '<input id="luliy-search-input" type="text" placeholder="\u641c\u7d22\u672c\u6587\u2026" autocomplete="off">' +
+      '<span id="luliy-search-count">0/0</span>' +
+      '<button id="luliy-search-prev" type="button" title="\u4e0a\u4e00\u4e2a">\u2191</button>' +
+      '<button id="luliy-search-next" type="button" title="\u4e0b\u4e00\u4e2a">\u2193</button>' +
+      '<button id="luliy-search-close" type="button" title="\u5173\u95ed">\u2715</button>';
+    document.body.appendChild(bar);
+
+    var input = bar.querySelector('#luliy-search-input');
+    var countEl = bar.querySelector('#luliy-search-count');
+    var marks = [], cur = -1;
+
+    function clearMarks() {
+      marks.forEach(function (m) {
+        var p = m.parentNode;
+        if (p) { p.replaceChild(document.createTextNode(m.textContent), m); p.normalize(); }
+      });
+      marks = []; cur = -1;
+    }
+
+    /* Walk text nodes, skip code/katex/script/style */
+    function highlight(term) {
+      clearMarks();
+      if (!term) { countEl.textContent = '0/0'; return; }
+      var lower = term.toLowerCase();
+      var walker = document.createTreeWalker(pbody, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          var p = node.parentElement;
+          while (p && p !== pbody) {
+            var tag = p.tagName;
+            if (tag === 'CODE' || tag === 'PRE' || tag === 'SCRIPT' || tag === 'STYLE' ||
+                p.classList.contains('katex') || p.classList.contains('mermaid') ||
+                p.classList.contains('luliy-series') || p.classList.contains('luliy-lineno'))
+              return NodeFilter.FILTER_REJECT;
+            p = p.parentElement;
+          }
+          return node.nodeValue.toLowerCase().indexOf(lower) >= 0
+            ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      var nodes = [], n;
+      while ((n = walker.nextNode())) nodes.push(n);
+      nodes.forEach(function (node) {
+        var text = node.nodeValue, idx = 0, lc = text.toLowerCase(), frag = document.createDocumentFragment(), last = 0;
+        while ((idx = lc.indexOf(lower, last)) >= 0) {
+          if (idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
+          var mk = document.createElement('mark');
+          mk.className = 'luliy-search-hit';
+          mk.textContent = text.slice(idx, idx + term.length);
+          frag.appendChild(mk); marks.push(mk);
+          last = idx + term.length;
+        }
+        if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        node.parentNode.replaceChild(frag, node);
+      });
+      if (marks.length) { cur = 0; focusMark(); }
+      updateCount();
+    }
+    function updateCount() { countEl.textContent = (marks.length ? (cur + 1) : 0) + '/' + marks.length; }
+    function focusMark() {
+      marks.forEach(function (m, i) { m.classList.toggle('is-current', i === cur); });
+      if (marks[cur]) marks[cur].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      updateCount();
+    }
+    function step(dir) {
+      if (!marks.length) return;
+      cur = (cur + dir + marks.length) % marks.length;
+      focusMark();
+    }
+
+    var deb = null;
+    input.addEventListener('input', function () {
+      clearTimeout(deb);
+      deb = setTimeout(function () { highlight(input.value.trim()); }, 220);
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); step(e.shiftKey ? -1 : 1); }
+      if (e.key === 'Escape') closeSearch();
+    });
+    bar.querySelector('#luliy-search-next').addEventListener('click', function () { step(1); });
+    bar.querySelector('#luliy-search-prev').addEventListener('click', function () { step(-1); });
+    bar.querySelector('#luliy-search-close').addEventListener('click', closeSearch);
+
+    function openSearch() {
+      bar.classList.add('is-open');
+      setTimeout(function () { input.focus(); input.select(); }, 50);
+    }
+    function closeSearch() {
+      bar.classList.remove('is-open');
+      clearMarks(); input.value = ''; countEl.textContent = '0/0';
+    }
+    root._luliyOpenSearch = openSearch;
+
+    /* Ctrl/Cmd+F hijack (only on article pages) */
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        openSearch();
+      }
+    });
+
+    /* Floating search trigger button */
+    if (!document.getElementById('luliy-search-fab')) {
+      var fab = document.createElement('button');
+      fab.id = 'luliy-search-fab';
+      fab.type = 'button';
+      fab.title = '\u641c\u7d22\u672c\u6587 (Ctrl+F)';
+      fab.textContent = '\uD83D\uDD0D';
+      fab.addEventListener('click', openSearch);
+      document.body.appendChild(fab);
+      window.addEventListener('scroll', function () {
+        fab.classList.toggle('is-visible', (window.scrollY || 0) > 300);
+      }, { passive: true });
+    }
+  }
+
+  /* ---- 23  Tag cloud page --------------------------------- */
+  function initTagCloud() {
+    if (!/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
+    var pbody = document.getElementById('postBody') ||
+      document.querySelector('.SideNav, .markdown-body, #content');
+    var mount = document.getElementById('content') || document.body;
+
+    fetchPosts().then(function (posts) {
+      if (!posts || !posts.length) return;
+      /* Count tag frequencies + collect year colors */
+      var freq = {}, colors = {};
+      posts.forEach(function (p) {
+        (p.labels || []).forEach(function (l) {
+          var name = (l.name || l).toString();
+          if (/^pinned(-\d+)?$/.test(name)) return;
+          freq[name] = (freq[name] || 0) + 1;
+          if (!colors[name]) colors[name] = '#' + ((l.color || '0969da') + '').replace(/^#/, '');
+        });
+      });
+      var tags = Object.keys(freq);
+      if (!tags.length) return;
+      var max = Math.max.apply(null, tags.map(function (t) { return freq[t]; }));
+      var min = Math.min.apply(null, tags.map(function (t) { return freq[t]; }));
+
+      var wrap = document.createElement('div');
+      wrap.id = 'luliy-tagcloud';
+      var title = document.createElement('h1');
+      title.className = 'luliy-tagcloud-title';
+      title.textContent = '\uD83C\uDFF7\uFE0F \u6807\u7b7e\u4e91';
+      wrap.appendChild(title);
+
+      var cloud = document.createElement('div');
+      cloud.className = 'luliy-tagcloud-body';
+      /* Sort by frequency desc for nicer layout */
+      tags.sort(function (a, b) { return freq[b] - freq[a]; });
+      tags.forEach(function (t) {
+        var ratio = max === min ? 0.5 : (freq[t] - min) / (max - min);
+        var size = 13 + ratio * 22;  /* 13px → 35px */
+        var bubble = document.createElement('a');
+        bubble.className = 'luliy-tag-bubble';
+        bubble.href = '/tag.html#' + encodeURIComponent(t);
+        bubble.style.fontSize = size.toFixed(1) + 'px';
+        bubble.style.setProperty('--tag-c', colors[t]);
+        bubble.innerHTML = esc(t) + '<sup>' + freq[t] + '</sup>';
+        bubble.addEventListener('click', function (e) {
+          /* Let the native Gmeek tag filter still work via hash */
+          playSfx('click');
+        });
+        cloud.appendChild(bubble);
+      });
+      wrap.appendChild(cloud);
+
+      /* Insert above the existing tag list */
+      var sidenav = document.querySelector('.SideNav');
+      if (sidenav && sidenav.parentNode) {
+        sidenav.parentNode.insertBefore(wrap, sidenav);
+      } else if (mount) {
+        mount.insertBefore(wrap, mount.firstChild);
+      }
+    }).catch(function () {});
+  }
+
+  /* ---- 25a  Mouse trail (theme cursor) -------------------- */
+  var _trailHandler = null, _trailNodes = [];
+  function initMouseTrail() {
+    if (_trailHandler) return;
+    if ('ontouchstart' in window) return;     /* skip touch devices */
+    if (prefersReduce()) return;
+    var theme = document.body.getAttribute('data-luliy-theme') || 'default';
+    var glyph = theme === 'sakura' ? '\uD83C\uDF38'
+      : theme === 'space' ? '\u2727'
+      : theme === 'sunset' ? '\u2600'
+      : theme === 'your-name' ? '\u2601'
+      : '\u2728';
+    var lastT = 0;
+    _trailHandler = function (e) {
+      var now = Date.now();
+      if (now - lastT < 60) return;
+      lastT = now;
+      var s = document.createElement('span');
+      s.className = 'luliy-trail-dot';
+      s.textContent = glyph;
+      s.style.left = e.clientX + 'px';
+      s.style.top = e.clientY + 'px';
+      s.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+      document.body.appendChild(s);
+      _trailNodes.push(s);
+      setTimeout(function () { s.remove(); _trailNodes.shift(); }, 1100);
+    };
+    document.addEventListener('mousemove', _trailHandler, { passive: true });
+  }
+  function stopMouseTrail() {
+    if (_trailHandler) document.removeEventListener('mousemove', _trailHandler);
+    _trailHandler = null;
+    _trailNodes.forEach(function (n) { n.remove(); }); _trailNodes = [];
+  }
+
+  /* ---- 25b  Fireflies (dark mode, mouse-attracted) -------- */
+  var _ffRAF = null, _ffCanvas = null;
+  function initFireflies() {
+    if (_ffCanvas) return;
+    if (prefersReduce()) return;
+    var canvas = document.createElement('canvas');
+    canvas.id = 'luliy-firefly-canvas';
+    canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2;';
+    document.body.appendChild(canvas);
+    _ffCanvas = canvas;
+    var ctx = canvas.getContext('2d');
+    var W, H;
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+
+    var mouse = { x: -999, y: -999 };
+    var mm = function (e) { mouse.x = e.clientX; mouse.y = e.clientY; };
+    document.addEventListener('mousemove', mm, { passive: true });
+    canvas._mm = mm;
+
+    var N = Math.min(26, Math.round(window.innerWidth / 50));
+    var flies = [];
+    for (var i = 0; i < N; i++) {
+      flies.push({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+        r: 1.4 + Math.random() * 1.8,
+        ph: Math.random() * Math.PI * 2,
+        ps: 0.02 + Math.random() * 0.03
+      });
+    }
+    function tick() {
+      if (!document.getElementById('luliy-firefly-canvas')) { _ffRAF = null; return; }
+      ctx.clearRect(0, 0, W, H);
+      flies.forEach(function (f) {
+        /* Gentle attraction toward mouse */
+        var dx = mouse.x - f.x, dy = mouse.y - f.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 220 && dist > 1) {
+          f.vx += (dx / dist) * 0.04;
+          f.vy += (dy / dist) * 0.04;
+        }
+        f.vx += (Math.random() - 0.5) * 0.05;
+        f.vy += (Math.random() - 0.5) * 0.05;
+        f.vx *= 0.94; f.vy *= 0.94;
+        f.x += f.vx; f.y += f.vy;
+        if (f.x < 0) f.x = W; if (f.x > W) f.x = 0;
+        if (f.y < 0) f.y = H; if (f.y > H) f.y = 0;
+        f.ph += f.ps;
+        var glow = 0.45 + Math.sin(f.ph) * 0.4;
+        var grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * 5);
+        grad.addColorStop(0, 'rgba(190,255,150,' + glow + ')');
+        grad.addColorStop(0.4, 'rgba(150,230,120,' + (glow * 0.4) + ')');
+        grad.addColorStop(1, 'rgba(150,230,120,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r * 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(220,255,180,' + glow + ')';
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2); ctx.fill();
+      });
+      _ffRAF = requestAnimationFrame(tick);
+    }
+    tick();
+  }
+  function stopFireflies() {
+    if (_ffCanvas) {
+      if (_ffCanvas._mm) document.removeEventListener('mousemove', _ffCanvas._mm);
+      _ffCanvas.remove(); _ffCanvas = null;
+    }
+    if (_ffRAF) { cancelAnimationFrame(_ffRAF); _ffRAF = null; }
+  }
+  /* Fireflies only make sense at night; re-evaluate on theme/mode change */
+  function maybeFireflies() {
+    var wantFf = localStorage.getItem('luliy-firefly') === '1';
+    var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark' ||
+      document.body.getAttribute('data-luliy-theme') === 'space';
+    if (wantFf && isDark && !prefersReduce()) initFireflies();
+    else stopFireflies();
+  }
+
+  /* ---- 18b  Mobile swipe gestures (prev/next post) -------- */
+  function initSwipeNav() {
+    if (!document.getElementById('postBody')) return;
+    if (!('ontouchstart' in window)) return;
+    var x0 = null, y0 = null;
+    document.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) return;
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+      if (x0 === null) return;
+      var t = e.changedTouches[0];
+      var dx = t.clientX - x0, dy = t.clientY - y0;
+      x0 = y0 = null;
+      if (Math.abs(dx) < 90 || Math.abs(dy) > 60) return;   /* horizontal only */
+      var sel = dx > 0 ? '.luliy-prevnext a:first-child' : '.luliy-prevnext a:last-child';
+      var link = document.querySelector(sel);
+      if (link && link.href) {
+        document.body.classList.add(dx > 0 ? 'luliy-swipe-right' : 'luliy-swipe-left');
+        setTimeout(function () { location.href = link.href; }, 180);
+      }
+    }, { passive: true });
+  }
+
+  /* ---- 26  View Transitions (cross-page fade) ------------- */
+  function initViewTransitions() {
+    if (!document.startViewTransition) return;   /* progressive enhancement */
+    if (prefersReduce()) return;
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      if (a.hasAttribute('download')) return;
+      /* Same-origin internal navigation only */
+      var url;
+      try { url = new URL(a.href, location.href); } catch (_) { return; }
+      if (url.origin !== location.origin) return;
+      if (url.pathname === location.pathname && url.hash) return;   /* in-page anchor */
+      e.preventDefault();
+      document.startViewTransition(function () {
+        return new Promise(function (res) {
+          /* small delay lets the fade-out paint */
+          setTimeout(function () { location.href = url.href; res(); }, 10);
+        });
+      });
+    });
+  }
+
+  /* ---- 14b  Card skeleton placeholders -------------------- */
+  function showCardSkeleton(nav) {
+    if (!nav) return;
+    nav.classList.add('luliy-card-grid');
+    var html = '';
+    for (var i = 0; i < 6; i++) {
+      html += '<li class="luliy-card-skeleton"><div class="sk-line sk-date"></div>' +
+        '<div class="sk-line sk-title"></div><div class="sk-line sk-title2"></div>' +
+        '<div class="sk-tags"><span></span><span></span></div></li>';
+    }
+    nav.innerHTML = html;
+  }
+
+  /* ---- 16b  External link favicon hover preview ----------- */
+  function initLinkPreview() {
+    var pbody = document.getElementById('postBody');
+    if (!pbody) return;
+    var tip = null;
+    function showTip(a, e) {
+      var url;
+      try { url = new URL(a.href); } catch (_) { return; }
+      if (url.origin === location.origin) return;
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'luliy-linktip';
+        document.body.appendChild(tip);
+      }
+      var host = url.hostname.replace(/^www\./, '');
+      tip.innerHTML =
+        '<img src="https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=32" alt="">' +
+        '<div class="lt-meta"><div class="lt-host">' + esc(host) + '</div>' +
+        '<div class="lt-path">' + esc((url.pathname + url.search).slice(0, 48) || '/') + '</div></div>';
+      tip.classList.add('is-on');
+      moveTip(e);
+    }
+    function moveTip(e) {
+      if (!tip) return;
+      var x = e.clientX + 14, y = e.clientY + 16;
+      var w = 240;
+      if (x + w > window.innerWidth) x = e.clientX - w - 14;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    }
+    function hideTip() { if (tip) tip.classList.remove('is-on'); }
+
+    pbody.querySelectorAll('a[href^="http"]').forEach(function (a) {
+      if (a._luliyTip) return; a._luliyTip = true;
+      a.addEventListener('mouseenter', function (e) { showTip(a, e); });
+      a.addEventListener('mousemove', moveTip);
+      a.addEventListener('mouseleave', hideTip);
+    });
+  }
+
+  /* ---- 27  Main entry ------------------------------------- */
   initLocalStorage();
 
   /* Restore theme immediately to prevent FOUC */
@@ -2210,6 +3040,23 @@
     initNavTransparency();
     initMobileNav();
     initFavoritesLock();   /* safety net — also called in post init */
+
+    /* v10 global features */
+    applyReduceMotion();
+    initViewTransitions();
+    initTagCloud();
+    if (localStorage.getItem('luliy-trail') === '1') initMouseTrail();
+    maybeFireflies();
+
+    /* Re-evaluate fireflies when color mode flips (Gmeek toggles data-color-mode) */
+    (function () {
+      var mo = new MutationObserver(maybeFireflies);
+      try { mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-color-mode'] }); } catch (e) {}
+      if (document.body) {
+        var mo2 = new MutationObserver(maybeFireflies);
+        try { mo2.observe(document.body, { attributes: true, attributeFilter: ['data-luliy-theme'] }); } catch (e) {}
+      }
+    })();
 
     var isPost    = !!document.getElementById('postBody');
     var hasList   = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
