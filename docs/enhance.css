@@ -441,7 +441,18 @@ body[data-luliy-theme="space"] .title-right a {
 .title-right a[href="atom.xml"],
 .title-right a[href="/atom.xml"],
 .title-right a[href$="/rss"],
-.title-right a[href$="/feed.xml"] { display: none !important; }
+.title-right a[href$="/feed.xml"],
+.title-right a[href$="rss.xml"],
+.title-right a[href$="atom.xml"] { display: none !important; }
+
+/* Hide "about" nav link (accessed via hero-cluster avatar instead).
+   Scoped to .title-right so it never touches article-body links. */
+.title-right a[href="/about"],
+.title-right a[href="/about.html"],
+.title-right a[href="about"],
+.title-right a[href="about.html"],
+.title-right a[href$="/about"],
+.title-right a[href$="/about.html"] { display: none !important; }
 
 /* .title-right layout */
 .title-right {
@@ -2435,9 +2446,10 @@ body[data-luliy-theme="mono"] #postBody h2 {
   box-shadow: 0 14px 40px rgba(0,0,0,0.22);
   z-index: 99990; opacity: 0; transition: transform 0.3s cubic-bezier(.2,.7,.3,1), opacity 0.3s;
   width: min(92vw, 420px);
+  pointer-events: none;   /* closed = click-through */
 }
 [data-color-mode="dark"] #luliy-search-bar { background: rgba(16,12,30,0.97); }
-#luliy-search-bar.is-open { transform: translate(-50%, 0); opacity: 1; }
+#luliy-search-bar.is-open { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
 .luliy-search-icon { font-size: 15px; opacity: 0.7; flex-shrink: 0; }
 #luliy-search-input {
   flex: 1; border: none; background: transparent; outline: none;
