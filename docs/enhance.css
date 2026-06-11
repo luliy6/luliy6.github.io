@@ -1346,8 +1346,13 @@ body[data-luliy-theme="mono"] {
 }
 #TOC details > summary::-webkit-details-marker { display: none !important; }
 
-/* ── TOC links base ──────────────────────────────────────── */
-#TOC a, .articletoc a, .toc a, #articleTOC a {
+/* ── TOC links base ──────────────────────────────────────────
+   Broad selector: covers #TOC / .articletoc / [id*=articleTOC] /
+   [class*=ArticleTOC] containers, nested <a>, and inner <span>s
+   (the Gmeek articletoc plugin wraps link text in spans and may
+   set inline colors — we override text color on the span too).   */
+#TOC a, .articletoc a, .toc a, #articleTOC a,
+[id*="articleTOC"] a, [class*="ArticleTOC"] a, [class*="articletoc"] a {
   display: block !important;
   padding: 4px 12px !important;
   border-radius: 6px !important;
@@ -1358,31 +1363,83 @@ body[data-luliy-theme="mono"] {
   line-height: 1.6 !important;
   word-break: break-word !important;
 }
-[data-color-mode="dark"] #TOC a,
-[data-color-mode="dark"] .articletoc a,
-[data-color-mode="dark"] #articleTOC a { color: #cdd6f4 !important; }
-#TOC a:hover, .articletoc a:hover, .toc a:hover, #articleTOC a:hover {
+/* Inherit color onto any inner wrapper the plugin adds */
+#TOC a *, .articletoc a *, .toc a *, #articleTOC a *,
+[id*="articleTOC"] a *, [class*="ArticleTOC"] a *, [class*="articletoc"] a * {
+  color: inherit !important;
+}
+/* Day fallback text color */
+#TOC a, .articletoc a, .toc a, #articleTOC a,
+[id*="articleTOC"] a, [class*="ArticleTOC"] a, [class*="articletoc"] a { color: #333 !important; }
+
+/* ── Dark mode: force readable light text ─────────────────── */
+[data-color-mode="dark"] [id*="articleTOC"] a,
+[data-color-mode="dark"] [class*="ArticleTOC"] a,
+[data-color-mode="dark"] [class*="articletoc"] a,
+[data-color-mode="dark"] #TOC a *,
+[data-color-mode="dark"] .articletoc a *,
+[data-color-mode="dark"] #articleTOC a *,
+[data-color-mode="dark"] [id*="articleTOC"] a *,
+[data-color-mode="dark"] [class*="ArticleTOC"] a * { color: #cdd6f4 !important; }
+
+/* Catch-all: any TOC text (li / span / plain nodes) stays readable
+   in dark mode, regardless of plugin markup. Injected header keeps
+   its own themed colours (set with higher-specificity rules above). */
+[data-color-mode="dark"] #TOC,
+[data-color-mode="dark"] .articletoc,
+[data-color-mode="dark"] .toc,
+[data-color-mode="dark"] #articleTOC,
+[data-color-mode="dark"] [id*="articleTOC"],
+[data-color-mode="dark"] [class*="ArticleTOC"],
+[data-color-mode="dark"] [class*="articletoc"] { color: #cdd6f4 !important; }
+[data-color-mode="dark"] #TOC li,
+[data-color-mode="dark"] .articletoc li,
+[data-color-mode="dark"] #articleTOC li,
+[data-color-mode="dark"] [id*="articleTOC"] li,
+[data-color-mode="dark"] [class*="ArticleTOC"] li,
+[data-color-mode="dark"] #TOC span:not(.luliy-toc-injected-label),
+[data-color-mode="dark"] .articletoc span:not(.luliy-toc-injected-label) { color: #cdd6f4 !important; }
+
+#TOC a:hover, .articletoc a:hover, .toc a:hover, #articleTOC a:hover,
+[id*="articleTOC"] a:hover, [class*="ArticleTOC"] a:hover, [class*="articletoc"] a:hover {
   background: var(--th-accent-hover, rgba(130,80,223,0.08)) !important;
   color: var(--th-accent, #8250df) !important;
+}
+[data-color-mode="dark"] #TOC a:hover,
+[data-color-mode="dark"] .articletoc a:hover,
+[data-color-mode="dark"] #articleTOC a:hover,
+[data-color-mode="dark"] [class*="ArticleTOC"] a:hover {
+  color: var(--th-accent, #cba6f7) !important;
 }
 
 /* ── Active TOC item — highlighted (theme-aware) ─────────── */
 #TOC a.active, #TOC a.luliy-toc-active,
 .articletoc a.active, .articletoc a.luliy-toc-active,
 .toc a.active, .toc a.luliy-toc-active,
-#articleTOC a.active {
+#articleTOC a.active,
+[id*="articleTOC"] a.active, [class*="ArticleTOC"] a.active,
+[class*="articletoc"] a.luliy-toc-active {
   background: var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
   color: var(--th-accent, #8250df) !important;
   font-weight: 700 !important;
   padding-left: 16px !important;
   border-left: 3px solid var(--th-accent, #8250df) !important;
 }
+#TOC a.active *, .articletoc a.active *, #articleTOC a.active *,
+#TOC a.luliy-toc-active *, .articletoc a.luliy-toc-active * {
+  color: var(--th-accent, #8250df) !important;
+}
 /* Dark active: brighten text for readability */
 [data-color-mode="dark"] #TOC a.active,
 [data-color-mode="dark"] #TOC a.luliy-toc-active,
 [data-color-mode="dark"] .articletoc a.active,
 [data-color-mode="dark"] .articletoc a.luliy-toc-active,
-[data-color-mode="dark"] #articleTOC a.active {
+[data-color-mode="dark"] #articleTOC a.active,
+[data-color-mode="dark"] [class*="ArticleTOC"] a.active,
+[data-color-mode="dark"] #TOC a.active *,
+[data-color-mode="dark"] .articletoc a.active *,
+[data-color-mode="dark"] #TOC a.luliy-toc-active *,
+[data-color-mode="dark"] .articletoc a.luliy-toc-active * {
   background: var(--th-accent-hover, rgba(130,80,223,0.32)) !important;
   color: var(--th-accent, #cba6f7) !important;
   border-left-color: var(--th-accent, #cba6f7) !important;
