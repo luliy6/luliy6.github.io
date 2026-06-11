@@ -1413,7 +1413,7 @@ body[data-luliy-theme="mono"] {
 [id*="articleTOC"], [class*="ArticleTOC"] {
   position: fixed !important;
   top: 130px !important;   /* below ctrl pill btn: 76px + ~44px + gap */
-  right: 80px !important;
+  right: 280px !important;
   left: auto !important;
   bottom: 20px !important;
   width: 244px !important;
