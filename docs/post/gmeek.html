@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark_colorblind" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js'></script><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js' onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script><script src='https://blog.meekdai.com/Gmeek/plugins/articletoc.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js'></script><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js'></script><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script><meta name='theme-color' content='#8250df'><link rel='apple-touch-icon' href='https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=180'><script>window.addEventListener('load',function(){if(window.Prism){Prism.plugins.autoloader.languages_path='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/';Prism.highlightAll();}if(window.mermaid){mermaid.initialize({startOnLoad:false,securityLevel:'loose',theme:document.documentElement.getAttribute('data-color-mode')==='dark'?'dark':'default'});document.querySelectorAll('pre>code.language-mermaid,code.language-mermaid').forEach(function(code){var block=document.createElement('div');block.className='mermaid';block.textContent=code.textContent.trim();(code.parentElement&&code.parentElement.tagName==='PRE'?code.parentElement:code).replaceWith(block);});if(mermaid.run){mermaid.run({querySelector:'.mermaid'});}else if(mermaid.init){mermaid.init(undefined,document.querySelectorAll('.mermaid'));}}if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}});</script><script src='https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js'></script><script src='https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js'></script><script src='https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js'></script><link rel='stylesheet' href='/enhance.css'><script defer src='/enhance.js'></script>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="Luliy 博客功能清单 - 完整280个
+
+> ✅ = 强烈推荐 | ⚡ = 简单 | 🔧 = 需要写代码 | 🚀 = 进阶
+
+---
+
+## 🟢 简单类
+
+| # | 功能 |
+|---|------|
+| 1 | ⚡ 随机文章按钮🎲 |
+| 2 | ⚡ 控制台彩蛋ASCII艺术字 |
+| 3 | ⚡ 宇宙年龄对比页脚 |
+| 4 | ⚡ 博客纪念日倒计时 |
+| 5 | ⚡ 打字机Banner逐字显示 |
+| 6 | ⚡ 今天是什么节气 |
+| 7 | ⚡ 生命的意义=42彩蛋 |
+| 8 | ⚡ 页脚随机古诗词 |
+| 9 | ⚡ 外链箭头悬停才显示 |
+| 10 | ⚡ Toast操作提示 |
+| 11 | ⚡ 代码块语言标签 |
+| 12 | ⚡ 文章点赞按钮 |
+| 13 | ⚡ 宇宙热寂倒计时 |
+| 14 | ⚡ 写作连续打卡天数 |
+| 15 | ⚡ Konami Code彩蛋↑↑↓↓←→ |
+| 16 | ⚡ 博主不在线提示（N天未更新） |
+| 17 | ⚡ 新文章发布横幅提示 |
+| 18 | ⚡ 文章难度标签🟢🟡🔴 |
+| 19 | ⚡ 印章落款效果 |
+| 20 | ⚡ 多语言欢迎语随机切换 |
+
+---
+
+## 🟡 中等类
+
+| # | 功能 |
+|---|------|
+| 21 | ✅ 全站搜索功能 |
+| 22 | ✅ 首页分类标签筛选 |
+| 23 | ✅ 灯箱左右切换图片 |
+| 24 | ✅ Toast操作反馈提示 |
+| 25 | 🔧 文章收藏夹本地存储 |
+| 26 | 🔧 字体大小A+/A-调节 |
+| 27 | 🔧 专注阅读模式 |
+| 28 | 🔧 文章二维码分享 |
+| 29 | 🔧 进度条颜色跟随皮肤 |
+| 30 | 🔧 段落悬停高亮 |
+| 31 | 🔧 相关文章推荐（按标签） |
+| 32 | 🔧 首页无限滚动加载 |
+| 33 | 🔧 暗色卡片层次感优化 |
+| 34 | 🔧 移动端底部导航栏 |
+| 35 | 🔧 文章字数统计面板 |
+| 36 | 🔧 阅读进度记忆 |
+| 37 | 🔧 博客便签本 |
+| 38 | 🔧 文章朗读TTS |
+| 39 | 🔧 图片懒加载模糊渐入 |
+| 40 | 🔧 护眼模式米黄色背景 |
+| 41 | 🔧 沉浸阅读聚光灯模式 |
+| 42 | 🔧 行间距调节 |
+| 43 | 🔧 卡片点击涟漪效果 |
+| 44 | 🔧 醉酒模式彩蛋 |
+| 45 | 🔧 虫洞传送跳转动画 |
+| 46 | 🔧 博客占卜神谕 |
+| 47 | 🔧 文章完成度提示75% |
+| 48 | 🔧 外链安全离站提示 |
+| 49 | 🔧 一键复制文章链接 |
+| 50 | 🔧 划词翻译气泡 |
+| 51 | 🔧 阅读心情选择 |
+| 52 | 🔧 共读人数显示 |
+| 53 | 🔧 下拉刷新动画 |
+| 54 | 🔧 移动端手势左右翻页 |
+| 55 | 🔧 访客留言贴纸墙 |
+| 56 | 🔧 读者身份标签选择 |
+| 57 | 🔧 文章版本历史显示 |
+| 58 | 🔧 黑客模式Matrix字符雨 |
+| 59 | 🔧 镜像世界页面翻转 |
+| 60 | 🔧 放大镜鼠标模式 |
+
+---
+
+## 🔴 进阶类
+
+| # | 功能 |
+|---|------|
+| 61 | ✅ 文章热力图GitHub风格 |
+| 62 | ✅ 页面加载动画全屏 |
+| 63 | ✅ 视差卡片3D倾斜效果 |
+| 64 | ✅ 星际跃迁页面跳转动画 |
+| 65 | 🚀 标签统计饼图Chart.js |
+| 66 | 🚀 文章时间线页面美化 |
+| 67 | 🚀 首页布局卡片/列表切换 |
+| 68 | 🚀 自定义主题色选择器 |
+| 69 | 🚀 系列文章顶部导航条 |
+| 70 | 🚀 文章封面自动生成渐变 |
+| 71 | 🚀 Service Worker离线缓存 |
+| 72 | 🚀 文章地图节点连线图 |
+| 73 | 🚀 博客年度报告可视化 |
+| 74 | 🚀 萤火虫夜间效果 |
+| 75 | 🚀 流体背景色块 |
+| 76 | 🚀 文章词云自动生成 |
+| 77 | 🚀 打字机终端开场动画 |
+| 78 | 🚀 水墨晕染中国风背景 |
+| 79 | 🚀 故障艺术Glitch标题 |
+| 80 | 🚀 引力波涟漪滚动效果 |
+| 81 | 🚀 磁力按钮跟随鼠标 |
+| 82 | 🚀 液态按钮变形效果 |
+| 83 | 🚀 博客大爆炸奇点开场 |
+| 84 | 🚀 卷轴展开文章动画 |
+| 85 | 🚀 霓虹灯标题发光效果 |
+| 86 | 🚀 滚动触发元素入场动画 |
+| 87 | 🚀 文章章节进度显示 |
+| 88 | 🚀 弹性滚动顶部回弹 |
+| 89 | 🚀 成就系统读者徽章 |
+| 90 | 🚀 签到功能每日打卡 |
+| 91 | 🚀 博主等级显示Lv.X |
+| 92 | 🚀 文章拼图还原挑战 |
+| 93 | 🚀 故事分支互动文章 |
+| 94 | 🚀 预加载下一篇文章 |
+| 95 | 🚀 字体切换多种选择 |
+| 96 | 🚀 竹简样式归档页 |
+| 97 | 🚀 像素风格主题切换 |
+| 98 | 🚀 老电视开机动画 |
+| 99 | 🚀 太阳风粒子方向感 |
+| 100 | 🚀 日冕头像发光效果 |
+
+---
+
+## 🤖 AI增强类
+
+| # | 功能 |
+|---|------|
+| 101 | ✅ AI文章摘要Claude API |
+| 102 | 🚀 AI关键词提取 |
+| 103 | 🚀 AI相关文章推荐 |
+| 104 | 🚀 AI针对文章问答 |
+| 105 | 🚀 AI文章封面生成 |
+| 106 | 🚀 AI文章情绪分析 |
+| 107 | 🚀 AI写作助手提示 |
+
+---
+
+## 🎨 视觉装饰类
+
+| # | 功能 |
+|---|------|
+| 108 | 🔧 雪花飘落效果 |
+| 109 | 🔧 树叶秋天飘落 |
+| 110 | 🔧 下雨效果+雨声 |
+| 111 | 🔧 彩虹特效按钮 |
+| 112 | 🔧 向日葵跟随鼠标 |
+| 113 | 🔧 蝴蝶跟随鼠标飞行 |
+| 114 | 🔧 蜘蛛网静止特效 |
+| 115 | 🔧 鱼缸背景游鱼 |
+| 116 | 🔧 星系粒子背景升级 |
+| 117 | 🔧 流星划过可许愿 |
+| 118 | 🔧 背景动态极光渐变 |
+| 119 | 🔧 卡片翻转显示摘要 |
+| 120 | 🔧 灯笼悬挂摆动 |
+| 121 | 🔧 毛笔字书写动画 |
+| 122 | 🔧 像素小人角落跑步 |
+| 123 | 🔧 CRT扫描线复古效果 |
+| 124 | 🔧 星座背景图案 |
+| 125 | 🔧 苔藓边缘生长 |
+| 126 | 🔧 波形可视化装饰 |
+| 127 | 🔧 草图手绘风格切换 |
+| 128 | 🔧 康定斯基抽象背景生成 |
+
+---
+
+## 🎵 音频类
+
+| # | 功能 |
+|---|------|
+| 129 | 🔧 环境白噪音雨声森林 |
+| 130 | 🔧 机械键盘打字音效升级 |
+| 131 | 🔧 文章朗读速度调节 |
+| 132 | 🔧 背景音乐淡入淡出 |
+| 133 | 🔧 磁带播放器UI |
+
+---
+
+## ⌨️ 快捷键系统
+
+| # | 功能 |
+|---|------|
+| 134 | 🔧 ?键弹出快捷键面板 |
+| 135 | 🔧 J/K上下篇跳转 |
+| 136 | 🔧 /键打开搜索框 |
+| 137 | 🔧 GH回首页GG回顶部 |
+
+---
+
+## 📊 数据可视化类
+
+| # | 功能 |
+|---|------|
+| 138 | 🚀 文章热力图按日期 |
+| 139 | 🚀 标签分布饼图 |
+| 140 | 🚀 博客成长折线图 |
+| 141 | 🚀 文章相似度矩阵 |
+| 142 | 🚀 文章时长分布色块 |
+| 143 | 🚀 第四维度3D文章视图 |
+| 144 | 🚀 博客文章地图节点图 |
+
+---
+
+## 🏠 个人品牌类
+
+| # | 功能 |
+|---|------|
+| 145 | 🚀 在线简历页/resume |
+| 146 | 🚀 GitHub项目展示墙 |
+| 147 | 🚀 技能树可视化 |
+| 148 | 🚀 人生进度条 |
+| 149 | 🚀 博客名片生成分享 |
+| 150 | 🚀 文章导出精美图片 |
+| 151 | 🚀 文章导出PDF |
+
+---
+
+## 🔐 隐私安全类
+
+| # | 功能 |
+|---|------|
+| 152 | 🔧 局部内容单独加密 |
+| 153 | 🔧 访问时间限制解锁 |
+| 154 | 🔧 摩斯电码装饰彩蛋 |
+| 155 | 🔧 隐写术隐藏文字 |
+| 156 | 🔧 页面源码彩蛋注释 |
+
+---
+
+## 🎪 节日特效类
+
+| # | 功能 |
+|---|------|
+| 157 | 🔧 博客生日撒彩带动画 |
+| 158 | 🔧 除夕跨年烟花特效 |
+| 159 | 🔧 万圣节幽灵主题 |
+| 160 | 🔧 圣诞节下雪戴帽 |
+| 161 | 🔧 春节红包雨 |
+| 162 | 🔧 高考加油横幅6月7日 |
+
+---
+
+## 🌌 宇宙主题类
+
+| # | 功能 |
+|---|------|
+| 163 | 🚀 博客大爆炸奇点开场 |
+| 164 | 🚀 文章星球首页宇宙 |
+| 165 | 🚀 星际跃迁跳转动画 |
+| 166 | 🚀 引力波涟漪滚动 |
+| 167 | 🚀 宇宙广播电波动画 |
+| 168 | 🚀 流星划过许愿功能 |
+| 169 | 🚀 脉冲星发文频率 |
+| 170 | 🚀 暗能量进度条升级 |
+| 171 | 🚀 宇宙微波背景噪点 |
+| 172 | 🚀 黑洞吸入重载动画 |
+| 173 | 🚀 虫洞文章传送 |
+| 174 | 🚀 太阳系时钟 |
+| 175 | 🚀 星际文明等级显示 |
+
+---
+
+## 🧪 实验性功能
+
+| # | 功能 |
+|---|------|
+| 176 | 🚀 语音导航命令 |
+| 177 | 🚀 手势翻页摄像头 |
+| 178 | 🚀 观测者效应段落发光 |
+| 179 | 🚀 眼动追踪模拟 |
+| 180 | 🚀 量子随机诗生成 |
+
+---
+
+## 🔬 开发者工具类
+
+| # | 功能 |
+|---|------|
+| 181 | 🔧 Ctrl+Shift+D调试面板 |
+| 182 | 🔧 插件管理可视化面板 |
+| 183 | 🔧 性能监控FPS悬浮窗 |
+| 184 | 🔧 JS错误自动上报Issue |
+| 185 | 🔧 主题实时预览 |
+
+---
+
+## 🎭 荒诞彩蛋类
+
+| # | 功能 |
+|---|------|
+| 186 | 🔧 文字翻转恶作剧 |
+| 187 | 🔧 橡皮泥标题揉捏 |
+| 188 | 🔧 博客时钟屏保5分钟 |
+| 189 | 🔧 时间胶囊未来信件 |
+| 190 | 🔧 薛定谔的文章 |
+| 191 | 🔧 平行宇宙1%概率 |
+| 192 | 🔧 熵增页面效果 |
+| 193 | 🔧 博客墓志铭生成器 |
+| 194 | 🔧 博客变游戏平台跳跃 |
+| 195 | 🔧 文章迷宫还原 |
+| 196 | 🔧 图灵测试对话框 |
+| 197 | 🔧 文章时光机模拟 |
+
+---
+
+## 🌿 自然生物类
+
+| # | 功能 |
+|---|------|
+| 198 | 🔧 重力粒子堆积 |
+| 199 | 🔧 布料模拟横幅 |
+| 200 | 🔧 弹珠板卡片掉落 |
+| 201 | 🔧 沙粒文字聚合 |
+| 202 | 🔧 萤火虫聚集鼠标 |
+| 203 | 🔧 蚂蚁搬运文章标题 |
+| 204 | 🔧 蜘蛛网织造效果 |
+
+---
+
+## 🌍 国际化类
+
+| # | 功能 |
+|---|------|
+| 205 | 🔧 中英文之间自动加空格 |
+| 206 | 🔧 全文机器翻译按钮 |
+| 207 | 🔧 高对比度无障碍模式 |
+| 208 | 🔧 文字间距阅读障碍模式 |
+
+---
+
+## 📅 时间日历类
+
+| # | 功能 |
+|---|------|
+| 209 | 🚀 文章日历视图 |
+| 210 | 🔧 今日节气节日显示 |
+| 211 | 🔧 写作连续打卡🔥 |
+| 212 | 🔧 博客时钟屏保 |
+
+---
+
+## 📱 多媒体类
+
+| # | 功能 |
+|---|------|
+| 213 | 🔧 视频卡片B站嵌入 |
+| 214 | 🔧 音频播放器美化 |
+| 215 | 🔧 图片相册轮播模式 |
+| 216 | 🔧 图片对比拖动滑块 |
+| 217 | 🔧 图片点击下载按钮 |
+
+---
+
+## 🎯 通知提醒类
+
+| # | 功能 |
+|---|------|
+| 218 | 🔧 新文章顶部横幅 |
+| 219 | 🔧 浏览器桌面通知 |
+| 220 | 🔧 标题消息提示升级 |
+
+---
+
+## 🗂️ 内容组织类
+
+| # | 功能 |
+|---|------|
+| 221 | 🚀 专题合集页面 |
+| 222 | 🚀 文章系列导航条 |
+| 223 | 🚀 友链卡片自动抓取 |
+| 224 | 🔧 文章摘要自动截取 |
+| 225 | 🔧 置顶文章📌徽章动画 |
+
+---
+
+## 🏆 游戏化类
+
+| # | 功能 |
+|---|------|
+| 226 | 🚀 读者成就系统徽章 |
+| 227 | 🚀 阅读排行榜Top5 |
+| 228 | 🔧 博主等级Lv.X显示 |
+| 229 | 🔧 每日签到功能 |
+| 230 | 🔧 打字速度挑战游戏 |
+| 231 | 🔧 今日运势随机生成 |
+
+---
+
+## 🛠️ 待修复问题
+
+| # | 问题 | 优先级 |
+|---|------|--------|
+| 232 | 工具栏和TOC位置冲突 | 🔴高 |
+| 233 | 菜单手机端超出屏幕 | 🔴高 |
+| 234 | 低端设备性能优化 | 🟡中 |
+| 235 | 暗色卡片层次感不足 | 🟡中 |
+| 236 | Hero Banner间距写死 | 🟡中 |
+| 237 | TOC触发条件优化 | 🟢低 |
+| 238 | 外链↗箭头太密集 | 🟢低 |
+| 239 | 移动端按钮间距太小 | 🟢低 |
+
+---
+
+## 最推荐先做的10个
+
+1. ✅ **全站搜索** — 最实用
+2. ✅ **Toast提示** — 基础设施
+3. ✅ **打字机Banner** — 简单效果好
+4. ✅ **首页分类筛选** — 文章多了必备
+5. ✅ **文章热力图** — 视觉好看
+6. ✅ **AI文章摘要** — 已有API能力
+7. ✅ **页面加载动画** — 第一印象
+8. ✅ **视差卡片3D倾斜** — 立刻提升档次
+9. ✅ **星际跃迁跳转** — 宇宙主题首选
+10. ✅ **随机文章按钮** — 5分钟能做完
+
+---
+
+*共239个功能 + 修复项。">
+<meta property="og:title" content="gmeek">
+<meta property="og:description" content="Luliy 博客功能清单 - 完整280个
+
+> ✅ = 强烈推荐 | ⚡ = 简单 | 🔧 = 需要写代码 | 🚀 = 进阶
+
+---
+
+## 🟢 简单类
+
+| # | 功能 |
+|---|------|
+| 1 | ⚡ 随机文章按钮🎲 |
+| 2 | ⚡ 控制台彩蛋ASCII艺术字 |
+| 3 | ⚡ 宇宙年龄对比页脚 |
+| 4 | ⚡ 博客纪念日倒计时 |
+| 5 | ⚡ 打字机Banner逐字显示 |
+| 6 | ⚡ 今天是什么节气 |
+| 7 | ⚡ 生命的意义=42彩蛋 |
+| 8 | ⚡ 页脚随机古诗词 |
+| 9 | ⚡ 外链箭头悬停才显示 |
+| 10 | ⚡ Toast操作提示 |
+| 11 | ⚡ 代码块语言标签 |
+| 12 | ⚡ 文章点赞按钮 |
+| 13 | ⚡ 宇宙热寂倒计时 |
+| 14 | ⚡ 写作连续打卡天数 |
+| 15 | ⚡ Konami Code彩蛋↑↑↓↓←→ |
+| 16 | ⚡ 博主不在线提示（N天未更新） |
+| 17 | ⚡ 新文章发布横幅提示 |
+| 18 | ⚡ 文章难度标签🟢🟡🔴 |
+| 19 | ⚡ 印章落款效果 |
+| 20 | ⚡ 多语言欢迎语随机切换 |
+
+---
+
+## 🟡 中等类
+
+| # | 功能 |
+|---|------|
+| 21 | ✅ 全站搜索功能 |
+| 22 | ✅ 首页分类标签筛选 |
+| 23 | ✅ 灯箱左右切换图片 |
+| 24 | ✅ Toast操作反馈提示 |
+| 25 | 🔧 文章收藏夹本地存储 |
+| 26 | 🔧 字体大小A+/A-调节 |
+| 27 | 🔧 专注阅读模式 |
+| 28 | 🔧 文章二维码分享 |
+| 29 | 🔧 进度条颜色跟随皮肤 |
+| 30 | 🔧 段落悬停高亮 |
+| 31 | 🔧 相关文章推荐（按标签） |
+| 32 | 🔧 首页无限滚动加载 |
+| 33 | 🔧 暗色卡片层次感优化 |
+| 34 | 🔧 移动端底部导航栏 |
+| 35 | 🔧 文章字数统计面板 |
+| 36 | 🔧 阅读进度记忆 |
+| 37 | 🔧 博客便签本 |
+| 38 | 🔧 文章朗读TTS |
+| 39 | 🔧 图片懒加载模糊渐入 |
+| 40 | 🔧 护眼模式米黄色背景 |
+| 41 | 🔧 沉浸阅读聚光灯模式 |
+| 42 | 🔧 行间距调节 |
+| 43 | 🔧 卡片点击涟漪效果 |
+| 44 | 🔧 醉酒模式彩蛋 |
+| 45 | 🔧 虫洞传送跳转动画 |
+| 46 | 🔧 博客占卜神谕 |
+| 47 | 🔧 文章完成度提示75% |
+| 48 | 🔧 外链安全离站提示 |
+| 49 | 🔧 一键复制文章链接 |
+| 50 | 🔧 划词翻译气泡 |
+| 51 | 🔧 阅读心情选择 |
+| 52 | 🔧 共读人数显示 |
+| 53 | 🔧 下拉刷新动画 |
+| 54 | 🔧 移动端手势左右翻页 |
+| 55 | 🔧 访客留言贴纸墙 |
+| 56 | 🔧 读者身份标签选择 |
+| 57 | 🔧 文章版本历史显示 |
+| 58 | 🔧 黑客模式Matrix字符雨 |
+| 59 | 🔧 镜像世界页面翻转 |
+| 60 | 🔧 放大镜鼠标模式 |
+
+---
+
+## 🔴 进阶类
+
+| # | 功能 |
+|---|------|
+| 61 | ✅ 文章热力图GitHub风格 |
+| 62 | ✅ 页面加载动画全屏 |
+| 63 | ✅ 视差卡片3D倾斜效果 |
+| 64 | ✅ 星际跃迁页面跳转动画 |
+| 65 | 🚀 标签统计饼图Chart.js |
+| 66 | 🚀 文章时间线页面美化 |
+| 67 | 🚀 首页布局卡片/列表切换 |
+| 68 | 🚀 自定义主题色选择器 |
+| 69 | 🚀 系列文章顶部导航条 |
+| 70 | 🚀 文章封面自动生成渐变 |
+| 71 | 🚀 Service Worker离线缓存 |
+| 72 | 🚀 文章地图节点连线图 |
+| 73 | 🚀 博客年度报告可视化 |
+| 74 | 🚀 萤火虫夜间效果 |
+| 75 | 🚀 流体背景色块 |
+| 76 | 🚀 文章词云自动生成 |
+| 77 | 🚀 打字机终端开场动画 |
+| 78 | 🚀 水墨晕染中国风背景 |
+| 79 | 🚀 故障艺术Glitch标题 |
+| 80 | 🚀 引力波涟漪滚动效果 |
+| 81 | 🚀 磁力按钮跟随鼠标 |
+| 82 | 🚀 液态按钮变形效果 |
+| 83 | 🚀 博客大爆炸奇点开场 |
+| 84 | 🚀 卷轴展开文章动画 |
+| 85 | 🚀 霓虹灯标题发光效果 |
+| 86 | 🚀 滚动触发元素入场动画 |
+| 87 | 🚀 文章章节进度显示 |
+| 88 | 🚀 弹性滚动顶部回弹 |
+| 89 | 🚀 成就系统读者徽章 |
+| 90 | 🚀 签到功能每日打卡 |
+| 91 | 🚀 博主等级显示Lv.X |
+| 92 | 🚀 文章拼图还原挑战 |
+| 93 | 🚀 故事分支互动文章 |
+| 94 | 🚀 预加载下一篇文章 |
+| 95 | 🚀 字体切换多种选择 |
+| 96 | 🚀 竹简样式归档页 |
+| 97 | 🚀 像素风格主题切换 |
+| 98 | 🚀 老电视开机动画 |
+| 99 | 🚀 太阳风粒子方向感 |
+| 100 | 🚀 日冕头像发光效果 |
+
+---
+
+## 🤖 AI增强类
+
+| # | 功能 |
+|---|------|
+| 101 | ✅ AI文章摘要Claude API |
+| 102 | 🚀 AI关键词提取 |
+| 103 | 🚀 AI相关文章推荐 |
+| 104 | 🚀 AI针对文章问答 |
+| 105 | 🚀 AI文章封面生成 |
+| 106 | 🚀 AI文章情绪分析 |
+| 107 | 🚀 AI写作助手提示 |
+
+---
+
+## 🎨 视觉装饰类
+
+| # | 功能 |
+|---|------|
+| 108 | 🔧 雪花飘落效果 |
+| 109 | 🔧 树叶秋天飘落 |
+| 110 | 🔧 下雨效果+雨声 |
+| 111 | 🔧 彩虹特效按钮 |
+| 112 | 🔧 向日葵跟随鼠标 |
+| 113 | 🔧 蝴蝶跟随鼠标飞行 |
+| 114 | 🔧 蜘蛛网静止特效 |
+| 115 | 🔧 鱼缸背景游鱼 |
+| 116 | 🔧 星系粒子背景升级 |
+| 117 | 🔧 流星划过可许愿 |
+| 118 | 🔧 背景动态极光渐变 |
+| 119 | 🔧 卡片翻转显示摘要 |
+| 120 | 🔧 灯笼悬挂摆动 |
+| 121 | 🔧 毛笔字书写动画 |
+| 122 | 🔧 像素小人角落跑步 |
+| 123 | 🔧 CRT扫描线复古效果 |
+| 124 | 🔧 星座背景图案 |
+| 125 | 🔧 苔藓边缘生长 |
+| 126 | 🔧 波形可视化装饰 |
+| 127 | 🔧 草图手绘风格切换 |
+| 128 | 🔧 康定斯基抽象背景生成 |
+
+---
+
+## 🎵 音频类
+
+| # | 功能 |
+|---|------|
+| 129 | 🔧 环境白噪音雨声森林 |
+| 130 | 🔧 机械键盘打字音效升级 |
+| 131 | 🔧 文章朗读速度调节 |
+| 132 | 🔧 背景音乐淡入淡出 |
+| 133 | 🔧 磁带播放器UI |
+
+---
+
+## ⌨️ 快捷键系统
+
+| # | 功能 |
+|---|------|
+| 134 | 🔧 ?键弹出快捷键面板 |
+| 135 | 🔧 J/K上下篇跳转 |
+| 136 | 🔧 /键打开搜索框 |
+| 137 | 🔧 GH回首页GG回顶部 |
+
+---
+
+## 📊 数据可视化类
+
+| # | 功能 |
+|---|------|
+| 138 | 🚀 文章热力图按日期 |
+| 139 | 🚀 标签分布饼图 |
+| 140 | 🚀 博客成长折线图 |
+| 141 | 🚀 文章相似度矩阵 |
+| 142 | 🚀 文章时长分布色块 |
+| 143 | 🚀 第四维度3D文章视图 |
+| 144 | 🚀 博客文章地图节点图 |
+
+---
+
+## 🏠 个人品牌类
+
+| # | 功能 |
+|---|------|
+| 145 | 🚀 在线简历页/resume |
+| 146 | 🚀 GitHub项目展示墙 |
+| 147 | 🚀 技能树可视化 |
+| 148 | 🚀 人生进度条 |
+| 149 | 🚀 博客名片生成分享 |
+| 150 | 🚀 文章导出精美图片 |
+| 151 | 🚀 文章导出PDF |
+
+---
+
+## 🔐 隐私安全类
+
+| # | 功能 |
+|---|------|
+| 152 | 🔧 局部内容单独加密 |
+| 153 | 🔧 访问时间限制解锁 |
+| 154 | 🔧 摩斯电码装饰彩蛋 |
+| 155 | 🔧 隐写术隐藏文字 |
+| 156 | 🔧 页面源码彩蛋注释 |
+
+---
+
+## 🎪 节日特效类
+
+| # | 功能 |
+|---|------|
+| 157 | 🔧 博客生日撒彩带动画 |
+| 158 | 🔧 除夕跨年烟花特效 |
+| 159 | 🔧 万圣节幽灵主题 |
+| 160 | 🔧 圣诞节下雪戴帽 |
+| 161 | 🔧 春节红包雨 |
+| 162 | 🔧 高考加油横幅6月7日 |
+
+---
+
+## 🌌 宇宙主题类
+
+| # | 功能 |
+|---|------|
+| 163 | 🚀 博客大爆炸奇点开场 |
+| 164 | 🚀 文章星球首页宇宙 |
+| 165 | 🚀 星际跃迁跳转动画 |
+| 166 | 🚀 引力波涟漪滚动 |
+| 167 | 🚀 宇宙广播电波动画 |
+| 168 | 🚀 流星划过许愿功能 |
+| 169 | 🚀 脉冲星发文频率 |
+| 170 | 🚀 暗能量进度条升级 |
+| 171 | 🚀 宇宙微波背景噪点 |
+| 172 | 🚀 黑洞吸入重载动画 |
+| 173 | 🚀 虫洞文章传送 |
+| 174 | 🚀 太阳系时钟 |
+| 175 | 🚀 星际文明等级显示 |
+
+---
+
+## 🧪 实验性功能
+
+| # | 功能 |
+|---|------|
+| 176 | 🚀 语音导航命令 |
+| 177 | 🚀 手势翻页摄像头 |
+| 178 | 🚀 观测者效应段落发光 |
+| 179 | 🚀 眼动追踪模拟 |
+| 180 | 🚀 量子随机诗生成 |
+
+---
+
+## 🔬 开发者工具类
+
+| # | 功能 |
+|---|------|
+| 181 | 🔧 Ctrl+Shift+D调试面板 |
+| 182 | 🔧 插件管理可视化面板 |
+| 183 | 🔧 性能监控FPS悬浮窗 |
+| 184 | 🔧 JS错误自动上报Issue |
+| 185 | 🔧 主题实时预览 |
+
+---
+
+## 🎭 荒诞彩蛋类
+
+| # | 功能 |
+|---|------|
+| 186 | 🔧 文字翻转恶作剧 |
+| 187 | 🔧 橡皮泥标题揉捏 |
+| 188 | 🔧 博客时钟屏保5分钟 |
+| 189 | 🔧 时间胶囊未来信件 |
+| 190 | 🔧 薛定谔的文章 |
+| 191 | 🔧 平行宇宙1%概率 |
+| 192 | 🔧 熵增页面效果 |
+| 193 | 🔧 博客墓志铭生成器 |
+| 194 | 🔧 博客变游戏平台跳跃 |
+| 195 | 🔧 文章迷宫还原 |
+| 196 | 🔧 图灵测试对话框 |
+| 197 | 🔧 文章时光机模拟 |
+
+---
+
+## 🌿 自然生物类
+
+| # | 功能 |
+|---|------|
+| 198 | 🔧 重力粒子堆积 |
+| 199 | 🔧 布料模拟横幅 |
+| 200 | 🔧 弹珠板卡片掉落 |
+| 201 | 🔧 沙粒文字聚合 |
+| 202 | 🔧 萤火虫聚集鼠标 |
+| 203 | 🔧 蚂蚁搬运文章标题 |
+| 204 | 🔧 蜘蛛网织造效果 |
+
+---
+
+## 🌍 国际化类
+
+| # | 功能 |
+|---|------|
+| 205 | 🔧 中英文之间自动加空格 |
+| 206 | 🔧 全文机器翻译按钮 |
+| 207 | 🔧 高对比度无障碍模式 |
+| 208 | 🔧 文字间距阅读障碍模式 |
+
+---
+
+## 📅 时间日历类
+
+| # | 功能 |
+|---|------|
+| 209 | 🚀 文章日历视图 |
+| 210 | 🔧 今日节气节日显示 |
+| 211 | 🔧 写作连续打卡🔥 |
+| 212 | 🔧 博客时钟屏保 |
+
+---
+
+## 📱 多媒体类
+
+| # | 功能 |
+|---|------|
+| 213 | 🔧 视频卡片B站嵌入 |
+| 214 | 🔧 音频播放器美化 |
+| 215 | 🔧 图片相册轮播模式 |
+| 216 | 🔧 图片对比拖动滑块 |
+| 217 | 🔧 图片点击下载按钮 |
+
+---
+
+## 🎯 通知提醒类
+
+| # | 功能 |
+|---|------|
+| 218 | 🔧 新文章顶部横幅 |
+| 219 | 🔧 浏览器桌面通知 |
+| 220 | 🔧 标题消息提示升级 |
+
+---
+
+## 🗂️ 内容组织类
+
+| # | 功能 |
+|---|------|
+| 221 | 🚀 专题合集页面 |
+| 222 | 🚀 文章系列导航条 |
+| 223 | 🚀 友链卡片自动抓取 |
+| 224 | 🔧 文章摘要自动截取 |
+| 225 | 🔧 置顶文章📌徽章动画 |
+
+---
+
+## 🏆 游戏化类
+
+| # | 功能 |
+|---|------|
+| 226 | 🚀 读者成就系统徽章 |
+| 227 | 🚀 阅读排行榜Top5 |
+| 228 | 🔧 博主等级Lv.X显示 |
+| 229 | 🔧 每日签到功能 |
+| 230 | 🔧 打字速度挑战游戏 |
+| 231 | 🔧 今日运势随机生成 |
+
+---
+
+## 🛠️ 待修复问题
+
+| # | 问题 | 优先级 |
+|---|------|--------|
+| 232 | 工具栏和TOC位置冲突 | 🔴高 |
+| 233 | 菜单手机端超出屏幕 | 🔴高 |
+| 234 | 低端设备性能优化 | 🟡中 |
+| 235 | 暗色卡片层次感不足 | 🟡中 |
+| 236 | Hero Banner间距写死 | 🟡中 |
+| 237 | TOC触发条件优化 | 🟢低 |
+| 238 | 外链↗箭头太密集 | 🟢低 |
+| 239 | 移动端按钮间距太小 | 🟢低 |
+
+---
+
+## 最推荐先做的10个
+
+1. ✅ **全站搜索** — 最实用
+2. ✅ **Toast提示** — 基础设施
+3. ✅ **打字机Banner** — 简单效果好
+4. ✅ **首页分类筛选** — 文章多了必备
+5. ✅ **文章热力图** — 视觉好看
+6. ✅ **AI文章摘要** — 已有API能力
+7. ✅ **页面加载动画** — 第一印象
+8. ✅ **视差卡片3D倾斜** — 立刻提升档次
+9. ✅ **星际跃迁跳转** — 宇宙主题首选
+10. ✅ **随机文章按钮** — 5分钟能做完
+
+---
+
+*共239个功能 + 修复项。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://luliy.me/post/gmeek.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
+<title>gmeek</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">gmeek</h1>
+<div class="title-right">
+    <a href="https://luliy.me" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/luliy6/luliy6.github.io/issues/31" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>Luliy 博客功能清单 - 完整280个</p>
+<blockquote>
+<p>✅ = 强烈推荐 | ⚡ = 简单 | 🔧 = 需要写代码 | 🚀 = 进阶</p>
+</blockquote>
+<hr>
+<h2>🟢 简单类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>⚡ 随机文章按钮🎲</td>
+</tr>
+<tr>
+<td>2</td>
+<td>⚡ 控制台彩蛋ASCII艺术字</td>
+</tr>
+<tr>
+<td>3</td>
+<td>⚡ 宇宙年龄对比页脚</td>
+</tr>
+<tr>
+<td>4</td>
+<td>⚡ 博客纪念日倒计时</td>
+</tr>
+<tr>
+<td>5</td>
+<td>⚡ 打字机Banner逐字显示</td>
+</tr>
+<tr>
+<td>6</td>
+<td>⚡ 今天是什么节气</td>
+</tr>
+<tr>
+<td>7</td>
+<td>⚡ 生命的意义=42彩蛋</td>
+</tr>
+<tr>
+<td>8</td>
+<td>⚡ 页脚随机古诗词</td>
+</tr>
+<tr>
+<td>9</td>
+<td>⚡ 外链箭头悬停才显示</td>
+</tr>
+<tr>
+<td>10</td>
+<td>⚡ Toast操作提示</td>
+</tr>
+<tr>
+<td>11</td>
+<td>⚡ 代码块语言标签</td>
+</tr>
+<tr>
+<td>12</td>
+<td>⚡ 文章点赞按钮</td>
+</tr>
+<tr>
+<td>13</td>
+<td>⚡ 宇宙热寂倒计时</td>
+</tr>
+<tr>
+<td>14</td>
+<td>⚡ 写作连续打卡天数</td>
+</tr>
+<tr>
+<td>15</td>
+<td>⚡ Konami Code彩蛋↑↑↓↓←→</td>
+</tr>
+<tr>
+<td>16</td>
+<td>⚡ 博主不在线提示（N天未更新）</td>
+</tr>
+<tr>
+<td>17</td>
+<td>⚡ 新文章发布横幅提示</td>
+</tr>
+<tr>
+<td>18</td>
+<td>⚡ 文章难度标签🟢🟡🔴</td>
+</tr>
+<tr>
+<td>19</td>
+<td>⚡ 印章落款效果</td>
+</tr>
+<tr>
+<td>20</td>
+<td>⚡ 多语言欢迎语随机切换</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🟡 中等类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>21</td>
+<td>✅ 全站搜索功能</td>
+</tr>
+<tr>
+<td>22</td>
+<td>✅ 首页分类标签筛选</td>
+</tr>
+<tr>
+<td>23</td>
+<td>✅ 灯箱左右切换图片</td>
+</tr>
+<tr>
+<td>24</td>
+<td>✅ Toast操作反馈提示</td>
+</tr>
+<tr>
+<td>25</td>
+<td>🔧 文章收藏夹本地存储</td>
+</tr>
+<tr>
+<td>26</td>
+<td>🔧 字体大小A+/A-调节</td>
+</tr>
+<tr>
+<td>27</td>
+<td>🔧 专注阅读模式</td>
+</tr>
+<tr>
+<td>28</td>
+<td>🔧 文章二维码分享</td>
+</tr>
+<tr>
+<td>29</td>
+<td>🔧 进度条颜色跟随皮肤</td>
+</tr>
+<tr>
+<td>30</td>
+<td>🔧 段落悬停高亮</td>
+</tr>
+<tr>
+<td>31</td>
+<td>🔧 相关文章推荐（按标签）</td>
+</tr>
+<tr>
+<td>32</td>
+<td>🔧 首页无限滚动加载</td>
+</tr>
+<tr>
+<td>33</td>
+<td>🔧 暗色卡片层次感优化</td>
+</tr>
+<tr>
+<td>34</td>
+<td>🔧 移动端底部导航栏</td>
+</tr>
+<tr>
+<td>35</td>
+<td>🔧 文章字数统计面板</td>
+</tr>
+<tr>
+<td>36</td>
+<td>🔧 阅读进度记忆</td>
+</tr>
+<tr>
+<td>37</td>
+<td>🔧 博客便签本</td>
+</tr>
+<tr>
+<td>38</td>
+<td>🔧 文章朗读TTS</td>
+</tr>
+<tr>
+<td>39</td>
+<td>🔧 图片懒加载模糊渐入</td>
+</tr>
+<tr>
+<td>40</td>
+<td>🔧 护眼模式米黄色背景</td>
+</tr>
+<tr>
+<td>41</td>
+<td>🔧 沉浸阅读聚光灯模式</td>
+</tr>
+<tr>
+<td>42</td>
+<td>🔧 行间距调节</td>
+</tr>
+<tr>
+<td>43</td>
+<td>🔧 卡片点击涟漪效果</td>
+</tr>
+<tr>
+<td>44</td>
+<td>🔧 醉酒模式彩蛋</td>
+</tr>
+<tr>
+<td>45</td>
+<td>🔧 虫洞传送跳转动画</td>
+</tr>
+<tr>
+<td>46</td>
+<td>🔧 博客占卜神谕</td>
+</tr>
+<tr>
+<td>47</td>
+<td>🔧 文章完成度提示75%</td>
+</tr>
+<tr>
+<td>48</td>
+<td>🔧 外链安全离站提示</td>
+</tr>
+<tr>
+<td>49</td>
+<td>🔧 一键复制文章链接</td>
+</tr>
+<tr>
+<td>50</td>
+<td>🔧 划词翻译气泡</td>
+</tr>
+<tr>
+<td>51</td>
+<td>🔧 阅读心情选择</td>
+</tr>
+<tr>
+<td>52</td>
+<td>🔧 共读人数显示</td>
+</tr>
+<tr>
+<td>53</td>
+<td>🔧 下拉刷新动画</td>
+</tr>
+<tr>
+<td>54</td>
+<td>🔧 移动端手势左右翻页</td>
+</tr>
+<tr>
+<td>55</td>
+<td>🔧 访客留言贴纸墙</td>
+</tr>
+<tr>
+<td>56</td>
+<td>🔧 读者身份标签选择</td>
+</tr>
+<tr>
+<td>57</td>
+<td>🔧 文章版本历史显示</td>
+</tr>
+<tr>
+<td>58</td>
+<td>🔧 黑客模式Matrix字符雨</td>
+</tr>
+<tr>
+<td>59</td>
+<td>🔧 镜像世界页面翻转</td>
+</tr>
+<tr>
+<td>60</td>
+<td>🔧 放大镜鼠标模式</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🔴 进阶类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>61</td>
+<td>✅ 文章热力图GitHub风格</td>
+</tr>
+<tr>
+<td>62</td>
+<td>✅ 页面加载动画全屏</td>
+</tr>
+<tr>
+<td>63</td>
+<td>✅ 视差卡片3D倾斜效果</td>
+</tr>
+<tr>
+<td>64</td>
+<td>✅ 星际跃迁页面跳转动画</td>
+</tr>
+<tr>
+<td>65</td>
+<td>🚀 标签统计饼图Chart.js</td>
+</tr>
+<tr>
+<td>66</td>
+<td>🚀 文章时间线页面美化</td>
+</tr>
+<tr>
+<td>67</td>
+<td>🚀 首页布局卡片/列表切换</td>
+</tr>
+<tr>
+<td>68</td>
+<td>🚀 自定义主题色选择器</td>
+</tr>
+<tr>
+<td>69</td>
+<td>🚀 系列文章顶部导航条</td>
+</tr>
+<tr>
+<td>70</td>
+<td>🚀 文章封面自动生成渐变</td>
+</tr>
+<tr>
+<td>71</td>
+<td>🚀 Service Worker离线缓存</td>
+</tr>
+<tr>
+<td>72</td>
+<td>🚀 文章地图节点连线图</td>
+</tr>
+<tr>
+<td>73</td>
+<td>🚀 博客年度报告可视化</td>
+</tr>
+<tr>
+<td>74</td>
+<td>🚀 萤火虫夜间效果</td>
+</tr>
+<tr>
+<td>75</td>
+<td>🚀 流体背景色块</td>
+</tr>
+<tr>
+<td>76</td>
+<td>🚀 文章词云自动生成</td>
+</tr>
+<tr>
+<td>77</td>
+<td>🚀 打字机终端开场动画</td>
+</tr>
+<tr>
+<td>78</td>
+<td>🚀 水墨晕染中国风背景</td>
+</tr>
+<tr>
+<td>79</td>
+<td>🚀 故障艺术Glitch标题</td>
+</tr>
+<tr>
+<td>80</td>
+<td>🚀 引力波涟漪滚动效果</td>
+</tr>
+<tr>
+<td>81</td>
+<td>🚀 磁力按钮跟随鼠标</td>
+</tr>
+<tr>
+<td>82</td>
+<td>🚀 液态按钮变形效果</td>
+</tr>
+<tr>
+<td>83</td>
+<td>🚀 博客大爆炸奇点开场</td>
+</tr>
+<tr>
+<td>84</td>
+<td>🚀 卷轴展开文章动画</td>
+</tr>
+<tr>
+<td>85</td>
+<td>🚀 霓虹灯标题发光效果</td>
+</tr>
+<tr>
+<td>86</td>
+<td>🚀 滚动触发元素入场动画</td>
+</tr>
+<tr>
+<td>87</td>
+<td>🚀 文章章节进度显示</td>
+</tr>
+<tr>
+<td>88</td>
+<td>🚀 弹性滚动顶部回弹</td>
+</tr>
+<tr>
+<td>89</td>
+<td>🚀 成就系统读者徽章</td>
+</tr>
+<tr>
+<td>90</td>
+<td>🚀 签到功能每日打卡</td>
+</tr>
+<tr>
+<td>91</td>
+<td>🚀 博主等级显示Lv.X</td>
+</tr>
+<tr>
+<td>92</td>
+<td>🚀 文章拼图还原挑战</td>
+</tr>
+<tr>
+<td>93</td>
+<td>🚀 故事分支互动文章</td>
+</tr>
+<tr>
+<td>94</td>
+<td>🚀 预加载下一篇文章</td>
+</tr>
+<tr>
+<td>95</td>
+<td>🚀 字体切换多种选择</td>
+</tr>
+<tr>
+<td>96</td>
+<td>🚀 竹简样式归档页</td>
+</tr>
+<tr>
+<td>97</td>
+<td>🚀 像素风格主题切换</td>
+</tr>
+<tr>
+<td>98</td>
+<td>🚀 老电视开机动画</td>
+</tr>
+<tr>
+<td>99</td>
+<td>🚀 太阳风粒子方向感</td>
+</tr>
+<tr>
+<td>100</td>
+<td>🚀 日冕头像发光效果</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🤖 AI增强类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>101</td>
+<td>✅ AI文章摘要Claude API</td>
+</tr>
+<tr>
+<td>102</td>
+<td>🚀 AI关键词提取</td>
+</tr>
+<tr>
+<td>103</td>
+<td>🚀 AI相关文章推荐</td>
+</tr>
+<tr>
+<td>104</td>
+<td>🚀 AI针对文章问答</td>
+</tr>
+<tr>
+<td>105</td>
+<td>🚀 AI文章封面生成</td>
+</tr>
+<tr>
+<td>106</td>
+<td>🚀 AI文章情绪分析</td>
+</tr>
+<tr>
+<td>107</td>
+<td>🚀 AI写作助手提示</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🎨 视觉装饰类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>108</td>
+<td>🔧 雪花飘落效果</td>
+</tr>
+<tr>
+<td>109</td>
+<td>🔧 树叶秋天飘落</td>
+</tr>
+<tr>
+<td>110</td>
+<td>🔧 下雨效果+雨声</td>
+</tr>
+<tr>
+<td>111</td>
+<td>🔧 彩虹特效按钮</td>
+</tr>
+<tr>
+<td>112</td>
+<td>🔧 向日葵跟随鼠标</td>
+</tr>
+<tr>
+<td>113</td>
+<td>🔧 蝴蝶跟随鼠标飞行</td>
+</tr>
+<tr>
+<td>114</td>
+<td>🔧 蜘蛛网静止特效</td>
+</tr>
+<tr>
+<td>115</td>
+<td>🔧 鱼缸背景游鱼</td>
+</tr>
+<tr>
+<td>116</td>
+<td>🔧 星系粒子背景升级</td>
+</tr>
+<tr>
+<td>117</td>
+<td>🔧 流星划过可许愿</td>
+</tr>
+<tr>
+<td>118</td>
+<td>🔧 背景动态极光渐变</td>
+</tr>
+<tr>
+<td>119</td>
+<td>🔧 卡片翻转显示摘要</td>
+</tr>
+<tr>
+<td>120</td>
+<td>🔧 灯笼悬挂摆动</td>
+</tr>
+<tr>
+<td>121</td>
+<td>🔧 毛笔字书写动画</td>
+</tr>
+<tr>
+<td>122</td>
+<td>🔧 像素小人角落跑步</td>
+</tr>
+<tr>
+<td>123</td>
+<td>🔧 CRT扫描线复古效果</td>
+</tr>
+<tr>
+<td>124</td>
+<td>🔧 星座背景图案</td>
+</tr>
+<tr>
+<td>125</td>
+<td>🔧 苔藓边缘生长</td>
+</tr>
+<tr>
+<td>126</td>
+<td>🔧 波形可视化装饰</td>
+</tr>
+<tr>
+<td>127</td>
+<td>🔧 草图手绘风格切换</td>
+</tr>
+<tr>
+<td>128</td>
+<td>🔧 康定斯基抽象背景生成</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🎵 音频类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>129</td>
+<td>🔧 环境白噪音雨声森林</td>
+</tr>
+<tr>
+<td>130</td>
+<td>🔧 机械键盘打字音效升级</td>
+</tr>
+<tr>
+<td>131</td>
+<td>🔧 文章朗读速度调节</td>
+</tr>
+<tr>
+<td>132</td>
+<td>🔧 背景音乐淡入淡出</td>
+</tr>
+<tr>
+<td>133</td>
+<td>🔧 磁带播放器UI</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>⌨️ 快捷键系统</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>134</td>
+<td>🔧 ?键弹出快捷键面板</td>
+</tr>
+<tr>
+<td>135</td>
+<td>🔧 J/K上下篇跳转</td>
+</tr>
+<tr>
+<td>136</td>
+<td>🔧 /键打开搜索框</td>
+</tr>
+<tr>
+<td>137</td>
+<td>🔧 GH回首页GG回顶部</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>📊 数据可视化类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>138</td>
+<td>🚀 文章热力图按日期</td>
+</tr>
+<tr>
+<td>139</td>
+<td>🚀 标签分布饼图</td>
+</tr>
+<tr>
+<td>140</td>
+<td>🚀 博客成长折线图</td>
+</tr>
+<tr>
+<td>141</td>
+<td>🚀 文章相似度矩阵</td>
+</tr>
+<tr>
+<td>142</td>
+<td>🚀 文章时长分布色块</td>
+</tr>
+<tr>
+<td>143</td>
+<td>🚀 第四维度3D文章视图</td>
+</tr>
+<tr>
+<td>144</td>
+<td>🚀 博客文章地图节点图</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🏠 个人品牌类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>145</td>
+<td>🚀 在线简历页/resume</td>
+</tr>
+<tr>
+<td>146</td>
+<td>🚀 GitHub项目展示墙</td>
+</tr>
+<tr>
+<td>147</td>
+<td>🚀 技能树可视化</td>
+</tr>
+<tr>
+<td>148</td>
+<td>🚀 人生进度条</td>
+</tr>
+<tr>
+<td>149</td>
+<td>🚀 博客名片生成分享</td>
+</tr>
+<tr>
+<td>150</td>
+<td>🚀 文章导出精美图片</td>
+</tr>
+<tr>
+<td>151</td>
+<td>🚀 文章导出PDF</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🔐 隐私安全类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>152</td>
+<td>🔧 局部内容单独加密</td>
+</tr>
+<tr>
+<td>153</td>
+<td>🔧 访问时间限制解锁</td>
+</tr>
+<tr>
+<td>154</td>
+<td>🔧 摩斯电码装饰彩蛋</td>
+</tr>
+<tr>
+<td>155</td>
+<td>🔧 隐写术隐藏文字</td>
+</tr>
+<tr>
+<td>156</td>
+<td>🔧 页面源码彩蛋注释</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🎪 节日特效类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>157</td>
+<td>🔧 博客生日撒彩带动画</td>
+</tr>
+<tr>
+<td>158</td>
+<td>🔧 除夕跨年烟花特效</td>
+</tr>
+<tr>
+<td>159</td>
+<td>🔧 万圣节幽灵主题</td>
+</tr>
+<tr>
+<td>160</td>
+<td>🔧 圣诞节下雪戴帽</td>
+</tr>
+<tr>
+<td>161</td>
+<td>🔧 春节红包雨</td>
+</tr>
+<tr>
+<td>162</td>
+<td>🔧 高考加油横幅6月7日</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🌌 宇宙主题类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>163</td>
+<td>🚀 博客大爆炸奇点开场</td>
+</tr>
+<tr>
+<td>164</td>
+<td>🚀 文章星球首页宇宙</td>
+</tr>
+<tr>
+<td>165</td>
+<td>🚀 星际跃迁跳转动画</td>
+</tr>
+<tr>
+<td>166</td>
+<td>🚀 引力波涟漪滚动</td>
+</tr>
+<tr>
+<td>167</td>
+<td>🚀 宇宙广播电波动画</td>
+</tr>
+<tr>
+<td>168</td>
+<td>🚀 流星划过许愿功能</td>
+</tr>
+<tr>
+<td>169</td>
+<td>🚀 脉冲星发文频率</td>
+</tr>
+<tr>
+<td>170</td>
+<td>🚀 暗能量进度条升级</td>
+</tr>
+<tr>
+<td>171</td>
+<td>🚀 宇宙微波背景噪点</td>
+</tr>
+<tr>
+<td>172</td>
+<td>🚀 黑洞吸入重载动画</td>
+</tr>
+<tr>
+<td>173</td>
+<td>🚀 虫洞文章传送</td>
+</tr>
+<tr>
+<td>174</td>
+<td>🚀 太阳系时钟</td>
+</tr>
+<tr>
+<td>175</td>
+<td>🚀 星际文明等级显示</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🧪 实验性功能</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>176</td>
+<td>🚀 语音导航命令</td>
+</tr>
+<tr>
+<td>177</td>
+<td>🚀 手势翻页摄像头</td>
+</tr>
+<tr>
+<td>178</td>
+<td>🚀 观测者效应段落发光</td>
+</tr>
+<tr>
+<td>179</td>
+<td>🚀 眼动追踪模拟</td>
+</tr>
+<tr>
+<td>180</td>
+<td>🚀 量子随机诗生成</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🔬 开发者工具类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>181</td>
+<td>🔧 Ctrl+Shift+D调试面板</td>
+</tr>
+<tr>
+<td>182</td>
+<td>🔧 插件管理可视化面板</td>
+</tr>
+<tr>
+<td>183</td>
+<td>🔧 性能监控FPS悬浮窗</td>
+</tr>
+<tr>
+<td>184</td>
+<td>🔧 JS错误自动上报Issue</td>
+</tr>
+<tr>
+<td>185</td>
+<td>🔧 主题实时预览</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🎭 荒诞彩蛋类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>186</td>
+<td>🔧 文字翻转恶作剧</td>
+</tr>
+<tr>
+<td>187</td>
+<td>🔧 橡皮泥标题揉捏</td>
+</tr>
+<tr>
+<td>188</td>
+<td>🔧 博客时钟屏保5分钟</td>
+</tr>
+<tr>
+<td>189</td>
+<td>🔧 时间胶囊未来信件</td>
+</tr>
+<tr>
+<td>190</td>
+<td>🔧 薛定谔的文章</td>
+</tr>
+<tr>
+<td>191</td>
+<td>🔧 平行宇宙1%概率</td>
+</tr>
+<tr>
+<td>192</td>
+<td>🔧 熵增页面效果</td>
+</tr>
+<tr>
+<td>193</td>
+<td>🔧 博客墓志铭生成器</td>
+</tr>
+<tr>
+<td>194</td>
+<td>🔧 博客变游戏平台跳跃</td>
+</tr>
+<tr>
+<td>195</td>
+<td>🔧 文章迷宫还原</td>
+</tr>
+<tr>
+<td>196</td>
+<td>🔧 图灵测试对话框</td>
+</tr>
+<tr>
+<td>197</td>
+<td>🔧 文章时光机模拟</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🌿 自然生物类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>198</td>
+<td>🔧 重力粒子堆积</td>
+</tr>
+<tr>
+<td>199</td>
+<td>🔧 布料模拟横幅</td>
+</tr>
+<tr>
+<td>200</td>
+<td>🔧 弹珠板卡片掉落</td>
+</tr>
+<tr>
+<td>201</td>
+<td>🔧 沙粒文字聚合</td>
+</tr>
+<tr>
+<td>202</td>
+<td>🔧 萤火虫聚集鼠标</td>
+</tr>
+<tr>
+<td>203</td>
+<td>🔧 蚂蚁搬运文章标题</td>
+</tr>
+<tr>
+<td>204</td>
+<td>🔧 蜘蛛网织造效果</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🌍 国际化类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>205</td>
+<td>🔧 中英文之间自动加空格</td>
+</tr>
+<tr>
+<td>206</td>
+<td>🔧 全文机器翻译按钮</td>
+</tr>
+<tr>
+<td>207</td>
+<td>🔧 高对比度无障碍模式</td>
+</tr>
+<tr>
+<td>208</td>
+<td>🔧 文字间距阅读障碍模式</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>📅 时间日历类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>209</td>
+<td>🚀 文章日历视图</td>
+</tr>
+<tr>
+<td>210</td>
+<td>🔧 今日节气节日显示</td>
+</tr>
+<tr>
+<td>211</td>
+<td>🔧 写作连续打卡🔥</td>
+</tr>
+<tr>
+<td>212</td>
+<td>🔧 博客时钟屏保</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>📱 多媒体类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>213</td>
+<td>🔧 视频卡片B站嵌入</td>
+</tr>
+<tr>
+<td>214</td>
+<td>🔧 音频播放器美化</td>
+</tr>
+<tr>
+<td>215</td>
+<td>🔧 图片相册轮播模式</td>
+</tr>
+<tr>
+<td>216</td>
+<td>🔧 图片对比拖动滑块</td>
+</tr>
+<tr>
+<td>217</td>
+<td>🔧 图片点击下载按钮</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🎯 通知提醒类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>218</td>
+<td>🔧 新文章顶部横幅</td>
+</tr>
+<tr>
+<td>219</td>
+<td>🔧 浏览器桌面通知</td>
+</tr>
+<tr>
+<td>220</td>
+<td>🔧 标题消息提示升级</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🗂️ 内容组织类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>221</td>
+<td>🚀 专题合集页面</td>
+</tr>
+<tr>
+<td>222</td>
+<td>🚀 文章系列导航条</td>
+</tr>
+<tr>
+<td>223</td>
+<td>🚀 友链卡片自动抓取</td>
+</tr>
+<tr>
+<td>224</td>
+<td>🔧 文章摘要自动截取</td>
+</tr>
+<tr>
+<td>225</td>
+<td>🔧 置顶文章📌徽章动画</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🏆 游戏化类</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>226</td>
+<td>🚀 读者成就系统徽章</td>
+</tr>
+<tr>
+<td>227</td>
+<td>🚀 阅读排行榜Top5</td>
+</tr>
+<tr>
+<td>228</td>
+<td>🔧 博主等级Lv.X显示</td>
+</tr>
+<tr>
+<td>229</td>
+<td>🔧 每日签到功能</td>
+</tr>
+<tr>
+<td>230</td>
+<td>🔧 打字速度挑战游戏</td>
+</tr>
+<tr>
+<td>231</td>
+<td>🔧 今日运势随机生成</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>🛠️ 待修复问题</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>#</th>
+<th>问题</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>232</td>
+<td>工具栏和TOC位置冲突</td>
+<td>🔴高</td>
+</tr>
+<tr>
+<td>233</td>
+<td>菜单手机端超出屏幕</td>
+<td>🔴高</td>
+</tr>
+<tr>
+<td>234</td>
+<td>低端设备性能优化</td>
+<td>🟡中</td>
+</tr>
+<tr>
+<td>235</td>
+<td>暗色卡片层次感不足</td>
+<td>🟡中</td>
+</tr>
+<tr>
+<td>236</td>
+<td>Hero Banner间距写死</td>
+<td>🟡中</td>
+</tr>
+<tr>
+<td>237</td>
+<td>TOC触发条件优化</td>
+<td>🟢低</td>
+</tr>
+<tr>
+<td>238</td>
+<td>外链↗箭头太密集</td>
+<td>🟢低</td>
+</tr>
+<tr>
+<td>239</td>
+<td>移动端按钮间距太小</td>
+<td>🟢低</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>最推荐先做的10个</h2>
+<ol>
+<li>✅ <strong>全站搜索</strong> — 最实用</li>
+<li>✅ <strong>Toast提示</strong> — 基础设施</li>
+<li>✅ <strong>打字机Banner</strong> — 简单效果好</li>
+<li>✅ <strong>首页分类筛选</strong> — 文章多了必备</li>
+<li>✅ <strong>文章热力图</strong> — 视觉好看</li>
+<li>✅ <strong>AI文章摘要</strong> — 已有API能力</li>
+<li>✅ <strong>页面加载动画</strong> — 第一印象</li>
+<li>✅ <strong>视差卡片3D倾斜</strong> — 立刻提升档次</li>
+<li>✅ <strong>星际跃迁跳转</strong> — 宇宙主题首选</li>
+<li>✅ <strong>随机文章按钮</strong> — 5分钟能做完</li>
+</ol>
+<hr>
+<p><em>共239个功能 + 修复项。想实现哪个，告诉Claude，直接写代码。</em><br>
+EOF<br>
+echo "done"</p></div>
+<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://luliy.me">Luliy</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if("05/30/2026"!=""){
+    var startSite=new Date("05/30/2026");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行 "+diffDay+" 天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","luliy6/luliy6.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+<script>function luliyWaitPost(){if(window._luliyInitPost){window._luliyInitPost();}else{setTimeout(luliyWaitPost,50);}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',luliyWaitPost);}else{luliyWaitPost();}</script>
+
+</html>
