@@ -1413,12 +1413,12 @@ body[data-luliy-theme="mono"] {
 [id*="articleTOC"], [class*="ArticleTOC"] {
   position: fixed !important;
   top: 130px !important;   /* below ctrl pill btn: 76px + ~44px + gap */
-  right: 280px !important;
+  right: 24px !important;
   left: auto !important;
   bottom: 20px !important;
   width: 244px !important;
   max-height: calc(100vh - 155px) !important;
-  overflow-y: auto !important;
+  overflow-y: scroll !important;
   overflow-x: hidden !important;
   z-index: 9992 !important;   /* above toolbar (9990) + panel (9991) */
   /* Glass card matching toolbar aesthetic */
@@ -1462,6 +1462,9 @@ body[data-luliy-theme="mono"] {
   border-bottom: 1px solid var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
   font-family: 'Noto Sans SC', sans-serif !important;
   user-select: none !important;
+  position: relative !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
 }
 [data-color-mode="dark"] #TOC details > summary,
 [data-color-mode="dark"] .articletoc details > summary {
