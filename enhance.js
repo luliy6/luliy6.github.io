@@ -1410,6 +1410,28 @@
       var links = Array.from(toc.querySelectorAll('a[href^="#"]'));
       if (!headings.length || !links.length) return true;
 
+      /* ── Strip inline colour the articletoc plugin sets on links /
+         their inner spans — otherwise it overrides the themed,
+         dark-mode-readable colours from enhance.css.               */
+      links.forEach(function (a) {
+        a.style.removeProperty('color');
+        a.style.removeProperty('background');
+        a.style.removeProperty('background-color');
+        a.querySelectorAll('*').forEach(function (el) {
+          el.style.removeProperty('color');
+          el.style.removeProperty('background');
+          el.style.removeProperty('background-color');
+        });
+      });
+      /* Also strip from any non-link list items / spans in the TOC */
+      toc.querySelectorAll('li, span, summary, div').forEach(function (el) {
+        if (el.classList.contains('luliy-toc-injected-hdr') ||
+            el.classList.contains('luliy-toc-injected-label') ||
+            el.classList.contains('luliy-toc-injected-totop')) return;
+        var c = el.style && el.style.color;
+        if (c) el.style.removeProperty('color');
+      });
+
       var lastActiveId = null;
       function onScroll() {
         var activeH = null;
