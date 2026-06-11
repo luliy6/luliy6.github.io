@@ -316,179 +316,213 @@ a.Label {
 }
 a.Label:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
 a.Label * { vertical-align: middle !important; line-height: 1 !important; }
-
 /* ══════════════════════════════════════════════════════════
-   05  Navbar — liquid glass + collapsible
+   05  Navbar — theme-aware liquid glass (6 themes)
 ══════════════════════════════════════════════════════════ */
 #header {
   position: fixed !important;
   top: 0 !important; left: 0 !important;
   width: 100% !important;
   min-height: 56px !important;
-  background: rgba(255,255,255,0.15) !important;
-  backdrop-filter: blur(32px) saturate(2.4) brightness(1.08) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(2.4) brightness(1.08) !important;
-  border-top: 1px solid rgba(255,255,255,0.60) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.20) !important;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.35) inset,
-    0 8px 36px rgba(0,0,0,0.16),
-    0 1px 3px rgba(0,0,0,0.08) !important;
+  backdrop-filter: blur(32px) saturate(2.2) brightness(1.06) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(2.2) brightness(1.06) !important;
+  border-top: 1px solid rgba(255,255,255,0.55) !important;
   padding: 0 clamp(12px, calc((100vw - 1040px)/2 + 20px), 50%) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   z-index: 9999 !important;
   box-sizing: border-box !important;
-  transition: background 0.4s, box-shadow 0.4s !important;
   gap: 8px !important;
   flex-wrap: nowrap !important;
   overflow: visible !important;
-}
-[data-color-mode="dark"] #header {
-  background: rgba(8,6,18,0.32) !important;
-  border-top-color: rgba(255,255,255,0.10) !important;
-  border-bottom-color: rgba(255,255,255,0.05) !important;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.06) inset,
-    0 8px 36px rgba(0,0,0,0.60),
-    0 1px 4px rgba(0,0,0,0.40) !important;
+  /* Base colors — overridden per theme below */
+  background: rgba(255,255,255,0.16) !important;
+  border-bottom: 1px solid rgba(130,80,223,0.16) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.30) inset, 0 8px 32px rgba(0,0,0,0.13) !important;
+  transition: background 0.45s, border-color 0.45s, box-shadow 0.45s !important;
 }
 
-/* Nav text — full contrast on all viewports */
+/* ── Per-theme navbar tint ───────────────────────────────── */
+body[data-luliy-theme="sakura"] #header {
+  background: rgba(255,220,238,0.20) !important;
+  border-bottom-color: rgba(201,64,112,0.20) !important;
+}
+body[data-luliy-theme="your-name"] #header {
+  background: rgba(210,235,255,0.20) !important;
+  border-bottom-color: rgba(26,89,164,0.18) !important;
+}
+body[data-luliy-theme="space"] #header {
+  background: rgba(4,8,28,0.38) !important;
+  border-bottom-color: rgba(0,229,255,0.22) !important;
+  border-top-color: rgba(0,229,255,0.12) !important;
+  box-shadow: 0 1px 0 rgba(0,229,255,0.06) inset, 0 8px 32px rgba(0,0,0,0.55) !important;
+}
+body[data-luliy-theme="sunset"] #header {
+  background: rgba(255,220,200,0.18) !important;
+  border-bottom-color: rgba(255,126,95,0.22) !important;
+}
+body[data-luliy-theme="mono"] #header {
+  background: rgba(245,245,245,0.24) !important;
+  border-bottom-color: rgba(0,0,0,0.16) !important;
+}
+
+/* Dark mode base + per-theme dark overrides */
+[data-color-mode="dark"] #header {
+  background: rgba(8,6,18,0.34) !important;
+  border-top-color: rgba(255,255,255,0.08) !important;
+  border-bottom-color: rgba(130,80,223,0.22) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 32px rgba(0,0,0,0.60) !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="sakura"] #header {
+  background: rgba(36,8,22,0.44) !important;
+  border-bottom-color: rgba(249,168,201,0.22) !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="your-name"] #header {
+  background: rgba(4,12,42,0.44) !important;
+  border-bottom-color: rgba(96,165,250,0.22) !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="space"] #header {
+  background: rgba(1,4,18,0.55) !important;
+  border-bottom-color: rgba(0,229,255,0.28) !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="sunset"] #header {
+  background: rgba(30,10,18,0.44) !important;
+  border-bottom-color: rgba(254,180,123,0.22) !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="mono"] #header {
+  background: rgba(12,12,12,0.50) !important;
+  border-bottom-color: rgba(255,255,255,0.12) !important;
+}
+
+/* ── Nav text — theme-aware, fully legible ───────────────── */
 #header a, .title-right a, .title-right button {
-  color: rgba(8,3,16,1.0) !important;
+  color: rgba(14,8,28,0.90) !important;
   font-weight: 700;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.40);
-  transition: color 0.2s;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.35);
+  transition: color 0.2s, background 0.2s;
 }
 [data-color-mode="dark"] #header a,
 [data-color-mode="dark"] .title-right a,
-[data-color-mode="dark"] .title-right button { color: rgba(248,244,255,1.0) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.55); }
-#header a:hover, .title-right a:hover { color: #8250df !important; }
-[data-color-mode="dark"] #header a:hover,
-[data-color-mode="dark"] .title-right a:hover { color: #cba6f7 !important; }
+[data-color-mode="dark"] .title-right button {
+  color: rgba(240,236,255,0.95) !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.60);
+}
+/* Space theme: slightly brighter cyan text */
+body[data-luliy-theme="space"] #header a,
+body[data-luliy-theme="space"] .title-right a {
+  color: rgba(200,240,255,0.92) !important;
+  text-shadow: 0 0 8px rgba(0,229,255,0.25);
+}
 
-/* Hide original blogTitle/avatar in header (hero cluster replaces them) */
+/* ── SVG icons in nav: always follow link text color ──────── */
+.title-right a svg, .title-right a img.icon,
+#header a svg { fill: currentColor !important; color: inherit !important;
+  width: 16px; height: 16px; vertical-align: middle; display: inline-block; }
+
+/* ── Link hover — theme-aware ────────────────────────────── */
+.title-right a:hover, #header a:hover {
+  background: var(--th-accent-soft, rgba(130,80,223,0.10)) !important;
+  color: var(--th-accent, #8250df) !important;
+  text-shadow: none !important;
+}
+[data-color-mode="dark"] .title-right a:hover,
+[data-color-mode="dark"] #header a:hover {
+  background: var(--th-accent-hover, rgba(130,80,223,0.24)) !important;
+  color: var(--th-accent, #cba6f7) !important;
+}
+
+/* Hide original blogTitle/avatar (hero cluster replaces them) */
 #header .blogTitle, #header .avatar, #header .postTitle { display: none !important; }
 
-/* Hide "about" from nav bar — accessed via avatar only */
+/* Hide "about" nav link — accessed via hero cluster avatar only */
 .title-right a[href="/about"],
 .title-right a[href="/about.html"],
 .title-right a[href*="/about"] { display: none !important; }
 
-/* .title-right — desktop: visible; mobile: hidden */
-.title-right {
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  flex: 1 !important;
-  justify-content: center !important;
-  flex-shrink: 1 !important;
-  flex-wrap: wrap !important;
-  z-index: 10000 !important;
-  min-width: 0 !important;
-}
-.title-right a {
-  white-space: nowrap !important;
-  font-size: 15px !important;
-  padding: 5px 11px !important;
-  border-radius: 8px !important;
-  text-decoration: none !important;
-  transition: background 0.18s, color 0.18s !important;
-}
-.title-right a:hover {
-  background: rgba(130,80,223,0.10) !important;
-}
-[data-color-mode="dark"] .title-right a:hover {
-  background: rgba(130,80,223,0.22) !important;
-}
-
-/* Hide RSS button from nav */
-.title-right a[href*="rss"],
-.title-right a[href*="RSS"],
-.title-right a[href$=".xml"],
-.title-right a[href*="feed"],
+/* Hide RSS */
+.title-right a[href*="rss"], .title-right a[href*="RSS"],
+.title-right a[href$=".xml"], .title-right a[href*="feed"],
 .title-right a svg.octicon-rss,
 .title-right a:has(svg[data-icon*="rss"]) { display: none !important; }
 
-/* Navbar transparent when scrolled (article pages) */
+/* .title-right layout */
+.title-right {
+  display: flex !important; align-items: center !important; gap: 6px !important;
+  flex: 1 !important; justify-content: center !important;
+  flex-shrink: 1 !important; flex-wrap: wrap !important;
+  z-index: 10000 !important; min-width: 0 !important;
+}
+.title-right a {
+  white-space: nowrap !important; font-size: 15px !important;
+  padding: 5px 11px !important; border-radius: 8px !important;
+  text-decoration: none !important;
+}
+
+/* Scrolled (article page) — transparent */
 #header.header-scrolled {
   background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-top-color: transparent !important;
-  border-bottom-color: transparent !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  border-top-color: transparent !important; border-bottom-color: transparent !important;
   box-shadow: none !important;
 }
 
-
-/* Hamburger button — hidden on desktop */
+/* ── Hamburger button ───────────────────────────────────── */
 #luliy-nav-ham {
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
+  display: none; flex-direction: column; justify-content: space-between;
   width: 28px; height: 20px;
   background: none; border: none; cursor: pointer; padding: 0;
-  margin-left: auto;
-  z-index: 10001;
-  flex-shrink: 0;
+  margin-left: auto; z-index: 10001; flex-shrink: 0;
 }
 #luliy-nav-ham span {
   display: block; width: 100%; height: 2px;
-  background: rgba(30,20,50,0.85);
-  border-radius: 2px;
-  transition: transform 0.28s, opacity 0.28s;
+  background: rgba(14,8,28,0.82); border-radius: 2px;
+  transition: transform 0.28s, opacity 0.28s, background 0.28s;
 }
-[data-color-mode="dark"] #luliy-nav-ham span { background: rgba(220,215,255,0.90); }
+[data-color-mode="dark"] #luliy-nav-ham span,
+body[data-luliy-theme="space"] #luliy-nav-ham span { background: rgba(220,235,255,0.90); }
+body[data-luliy-theme="sunset"] #luliy-nav-ham span { background: rgba(80,20,10,0.85); }
+[data-color-mode="dark"] body[data-luliy-theme="sunset"] #luliy-nav-ham span { background: rgba(255,210,185,0.90); }
 #luliy-nav-ham.is-open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
 #luliy-nav-ham.is-open span:nth-child(2) { opacity: 0; }
 #luliy-nav-ham.is-open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
-/* Mobile dropdown nav panel */
+/* ── Mobile dropdown ─────────────────────────────────────── */
 #luliy-nav-dropdown {
-  display: none;
-  position: fixed;
-  top: 56px; left: 0; right: 0;
-  background: rgba(255,255,255,0.94);
-  backdrop-filter: blur(24px) saturate(2);
-  -webkit-backdrop-filter: blur(24px) saturate(2);
+  display: none; position: fixed; top: 56px; left: 0; right: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(24px) saturate(2); -webkit-backdrop-filter: blur(24px) saturate(2);
   border-bottom: 1px solid rgba(255,255,255,0.30);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.16);
-  z-index: 9998;
-  flex-direction: column;
-  padding: 10px 16px 14px;
-  gap: 2px;
-  transform: translateY(-8px);
-  opacity: 0;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.16); z-index: 9998;
+  flex-direction: column; padding: 10px 16px 14px; gap: 2px;
+  transform: translateY(-8px); opacity: 0;
   transition: transform 0.24s cubic-bezier(.4,0,.2,1), opacity 0.24s;
 }
 [data-color-mode="dark"] #luliy-nav-dropdown {
-  background: rgba(14,10,28,0.95);
-  border-bottom-color: rgba(255,255,255,0.08);
+  background: rgba(14,10,28,0.96); border-bottom-color: rgba(255,255,255,0.08);
 }
-#luliy-nav-dropdown.is-open {
-  display: flex;
-  transform: translateY(0);
-  opacity: 1;
-}
+body[data-luliy-theme="sakura"] #luliy-nav-dropdown { background: rgba(255,230,242,0.96) !important; }
+body[data-luliy-theme="your-name"] #luliy-nav-dropdown { background: rgba(225,240,255,0.96) !important; }
+body[data-luliy-theme="space"] #luliy-nav-dropdown,
+[data-color-mode="dark"] body[data-luliy-theme="space"] #luliy-nav-dropdown { background: rgba(4,8,28,0.97) !important; }
+body[data-luliy-theme="sunset"] #luliy-nav-dropdown { background: rgba(255,240,230,0.96) !important; }
+#luliy-nav-dropdown.is-open { display: flex; transform: translateY(0); opacity: 1; }
+
+/* Dropdown nav items */
 .luliy-nav-item {
-  display: block !important;
-  padding: 10px 14px !important;
-  border-radius: 10px !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  color: #1e1032 !important;
-  text-decoration: none !important;
-  border: none !important;
-  background: transparent !important;
-  cursor: pointer !important;
-  transition: background 0.16s !important;
-  width: 100% !important;
-  text-align: left !important;
+  display: block !important; padding: 10px 14px !important;
+  border-radius: 10px !important; font-size: 15px !important; font-weight: 600 !important;
+  color: #1e1032 !important; text-decoration: none !important; border: none !important;
+  background: transparent !important; cursor: pointer !important;
+  transition: background 0.16s !important; width: 100% !important; text-align: left !important;
 }
 [data-color-mode="dark"] .luliy-nav-item { color: #e0daf8 !important; }
-.luliy-nav-item:hover { background: rgba(130,80,223,0.10) !important; color: #8250df !important; }
+body[data-luliy-theme="space"] .luliy-nav-item,
+[data-color-mode="dark"] body[data-luliy-theme="space"] .luliy-nav-item { color: #c8e8ff !important; }
+.luliy-nav-item:hover {
+  background: var(--th-accent-soft, rgba(130,80,223,0.10)) !important;
+  color: var(--th-accent, #8250df) !important;
+}
 
 /* ══════════════════════════════════════════════════════════
    06  Hero cluster (avatar + name + clock in header)
@@ -681,14 +715,73 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 .luliy-card:hover::before { opacity: 0.85; }
 .luliy-card-inner { position: relative; z-index: 1; }
 
-/* Hover shine sweep across the card */
+/* ── Theme decoration layer (.luliy-card-deco) ───────────── */
+.luliy-card-deco {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0;         /* hidden by default, shown only for themed variants */
+  transition: opacity 0.35s;
+}
+.luliy-card:hover .luliy-card-deco { opacity: 1; }
+
+/* Sakura theme: floating cherry blossom petals via radial dots */
+body[data-luliy-theme="sakura"] .luliy-card-deco {
+  opacity: 0.55;
+  background-image:
+    radial-gradient(ellipse 5px 7px at 15% 25%, rgba(255,160,190,0.65) 0%, transparent 70%),
+    radial-gradient(ellipse 6px 5px at 72% 18%, rgba(255,190,210,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 4px 6px at 88% 60%, rgba(255,140,175,0.50) 0%, transparent 70%),
+    radial-gradient(ellipse 5px 4px at 30% 75%, rgba(255,170,200,0.45) 0%, transparent 70%),
+    radial-gradient(ellipse 4px 6px at 55% 45%, rgba(255,180,215,0.40) 0%, transparent 70%),
+    radial-gradient(ellipse 3px 5px at 8%  85%, rgba(255,150,185,0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 5px 3px at 64% 88%, rgba(255,200,220,0.40) 0%, transparent 70%);
+  background-repeat: no-repeat;
+}
+.luliy-card:hover body[data-luliy-theme="sakura"] .luliy-card-deco { opacity: 0.80; }
+[data-color-mode="dark"] body[data-luliy-theme="sakura"] .luliy-card-deco {
+  background-image:
+    radial-gradient(ellipse 5px 7px at 15% 25%, rgba(255,130,165,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 6px 5px at 72% 18%, rgba(255,160,190,0.45) 0%, transparent 70%),
+    radial-gradient(ellipse 4px 6px at 88% 60%, rgba(255,120,160,0.50) 0%, transparent 70%),
+    radial-gradient(ellipse 5px 4px at 30% 75%, rgba(255,140,175,0.45) 0%, transparent 70%),
+    radial-gradient(ellipse 4px 6px at 55% 45%, rgba(255,150,185,0.40) 0%, transparent 70%),
+    radial-gradient(ellipse 3px 5px at 8%  85%, rgba(255,120,160,0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 5px 3px at 64% 88%, rgba(255,170,200,0.40) 0%, transparent 70%);
+}
+
+/* Space theme: star field — tiny white twinkle dots */
+body[data-luliy-theme="space"] .luliy-card-deco {
+  opacity: 0.60;
+  background-image:
+    radial-gradient(circle 1.5px at 12% 20%, rgba(255,255,255,0.90) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 78% 14%, rgba(180,230,255,0.85) 0%, transparent 80%),
+    radial-gradient(circle 2px   at 55% 30%, rgba(255,255,255,0.70) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 92% 55%, rgba(200,240,255,0.80) 0%, transparent 80%),
+    radial-gradient(circle 1.5px at 35% 68%, rgba(255,255,255,0.75) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 20% 82%, rgba(180,210,255,0.65) 0%, transparent 80%),
+    radial-gradient(circle 2px   at 68% 75%, rgba(255,255,255,0.60) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 47% 90%, rgba(200,230,255,0.70) 0%, transparent 80%),
+    radial-gradient(circle 1.5px at 85% 88%, rgba(255,255,255,0.55) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 5%  50%, rgba(180,220,255,0.60) 0%, transparent 80%);
+  background-repeat: no-repeat;
+}
+/* Animate star twinkle on hover */
+@keyframes luliyStarTwinkle {
+  0%,100% { opacity: 0.60; } 50% { opacity: 0.90; }
+}
+body[data-luliy-theme="space"] .luliy-card:hover .luliy-card-deco {
+  animation: luliyStarTwinkle 1.8s ease-in-out infinite;
+}
 .luliy-card::after {
   content: '';
   position: absolute; top: 0; left: -80%;
   width: 50%; height: 100%;
   background: linear-gradient(105deg, transparent, rgba(255,255,255,0.45), transparent);
   transform: skewX(-20deg);
-  pointer-events: none;
+  pointer-events: none; z-index: 2;
   transition: left 0.55s cubic-bezier(.4,0,.2,1);
 }
 .luliy-card:hover::after { left: 130%; }
@@ -1053,21 +1146,44 @@ body[data-luliy-theme="space"] .mac-strip {
 body[data-luliy-theme="space"] .mac-lang { color: rgba(160,140,255,0.70); }
 
 /* ── Line numbers gutter ─────────────────────────────────── */
-pre.has-lineno { display: flex; align-items: flex-start; }
+/* When line numbers are active:
+   1. Strip padding from pre (avoid double-offset with flex children)
+   2. Both luliy-lineno and code get identical font + line-height
+   3. code gets the original pre padding minus left (lineno handles left)  */
+pre.has-lineno {
+  display: flex !important;
+  align-items: flex-start !important;
+  padding: 0 !important;           /* padding moved onto children below */
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
 pre.has-lineno > .luliy-lineno {
   flex-shrink: 0;
   position: sticky; left: 0;
   text-align: right;
-  padding-right: 12px;
-  margin-right: 12px;
+  /* Match code block padding exactly */
+  padding: 1em 0.75em 1em 1em;
   border-right: 1px solid rgba(130,80,223,0.18);
   color: rgba(130,80,223,0.50);
   user-select: none;
   white-space: pre;
-  font-size: inherit; line-height: inherit;
+  /* Font must be byte-for-byte identical to code or lines drift */
+  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 0.9em !important;
+  line-height: 1.65 !important;
   background: inherit;
   min-width: 2.2em;
   z-index: 1;
+  box-sizing: border-box;
+}
+pre.has-lineno > code {
+  flex: 1; min-width: 0; display: block;
+  padding: 1em 1em 1em 0.75em !important; /* same vertical, no left gutter */
+  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 0.9em !important;
+  line-height: 1.65 !important;
+  box-sizing: border-box;
+  overflow: visible;
 }
 [data-color-mode="dark"] pre.has-lineno > .luliy-lineno,
 body[data-luliy-theme="space"] pre.has-lineno > .luliy-lineno {
@@ -1082,7 +1198,6 @@ body[data-luliy-theme="mono"] pre.has-lineno > .luliy-lineno {
   border-right-color: rgba(255,255,255,0.18);
   color: rgba(255,255,255,0.30);
 }
-pre.has-lineno > code { flex: 1; min-width: 0; display: block; }
 /* Folded / fullscreen interplay */
 pre.is-folded > .luliy-lineno { visibility: hidden; }
 
@@ -1373,6 +1488,11 @@ body[data-luliy-theme="mono"] {
 [id*="articleTOC"] a, [class*="ArticleTOC"] a, [class*="articletoc"] a { color: #333 !important; }
 
 /* ── Dark mode: force readable light text ─────────────────── */
+/* ── Dark mode: force WHITE text on all TOC links ─────────── */
+[data-color-mode="dark"] #TOC a,
+[data-color-mode="dark"] .articletoc a,
+[data-color-mode="dark"] .toc a,
+[data-color-mode="dark"] #articleTOC a,
 [data-color-mode="dark"] [id*="articleTOC"] a,
 [data-color-mode="dark"] [class*="ArticleTOC"] a,
 [data-color-mode="dark"] [class*="articletoc"] a,
@@ -1380,25 +1500,7 @@ body[data-luliy-theme="mono"] {
 [data-color-mode="dark"] .articletoc a *,
 [data-color-mode="dark"] #articleTOC a *,
 [data-color-mode="dark"] [id*="articleTOC"] a *,
-[data-color-mode="dark"] [class*="ArticleTOC"] a * { color: #cdd6f4 !important; }
-
-/* Catch-all: any TOC text (li / span / plain nodes) stays readable
-   in dark mode, regardless of plugin markup. Injected header keeps
-   its own themed colours (set with higher-specificity rules above). */
-[data-color-mode="dark"] #TOC,
-[data-color-mode="dark"] .articletoc,
-[data-color-mode="dark"] .toc,
-[data-color-mode="dark"] #articleTOC,
-[data-color-mode="dark"] [id*="articleTOC"],
-[data-color-mode="dark"] [class*="ArticleTOC"],
-[data-color-mode="dark"] [class*="articletoc"] { color: #cdd6f4 !important; }
-[data-color-mode="dark"] #TOC li,
-[data-color-mode="dark"] .articletoc li,
-[data-color-mode="dark"] #articleTOC li,
-[data-color-mode="dark"] [id*="articleTOC"] li,
-[data-color-mode="dark"] [class*="ArticleTOC"] li,
-[data-color-mode="dark"] #TOC span:not(.luliy-toc-injected-label),
-[data-color-mode="dark"] .articletoc span:not(.luliy-toc-injected-label) { color: #cdd6f4 !important; }
+[data-color-mode="dark"] [class*="ArticleTOC"] a * { color: #ffffff !important; }
 
 #TOC a:hover, .articletoc a:hover, .toc a:hover, #articleTOC a:hover,
 [id*="articleTOC"] a:hover, [class*="ArticleTOC"] a:hover, [class*="articletoc"] a:hover {
@@ -1631,7 +1733,11 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
 #luliy-ctrl-panel {
   display: none; flex-direction: column;
   position: absolute; top: calc(100% + 8px); right: 0;
-  min-width: 226px;
+  min-width: 248px; max-width: 280px;
+  max-height: calc(100vh - 90px);
+  overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(130,80,223,0.20) transparent;
   background: rgba(255,255,255,0.97);
   border: 1px solid rgba(130,80,223,0.18);
   border-radius: 18px; padding: 10px 8px;
@@ -1640,7 +1746,6 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   -webkit-backdrop-filter: blur(22px) saturate(1.8);
   z-index: 9991;
   gap: 1px;
-  overflow: hidden;
 }
 [data-color-mode="dark"] #luliy-ctrl-panel {
   background: rgba(14,10,28,0.98);
@@ -2056,80 +2161,86 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
 #luliy-fav-gate-card.shake { animation: luliyShake 0.45s ease; }
 
 /* ══════════════════════════════════════════════════════════
-   26  Music player — floating pill, bottom-left
+   26  Music player — embedded in toolbar ctrl panel
 ══════════════════════════════════════════════════════════ */
-#luliy-music {
-  position: fixed; bottom: 22px; left: 22px;
-  z-index: 9988;
-  display: flex; align-items: center; gap: 8px;
-}
-#luliy-music-toggle {
-  width: 42px; height: 42px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.45);
-  background: rgba(255,255,255,0.22);
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
-  font-size: 18px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.20), 0 1px 0 rgba(255,255,255,0.55) inset;
-  transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
-  flex-shrink: 0;
-}
-#luliy-music-toggle:hover { transform: scale(1.06); background: rgba(255,255,255,0.34); }
-[data-color-mode="dark"] #luliy-music-toggle {
-  background: rgba(18,14,36,0.72);
-  border-color: rgba(130,80,223,0.36);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.55);
-}
-/* Spinning record while playing */
-@keyframes luliySpin { to { transform: rotate(360deg); } }
-#luliy-music-toggle.is-playing { animation: luliySpin 3.5s linear infinite; }
-
-#luliy-music-panel {
-  display: none;
-  align-items: center; gap: 10px;
-  padding: 8px 14px;
-  border-radius: 22px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(22px) saturate(1.8);
-  -webkit-backdrop-filter: blur(22px) saturate(1.8);
-  border: 1px solid rgba(130,80,223,0.20);
-  box-shadow: 0 10px 32px rgba(0,0,0,0.20), 0 1px 0 rgba(255,255,255,0.70) inset;
-  max-width: min(62vw, 320px);
-}
-[data-color-mode="dark"] #luliy-music-panel {
-  background: rgba(14,10,28,0.95);
-  border-color: rgba(130,80,223,0.34);
-  box-shadow: 0 10px 32px rgba(0,0,0,0.60);
-}
-#luliy-music.is-open #luliy-music-panel { display: flex; }
-#luliy-music-name {
+/* Now-playing track name */
+.luliy-music-name {
   font-size: 12px; font-weight: 700;
-  color: #1e1032; letter-spacing: 0.5px;
+  color: var(--th-accent, #8250df);
+  padding: 4px 12px 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 220px;
   font-family: 'Noto Sans SC', sans-serif;
-  max-width: 150px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-[data-color-mode="dark"] #luliy-music-name { color: #cdd6f4; }
-#luliy-music-ctrls { display: flex; align-items: center; gap: 4px; }
-#luliy-music-ctrls button {
-  width: 28px; height: 28px; border-radius: 50%;
-  border: 1px solid rgba(130,80,223,0.28);
-  background: rgba(130,80,223,0.08);
-  color: #8250df; font-size: 12px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, transform 0.15s;
-  flex-shrink: 0;
-}
-#luliy-music-ctrls button:hover { background: rgba(130,80,223,0.18); transform: translateY(-1px); }
-[data-color-mode="dark"] #luliy-music-ctrls button {
-  color: #cba6f7;
-  border-color: rgba(130,80,223,0.45);
-  background: rgba(130,80,223,0.16);
-}
-[data-color-mode="dark"] #luliy-music-ctrls button:hover { background: rgba(130,80,223,0.30); }
+[data-color-mode="dark"] .luliy-music-name { color: var(--th-accent, #cba6f7); }
 
+/* Transport controls row */
+.luliy-music-ctrls {
+  display: flex; align-items: center; gap: 4px;
+  padding: 2px 10px 4px;
+}
+.luliy-music-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.28));
+  background: var(--th-accent-soft, rgba(130,80,223,0.07));
+  color: var(--th-accent, #8250df);
+  font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.15s; flex-shrink: 0;
+}
+.luliy-music-btn:hover {
+  background: var(--th-accent-hover, rgba(130,80,223,0.18));
+  transform: scale(1.08);
+}
+[data-color-mode="dark"] .luliy-music-btn {
+  color: var(--th-accent, #cba6f7);
+  border-color: var(--th-accent-hover, rgba(130,80,223,0.40));
+}
+
+/* Playlist */
+.luliy-playlist {
+  display: flex; flex-direction: column;
+  max-height: 180px; overflow-y: auto;
+  margin: 2px 6px 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--th-accent-soft, rgba(130,80,223,0.20)) transparent;
+}
+.luliy-playlist::-webkit-scrollbar { width: 3px; }
+.luliy-playlist::-webkit-scrollbar-thumb {
+  background: var(--th-accent-soft, rgba(130,80,223,0.28)); border-radius: 2px;
+}
+.luliy-playlist-item {
+  display: flex; align-items: center; gap: 6px;
+  width: 100%; text-align: left;
+  padding: 5px 8px; border-radius: 8px;
+  background: none; border: none; cursor: pointer;
+  transition: background 0.15s;
+}
+.luliy-playlist-item:hover {
+  background: var(--th-accent-soft, rgba(130,80,223,0.10)) !important;
+}
+.luliy-playlist-item.is-playing {
+  background: var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
+}
+.luliy-playlist-icon {
+  font-size: 11px; flex-shrink: 0; width: 14px;
+  color: var(--th-accent, #8250df);
+  transition: color 0.15s;
+}
+[data-color-mode="dark"] .luliy-playlist-icon { color: var(--th-accent, #cba6f7); }
+.luliy-playlist-item.is-playing .luliy-playlist-icon { color: var(--th-accent, #8250df); font-weight: 900; }
+.luliy-playlist-name {
+  font-size: 12px; color: #333; flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+[data-color-mode="dark"] .luliy-playlist-name { color: #e0daf8; }
+.luliy-playlist-item.is-playing .luliy-playlist-name {
+  color: var(--th-accent, #8250df); font-weight: 700;
+}
+[data-color-mode="dark"] .luliy-playlist-item.is-playing .luliy-playlist-name {
+  color: var(--th-accent, #cba6f7);
+}
 /* ══════════════════════════════════════════════════════════
    27  Responsive (mobile)
 ══════════════════════════════════════════════════════════ */
@@ -2247,11 +2358,6 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   }
   /* Sticky header off on mobile (table becomes its own scroll box) */
   #postBody th { position: static !important; }
-
-  /* ── Music player: tucked tighter into the corner ─────────── */
-  #luliy-music { bottom: 14px; left: 12px; }
-  #luliy-music-toggle { width: 38px; height: 38px; font-size: 16px; }
-  #luliy-music-name { max-width: 100px; }
 
   /* ── Gallery grid: smaller tiles ──────────────────────────── */
   #luliy-home-gallery.is-grid { grid-template-columns: repeat(2, 1fr); }

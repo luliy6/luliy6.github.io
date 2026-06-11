@@ -390,18 +390,8 @@
 
   /* ---- 09  Hero cluster (avatar + name + clock in header) - */
   function initHeroCluster() {
-    function injectHomeBtn(header) {
-      var tr = header.querySelector('.title-right');
-      if (!tr || document.getElementById('luliy-nav-home')) return;
-      var home = document.createElement('a');
-      home.id = 'luliy-nav-home';
-      home.href = LULIY_OPTS.homeUrl || '/';
-      home.textContent = '\uD83C\uDFE0 \u4e3b\u9875';   /* 🏠 主页 */
-      tr.insertBefore(home, tr.firstChild);
-    }
     function tryBuild() {
       var header = document.getElementById('header'); if (!header) return false;
-      injectHomeBtn(header);
       if (document.getElementById('luliy-hero-cluster')) return true;
       var av = header.querySelector('img.avatar, img[src*="avatar"]');
       if (!av) return false;
@@ -664,6 +654,36 @@
     var bar = document.createElement('div');
     bar.id = 'luliy-toolbar';
 
+    /* ── Shared Audio engine (lives in toolbar closure) ────── */
+    var _audio = new Audio();
+    _audio.preload = 'none';
+    _audio.volume = 0.55;
+    var _trackIdx = 0;
+    var _musicPlaying = false;
+
+    function _getTracks() {
+      var list = (LULIY_OPTS.musicTracks || []).slice();
+      try {
+        var custom = JSON.parse(localStorage.getItem('luliy-music') || '[]');
+        if (Array.isArray(custom)) list = list.concat(custom);
+      } catch (e) {}
+      return list.filter(function (t) { return t && t.src; });
+    }
+
+    function _loadTrack(i) {
+      var tracks = _getTracks();
+      if (!tracks.length) return null;
+      _trackIdx = ((i % tracks.length) + tracks.length) % tracks.length;
+      _audio.src = tracks[_trackIdx].src;
+      return tracks[_trackIdx];
+    }
+
+    function _playAudio() {
+      if (!_audio.src) _loadTrack(0);
+      return _audio.play();
+    }
+    function _pauseAudio() { _audio.pause(); }
+
     /* ── Pill trigger button ──────────────────────────────── */
     var ctrlBtn = document.createElement('button');
     ctrlBtn.id = 'luliy-ctrl-btn';
@@ -671,7 +691,7 @@
     function refreshBtnLabel() {
       var sfx    = localStorage.getItem('luliy-sfx')    !== '0';
       var sakura = localStorage.getItem('luliy-sakura') !== '0';
-      ctrlBtn.textContent = (sfx ? '\uD83D\uDD0A' : '\uD83D\uDD07') + ' \u2728 ' + (sakura ? '\uD83C\uDF38' : '\u00D7');
+      ctrlBtn.textContent = (sfx ? '\uD83D\uDD0A' : '\uD83D\uDD07') + ' \u2728 ' + (sakura ? '\uD83C\uDF38' : '\u00D7') + (_musicPlaying ? ' \uD83C\uDFB5' : '');
     }
     refreshBtnLabel();
 
@@ -866,6 +886,131 @@
       panel.appendChild(sansRow);
     }
 
+    /* ── 🎵 Music player section ─────────────────────────── */
+    panel.appendChild(mkSep());
+    panel.appendChild(mkSec('\uD83C\uDFB5 \u97f3\u4e50'));   /* 🎵 音乐 */
+
+    /* Now-playing display */
+    var musicNameEl = document.createElement('div');
+    musicNameEl.id = 'luliy-music-name';
+    musicNameEl.className = 'luliy-music-name';
+    musicNameEl.textContent = '--';
+    panel.appendChild(musicNameEl);
+
+    /* Transport controls */
+    var musicCtrls = document.createElement('div');
+    musicCtrls.className = 'luliy-music-ctrls';
+    function mkMusicBtn(label, title) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'luliy-music-btn'; b.textContent = label; b.title = title || label;
+      return b;
+    }
+    var mPlayBtn = mkMusicBtn('\u25b6', '\u64ad\u653e');   /* ▶ */
+    var mPrevBtn = mkMusicBtn('\u23ee', '\u4e0a\u4e00\u9996');   /* ⏮ */
+    var mNextBtn = mkMusicBtn('\u23ed', '\u4e0b\u4e00\u9996');   /* ⏭ */
+    var mAddBtn  = mkMusicBtn('\uff0b', '\u6dfb\u52a0\u97f3\u4e50');   /* ＋ */
+    musicCtrls.appendChild(mPrevBtn);
+    musicCtrls.appendChild(mPlayBtn);
+    musicCtrls.appendChild(mNextBtn);
+    musicCtrls.appendChild(mAddBtn);
+    panel.appendChild(musicCtrls);
+
+    /* Playlist */
+    var playlistEl = document.createElement('div');
+    playlistEl.className = 'luliy-playlist';
+    panel.appendChild(playlistEl);
+
+    function refreshPlaylist() {
+      var tracks = _getTracks();
+      playlistEl.innerHTML = '';
+      if (!tracks.length) {
+        musicNameEl.textContent = '\u6682\u65e0\u66f2\u76ee\uff0c\u70b9 \uff0b \u6dfb\u52a0';   /* 暂无曲目，点 ＋ 添加 */
+        return;
+      }
+      tracks.forEach(function (t, i) {
+        var item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'luliy-playlist-item' + (i === _trackIdx ? ' is-playing' : '');
+        item.title = t.src;
+        var icon = document.createElement('span');
+        icon.className = 'luliy-playlist-icon';
+        icon.textContent = i === _trackIdx && _musicPlaying ? '\u25b6' : '\u266a';   /* ▶ / ♪ */
+        var name = document.createElement('span');
+        name.className = 'luliy-playlist-name';
+        name.textContent = t.name || ('\u66f2\u76ee ' + (i + 1));
+        item.appendChild(icon); item.appendChild(name);
+        item.addEventListener('click', function (e) {
+          e.stopPropagation();
+          _loadTrack(i);
+          _playAudio().then(function () {
+            _musicPlaying = true;
+            mPlayBtn.textContent = '\u23f8';
+            refreshPlaylist();
+            musicNameEl.textContent = tracks[i].name || ('\u66f2\u76ee ' + (i + 1));
+          }).catch(function () {});
+        });
+        playlistEl.appendChild(item);
+      });
+      if (_trackIdx < tracks.length) {
+        musicNameEl.textContent = tracks[_trackIdx].name || ('\u66f2\u76ee ' + (_trackIdx + 1));
+      }
+    }
+    refreshPlaylist();
+
+    mPlayBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (_musicPlaying) {
+        _pauseAudio(); _musicPlaying = false;
+        mPlayBtn.textContent = '\u25b6';
+        refreshBtnLabel();
+      } else {
+        _playAudio().then(function () {
+          _musicPlaying = true; mPlayBtn.textContent = '\u23f8';
+          refreshBtnLabel(); refreshPlaylist();
+        }).catch(function () {});
+      }
+      playSfx('click');
+    });
+    mPrevBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var t = _loadTrack(_trackIdx - 1);
+      if (t && _musicPlaying) {
+        _playAudio().then(function () { mPlayBtn.textContent = '\u23f8'; refreshPlaylist(); }).catch(function(){});
+      } else { refreshPlaylist(); }
+      playSfx('click');
+    });
+    mNextBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var t = _loadTrack(_trackIdx + 1);
+      if (t && _musicPlaying) {
+        _playAudio().then(function () { mPlayBtn.textContent = '\u23f8'; refreshPlaylist(); }).catch(function(){});
+      } else { refreshPlaylist(); }
+      playSfx('click');
+    });
+    _audio.addEventListener('ended', function () {
+      var t = _loadTrack(_trackIdx + 1);
+      if (t) _playAudio().then(function () { mPlayBtn.textContent = '\u23f8'; refreshPlaylist(); }).catch(function(){});
+    });
+
+    mAddBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var url = window.prompt('\u7c98\u8d34\u97f3\u4e50\u76f4\u94fe\uff08mp3\uff09\uff0c\u6216\u8f93\u5165 reset \u6e05\u7a7a\uff1a', '');
+      if (url === null) return;
+      url = url.trim();
+      var custom = [];
+      try { custom = JSON.parse(localStorage.getItem('luliy-music') || '[]'); } catch (_) {}
+      if (!Array.isArray(custom)) custom = [];
+      if (url.toLowerCase() === 'reset') {
+        custom = [];
+      } else if (url) {
+        var nm = window.prompt('\u66f2\u76ee\u540d\u79f0\uff1a', '\u6211\u7684\u97f3\u4e50') || '\u6211\u7684\u97f3\u4e50';
+        custom.push({ name: nm, src: url });
+      }
+      localStorage.setItem('luliy-music', JSON.stringify(custom));
+      refreshPlaylist();
+      playSfx('click');
+    });
+
     /* Toggle open / close */
     ctrlBtn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -911,6 +1056,12 @@
       li.className = 'luliy-card';
       li.setAttribute('data-ci', String((colourIdx || 0) % 4));
       if (isPinned) li.setAttribute('data-pinned', '1');
+
+      /* Theme decoration layer (sakura petals / stars / etc.) */
+      var deco = document.createElement('div');
+      deco.className = 'luliy-card-deco';
+      deco.setAttribute('aria-hidden', 'true');
+      li.appendChild(deco);
 
       var a = document.createElement('a');
       a.href = buildPostLink(post.link);
@@ -1130,9 +1281,10 @@
         var gutter = document.createElement('span');
         gutter.className = 'luliy-lineno';
         gutter.setAttribute('aria-hidden', 'true');
+        /* Build the numbers string — must match code's actual line count */
         var nums = '';
         for (var ln = 1; ln <= lineCount; ln++) nums += ln + '\n';
-        gutter.textContent = nums;
+        gutter.textContent = nums.replace(/\n$/, '');  /* trim trailing newline to match code */
         pre.insertBefore(gutter, code);
         pre.classList.add('has-lineno');
       }
@@ -1819,110 +1971,6 @@
     setTimeout(function () { input.focus(); }, 300);
   }
 
-  /* ---- 23  Music player (floating, custom playlist) ---------
-     Default playlist from LULIY_OPTS.musicTracks; users add their
-     own mp3 links via the ＋ button (saved in localStorage).      */
-  function getMusicTracks() {
-    var list = (LULIY_OPTS.musicTracks || []).slice();
-    try {
-      var custom = JSON.parse(localStorage.getItem('luliy-music') || '[]');
-      if (Array.isArray(custom)) list = list.concat(custom);
-    } catch (e) {}
-    return list.filter(function (t) { return t && t.src; });
-  }
-
-  function initMusicPlayer() {
-    if (document.getElementById('luliy-music')) return;
-
-    var tracks = getMusicTracks();
-    var idx = 0, audio = new Audio();
-    audio.preload = 'none';
-    audio.volume = 0.55;
-
-    var box = document.createElement('div');
-    box.id = 'luliy-music';
-    box.innerHTML =
-      '<button id="luliy-music-toggle" type="button" title="\u97f3\u4e50" aria-label="\u97f3\u4e50">\uD83C\uDFB5</button>' +
-      '<div id="luliy-music-panel">' +
-      '  <div id="luliy-music-name">--</div>' +
-      '  <div id="luliy-music-ctrls">' +
-      '    <button id="luliy-music-play" type="button" aria-label="\u64ad\u653e">\u25b6</button>' +
-      '    <button id="luliy-music-next" type="button" aria-label="\u4e0b\u4e00\u9996">\u23ed</button>' +
-      '    <button id="luliy-music-add"  type="button" aria-label="\u6dfb\u52a0" title="\u6dfb\u52a0\u97f3\u4e50\u94fe\u63a5">\uff0b</button>' +
-      '  </div>' +
-      '</div>';
-    document.body.appendChild(box);
-
-    var toggle = box.querySelector('#luliy-music-toggle');
-    var nameEl = box.querySelector('#luliy-music-name');
-    var playBtn = box.querySelector('#luliy-music-play');
-    var nextBtn = box.querySelector('#luliy-music-next');
-    var addBtn  = box.querySelector('#luliy-music-add');
-
-    function refreshName() {
-      tracks = getMusicTracks();
-      if (!tracks.length) { nameEl.textContent = '\u6682\u65e0\u66f2\u76ee\uff0c\u70b9 \uff0b \u6dfb\u52a0'; return; }
-      if (idx >= tracks.length) idx = 0;
-      nameEl.textContent = tracks[idx].name || ('\u66f2\u76ee ' + (idx + 1));
-      nameEl.title = tracks[idx].src;
-    }
-    refreshName();
-
-    function load(i) {
-      tracks = getMusicTracks();
-      if (!tracks.length) return false;
-      idx = ((i % tracks.length) + tracks.length) % tracks.length;
-      audio.src = tracks[idx].src;
-      refreshName();
-      return true;
-    }
-
-    function play() {
-      if (!audio.src && !load(idx)) return;
-      audio.play().then(function () {
-        playBtn.textContent = '\u23f8';
-        toggle.classList.add('is-playing');
-      }).catch(function () {
-        nameEl.textContent = '\u64ad\u653e\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u94fe\u63a5';
-      });
-    }
-    function pause() {
-      audio.pause();
-      playBtn.textContent = '\u25b6';
-      toggle.classList.remove('is-playing');
-    }
-
-    playBtn.addEventListener('click', function () { audio.paused ? play() : pause(); });
-    nextBtn.addEventListener('click', function () { if (load(idx + 1)) play(); });
-    audio.addEventListener('ended', function () { if (load(idx + 1)) play(); });
-
-    addBtn.addEventListener('click', function () {
-      var url = window.prompt(
-        '\u7c98\u8d34\u97f3\u4e50\u76f4\u94fe\uff08mp3 \u7b49\uff0c\u8f93\u5165 reset \u6e05\u7a7a\u81ea\u5b9a\u4e49\u66f2\u76ee\uff09\uff1a', '');
-      if (url === null) return;
-      url = url.trim();
-      var custom = [];
-      try { custom = JSON.parse(localStorage.getItem('luliy-music') || '[]'); } catch (_) {}
-      if (!Array.isArray(custom)) custom = [];
-      if (url.toLowerCase() === 'reset') custom = [];
-      else if (url) {
-        var nm = window.prompt('\u66f2\u76ee\u540d\u79f0\uff1a', '\u6211\u7684\u97f3\u4e50') || '\u6211\u7684\u97f3\u4e50';
-        custom.push({ name: nm, src: url });
-      }
-      localStorage.setItem('luliy-music', JSON.stringify(custom));
-      refreshName();
-      playSfx('click');
-    });
-
-    toggle.addEventListener('click', function (e) {
-      e.stopPropagation();
-      box.classList.toggle('is-open');
-    });
-    document.addEventListener('click', function (e) {
-      if (!box.contains(e.target)) box.classList.remove('is-open');
-    });
-  }
-
   /* ---- 21  Post page init --------------------------------- */
   root._luliyInitPost = function () {
     if (root._luliyPostInited) return;
@@ -2161,7 +2209,6 @@
     initToolbar();
     initNavTransparency();
     initMobileNav();
-    initMusicPlayer();
     initFavoritesLock();   /* safety net — also called in post init */
 
     var isPost    = !!document.getElementById('postBody');
