@@ -435,16 +435,13 @@ body[data-luliy-theme="space"] .title-right a {
 /* Hide original blogTitle/avatar (hero cluster replaces them) */
 #header .blogTitle, #header .avatar, #header .postTitle { display: none !important; }
 
-/* Hide "about" nav link — accessed via hero cluster avatar only */
-.title-right a[href="/about"],
-.title-right a[href="/about.html"],
-.title-right a[href*="/about"] { display: none !important; }
-
-/* Hide RSS */
-.title-right a[href*="rss"], .title-right a[href*="RSS"],
-.title-right a[href$=".xml"], .title-right a[href*="feed"],
-.title-right a svg.octicon-rss,
-.title-right a:has(svg[data-icon*="rss"]) { display: none !important; }
+/* Hide RSS feed links (exact-match href only to avoid false positives) */
+.title-right a[href="rss.xml"],
+.title-right a[href="/rss.xml"],
+.title-right a[href="atom.xml"],
+.title-right a[href="/atom.xml"],
+.title-right a[href$="/rss"],
+.title-right a[href$="/feed.xml"] { display: none !important; }
 
 /* .title-right layout */
 .title-right {
@@ -589,9 +586,10 @@ body[data-luliy-theme="space"] .luliy-nav-item,
 ══════════════════════════════════════════════════════════ */
 #luliy-progress-bar {
   position: fixed; top: 0; left: 0; height: 3px; width: 0;
-  background: linear-gradient(90deg, #8250df, #ff6b9d, #f0b429);
+  background: linear-gradient(90deg, var(--th-accent, #8250df), var(--th-h3, #ff6b9d), var(--th-h4, #f0b429));
   z-index: 100000; transition: width 0.1s linear;
-  box-shadow: 0 0 10px rgba(130,80,223,0.6);
+  box-shadow: 0 0 10px var(--th-accent-soft, rgba(130,80,223,0.6));
+  pointer-events: none;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -740,7 +738,7 @@ body[data-luliy-theme="sakura"] .luliy-card-deco {
     radial-gradient(ellipse 5px 3px at 64% 88%, rgba(255,200,220,0.40) 0%, transparent 70%);
   background-repeat: no-repeat;
 }
-.luliy-card:hover body[data-luliy-theme="sakura"] .luliy-card-deco { opacity: 0.80; }
+body[data-luliy-theme="sakura"] .luliy-card:hover .luliy-card-deco { opacity: 0.80; }
 [data-color-mode="dark"] body[data-luliy-theme="sakura"] .luliy-card-deco {
   background-image:
     radial-gradient(ellipse 5px 7px at 15% 25%, rgba(255,130,165,0.55) 0%, transparent 70%),
@@ -1411,7 +1409,7 @@ body[data-luliy-theme="mono"] {
   max-height: calc(100vh - 155px) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  z-index: 8900 !important;
+  z-index: 9992 !important;   /* above toolbar (9990) + panel (9991) */
   /* Glass card matching toolbar aesthetic */
   background: rgba(255,255,255,0.96) !important;
   backdrop-filter: blur(28px) saturate(1.8) !important;
@@ -1946,15 +1944,17 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   opacity: 0; pointer-events: none;
   transition: opacity 0.28s, transform 0.28s, color 0.3s, background 0.3s, border-color 0.3s;
   z-index: 9989;
+  isolation: isolate;   /* stacking context keeps SVG ring contained */
 }
 #luliy-back-top.is-visible { opacity: 1; pointer-events: all; }
 #luliy-back-top:hover { transform: translateY(-3px); background: var(--th-accent-hover, rgba(130,80,223,0.35)); }
 [data-color-mode="dark"] #luliy-back-top { color: var(--th-accent, #cba6f7); }
 
-/* Reading progress ring wrapping the back-top arrow */
+/* Reading progress ring — contained inside button */
 #luliy-back-top .luliy-ring {
-  position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px);
+  position: absolute; inset: 0; width: 100%; height: 100%;
   transform: rotate(-90deg); pointer-events: none;
+  border-radius: 50%;
 }
 #luliy-back-top .luliy-ring-bg {
   fill: none; stroke: var(--th-accent-soft, rgba(130,80,223,0.18)); stroke-width: 2.5;
