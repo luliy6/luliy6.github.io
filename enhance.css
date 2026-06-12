@@ -2,7 +2,7 @@
    Sections:
    00  Font imports
    01  CSS Variables + Reset
-   02  Welcome splash overlay (animation sequence)
+   02  Homepage Hero (first-visit full-screen, animation sequence)
    03  Background image
    04  Typography — fonts / day=black / night=white / sans toggle
    05  Navbar — liquid glass + collapsible + homepage button
@@ -89,6 +89,7 @@ html, body { overflow-x: clip; }
 #luliy-hero {
   /* Escape any parent padding/margin to be truly full-viewport */
   position: relative;
+  animation: luliyHeroBgIn 1.8s ease both;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
@@ -120,7 +121,12 @@ html, body { overflow-x: clip; }
   color: #fff;
   font-family: 'Noto Sans SC', sans-serif;
   text-shadow: 0 4px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4);
-  animation: luliyHeroIn 1.3s cubic-bezier(.2,.7,.3,1) both;
+  animation: luliyHeroTitleIn 1.6s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes luliyHeroTitleIn {
+  0%   { opacity: 0; transform: translateY(34px); letter-spacing: 18px; filter: blur(6px); }
+  60%  { filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0); letter-spacing: 4px; }
 }
 #luliy-hero-subtitle {
   margin: 14px 0 0;
@@ -147,6 +153,25 @@ html, body { overflow-x: clip; }
   transition: background 0.2s;
 }
 #luliy-hero-hint:hover { background: rgba(255,255,255,0.24); }
+#luliy-hero-hint:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.85);
+  outline-offset: 3px;
+}
+@keyframes luliyHeroBgIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* Reduce-motion: hero appears instantly, no stagger */
+body.luliy-reduce-motion #luliy-hero,
+body.luliy-reduce-motion #luliy-hero-title,
+body.luliy-reduce-motion #luliy-hero-subtitle,
+body.luliy-reduce-motion #luliy-hero-hint {
+  animation: none !important;
+  opacity: 1 !important; transform: none !important; filter: none !important;
+}
+#luliy-hero-hint { transform: translateX(-50%); }  /* keep centring when reduce overrides transform */
+body.luliy-reduce-motion #luliy-hero-hint { transform: translateX(-50%) !important; }
+
 @keyframes luliyHeroIn {
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -437,9 +462,14 @@ body[data-luliy-theme="mono"] #header     { border-top: 2px solid rgba(220,220,2
 /* ── Hamburger — mobile ─────────────────────────────────── */
 #luliy-nav-ham {
   display: none; flex-direction: column; justify-content: space-between;
-  width: 26px; height: 18px;
-  background: none; border: none; cursor: pointer; padding: 0;
+  /* 44x44 touch target (Apple HIG min); bars stay 26x18 via padding */
+  width: 44px; height: 44px;
+  padding: 13px 9px;
+  box-sizing: border-box;
+  background: none; border: none; cursor: pointer;
   margin-left: auto; z-index: 10001; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 #luliy-nav-ham span {
   display: block; width: 100%; height: 2px;
@@ -1835,6 +1865,23 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   box-shadow: 0 6px 18px rgba(0,0,0,0.22);
 }
 .luliy-ctrl-preview-card:active { transform: scale(0.96); }
+
+/* Active mode card: accent ring + check badge */
+.luliy-ctrl-preview-card.is-active {
+  border-color: var(--th-accent, #8250df) !important;
+  box-shadow: 0 0 0 2px var(--th-accent-soft, rgba(130,80,223,0.35)),
+              0 4px 14px rgba(0,0,0,0.18);
+  position: relative;
+}
+.luliy-ctrl-preview-card.is-active::after {
+  content: '\2713';
+  position: absolute; top: -7px; right: -7px;
+  width: 17px; height: 17px; border-radius: 50%;
+  background: var(--th-accent, #8250df); color: #fff;
+  font-size: 11px; line-height: 17px; text-align: center;
+  font-weight: 900;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
 .luliy-ctrl-preview-card .preview-dot {
   width: 8px; height: 8px; border-radius: 50%;
   margin: 0 auto 3px; display: block;
