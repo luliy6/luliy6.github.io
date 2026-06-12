@@ -189,16 +189,25 @@
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSite(); }
     });
 
-    /* Parallax + fade as the user scrolls past the hero */
+    /* Parallax + fade as user scrolls + hide/show navbar */
     onScrollRAF(function () {
       var st = window.scrollY || 0;
       var vh = window.innerHeight;
-      if (st > vh) return;            /* fully scrolled past — skip work */
+      var header = document.getElementById('header');
+
+      /* ── Navbar: fully hidden while Hero fills the viewport ── */
+      if (header) {
+        var inHero = st < vh * 0.85;
+        header.style.opacity  = inHero ? '0' : '';
+        header.style.pointerEvents = inHero ? 'none' : '';
+        header.style.transition = 'opacity 0.5s ease';
+      }
+
+      if (st > vh) return;
       var p = Math.min(1, st / vh);
       inner.style.transform = 'translateY(' + (p * 60) + 'px)';
       inner.style.opacity = String(1 - p * 1.4);
       hint.style.opacity = String(1 - p * 2);
-      hero.style.filter = 'brightness(' + (1 - p * 0.3) + ')';
     });
   }
 
@@ -419,55 +428,95 @@
     });
   }
 
-  /* ---- 09  Hero cluster (avatar + name + clock in header) - */
+  /* ---- 09  Navbar — rebuilt: avatar+name centred, time top-left, icons spread */
   function initHeroCluster() {
     function tryBuild() {
       var header = document.getElementById('header'); if (!header) return false;
-      if (document.getElementById('luliy-hero-cluster')) return true;
-      var av = header.querySelector('img.avatar, img[src*="avatar"]');
-      if (!av) return false;
+      if (document.getElementById('luliy-nav-rebuilt')) return true;
 
-      var cluster = document.createElement('a');
-      cluster.id = 'luliy-hero-cluster';
-      cluster.href = '/about';
-      cluster.title = '\u5173\u4e8e\u6211';
+      /* Mark header as rebuilt so CSS can target it */
+      header.setAttribute('data-luliy-nav', '1');
+      header.id = 'header'; /* keep Gmeek id */
 
-      var avClone = av.cloneNode(true);
-      avClone.style.cssText = '';
-      cluster.appendChild(avClone);
-
-      var info = document.createElement('div');
-      info.id = 'luliy-hero-info';
-
-      var nameEl = document.createElement('div');
-      nameEl.id = 'luliy-hero-name';
-      nameEl.textContent = 'Luliy';
-      info.appendChild(nameEl);
-
-      var clk = document.createElement('div');
-      clk.id = 'luliy-avatar-clock';
-      info.appendChild(clk);
-
-      cluster.appendChild(info);
-      header.insertBefore(cluster, header.firstChild);
-
-      /* Hide original avatar in header */
-      if (av.parentElement && av.parentElement !== header) av.parentElement.style.display = 'none';
-      else av.style.display = 'none';
-      header.querySelectorAll('.blogTitle, .postTitle').forEach(function (el) {
+      /* Hide every existing child except .title-right SVG nav links */
+      Array.from(header.children).forEach(function (el) {
+        var id = el.id || '';
+        var cls = el.className || '';
+        /* Keep our toolbar + existing title-right (we relocate its links) */
+        if (id === 'luliy-toolbar' || id === 'luliy-nav-rebuilt') return;
         el.style.display = 'none';
       });
 
-      function updClock() {
+      /* Outer rebuilt shell */
+      var shell = document.createElement('div');
+      shell.id = 'luliy-nav-rebuilt';
+
+      /* ── Top-left: time ─────────────────────────────────── */
+      var timeEl = document.createElement('div');
+      timeEl.id = 'luliy-nav-time';
+      function updTime() {
         var n = new Date();
-        clk.textContent =
-          String(n.getHours()).padStart(2, '0') + ':' +
-          String(n.getMinutes()).padStart(2, '0') + ':' +
-          String(n.getSeconds()).padStart(2, '0');
+        timeEl.textContent =
+          String(n.getHours()).padStart(2,'0') + ':' +
+          String(n.getMinutes()).padStart(2,'0') + ':' +
+          String(n.getSeconds()).padStart(2,'0');
       }
-      updClock(); setInterval(updClock, 1000);
+      updTime(); setInterval(updTime, 1000);
+
+      /* ── Centre: avatar + blog name ─────────────────────── */
+      var centre = document.createElement('div');
+      centre.id = 'luliy-nav-centre';
+
+      var avatarLink = document.createElement('a');
+      avatarLink.href = '/about'; avatarLink.id = 'luliy-nav-avatar-link';
+      var avatarImg = document.createElement('img');
+      avatarImg.src = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/Luliy.jpg';
+      avatarImg.id = 'luliy-nav-avatar'; avatarImg.alt = 'Luliy';
+      avatarLink.appendChild(avatarImg);
+
+      var blogName = document.createElement('a');
+      blogName.href = '/'; blogName.id = 'luliy-nav-blogname';
+      blogName.textContent = 'Luliy';
+
+      centre.appendChild(avatarLink);
+      centre.appendChild(blogName);
+
+      /* ── Collect original nav icon links from .title-right ─ */
+      var tr = header.querySelector('.title-right, [class*="title-right"]');
+      var iconsLeft  = document.createElement('div');
+      var iconsRight = document.createElement('div');
+      iconsLeft.id  = 'luliy-nav-icons-left';
+      iconsRight.id = 'luliy-nav-icons-right';
+
+      var links = tr ? Array.from(tr.querySelectorAll('a, button')) : [];
+      /* Split evenly: first half left, second half right */
+      var half = Math.ceil(links.length / 2);
+      links.forEach(function (a, i) {
+        a.classList.add('luliy-nav-icon-link');
+        if (i < half) iconsLeft.appendChild(a.cloneNode(true));
+        else iconsRight.appendChild(a.cloneNode(true));
+      });
+      /* Make sure Gmeek colour-mode circle button still works */
+      [iconsLeft, iconsRight].forEach(function (col) {
+        col.querySelectorAll('.circle').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            /* Re-trigger the original hidden button */
+            var orig = tr && tr.querySelector('.circle');
+            if (orig) orig.click();
+          });
+        });
+      });
+
+      shell.appendChild(timeEl);
+      shell.appendChild(iconsLeft);
+      shell.appendChild(centre);
+      shell.appendChild(iconsRight);
+
+      /* Theme-mode toggle circle is kept operational via event above */
+      header.insertBefore(shell, header.firstChild);
       return true;
     }
+
     if (!tryBuild()) {
       var tries = 0;
       var iv = setInterval(function () {
@@ -590,14 +639,17 @@
     playSfx('click');
   }
 
-  /* ---- Reading preferences (font size + sans-serif) -------- */
+  /* ---- Reading preferences (font size + font style) -------- */
   function applyReadingPrefs() {
     var pbody = document.getElementById('postBody');
     if (!pbody) return;
     var px = parseInt(localStorage.getItem('luliy-fontsize') || '18', 10) || 18;
     px = Math.min(24, Math.max(14, px));
     pbody.style.setProperty('font-size', px + 'px', 'important');
-    document.body.classList.toggle('luliy-sans', localStorage.getItem('luliy-sans') === '1');
+    /* Font mode: '0'=default(楷体), '1'=黑体, '2'=苍耳今楷 */
+    var fm = localStorage.getItem('luliy-sans') || '0';
+    document.body.classList.toggle('luliy-sans',   fm === '1');
+    document.body.classList.toggle('luliy-canger', fm === '2');
   }
   root._luliyApplyReadingPrefs = applyReadingPrefs;
 
@@ -854,6 +906,36 @@
     previewWrap.appendChild(previewNight);
     panel.appendChild(previewWrap);
 
+    /* Make day/night cards interactive — click to switch colour mode */
+    function setColorMode(mode) {
+      /* Gmeek stores the preference and sets data-color-mode on <html> */
+      var htmlEl = document.documentElement;
+      htmlEl.setAttribute('data-color-mode', mode);
+      try { localStorage.setItem('meek_theme', mode); } catch(e){}
+      /* Try to sync Gmeek's own circle button state */
+      var circle = document.querySelector('.circle');
+      if (circle) {
+        var curMode = circle.getAttribute('data-color-mode') ||
+          circle.getAttribute('data-mode') || '';
+        /* Only click if it would actually toggle to desired mode */
+        if (curMode !== mode) circle.click();
+      }
+      /* Trigger ripple from centre */
+      if (root._luliyThemeRipple) root._luliyThemeRipple(
+        window.innerWidth / 2, window.innerHeight / 2);
+      syncThemeRows();
+    }
+    previewDay.style.cursor = 'pointer';
+    previewNight.style.cursor = 'pointer';
+    previewDay.title = '\u5207\u6362\u767d\u5929\u6a21\u5f0f';   /* 切换白天模式 */
+    previewNight.title = '\u5207\u6362\u591c\u665a\u6a21\u5f0f'; /* 切换夜晚模式 */
+    previewDay.addEventListener('click', function(e) {
+      e.stopPropagation(); setColorMode('light'); playSfx('theme');
+    });
+    previewNight.addEventListener('click', function(e) {
+      e.stopPropagation(); setColorMode('dark'); playSfx('theme');
+    });
+
     function syncThemeRows() {
       var cur = localStorage.getItem('luliy-sink') || 'default';
       panel.querySelectorAll('[data-sink]').forEach(function (r) {
@@ -941,14 +1023,15 @@
       fsMinus.addEventListener('click', function (e) { e.stopPropagation(); setFs(curFs() - 1); playSfx('click'); });
       fsPlus.addEventListener('click',  function (e) { e.stopPropagation(); setFs(curFs() + 1); playSfx('click'); });
 
-      /* Sans-serif toggle */
-      var sansOn  = localStorage.getItem('luliy-sans') === '1';
-      var sansRow = mkRow('\u270d', '\u9ed1\u4f53\u6a21\u5f0f', sansOn ? '\u5f00\u542f' : '\u5173\u95ed'); /* ✍ 黑体模式 */
+      /* Font style: cycle default → 黑体 → 苍耳今楷 */
+      var _fontLabels = {'0':'\u9ed8\u8ba4','1':'\u9ed1\u4f53','2':'\u82cd\u8033\u6977'};
+      var sansRow = mkRow('\u270d', '\u5b57\u4f53', _fontLabels[localStorage.getItem('luliy-sans')||'0']);
       sansRow.addEventListener('click', function (e) {
         e.stopPropagation();
-        var on = localStorage.getItem('luliy-sans') === '1';
-        localStorage.setItem('luliy-sans', on ? '0' : '1');
-        sansRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
+        var cur = localStorage.getItem('luliy-sans') || '0';
+        var next = cur === '0' ? '1' : cur === '1' ? '2' : '0';
+        localStorage.setItem('luliy-sans', next);
+        sansRow._bdg.textContent = _fontLabels[next];
         applyReadingPrefs();
         playSfx('click');
       });
