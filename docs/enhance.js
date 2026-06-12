@@ -494,7 +494,10 @@
       centre.appendChild(avatarLink);
       centre.appendChild(blogName);
 
-      /* ── Collect original nav icon links from .title-right ─ */
+      /* ── MOVE original nav elements from .title-right ──────
+         Moving (not cloning) keeps every native Gmeek listener —
+         the day/night circle toggles + swaps its icon exactly as
+         stock Gmeek does. No re-trigger hacks, no duplicate IDs. */
       var tr = header.querySelector('.title-right, [class*="title-right"]');
       var iconsLeft  = document.createElement('div');
       var iconsRight = document.createElement('div');
@@ -502,33 +505,27 @@
       iconsRight.id = 'luliy-nav-icons-right';
 
       var links = tr ? Array.from(tr.querySelectorAll('a, button')) : [];
+      /* About + RSS never appear as icons (about lives behind the avatar) */
+      links = links.filter(function (a) {
+        var href = a.getAttribute('href') || '';
+        if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
+        if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
+        return true;
+      });
+      /* Stash metadata for the mobile dropdown (title-right empties out) */
+      root._luliyNavLinks = links.map(function (a) {
+        return {
+          href: a.getAttribute('href') || '',
+          absHref: a.href || '',
+          label: a.getAttribute('title') || (a.textContent || '').trim()
+        };
+      });
       /* Split evenly: first half left, second half right */
       var half = Math.ceil(links.length / 2);
       links.forEach(function (a, i) {
         a.classList.add('luliy-nav-icon-link');
-        var clone = a.cloneNode(true);
-        /* Strip ids from clone + descendants (originals stay in DOM) */
-        if (clone.removeAttribute) clone.removeAttribute('id');
-        if (clone.querySelectorAll) {
-          clone.querySelectorAll('[id]').forEach(function (el) { el.removeAttribute('id'); });
-        }
-        if (i < half) iconsLeft.appendChild(clone);
-        else iconsRight.appendChild(clone);
-      });
-      /* Make sure Gmeek colour-mode circle button still works */
-      [iconsLeft, iconsRight].forEach(function (col) {
-        col.querySelectorAll('.circle').forEach(function (btn) {
-          /* Strip any inline onclick the clone inherited —
-             otherwise inline handler + our re-trigger = double toggle */
-          btn.removeAttribute('onclick');
-          btn.onclick = null;
-          btn.addEventListener('click', function (e) {
-            e.preventDefault(); e.stopPropagation();
-            /* Re-trigger the original hidden button exactly once */
-            var orig = tr && tr.querySelector('.circle');
-            if (orig) orig.click();
-          });
-        });
+        if (i < half) iconsLeft.appendChild(a);   /* appendChild MOVES the node */
+        else iconsRight.appendChild(a);
       });
 
       shell.appendChild(timeEl);
@@ -536,7 +533,6 @@
       shell.appendChild(centre);
       shell.appendChild(iconsRight);
 
-      /* Theme-mode toggle circle is kept operational via event above */
       header.insertBefore(shell, header.firstChild);
       return true;
     }
@@ -1257,7 +1253,8 @@
       var next = order[(cur + 1) % order.length];
       localStorage.setItem('luliy-cardview', next);
       cardViewRow._bdg.textContent = _cvLabels[next];
-      applyCardView();
+      if (root._luliyRerenderCards) root._luliyRerenderCards();
+      else applyCardView();
       playSfx('click');
     });
     panel.appendChild(cardViewRow);
@@ -1424,12 +1421,6 @@
       var perPage = 12;
       var onIndex = isIndexPage();
 
-      var displayPosts = regularPosts;
-      if (onIndex) {
-        var start = (pageNum - 1) * perPage;
-        displayPosts = regularPosts.slice(start, start + perPage);
-      }
-
       /* Pinned section — fixed area, always above the regular grid */
       if (pinnedPosts.length > 0 && onIndex && pageNum === 1) {
         var existing = document.getElementById('luliy-pinned-section');
@@ -1443,24 +1434,101 @@
         nav.parentNode.insertBefore(ps, nav);
       }
 
-      nav.innerHTML = '';
-      nav.className = 'luliy-card-grid';
-
-      /* Card grouping — insert a year divider whenever the year changes */
-      var lastYear = null;
-      displayPosts.forEach(function (post, i) {
+      /* Shared helpers for both render paths */
+      var _tlObserver = null;          /* timeline IntersectionObserver */
+      function appendWithYearDiv(container, post, i, state) {
         var y = (post.created || '').slice(0, 4);
-        if (y && y !== lastYear) {
-          lastYear = y;
+        if (y && y !== state.lastYear) {
+          state.lastYear = y;
           var divider = document.createElement('li');
           divider.className = 'luliy-card-yeardiv';
           divider.innerHTML = '<span>' + esc(y) + '</span>';
-          nav.appendChild(divider);
+          container.appendChild(divider);
         }
-        nav.appendChild(buildCard(post, false, i));
-      });
+        container.appendChild(buildCard(post, false, i));
+      }
+      function teardownTimeline() {
+        if (_tlObserver) { try { _tlObserver.disconnect(); } catch (e) {} _tlObserver = null; }
+        var sent = document.getElementById('luliy-tl-sentinel');
+        if (sent) sent.remove();
+        document.body.classList.remove('luliy-tl-infinite');
+      }
 
-      applyCardView();
+      /* ── Paginated render (grid / list views) ──────────── */
+      function renderPaged() {
+        teardownTimeline();
+        var displayPosts = regularPosts;
+        if (onIndex) {
+          var start = (pageNum - 1) * perPage;
+          displayPosts = regularPosts.slice(start, start + perPage);
+        }
+        nav.innerHTML = '';
+        nav.className = 'luliy-card-grid';
+        var st = { lastYear: null };
+        displayPosts.forEach(function (post, i) { appendWithYearDiv(nav, post, i, st); });
+      }
+
+      /* ── Timeline render: infinite scroll, no post limit ──── */
+      function renderTimeline() {
+        teardownTimeline();
+        nav.innerHTML = '';
+        nav.className = 'luliy-card-grid';
+        document.body.classList.add('luliy-tl-infinite');   /* hides pagination */
+
+        var BATCH = 15;
+        var cursor = 0;
+        var st = { lastYear: null };
+
+        /* Sentinel sits AFTER the grid so the spine isn't stretched by it */
+        var sentinel = document.createElement('div');
+        sentinel.id = 'luliy-tl-sentinel';
+        sentinel.textContent = '\u52a0\u8f7d\u4e2d\u2026';   /* 加载中… */
+        nav.parentNode.insertBefore(sentinel, nav.nextSibling);
+
+        function appendBatch() {
+          var end = Math.min(cursor + BATCH, regularPosts.length);
+          for (var i = cursor; i < end; i++) {
+            appendWithYearDiv(nav, regularPosts[i], i, st);
+          }
+          cursor = end;
+          if (cursor >= regularPosts.length) {
+            sentinel.textContent =
+              '\u2014 \u5168\u90e8 ' + regularPosts.length + ' \u7bc7\u5df2\u52a0\u8f7d \u2014'; /* — 全部 N 篇已加载 — */
+            sentinel.classList.add('is-done');
+            if (_tlObserver) { try { _tlObserver.disconnect(); } catch (e) {} _tlObserver = null; }
+          }
+        }
+
+        appendBatch();   /* first screen */
+
+        if (cursor < regularPosts.length) {
+          if ('IntersectionObserver' in window) {
+            _tlObserver = new IntersectionObserver(function (entries) {
+              entries.forEach(function (en) {
+                if (en.isIntersecting) appendBatch();
+              });
+            }, { rootMargin: '600px 0px' });   /* prefetch well before bottom */
+            _tlObserver.observe(sentinel);
+          } else {
+            /* Fallback: rAF-throttled scroll proximity check */
+            onScrollRAF(function () {
+              if (!sentinel.isConnected) return;   /* view switched away */
+              if (cursor >= regularPosts.length) return;
+              var r = sentinel.getBoundingClientRect();
+              if (r.top < window.innerHeight + 600) appendBatch();
+            });
+          }
+        }
+      }
+
+      /* ── Route by current view + expose re-render for view switch ─ */
+      function renderRegular() {
+        if (getCardView() === 'timeline') renderTimeline();
+        else renderPaged();
+        applyCardView();
+      }
+      root._luliyRerenderCards = renderRegular;
+      renderRegular();
 
     }).catch(function () { fallbackDomCards(nav); });
 
@@ -1943,24 +2011,17 @@
     function populateDrop() {
       drop.innerHTML = '';
 
-      /* -- Original nav links (title-right hidden on mobile) -- */
+      /* -- Nav links: stashed by navbar rebuild (title-right is emptied) -- */
       try {
-      var trNav = document.querySelector('.title-right, [class*="title-right"]');
-      if (trNav) {
-        var navLinks = Array.from(trNav.querySelectorAll('a')).filter(function (a) {
-          var href = a.getAttribute('href') || '';
-          if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
-          if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
-          return !!href;
-        });
-        if (navLinks.length) {
-          navLinks.forEach(function (a) {
+        var navMeta = (root._luliyNavLinks || []).filter(function (m) { return m.href || m.absHref; });
+        if (navMeta.length) {
+          navMeta.forEach(function (m) {
             var item = document.createElement('a');
             item.className = 'luliy-nav-item';
-            item.href = a.href;
-            var label = a.getAttribute('title') || (a.textContent || '').trim();
+            item.href = m.absHref || m.href;
+            var label = m.label;
             if (!label) {
-              var p = (a.getAttribute('href') || '').replace(/^\//, '').replace(/\.html$/, '');
+              var p = (m.href || '').replace(/^\//, '').replace(/\.html$/, '');
               label = p || '\u94fe\u63a5';
             }
             item.textContent = label;
@@ -1968,7 +2029,6 @@
           });
           drop.appendChild(makeSep());
         }
-      }
       } catch (eNav) {}
 
       /* ── 🔊 SFX toggle ───────────────────────────────────── */
@@ -2691,7 +2751,8 @@
     toggle.querySelectorAll('button').forEach(function (b) {
       b.addEventListener('click', function () {
         localStorage.setItem('luliy-cardview', b.getAttribute('data-v'));
-        applyCardView();
+        if (root._luliyRerenderCards) root._luliyRerenderCards();
+        else applyCardView();
         playSfx('click');
       });
     });
