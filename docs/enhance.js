@@ -243,16 +243,37 @@
     });
   }
 
+  /* ---- Shared rAF-throttled scroll listener ---------------
+     Many features react to scroll; funnel them through one
+     requestAnimationFrame tick instead of N raw handlers.       */
+  var _scrollFns = [], _scrollRAF = false;
+  function onScrollRAF(fn) {
+    _scrollFns.push(fn);
+    if (_scrollFns.length === 1) {
+      window.addEventListener('scroll', function () {
+        if (_scrollRAF) return;
+        _scrollRAF = true;
+        requestAnimationFrame(function () {
+          _scrollRAF = false;
+          for (var i = 0; i < _scrollFns.length; i++) {
+            try { _scrollFns[i](); } catch (e) {}
+          }
+        });
+      }, { passive: true });
+    }
+    fn();   /* run once immediately for initial state */
+  }
+
   /* ---- 02  Progress bar ----------------------------------- */
   function initProgressBar() {
     var bar = document.createElement('div');
     bar.id = 'luliy-progress-bar';
     document.body.appendChild(bar);
-    window.addEventListener('scroll', function () {
+    onScrollRAF(function () {
       var st = window.scrollY || document.documentElement.scrollTop;
       var dh = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       bar.style.width = (dh > 0 ? Math.round(st / dh * 100) : 0) + '%';
-    }, { passive: true });
+    });
   }
 
   /* ---- 03  Dynamic title ---------------------------------- */
@@ -489,7 +510,7 @@
     function getBannerH() { bannerH = banner.offsetHeight || 56; }
     getBannerH();
     window.addEventListener('resize', getBannerH, { passive: true });
-    window.addEventListener('scroll', function () {
+    onScrollRAF(function () {
       var st = window.scrollY || window.pageYOffset || 0;
       var progress = Math.min(1, st / (bannerH + 32));
       banner.style.transform = 'translateY(-' + (progress * (bannerH + 32)) + 'px)';
@@ -676,10 +697,10 @@
     if (!document.getElementById('postBody')) return;
     var header = document.getElementById('header');
     if (!header) return;
-    window.addEventListener('scroll', function () {
+    onScrollRAF(function () {
       var st = window.scrollY || window.pageYOffset || 0;
       header.classList.toggle('header-scrolled', st > 100);
-    }, { passive: true });
+    });
   }
 
   function initToolbar() {
@@ -1615,9 +1636,9 @@
         playSfx('click');
       });
       document.body.appendChild(btn);
-      window.addEventListener('scroll', function () {
+      onScrollRAF(function () {
         btn.classList.toggle('is-visible', (window.scrollY || 0) > 300);
-      }, { passive: true });
+      });
     }
 
     function trySetup() {
@@ -1627,9 +1648,12 @@
 
       /* ── Extract TOC from inside #postBody → append to body ──
          articletoc.js inserts the TOC inline inside #postBody.
-         We move it to document.body so position:fixed works correctly
-         and it renders OUTSIDE the article glass card.             */
-      if (pbody && pbody.contains(toc)) {
+         We move it to document.body so position:fixed works correctly,
+         it renders OUTSIDE the article glass card, AND its z-index is
+         evaluated in the root stacking context (ancestors with
+         backdrop-filter/transform would otherwise trap it below the
+         toolbar panel).                                              */
+      if (toc.parentElement !== document.body) {
         document.body.appendChild(toc);
       }
 
@@ -1745,8 +1769,7 @@
           }
         }
       }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      onScroll();
+      onScrollRAF(onScroll);
       return true;
     }
 
@@ -2487,8 +2510,7 @@
       var pct = dh > 0 ? Math.min(1, st / dh) : 0;
       fg.style.strokeDashoffset = circ * (1 - pct);
     }
-    window.addEventListener('scroll', update, { passive: true });
-    update();
+    onScrollRAF(update);
   }
 
   /* ---- 21b  Series nav (same-tag prev/next) --------------- */
@@ -2720,9 +2742,9 @@
       fab.textContent = '\uD83D\uDD0D';
       fab.addEventListener('click', openSearch);
       document.body.appendChild(fab);
-      window.addEventListener('scroll', function () {
+      onScrollRAF(function () {
         fab.classList.toggle('is-visible', (window.scrollY || 0) > 300);
-      }, { passive: true });
+      });
     }
   }
 

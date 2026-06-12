@@ -178,7 +178,7 @@ html,
    03  Background image — fixed, full viewport
 ══════════════════════════════════════════════════════════ */
 body {
-  background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9999.png') !important;
+  background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png') !important;
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;
@@ -1413,12 +1413,12 @@ body[data-luliy-theme="mono"] {
 [id*="articleTOC"], [class*="ArticleTOC"] {
   position: fixed !important;
   top: 130px !important;   /* below ctrl pill btn: 76px + ~44px + gap */
-  right: 24px !important;
+  right: 20px !important;
   left: auto !important;
   bottom: 20px !important;
   width: 244px !important;
   max-height: calc(100vh - 155px) !important;
-  overflow-y: scroll !important;
+  overflow-y: auto !important;
   overflow-x: hidden !important;
   z-index: 9992 !important;   /* above toolbar (9990) + panel (9991) */
   /* Glass card matching toolbar aesthetic */
@@ -1462,9 +1462,6 @@ body[data-luliy-theme="mono"] {
   border-bottom: 1px solid var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
   font-family: 'Noto Sans SC', sans-serif !important;
   user-select: none !important;
-  position: relative !important;
-  z-index: 2 !important;
-  pointer-events: auto !important;
 }
 [data-color-mode="dark"] #TOC details > summary,
 [data-color-mode="dark"] .articletoc details > summary {
@@ -1744,9 +1741,11 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
 /* ── Ctrl dropdown panel ──────────────────────────────── */
 #luliy-ctrl-panel {
   display: none; flex-direction: column;
-  position: absolute; top: calc(100% + 8px); right: 0;
+  /* Opens to the LEFT of the pill button so it never covers the
+     right-edge column where the TOC, back-to-top and search FAB live. */
+  position: absolute; top: 0; right: calc(100% + 10px);
   min-width: 248px; max-width: 280px;
-  max-height: calc(100vh - 90px);
+  max-height: min(560px, calc(100vh - 120px));
   overflow-y: auto; overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(130,80,223,0.20) transparent;
