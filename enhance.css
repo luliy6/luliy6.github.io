@@ -77,10 +77,12 @@ html,
   background-color: transparent !important;
 }
 
-/* Guard: 100vw elements (hero) must never cause horizontal scroll */
-html, body { overflow-x: clip; }
+/* Guard: 100vw elements (hero) must never cause horizontal scroll.
+   IMPORTANT: clip on <html> ONLY — Gmeek's <body> is a centred
+   max-width container; clipping it would crop the full-bleed hero. */
+html { overflow-x: clip; }
 @supports not (overflow-x: clip) {
-  html, body { overflow-x: hidden; }
+  html { overflow-x: hidden; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -91,6 +93,7 @@ html, body { overflow-x: clip; }
   position: relative;
   animation: luliyHeroBgIn 1.8s ease both;
   width: 100vw;
+  max-width: none !important;   /* defeat any inherited max-width */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   height: 100vh;
@@ -384,8 +387,8 @@ body[data-luliy-theme="mono"] #header     { border-top: 2px solid rgba(220,220,2
 /* ── Time — top-left ────────────────────────────────────── */
 #luliy-nav-time {
   position: absolute;
-  top: 6px; left: 20px;
-  font-size: 11px;
+  top: 5px; left: 20px;
+  font-size: 13px;
   font-family: 'LXGW WenKai Mono', monospace;
   color: rgba(255,255,255,0.55);
   letter-spacing: 1px;
@@ -2453,6 +2456,36 @@ body[data-luliy-theme="mono"] #postBody h2 {
 .luliy-card-timeline .luliy-card-tags { order: 2; }
 .luliy-card-timeline .luliy-card-deco { display: none; }
 
+/* ── Infinite-scroll sentinel (timeline view) ─────────────── */
+#luliy-tl-sentinel {
+  text-align: center;
+  padding: 22px 0 30px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--th-accent, #8250df);
+  opacity: 0.75;
+  font-family: 'Noto Sans SC', sans-serif;
+  animation: luliyTlPulse 1.4s ease-in-out infinite;
+}
+#luliy-tl-sentinel.is-done {
+  animation: none;
+  opacity: 0.55;
+  color: var(--color-fg-muted, #888);
+}
+@keyframes luliyTlPulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.95; }
+}
+/* Timeline infinite mode: hide page-based navigation (it no longer applies) */
+body.luliy-tl-infinite .pagination,
+body.luliy-tl-infinite .paginate,
+body.luliy-tl-infinite #pagination,
+body.luliy-tl-infinite .Paginate,
+body.luliy-tl-infinite .pagenav,
+body.luliy-tl-infinite a[href*="?page="] {
+  display: none !important;
+}
+
 /* Mobile: collapse to single left-aligned column */
 @media (max-width: 768px) {
   .luliy-card-timeline::before { left: 16px; margin-left: 0; }
@@ -2879,7 +2912,7 @@ body.luliy-swipe-right #postBody { animation: luliySwipeR 0.18s ease forwards; }
   }
   #luliy-nav-blogname { font-size: 18px !important; letter-spacing: 1.5px !important; }
   #luliy-nav-avatar { width: 28px !important; height: 28px !important; }
-  #luliy-nav-time { font-size: 9px !important; left: 12px !important; top: 5px !important; }
+  #luliy-nav-time { font-size: 11px !important; left: 12px !important; top: 4px !important; }
   /* Never resurrect the original title-right (replaced by rebuilt nav) */
   .title-right { display: none !important; }
   /* Toolbar hidden on mobile — sfx/theme/sakura/TOC live in dropdown */
