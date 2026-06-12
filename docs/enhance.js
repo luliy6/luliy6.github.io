@@ -190,17 +190,24 @@
     });
 
     /* Parallax + fade as user scrolls + hide/show navbar */
+    var _heroHeader = null, _heroHdrInit = false, _heroWasIn = null;
     onScrollRAF(function () {
       var st = window.scrollY || 0;
       var vh = window.innerHeight;
-      var header = document.getElementById('header');
 
       /* ── Navbar: fully hidden while Hero fills the viewport ── */
-      if (header) {
+      if (!_heroHeader) _heroHeader = document.getElementById('header');
+      if (_heroHeader) {
+        if (!_heroHdrInit) {            /* set transition exactly once */
+          _heroHeader.style.transition = 'opacity 0.5s ease';
+          _heroHdrInit = true;
+        }
         var inHero = st < vh * 0.85;
-        header.style.opacity  = inHero ? '0' : '';
-        header.style.pointerEvents = inHero ? 'none' : '';
-        header.style.transition = 'opacity 0.5s ease';
+        if (inHero !== _heroWasIn) {    /* write styles only on state change */
+          _heroHeader.style.opacity = inHero ? '0' : '';
+          _heroHeader.style.pointerEvents = inHero ? 'none' : '';
+          _heroWasIn = inHero;
+        }
       }
 
       if (st > vh) return;
@@ -443,7 +450,7 @@
         var id = el.id || '';
         var cls = el.className || '';
         /* Keep our toolbar + existing title-right (we relocate its links) */
-        if (id === 'luliy-toolbar' || id === 'luliy-nav-rebuilt') return;
+        if (id === 'luliy-toolbar' || id === 'luliy-nav-rebuilt' || id === 'luliy-nav-ham') return;
         el.style.display = 'none';
       });
 
@@ -493,14 +500,25 @@
       var half = Math.ceil(links.length / 2);
       links.forEach(function (a, i) {
         a.classList.add('luliy-nav-icon-link');
-        if (i < half) iconsLeft.appendChild(a.cloneNode(true));
-        else iconsRight.appendChild(a.cloneNode(true));
+        var clone = a.cloneNode(true);
+        /* Strip ids from clone + descendants (originals stay in DOM) */
+        if (clone.removeAttribute) clone.removeAttribute('id');
+        if (clone.querySelectorAll) {
+          clone.querySelectorAll('[id]').forEach(function (el) { el.removeAttribute('id'); });
+        }
+        if (i < half) iconsLeft.appendChild(clone);
+        else iconsRight.appendChild(clone);
       });
       /* Make sure Gmeek colour-mode circle button still works */
       [iconsLeft, iconsRight].forEach(function (col) {
         col.querySelectorAll('.circle').forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            /* Re-trigger the original hidden button */
+          /* Strip any inline onclick the clone inherited —
+             otherwise inline handler + our re-trigger = double toggle */
+          btn.removeAttribute('onclick');
+          btn.onclick = null;
+          btn.addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            /* Re-trigger the original hidden button exactly once */
             var orig = tr && tr.querySelector('.circle');
             if (orig) orig.click();
           });
@@ -908,19 +926,25 @@
 
     /* Make day/night cards interactive — click to switch colour mode */
     function setColorMode(mode) {
-      /* Gmeek stores the preference and sets data-color-mode on <html> */
       var htmlEl = document.documentElement;
-      htmlEl.setAttribute('data-color-mode', mode);
-      try { localStorage.setItem('meek_theme', mode); } catch(e){}
-      /* Try to sync Gmeek's own circle button state */
-      var circle = document.querySelector('.circle');
-      if (circle) {
-        var curMode = circle.getAttribute('data-color-mode') ||
-          circle.getAttribute('data-mode') || '';
-        /* Only click if it would actually toggle to desired mode */
-        if (curMode !== mode) circle.click();
+      /* Normalise current mode ('auto' resolves via media query) */
+      var cur = htmlEl.getAttribute('data-color-mode') || 'light';
+      if (cur === 'auto') {
+        cur = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          ? 'dark' : 'light';
       }
-      /* Trigger ripple from centre */
+      if (cur === mode) { syncThemeRows(); return; }   /* already there */
+
+      /* Prefer Gmeek's own toggle (keeps its storage in sync) … */
+      var circle = document.querySelector('.circle');
+      if (circle) circle.click();
+      /* … then verify; fall back to manual attribute set */
+      var after = htmlEl.getAttribute('data-color-mode') || '';
+      if (after !== mode) {
+        htmlEl.setAttribute('data-color-mode', mode);
+        try { localStorage.setItem('meek_theme', mode); } catch (e) {}
+      }
+      /* Ripple from viewport centre */
       if (root._luliyThemeRipple) root._luliyThemeRipple(
         window.innerWidth / 2, window.innerHeight / 2);
       syncThemeRows();
@@ -1891,6 +1915,32 @@
     function populateDrop() {
       drop.innerHTML = '';
 
+      /* -- Original nav links (title-right hidden on mobile) -- */
+      var trNav = document.querySelector('.title-right, [class*="title-right"]');
+      if (trNav) {
+        var navLinks = Array.from(trNav.querySelectorAll('a')).filter(function (a) {
+          var href = a.getAttribute('href') || '';
+          if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
+          if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
+          return !!href;
+        });
+        if (navLinks.length) {
+          navLinks.forEach(function (a) {
+            var item = document.createElement('a');
+            item.className = 'luliy-nav-item';
+            item.href = a.href;
+            var label = a.getAttribute('title') || (a.textContent || '').trim();
+            if (!label) {
+              var p = (a.getAttribute('href') || '').replace(/^\//, '').replace(/\.html$/, '');
+              label = p || '\u94fe\u63a5';
+            }
+            item.textContent = label;
+            drop.appendChild(item);
+          });
+          drop.appendChild(makeSep());
+        }
+      }
+
       /* ── 🔊 SFX toggle ───────────────────────────────────── */
       var sfxOn = localStorage.getItem('luliy-sfx') !== '0';
       var sfxItem = document.createElement('button');
@@ -1972,15 +2022,16 @@
         drop.appendChild(fsItem);
 
         /* ── ✍ Sans-serif toggle ──────────────────────────── */
-        var sansOn2 = localStorage.getItem('luliy-sans') === '1';
+        var _mobFontLabels = {'0':'\u9ed8\u8ba4','1':'\u9ed1\u4f53','2':'\u82cd\u8033\u6977'};
         var sansItem = document.createElement('button');
         sansItem.className = 'luliy-nav-item luliy-drop-toggle';
         sansItem.type = 'button';
-        sansItem.textContent = '\u270d \u9ed1\u4f53\u00b7' + (sansOn2 ? '\u5f00\u542f' : '\u5173\u95ed');
+        sansItem.textContent = '\u270d \u5b57\u4f53\u00b7' + _mobFontLabels[localStorage.getItem('luliy-sans') || '0'];
         sansItem.addEventListener('click', function () {
-          var on = localStorage.getItem('luliy-sans') === '1';
-          localStorage.setItem('luliy-sans', on ? '0' : '1');
-          sansItem.textContent = '\u270d \u9ed1\u4f53\u00b7' + (!on ? '\u5f00\u542f' : '\u5173\u95ed');
+          var cur = localStorage.getItem('luliy-sans') || '0';
+          var next = cur === '0' ? '1' : cur === '1' ? '2' : '0';
+          localStorage.setItem('luliy-sans', next);
+          sansItem.textContent = '\u270d \u5b57\u4f53\u00b7' + _mobFontLabels[next];
           if (root._luliyApplyReadingPrefs) root._luliyApplyReadingPrefs();
         });
         drop.appendChild(sansItem);
@@ -2578,6 +2629,11 @@
   function applyCardView() {
     var view = getCardView();
     document.querySelectorAll('.luliy-card-grid').forEach(function (g) {
+      /* Pinned strip always stays a grid — alt layouts make no sense there */
+      if (g.classList.contains('luliy-pinned-grid')) {
+        g.classList.remove('luliy-card-list', 'luliy-card-timeline');
+        return;
+      }
       g.classList.toggle('luliy-card-list', view === 'list');
       g.classList.toggle('luliy-card-timeline', view === 'timeline');
     });
