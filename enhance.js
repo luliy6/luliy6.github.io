@@ -13,7 +13,7 @@
    10  Hero banner (homepage scroll-fold)
    11  Tag page search toolbar
    12  Image lightbox
-   13  Floating toolbar + unified sink (6 themes) + reading prefs + music + ambient + extras
+   13  Floating toolbar + unified sink (6 themes) + reading prefs + music + extras
    14  Home card rebuild (grid/list toggle + year grouping + skeleton)
    15  macOS code block strip (+ line numbers)
    16  Sakura petals + shooting stars
