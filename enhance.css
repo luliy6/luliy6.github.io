@@ -77,6 +77,12 @@ html,
   background-color: transparent !important;
 }
 
+/* Guard: 100vw elements (hero) must never cause horizontal scroll */
+html, body { overflow-x: clip; }
+@supports not (overflow-x: clip) {
+  html, body { overflow-x: hidden; }
+}
+
 /* ══════════════════════════════════════════════════════════
    02  Homepage Hero — full-screen, scroll to enter
 ══════════════════════════════════════════════════════════ */
@@ -490,12 +496,11 @@ body[data-luliy-theme="space"] .luliy-nav-item,
 .title-right a[href$="/about"],
 .title-right a[href$="/about.html"] { display: none !important; }
 
-/* Scrolled (article page) — transparent */
+/* Scrolled (article page) — lighter dark glass, still legible */
 #header.header-scrolled {
-  background: transparent !important;
-  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
-  border-top-color: transparent !important; border-bottom-color: transparent !important;
-  box-shadow: none !important;
+  background: rgba(10,6,20,0.62) !important;
+  border-bottom-color: rgba(255,255,255,0.05) !important;
+  box-shadow: 0 1px 12px rgba(0,0,0,0.25) !important;
 }
 
 
@@ -2374,14 +2379,16 @@ body[data-luliy-theme="mono"] #postBody h2 {
   border: 3px solid var(--color-canvas-default, #fff);
   box-shadow: 0 0 0 2px var(--th-accent-soft, rgba(130,80,223,0.4));
   opacity: 1; z-index: 3;
-  /* Right-side card: dot on the left */
-  left: auto;
-  right: calc(-36px + 3px);
-}
-/* Left-side card: dot on the right */
-.luliy-card-timeline .luliy-card:nth-child(even)::before {
-  left: calc(-36px + 3px);
+  /* Right-side card: spine is to its LEFT → dot sits at left edge.
+     Card's left edge is 18px right of spine; dot is 12px + 6px border ⇒
+     centre the dot on the spine: left = -(18 + 9) = -27px */
+  left: -27px;
   right: auto;
+}
+/* Left-side card: spine is to its RIGHT → dot at right edge */
+.luliy-card-timeline .luliy-card:nth-child(even)::before {
+  left: auto;
+  right: -27px;
 }
 [data-color-mode="dark"] .luliy-card-timeline .luliy-card::before {
   border-color: rgba(10,6,20,0.95);
@@ -2410,7 +2417,7 @@ body[data-luliy-theme="mono"] #postBody h2 {
   }
   .luliy-card-timeline .luliy-card::before,
   .luliy-card-timeline .luliy-card:nth-child(even)::before {
-    left: -30px !important; right: auto !important;
+    left: -33px !important; right: auto !important;
   }
 }
 
@@ -2434,7 +2441,7 @@ body[data-luliy-theme="mono"] #postBody h2 {
 }
 /* Subtle hint that double-click / F exits, shown briefly on entering focus mode */
 body.luliy-focus-mode::after {
-  content: 'F \u6216\u53cc\u51fb\u9000\u51fa\u4e13\u6ce8\u6a21\u5f0f';   /* F 或双击退出专注模式 */
+  content: 'F 或双击退出专注模式';
   position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
   background: rgba(0,0,0,0.66); color: #fff;
   padding: 8px 18px; border-radius: 24px; font-size: 12px; letter-spacing: 1px;
@@ -2806,22 +2813,28 @@ body.luliy-swipe-right #postBody { animation: luliySwipeR 0.18s ease forwards; }
    27  Responsive (mobile)
 ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Show hamburger (for sfx/theme/sakura/TOC dropdown) */
-  #luliy-nav-ham { display: flex !important; }
-
-  /* Keep .title-right visible in navbar — centered, compact */
-  .title-right {
+  /* ── Rebuilt navbar mobile layout ─────────────────────── */
+  /* Hamburger: absolute right, vertically centred */
+  #luliy-nav-ham {
     display: flex !important;
-    flex: 1 !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 2px !important;
-    flex-wrap: wrap !important;
+    position: absolute !important;
+    right: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
   }
-  .title-right a {
-    font-size: 12px !important;
-    padding: 4px 7px !important;
+  /* Icon groups collapse — their links live in the dropdown */
+  #luliy-nav-icons-left, #luliy-nav-icons-right { display: none !important; }
+  /* Centre group fills the bar */
+  #luliy-nav-rebuilt {
+    grid-template-columns: 1fr !important;
+    padding: 0 52px !important;   /* clearance for ham */
   }
+  #luliy-nav-blogname { font-size: 18px !important; letter-spacing: 1.5px !important; }
+  #luliy-nav-avatar { width: 28px !important; height: 28px !important; }
+  #luliy-nav-time { font-size: 9px !important; left: 12px !important; top: 5px !important; }
+  /* Never resurrect the original title-right (replaced by rebuilt nav) */
+  .title-right { display: none !important; }
   /* Toolbar hidden on mobile — sfx/theme/sakura/TOC live in dropdown */
   #luliy-toolbar { display: none !important; }
 
