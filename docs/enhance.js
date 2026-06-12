@@ -36,39 +36,26 @@
      SITE OPTIONS — edit these to customise
   ════════════════════════════════════════════════════════ */
   var LULIY_OPTS = {
-    /* Homepage bottom gallery: 1 image = banner, 2+ = grid.
-       Users can append their own via the ✎ button (saved in localStorage). */
+    /* Homepage bottom gallery: 1 image = banner, 2+ = grid. */
     galleryImages: [
       'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg'
     ],
-    galleryText: '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65',          /* 我将无限进步 */
+    galleryText: '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65',
 
-    /* Welcome splash animation sequence — lines fade in one by one */
-    welcomeSequence: [
-      '\u6b22\u8fce\u6765\u5230 Luliy \u7684\u4e16\u754c',          /* 欢迎来到 Luliy 的世界 */
-      '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65\uff01',                 /* 我将无限进步！ */
-      '\u613f\u4f60\u5728\u8fd9\u91cc\u6709\u6240\u6536\u83b7 \u2727' /* 愿你在这里有所收获 ✧ */
-    ],
+    /* Homepage full-screen Hero (scroll down to enter). */
+    heroImage: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/SunFragment17_8k.webp',
+    heroTitle: 'Luliy',
+    heroSubtitle: '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65',
+    heroHint: '\u4e0b\u6ed1\u8fdb\u5165 \u2193',
 
-    /* Music playlist — replace src with your own hosted mp3 links.
-       The first track is a placeholder demo; swap in a real space-
-       themed soundtrack URL of your own. */
+    /* Music playlist — global playback, resumes across page loads. */
     musicTracks: [
-      { name: '\u661f\u9645\u6f2b\u6e38\u00b7\u793a\u4f8b\u66f2\u76ee', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' }
+      { name: 'dark', src: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/dark.mp3' }
     ],
 
-    /* Favorites page lock — SHA-256 of the password (121383).
-       NOTE: this is a front-end gate (deterrent), not true encryption:
-       the page source is still publicly readable. */
+    /* Favorites page lock — SHA-256 of the password (121383). */
     favoritesHash: 'c9c9ed97be82f3ed62e9d127e4df48397549f81ba53a07f5639b68987552ce21',
     favoritesPathMatch: /favorites/i,
-
-    /* Ambient / white-noise tracks — loop & layer over music.
-       Replace src with your own hosted loops (rain / waves / cafe…). */
-    ambientTracks: [
-      { name: '\u96e8\u58f0', src: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_4c5b8b3b8e.mp3?filename=light-rain-ambient-114354.mp3' },
-      { name: '\u6d77\u6d6a', src: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_3e8e3f4e5a.mp3?filename=ocean-waves-112762.mp3' }
-    ],
 
     homeUrl: '/'
   };
@@ -152,74 +139,67 @@
   }
 
   /* ---- 00  Welcome splash (animation sequence) ------------- */
-  function initWelcomeSplash() {
-    if (sessionStorage.getItem('luliy-welcomed') === '1') return;
+  /* ---- 00  Homepage Hero (full-screen, scroll to enter) --- */
+  function initHomeHero() {
+    /* Only on the homepage / index, not on article or single pages */
+    if (!isIndexPage()) return;
+    if (document.getElementById('luliy-hero')) return;
 
-    var splash = document.createElement('div');
-    splash.id = 'luliy-welcome';
+    var hero = document.createElement('section');
+    hero.id = 'luliy-hero';
+    hero.style.backgroundImage = "linear-gradient(to bottom, rgba(10,6,22,0.10), rgba(10,6,22,0.45)), url('" + LULIY_OPTS.heroImage + "')";
 
     var inner = document.createElement('div');
-    inner.id = 'luliy-welcome-inner';
+    inner.id = 'luliy-hero-inner';
 
-    var seq = LULIY_OPTS.welcomeSequence || [];
-    var title = document.createElement('div');
-    title.id = 'luliy-welcome-title';
-    title.className = 'luliy-welcome-seq';
-    title.textContent = seq[0] || '\u6b22\u8fce';
-    title.style.animationDelay = '0.2s';
+    var title = document.createElement('h1');
+    title.id = 'luliy-hero-title';
+    title.textContent = LULIY_OPTS.heroTitle || 'Luliy';
+
+    var sub = document.createElement('p');
+    sub.id = 'luliy-hero-subtitle';
+    sub.textContent = LULIY_OPTS.heroSubtitle || '';
+
     inner.appendChild(title);
-
-    /* Subsequent lines fade in one after another */
-    for (var i = 1; i < seq.length; i++) {
-      var line = document.createElement('div');
-      line.className = 'luliy-welcome-seq' + (i === 1 ? '' : ' luliy-welcome-extra');
-      if (i === 1) line.id = 'luliy-welcome-sub';
-      line.textContent = seq[i];
-      line.style.animationDelay = (0.2 + i * 0.55) + 's';
-      inner.appendChild(line);
-    }
-
-    var btn = document.createElement('button');
-    btn.id = 'luliy-welcome-btn';
-    btn.className = 'luliy-welcome-seq';
-    btn.style.animationDelay = (0.2 + seq.length * 0.55) + 's';
-    btn.textContent = '\u70b9\u51fb\u8fdb\u5165';
-    inner.appendChild(btn);
+    inner.appendChild(sub);
 
     var hint = document.createElement('div');
-    hint.id = 'luliy-welcome-hint';
-    hint.textContent = '\u25bc  ENTER';
+    hint.id = 'luliy-hero-hint';
+    hint.textContent = LULIY_OPTS.heroHint || '\u2193';
+    hint.setAttribute('role', 'button');
+    hint.setAttribute('tabindex', '0');
 
-    splash.appendChild(inner);
-    splash.appendChild(hint);
-    document.body.appendChild(splash);
-    document.body.style.overflow = 'hidden';
+    hero.appendChild(inner);
+    hero.appendChild(hint);
 
-    function enter() {
-      if (splash._luliyLeaving) return;
-      splash._luliyLeaving = true;
-      sessionStorage.setItem('luliy-welcomed', '1');
-      /* Immediately stop intercepting clicks — don't wait for the animation */
-      splash.style.pointerEvents = 'none';
-      splash.classList.add('is-leaving');
-      document.body.style.overflow = '';
-      document.removeEventListener('keydown', kHandler);
-      setTimeout(function () { if (splash.parentNode) splash.remove(); }, 700);
+    /* Insert hero as the very first thing in the page flow */
+    if (document.body.firstChild) document.body.insertBefore(hero, document.body.firstChild);
+    else document.body.appendChild(hero);
+
+    /* Smooth-scroll to content when hint clicked / Enter pressed */
+    function enterSite() {
+      var target = document.getElementById('content') ||
+                   document.querySelector('.SideNav') ||
+                   document.getElementById('header');
+      var y = target ? (target.getBoundingClientRect().top + window.scrollY - 60) : window.innerHeight;
+      window.scrollTo({ top: Math.max(y, window.innerHeight * 0.92), behavior: 'smooth' });
     }
+    hint.addEventListener('click', enterSite);
+    hint.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSite(); }
+    });
 
-    /* Whole overlay is clickable to dismiss (not just the button) */
-    splash.addEventListener('click', function () { enter(); });
-    btn.addEventListener('click', function (e) { e.stopPropagation(); enter(); });
-
-    var kHandler = function (e) {
-      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
-        enter();
-      }
-    };
-    document.addEventListener('keydown', kHandler);
-
-    /* Safety net: auto-dismiss after 8s so it can never permanently block the page */
-    setTimeout(function () { if (!splash._luliyLeaving) enter(); }, 8000);
+    /* Parallax + fade as the user scrolls past the hero */
+    onScrollRAF(function () {
+      var st = window.scrollY || 0;
+      var vh = window.innerHeight;
+      if (st > vh) return;            /* fully scrolled past — skip work */
+      var p = Math.min(1, st / vh);
+      inner.style.transform = 'translateY(' + (p * 60) + 'px)';
+      inner.style.opacity = String(1 - p * 1.4);
+      hint.style.opacity = String(1 - p * 2);
+      hero.style.filter = 'brightness(' + (1 - p * 0.3) + ')';
+    });
   }
 
   /* ---- 01  localStorage init ------------------------------ */
@@ -708,12 +688,17 @@
     var bar = document.createElement('div');
     bar.id = 'luliy-toolbar';
 
-    /* ── Shared Audio engine (lives in toolbar closure) ────── */
+    /* ── Shared Audio engine with cross-page resume ─────────
+       Gmeek is a multi-page site, so each navigation destroys the
+       Audio object. We persist {track, position, playing} to
+       localStorage and resume on the next page (subject to the
+       browser autoplay policy — first play needs a user gesture). */
     var _audio = new Audio();
-    _audio.preload = 'none';
+    _audio.preload = 'metadata';
     _audio.volume = 0.55;
     var _trackIdx = 0;
     var _musicPlaying = false;
+    var MUSIC_STATE = 'luliy-music-state';
 
     function _getTracks() {
       var list = (LULIY_OPTS.musicTracks || []).slice();
@@ -724,11 +709,28 @@
       return list.filter(function (t) { return t && t.src; });
     }
 
-    function _loadTrack(i) {
+    function _saveState() {
+      try {
+        localStorage.setItem(MUSIC_STATE, JSON.stringify({
+          idx: _trackIdx,
+          pos: _audio.currentTime || 0,
+          playing: _musicPlaying,
+          t: Date.now()
+        }));
+      } catch (e) {}
+    }
+
+    function _loadTrack(i, resumePos) {
       var tracks = _getTracks();
       if (!tracks.length) return null;
       _trackIdx = ((i % tracks.length) + tracks.length) % tracks.length;
       _audio.src = tracks[_trackIdx].src;
+      if (resumePos) {
+        _audio.addEventListener('loadedmetadata', function onMeta() {
+          _audio.removeEventListener('loadedmetadata', onMeta);
+          try { if (resumePos < _audio.duration) _audio.currentTime = resumePos; } catch (e) {}
+        });
+      }
       return tracks[_trackIdx];
     }
 
@@ -737,6 +739,19 @@
       return _audio.play();
     }
     function _pauseAudio() { _audio.pause(); }
+
+    /* Persist position periodically + on page unload */
+    _audio.addEventListener('timeupdate', function () {
+      if (_musicPlaying) {
+        /* throttle: save roughly every 3s */
+        var now = Date.now();
+        if (!_audio._lastSave || now - _audio._lastSave > 3000) {
+          _audio._lastSave = now; _saveState();
+        }
+      }
+    });
+    window.addEventListener('pagehide', _saveState);
+    window.addEventListener('beforeunload', _saveState);
 
     /* ── Pill trigger button ──────────────────────────────── */
     var ctrlBtn = document.createElement('button');
@@ -1043,8 +1058,36 @@
     });
     _audio.addEventListener('ended', function () {
       var t = _loadTrack(_trackIdx + 1);
-      if (t) _playAudio().then(function () { mPlayBtn.textContent = '\u23f8'; refreshPlaylist(); }).catch(function(){});
+      if (t) _playAudio().then(function () { mPlayBtn.textContent = '\u23f8'; refreshPlaylist(); _saveState(); }).catch(function(){});
     });
+    /* Keep play button + state in sync if audio pauses/plays externally */
+    _audio.addEventListener('pause', function () { _musicPlaying = false; mPlayBtn.textContent = '\u25b6'; refreshBtnLabel(); _saveState(); });
+    _audio.addEventListener('play',  function () { _musicPlaying = true;  mPlayBtn.textContent = '\u23f8'; refreshBtnLabel(); });
+
+    /* Restore playback from the previous page (global resume) */
+    (function restoreMusic() {
+      var st = null;
+      try { st = JSON.parse(localStorage.getItem(MUSIC_STATE) || 'null'); } catch (e) {}
+      if (!st || typeof st.idx !== 'number') return;
+      var tracks = _getTracks();
+      if (!tracks.length) return;
+      _loadTrack(st.idx, st.pos || 0);
+      refreshPlaylist();
+      musicNameEl.textContent = (tracks[_trackIdx] && tracks[_trackIdx].name) || ('\u66f2\u76ee ' + (_trackIdx + 1));
+      if (st.playing) {
+        _playAudio().then(function () {
+          _musicPlaying = true; mPlayBtn.textContent = '\u23f8'; refreshBtnLabel(); refreshPlaylist();
+        }).catch(function () {
+          var resumeOnce = function () {
+            _playAudio().then(function () {
+              _musicPlaying = true; mPlayBtn.textContent = '\u23f8'; refreshBtnLabel(); refreshPlaylist();
+            }).catch(function () {});
+          };
+          document.addEventListener('click', resumeOnce, { once: true });
+          document.addEventListener('keydown', resumeOnce, { once: true });
+        });
+      }
+    })();
 
     mAddBtn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -1065,52 +1108,20 @@
       playSfx('click');
     });
 
-    /* ── 🌧 Ambient soundscapes (loop & layer over music) ──── */
-    var _ambientAudios = {};   /* name -> Audio */
-    var ambList = LULIY_OPTS.ambientTracks || [];
-    if (ambList.length) {
-      panel.appendChild(mkSep());
-      panel.appendChild(mkSec('\uD83C\uDF27 \u73af\u5883\u97f3'));   /* 🌧 环境音 */
-      var ambWrap = document.createElement('div');
-      ambWrap.className = 'luliy-ambient-wrap';
-      ambList.forEach(function (amb) {
-        var chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'luliy-ambient-chip';
-        chip.textContent = amb.name;
-        chip.addEventListener('click', function (e) {
-          e.stopPropagation();
-          var a = _ambientAudios[amb.name];
-          if (a && !a.paused) {
-            a.pause();
-            chip.classList.remove('is-on');
-          } else {
-            if (!a) {
-              a = new Audio(amb.src);
-              a.loop = true; a.volume = 0.4;
-              _ambientAudios[amb.name] = a;
-            }
-            a.play().then(function () { chip.classList.add('is-on'); }).catch(function () {});
-          }
-          playSfx('click');
-        });
-        ambWrap.appendChild(chip);
-      });
-      panel.appendChild(ambWrap);
-    }
-
     /* ── ⚙ Extras: card view / cursor trail / fireflies / focus / reduce-motion ── */
     panel.appendChild(mkSep());
     panel.appendChild(mkSec('\u2728 \u4e2a\u6027\u5316'));   /* ✨ 个性化 */
 
     /* Card view (grid/list) — only meaningful on list pages */
-    var cardViewRow = mkRow('\uD83D\uDD33', '\u5361\u7247\u89c6\u56fe',
-      localStorage.getItem('luliy-cardview') === 'list' ? '\u5217\u8868' : '\u7f51\u683c');
+    var _cvLabels = { grid: '\u7f51\u683c', list: '\u5217\u8868', timeline: '\u65f6\u95f4\u8f74' };
+    var cardViewRow = mkRow('\uD83D\uDD33', '\u5361\u7247\u89c6\u56fe', _cvLabels[getCardView()]);
     cardViewRow.addEventListener('click', function (e) {
       e.stopPropagation();
-      var cur = localStorage.getItem('luliy-cardview') === 'list' ? 'grid' : 'list';
-      localStorage.setItem('luliy-cardview', cur);
-      cardViewRow._bdg.textContent = cur === 'list' ? '\u5217\u8868' : '\u7f51\u683c';
+      var order = ['grid', 'list', 'timeline'];
+      var cur = order.indexOf(getCardView());
+      var next = order[(cur + 1) % order.length];
+      localStorage.setItem('luliy-cardview', next);
+      cardViewRow._bdg.textContent = _cvLabels[next];
       applyCardView();
       playSfx('click');
     });
@@ -1161,10 +1172,11 @@
         document.body.classList.contains('luliy-focus-mode') ? '\u5f00\u542f' : '\u5173\u95ed');
       focusRow.addEventListener('click', function (e) {
         e.stopPropagation();
-        var on = document.body.classList.toggle('luliy-focus-mode');
+        var on = toggleFocusMode();
         focusRow._bdg.textContent = on ? '\u5f00\u542f' : '\u5173\u95ed';
-        playSfx('click');
       });
+      focusRow._badge = focusRow._bdg;
+      root._luliyFocusRow = focusRow;
       panel.appendChild(focusRow);
     }
 
@@ -1235,15 +1247,6 @@
       dateEl.textContent = relDate ? (relDate + ' \u00b7 ' + absDate) : absDate;
       dateEl.title = absDate;
 
-      /* Multi-level pin badge: 📌 / 📌2 / 📌3 ... */
-      if (isPinned && post.pinLevel) {
-        var pin = document.createElement('span');
-        pin.className = 'luliy-card-pinbadge';
-        pin.textContent = '\uD83D\uDCCC' + (post.pinLevel > 1 ? post.pinLevel : '');
-        pin.title = '\u7f6e\u9876\u7ea7\u522b ' + post.pinLevel;
-        li.appendChild(pin);
-      }
-
       var titleEl = document.createElement('div');
       titleEl.className = 'luliy-card-title';
       titleEl.textContent = post.title || '\u65e0\u9898';
@@ -1298,10 +1301,6 @@
         if (existing) existing.remove();
         var ps = document.createElement('div');
         ps.id = 'luliy-pinned-section';
-        var psTitle = document.createElement('div');
-        psTitle.className = 'luliy-pinned-title';
-        psTitle.textContent = '\uD83D\uDCCC \u7f6e\u9876\u63a8\u8350';   /* 📌 置顶推荐 */
-        ps.appendChild(psTitle);
         var pg = document.createElement('ul');
         pg.className = 'luliy-card-grid luliy-pinned-grid';
         pinnedPosts.forEach(function (post, i) { pg.appendChild(buildCard(post, true, i)); });
@@ -2432,13 +2431,73 @@
      NEW MODULES (v10)
   ════════════════════════════════════════════════════════ */
 
+  /* ---- Focus reading mode (F key / double-click / exit btn) */
+  function toggleFocusMode(force) {
+    var on = (typeof force === 'boolean')
+      ? force
+      : !document.body.classList.contains('luliy-focus-mode');
+    document.body.classList.toggle('luliy-focus-mode', on);
+    /* Sync the settings-panel badge if present */
+    if (root._luliyFocusRow && root._luliyFocusRow._badge) {
+      root._luliyFocusRow._badge.textContent = on ? '\u5f00\u542f' : '\u5173\u95ed';
+    }
+    /* Show / hide the floating exit button */
+    var exit = document.getElementById('luliy-focus-exit');
+    if (on && !exit) {
+      exit = document.createElement('button');
+      exit.id = 'luliy-focus-exit';
+      exit.type = 'button';
+      exit.innerHTML = '\u2715 \u9000\u51fa\u4e13\u6ce8';   /* ✕ 退出专注 */
+      exit.title = '\u9000\u51fa\u4e13\u6ce8\u6a21\u5f0f (F)';
+      exit.addEventListener('click', function () { toggleFocusMode(false); });
+      document.body.appendChild(exit);
+    } else if (!on && exit) {
+      exit.remove();
+    }
+    try { playSfx('click'); } catch (e) {}
+    return on;
+  }
+
+  function initFocusMode() {
+    if (!document.getElementById('postBody')) return;
+
+    /* F key toggles focus mode (ignore when typing in a field) */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'f' && e.key !== 'F') return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;   /* Ctrl+F = search */
+      var t = e.target;
+      var tag = t && t.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (t && t.isContentEditable)) return;
+      e.preventDefault();
+      toggleFocusMode();
+    });
+
+    /* Double-click the article body toggles focus mode
+       (ignore double-clicks on links / code / images / selections) */
+    var pbody = document.getElementById('postBody');
+    pbody.addEventListener('dblclick', function (e) {
+      var t = e.target;
+      if (t.closest('a, code, pre, img, button, table, .luliy-series, mark')) return;
+      /* Don't toggle if the user is selecting text */
+      var sel = window.getSelection && window.getSelection();
+      if (sel && sel.toString().length > 0) return;
+      toggleFocusMode();
+    });
+  }
+  root._luliyToggleFocus = toggleFocusMode;
+
   /* ---- Card view (grid / list) ---------------------------- */
+  var CARD_VIEWS = ['grid', 'list', 'timeline'];
+  function getCardView() {
+    var v = localStorage.getItem('luliy-cardview');
+    return CARD_VIEWS.indexOf(v) >= 0 ? v : 'grid';
+  }
   function applyCardView() {
-    var view = localStorage.getItem('luliy-cardview') === 'list' ? 'list' : 'grid';
+    var view = getCardView();
     document.querySelectorAll('.luliy-card-grid').forEach(function (g) {
       g.classList.toggle('luliy-card-list', view === 'list');
+      g.classList.toggle('luliy-card-timeline', view === 'timeline');
     });
-    /* Update toggle button if present */
     var tb = document.getElementById('luliy-cardview-toggle');
     if (tb) tb.setAttribute('data-view', view);
   }
@@ -2453,18 +2512,19 @@
 
     var bar = document.createElement('div');
     bar.id = 'luliy-cardview-bar';
-    var toggle = document.createElement('button');
+    var toggle = document.createElement('div');
     toggle.id = 'luliy-cardview-toggle';
-    toggle.type = 'button';
-    toggle.setAttribute('data-view', localStorage.getItem('luliy-cardview') === 'list' ? 'list' : 'grid');
+    toggle.setAttribute('data-view', getCardView());
     toggle.innerHTML =
-      '<span class="cv-grid" title="\u7f51\u683c\u89c6\u56fe">\u2317</span>' +
-      '<span class="cv-list" title="\u5217\u8868\u89c6\u56fe">\u2630</span>';
-    toggle.addEventListener('click', function () {
-      var cur = localStorage.getItem('luliy-cardview') === 'list' ? 'grid' : 'list';
-      localStorage.setItem('luliy-cardview', cur);
-      applyCardView();
-      playSfx('click');
+      '<button type="button" class="cv-grid" data-v="grid" title="\u7f51\u683c\u89c6\u56fe">\u2317</button>' +
+      '<button type="button" class="cv-list" data-v="list" title="\u5217\u8868\u89c6\u56fe">\u2630</button>' +
+      '<button type="button" class="cv-timeline" data-v="timeline" title="\u65f6\u95f4\u8f74\u89c6\u56fe">\u2261\u20D7</button>';
+    toggle.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        localStorage.setItem('luliy-cardview', b.getAttribute('data-v'));
+        applyCardView();
+        playSfx('click');
+      });
     });
     bar.appendChild(toggle);
     nav.parentNode.insertBefore(bar, nav);
@@ -3077,8 +3137,7 @@
   })();
 
   /* Welcome splash (before DOM ready, append after body exists) */
-  if (document.body) initWelcomeSplash();
-  else document.addEventListener('DOMContentLoaded', initWelcomeSplash);
+  /* Homepage Hero is initialised inside ready() (needs DOM + helpers) */
 
   /* Sakura petals */
   if (localStorage.getItem('luliy-sakura') !== '0') {
@@ -3087,6 +3146,7 @@
   }
 
   ready(function () {
+    initHomeHero();
     initProgressBar();
     initDynamicTitle();
     initUptime();
@@ -3103,6 +3163,7 @@
 
     /* v10 global features */
     applyReduceMotion();
+    initFocusMode();
     initViewTransitions();
     initTagCloud();
     if (localStorage.getItem('luliy-trail') === '1') initMouseTrail();
