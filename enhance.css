@@ -72,107 +72,77 @@ html,
 }
 
 /* ══════════════════════════════════════════════════════════
-   02  Welcome splash overlay
+   02  Homepage Hero — full-screen, scroll to enter
 ══════════════════════════════════════════════════════════ */
-#luliy-welcome {
-  position: fixed; inset: 0; z-index: 999999;
-  background:
-    url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg')
-    center / cover no-repeat;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: opacity 0.9s cubic-bezier(.4,0,.2,1), transform 0.9s cubic-bezier(.4,0,.2,1);
-  will-change: opacity, transform;
-  overflow: hidden;
-}
-#luliy-welcome::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,20,0.28) 0%,
-    rgba(0,0,20,0.52) 55%,
-    rgba(0,0,20,0.72) 100%
-  );
-}
-#luliy-welcome.is-leaving {
-  opacity: 0;
-  transform: scale(1.055);
-  pointer-events: none;
-}
-#luliy-welcome-inner {
-  position: relative; z-index: 1;
+#luliy-hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 520px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 24px 40px;
-  animation: welcomeFadeIn 1.4s cubic-bezier(.4,0,.2,1) both;
-  animation-delay: 0.2s;
+  overflow: hidden;
+  z-index: 1;
+  /* push the rest of the page below the fold */
+  margin-bottom: 8px;
 }
-@keyframes welcomeFadeIn {
-  from { opacity: 0; transform: translateY(28px); }
+#luliy-hero-inner {
+  position: relative;
+  z-index: 2;
+  will-change: transform, opacity;
+  padding: 0 24px;
+}
+#luliy-hero-title {
+  margin: 0;
+  font-size: clamp(48px, 9vw, 110px);
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #fff;
+  font-family: 'Noto Sans SC', sans-serif;
+  text-shadow: 0 4px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4);
+  animation: luliyHeroIn 1.3s cubic-bezier(.2,.7,.3,1) both;
+}
+#luliy-hero-subtitle {
+  margin: 14px 0 0;
+  font-size: clamp(15px, 2.4vw, 22px);
+  letter-spacing: 8px;
+  color: rgba(255,255,255,0.92);
+  font-family: 'LXGW WenKai Screen', serif;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.55);
+  animation: luliyHeroIn 1.3s cubic-bezier(.2,.7,.3,1) 0.25s both;
+}
+#luliy-hero-hint {
+  position: absolute;
+  bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  color: rgba(255,255,255,0.9);
+  font-size: 14px; letter-spacing: 3px;
+  cursor: pointer; user-select: none;
+  padding: 8px 18px; border-radius: 30px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.25);
+  animation: luliyHeroBounce 2s ease-in-out infinite, luliyHeroIn 1.3s ease 0.6s both;
+  transition: background 0.2s;
+}
+#luliy-hero-hint:hover { background: rgba(255,255,255,0.24); }
+@keyframes luliyHeroIn {
+  from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-/* Animation sequence — every line/button fades in with its own delay */
-.luliy-welcome-seq {
-  opacity: 0;
-  animation: welcomeFadeIn 1.1s cubic-bezier(.4,0,.2,1) both;
+@keyframes luliyHeroBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(8px); }
 }
-#luliy-welcome-inner { animation: none; } /* delegated to children */
-.luliy-welcome-extra {
-  font-size: 0.92rem;
-  color: rgba(255,255,255,0.60);
-  margin: 0 0 28px;
-  letter-spacing: 4px;
-  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', serif;
-}
-#luliy-welcome-title {
-  font-family: 'Noto Sans SC', 'Source Han Sans CN', sans-serif;
-  font-size: clamp(1.8rem, 5vw, 3.2rem);
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 2px 30px rgba(0,0,0,0.55), 0 0 100px rgba(240,180,41,0.18);
-  margin: 0 0 12px;
-  letter-spacing: 4px;
-  line-height: 1.25;
-}
-#luliy-welcome-sub {
-  font-size: 1rem;
-  color: rgba(255,255,255,0.70);
-  margin: 0 0 40px;
-  letter-spacing: 3px;
-  font-style: italic;
-  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', serif;
-}
-#luliy-welcome-btn {
-  padding: 14px 52px;
-  border-radius: 999px;
-  border: 1.5px solid rgba(255,255,255,0.60);
-  background: rgba(255,255,255,0.10);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  color: #fff;
-  font-size: 15px; font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 3px;
-  font-family: 'Noto Sans SC', 'LXGW WenKai Screen', sans-serif;
-  transition: background 0.3s, transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-  box-shadow: 0 4px 28px rgba(0,0,0,0.22);
-}
-#luliy-welcome-btn:hover {
-  background: rgba(255,255,255,0.22);
-  border-color: rgba(255,255,255,0.90);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
-}
-#luliy-welcome-hint {
-  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-  color: rgba(255,255,255,0.45); font-size: 11px; letter-spacing: 3px;
-  white-space: nowrap;
-  animation: welcomePulse 2.4s ease infinite;
-}
-@keyframes welcomePulse {
-  0%,100% { opacity: 0.45; transform: translateX(-50%) translateY(0); }
-  50%      { opacity: 0.90; transform: translateX(-50%) translateY(5px); }
-}
+body.luliy-reduce-motion #luliy-hero-hint { animation: none; }
+/* On article / single pages there is no hero, so this never applies. */
 
 /* ══════════════════════════════════════════════════════════
    03  Background image — fixed, full viewport
@@ -199,8 +169,7 @@ body {
 #postBody h1, #postBody h2, #postBody h3,
 #postBody h4, #postBody h5, #postBody h6,
 .luliy-card-title, #luliy-hero-name,
-.blogTitle, .blogTitle h1, .blogTitle a,
-#luliy-welcome-title {
+.blogTitle, .blogTitle h1, .blogTitle a {
   font-family: 'Noto Sans SC', 'Source Han Sans CN', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
   font-weight: 500 !important;
 }
@@ -507,7 +476,8 @@ body[data-luliy-theme="sunset"] #luliy-nav-ham span { background: rgba(80,20,10,
   transition: transform 0.24s cubic-bezier(.4,0,.2,1), opacity 0.24s;
 }
 [data-color-mode="dark"] #luliy-nav-dropdown {
-  background: rgba(14,10,28,0.96); border-bottom-color: rgba(255,255,255,0.08);
+  background: rgba(10,7,20,0.985); border-bottom-color: rgba(255,255,255,0.10);
+  box-shadow: 0 16px 44px rgba(0,0,0,0.6);
 }
 body[data-luliy-theme="sakura"] #luliy-nav-dropdown { background: rgba(255,230,242,0.96) !important; }
 body[data-luliy-theme="your-name"] #luliy-nav-dropdown { background: rgba(225,240,255,0.96) !important; }
@@ -524,9 +494,9 @@ body[data-luliy-theme="sunset"] #luliy-nav-dropdown { background: rgba(255,240,2
   background: transparent !important; cursor: pointer !important;
   transition: background 0.16s !important; width: 100% !important; text-align: left !important;
 }
-[data-color-mode="dark"] .luliy-nav-item { color: #e0daf8 !important; }
+[data-color-mode="dark"] .luliy-nav-item { color: #f3f0ff !important; }
 body[data-luliy-theme="space"] .luliy-nav-item,
-[data-color-mode="dark"] body[data-luliy-theme="space"] .luliy-nav-item { color: #c8e8ff !important; }
+[data-color-mode="dark"] body[data-luliy-theme="space"] .luliy-nav-item { color: #d8f0ff !important; }
 .luliy-nav-item:hover {
   background: var(--th-accent-soft, rgba(130,80,223,0.10)) !important;
   color: var(--th-accent, #8250df) !important;
@@ -821,22 +791,6 @@ body[data-luliy-theme="space"] .luliy-card:hover .luliy-card-deco {
   opacity: 0.35;
 }
 
-/* ── Multi-level pin badge (📌 / 📌2 / 📌3) ───────────────── */
-.luliy-card-pinbadge {
-  position: absolute; top: 8px; right: 10px;
-  font-size: 12px; line-height: 1;
-  padding: 3px 6px; border-radius: 8px;
-  background: rgba(240,180,41,0.16);
-  border: 1px solid rgba(240,180,41,0.35);
-  z-index: 2; pointer-events: none;
-  font-family: 'LXGW WenKai Mono', monospace;
-  color: #b07b00; font-weight: 700;
-}
-[data-color-mode="dark"] .luliy-card-pinbadge {
-  background: rgba(240,180,41,0.14);
-  color: #f0b429;
-}
-
 /* ══════════════════════════════════════════════════════════
    10  Date badge
 ══════════════════════════════════════════════════════════ */
@@ -854,17 +808,6 @@ body[data-luliy-theme="space"] .luliy-card:hover .luliy-card-deco {
    11  Pinned section
 ══════════════════════════════════════════════════════════ */
 #luliy-pinned-section { margin-bottom: 28px; }
-.luliy-pinned-title {
-  font-size: 14px; font-weight: 800; letter-spacing: 2px;
-  color: #b07b00;
-  font-family: 'Noto Sans SC', sans-serif;
-  padding: 0 4px 8px;
-  text-shadow: 0 1px 4px rgba(255,255,255,0.40);
-}
-[data-color-mode="dark"] .luliy-pinned-title {
-  color: #f0b429;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.50);
-}
 .luliy-pinned-grid {
   padding: 16px 16px 24px;
   background: rgba(255,255,255,0.10) !important;
@@ -976,20 +919,31 @@ body[data-luliy-theme="sakura"] #postBody {
 }
 
 /* ── Your Name: sky blue frosted glass ───────────────────── */
+/* ── Your Name: 新海诚 sky-blue glass with golden top light ── */
 body[data-luliy-theme="your-name"] #postBody {
-  background: rgba(230,244,255,0.84) !important;
-  backdrop-filter: blur(26px) saturate(1.6) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(1.6) !important;
-  border: 1px solid rgba(26,89,164,0.30) !important;
-  border-top: 3px solid rgba(26,89,164,0.70) !important;
-  border-radius: 20px !important;
+  background:
+    radial-gradient(120% 80% at 80% -10%, rgba(255,212,59,0.18), transparent 55%),
+    radial-gradient(120% 90% at 10% 0%, rgba(229,153,247,0.14), transparent 50%),
+    linear-gradient(165deg, rgba(225,242,255,0.90), rgba(206,234,255,0.86)) !important;
+  backdrop-filter: blur(28px) saturate(1.7) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.7) !important;
+  border: 1px solid rgba(30,111,212,0.28) !important;
+  border-top: 3px solid rgba(255,169,77,0.75) !important;
+  border-radius: 22px !important;
   padding: 36px 40px !important;
   margin-bottom: 48px !important;
-  box-shadow: 0 6px 44px rgba(26,89,164,0.14), 0 0 60px rgba(244,167,56,0.06) !important;
+  box-shadow:
+    0 6px 44px rgba(30,111,212,0.16),
+    0 0 70px rgba(255,212,59,0.10),
+    0 1px 0 rgba(255,255,255,0.7) inset !important;
 }
 [data-color-mode="dark"] body[data-luliy-theme="your-name"] #postBody {
-  background: rgba(4,14,52,0.82) !important;
-  border-color: rgba(26,89,164,0.32) !important;
+  background:
+    radial-gradient(120% 80% at 80% -10%, rgba(255,212,59,0.12), transparent 55%),
+    radial-gradient(120% 90% at 10% 0%, rgba(116,192,252,0.14), transparent 50%),
+    linear-gradient(165deg, rgba(8,24,64,0.88), rgba(4,16,46,0.90)) !important;
+  border-color: rgba(116,192,252,0.30) !important;
+  border-top-color: rgba(255,212,59,0.55) !important;
 }
 
 /* ── Space: deep space dark glass ────────────────────────── */
@@ -1010,21 +964,31 @@ body[data-luliy-theme="space"] #postBody {
   border-color: rgba(0,200,255,0.28) !important;
 }
 
-/* ── Sunset: warm dusk gradient glass ────────────────────── */
+/* ── Sunset: 日落大道 highway dusk gradient glass ─────────── */
 body[data-luliy-theme="sunset"] #postBody {
-  background: linear-gradient(160deg, rgba(255,243,234,0.88), rgba(255,232,221,0.84)) !important;
-  backdrop-filter: blur(26px) saturate(1.5) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(1.5) !important;
-  border: 1px solid rgba(255,126,95,0.40) !important;
-  border-top: 3px solid rgba(255,126,95,0.65) !important;
+  background:
+    radial-gradient(130% 70% at 50% 120%, rgba(255,154,60,0.30), transparent 60%),
+    radial-gradient(120% 60% at 80% 110%, rgba(255,107,107,0.20), transparent 55%),
+    linear-gradient(170deg, rgba(255,238,228,0.90), rgba(255,224,212,0.86)) !important;
+  backdrop-filter: blur(26px) saturate(1.55) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.55) !important;
+  border: 1px solid rgba(196,69,105,0.34) !important;
+  border-top: 3px solid rgba(255,154,60,0.72) !important;
   border-radius: 20px !important;
   padding: 36px 40px !important;
   margin-bottom: 48px !important;
-  box-shadow: 0 6px 44px rgba(224,86,110,0.16), 0 0 60px rgba(254,180,123,0.10) !important;
+  box-shadow:
+    0 6px 44px rgba(196,69,105,0.18),
+    0 0 70px rgba(255,154,60,0.12),
+    0 1px 0 rgba(255,255,255,0.6) inset !important;
 }
 [data-color-mode="dark"] body[data-luliy-theme="sunset"] #postBody {
-  background: linear-gradient(160deg, rgba(40,14,26,0.84), rgba(30,10,22,0.86)) !important;
-  border-color: rgba(254,180,123,0.26) !important;
+  background:
+    radial-gradient(130% 70% at 50% 120%, rgba(255,154,60,0.22), transparent 60%),
+    radial-gradient(120% 70% at 15% 0%, rgba(106,48,147,0.30), transparent 55%),
+    linear-gradient(170deg, rgba(45,18,52,0.90), rgba(28,12,38,0.92)) !important;
+  border-color: rgba(255,154,60,0.30) !important;
+  border-top-color: rgba(255,154,60,0.55) !important;
 }
 
 /* ── Mono: minimalist black & white paper ────────────────── */
@@ -1154,46 +1118,55 @@ body[data-luliy-theme="space"] .mac-strip {
 [data-color-mode="dark"] .mac-lang,
 body[data-luliy-theme="space"] .mac-lang { color: rgba(160,140,255,0.70); }
 
-/* ── Line numbers gutter ─────────────────────────────────── */
-/* When line numbers are active:
-   1. Strip padding from pre (avoid double-offset with flex children)
-   2. Both luliy-lineno and code get identical font + line-height
-   3. code gets the original pre padding minus left (lineno handles left)  */
+/* ── Line numbers gutter — perfect baseline alignment ─────── */
 pre.has-lineno {
   display: flex !important;
-  align-items: flex-start !important;
-  padding: 0 !important;           /* padding moved onto children below */
+  align-items: stretch !important;
+  padding: 0 !important;
   overflow-x: auto !important;
   overflow-y: hidden !important;
+  /* Shared metrics — both children inherit these exactly */
+  --lno-fs: 0.9em;
+  --lno-lh: 1.7;
+  --lno-pad-y: 1em;
+  tab-size: 4; -moz-tab-size: 4;
 }
 pre.has-lineno > .luliy-lineno {
   flex-shrink: 0;
-  position: sticky; left: 0;
   text-align: right;
-  /* Match code block padding exactly */
-  padding: 1em 0.75em 1em 1em;
+  padding: var(--lno-pad-y) 0.7em var(--lno-pad-y) 1em;
+  margin: 0;
   border-right: 1px solid rgba(130,80,223,0.18);
   color: rgba(130,80,223,0.50);
   user-select: none;
   white-space: pre;
-  /* Font must be byte-for-byte identical to code or lines drift */
-  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', monospace !important;
-  font-size: 0.9em !important;
-  line-height: 1.65 !important;
+  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace !important;
+  font-size: var(--lno-fs) !important;
+  line-height: var(--lno-lh) !important;
   background: inherit;
-  min-width: 2.2em;
-  z-index: 1;
+  min-width: 2.4em;
   box-sizing: border-box;
+  vertical-align: top;
 }
 pre.has-lineno > code {
-  flex: 1; min-width: 0; display: block;
-  padding: 1em 1em 1em 0.75em !important; /* same vertical, no left gutter */
-  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', monospace !important;
-  font-size: 0.9em !important;
-  line-height: 1.65 !important;
+  flex: 1 1 auto; min-width: 0;
+  display: block;
+  padding: var(--lno-pad-y) 1em var(--lno-pad-y) 0.9em !important;
+  margin: 0 !important;
+  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace !important;
+  font-size: var(--lno-fs) !important;
+  line-height: var(--lno-lh) !important;
   box-sizing: border-box;
   overflow: visible;
+  /* Critical: never wrap, so each visual line maps 1:1 to a number */
+  white-space: pre !important;
+  word-break: normal !important;
+  word-wrap: normal !important;
+  tab-size: 4; -moz-tab-size: 4;
+  vertical-align: top;
 }
+/* Neutralise any Prism/Primer top-padding that would offset code vs gutter */
+pre.has-lineno > code > * { line-height: inherit !important; }
 [data-color-mode="dark"] pre.has-lineno > .luliy-lineno,
 body[data-luliy-theme="space"] pre.has-lineno > .luliy-lineno {
   border-right-color: rgba(130,80,223,0.32);
@@ -1324,13 +1297,20 @@ body[data-luliy-theme="sakura"] {
 }
 
 /* 3  Your Name — sky blue + golden */
+/* 3  Your Name — 新海诚 vivid sky-blue × golden-hour orange */
 body[data-luliy-theme="your-name"] {
-  --th-h1: #0d2b6b; --th-h1-border: 2px solid rgba(26,89,164,0.38);
-  --th-h2: #1a59a4; --th-h2-bl: 5px solid #f4a738; --th-h2-bg: rgba(26,89,164,0.08);
-  --th-h3: #2062a8; --th-h4: #2878c8; --th-strong: #f4a738;
-  --th-accent: #1a59a4;
-  --th-accent-soft: rgba(26,89,164,0.10);
-  --th-accent-hover: rgba(26,89,164,0.16);
+  --th-h1: #0b3d91; --th-h1-border: 2px solid rgba(30,111,212,0.42);
+  --th-h2: #1e6fd4; --th-h2-bl: 5px solid #ffa94d; --th-h2-bg: rgba(30,111,212,0.09);
+  --th-h3: #2b7de0; --th-h4: #3d8bed; --th-strong: #f08c00;
+  --th-accent: #1e6fd4;
+  --th-accent-soft: rgba(30,111,212,0.11);
+  --th-accent-hover: rgba(30,111,212,0.18);
+  /* twilight / golden accents used by the panel gradient */
+  --yn-sky-top: #1e6fd4;
+  --yn-sky-mid: #74c0fc;
+  --yn-glow:    #ffd43b;
+  --yn-warm:    #ffa94d;
+  --yn-twilight:#e599f7;
 }
 
 /* 4  Space — deep night blue */
@@ -1344,13 +1324,21 @@ body[data-luliy-theme="space"] {
 }
 
 /* 5  Sunset — dusk orange */
+/* 5  Sunset — 日落大道 highway dusk (purple→magenta→orange) */
 body[data-luliy-theme="sunset"] {
-  --th-h1: #6b2230; --th-h1-border: 2px solid rgba(255,126,95,0.40);
-  --th-h2: #c2453c; --th-h2-bl: 5px solid #ff7e5f; --th-h2-bg: rgba(255,126,95,0.10);
-  --th-h3: #d05848; --th-h4: #dd6a55; --th-strong: #e0566e;
-  --th-accent: #d8533f;
-  --th-accent-soft: rgba(255,126,95,0.12);
-  --th-accent-hover: rgba(255,126,95,0.20);
+  --th-h1: #5a1a4d; --th-h1-border: 2px solid rgba(196,69,105,0.42);
+  --th-h2: #c44569; --th-h2-bl: 5px solid #ff9a3c; --th-h2-bg: rgba(255,107,107,0.10);
+  --th-h3: #d6456a; --th-h4: #e05a52; --th-strong: #ff6b6b;
+  --th-accent: #c44569;
+  --th-accent-soft: rgba(196,69,105,0.12);
+  --th-accent-hover: rgba(196,69,105,0.20);
+  /* horizon gradient stops used by the panel + hero */
+  --ss-sky:    #2d1b4e;
+  --ss-purple: #6a3093;
+  --ss-magenta:#c44569;
+  --ss-coral:  #ff6b6b;
+  --ss-orange: #ff9a3c;
+  --ss-glow:   #ffc14d;
 }
 
 /* 6  Mono — minimalist black & white */
@@ -1378,10 +1366,10 @@ body[data-luliy-theme="mono"] {
   --th-accent-hover: rgba(249,168,201,0.30);
 }
 [data-color-mode="dark"] body[data-luliy-theme="your-name"] {
-  --th-h1: #60a5fa; --th-h2: #93c5fd; --th-h3: #a8d5ff; --th-h4: #c0e4ff; --th-strong: #f4a738;
-  --th-accent: #79b8ff;
-  --th-accent-soft: rgba(96,165,250,0.20);
-  --th-accent-hover: rgba(96,165,250,0.32);
+  --th-h1: #74c0fc; --th-h2: #a5d8ff; --th-h3: #c0e4ff; --th-h4: #d0ecff; --th-strong: #ffd43b;
+  --th-accent: #74c0fc;
+  --th-accent-soft: rgba(116,192,252,0.20);
+  --th-accent-hover: rgba(116,192,252,0.34);
 }
 /* space is always light on dark bg — same variables */
 [data-color-mode="dark"] body[data-luliy-theme="space"] {
@@ -1391,10 +1379,10 @@ body[data-luliy-theme="mono"] {
   --th-accent-hover: rgba(0,229,255,0.30);
 }
 [data-color-mode="dark"] body[data-luliy-theme="sunset"] {
-  --th-h1: #feb47b; --th-h2: #ffc89a; --th-h3: #ffd4ae; --th-h4: #ffe0c4; --th-strong: #ff9e7d;
-  --th-accent: #feb47b;
-  --th-accent-soft: rgba(254,180,123,0.18);
-  --th-accent-hover: rgba(254,180,123,0.30);
+  --th-h1: #ff9a3c; --th-h2: #ffb86c; --th-h3: #ffcb91; --th-h4: #ffd9b0; --th-strong: #ff8787;
+  --th-accent: #ff9a3c;
+  --th-accent-soft: rgba(255,154,60,0.18);
+  --th-accent-hover: rgba(255,154,60,0.32);
 }
 [data-color-mode="dark"] body[data-luliy-theme="mono"] {
   --th-h1: #f0f0f0; --th-h2: #e0e0e0; --th-h3: #cccccc; --th-h4: #bbbbbb; --th-strong: #ffffff;
@@ -1802,7 +1790,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   font-size: 13px; font-weight: 700; color: #1e1032;
   font-family: 'Noto Sans SC', sans-serif; pointer-events: none;
 }
-[data-color-mode="dark"] .luliy-ctrl-lbl { color: #cdd6f4; }
+[data-color-mode="dark"] .luliy-ctrl-lbl { color: #ece8ff; }
 .luliy-ctrl-row.is-active .luliy-ctrl-lbl { color: #8250df; }
 [data-color-mode="dark"] .luliy-ctrl-row.is-active .luliy-ctrl-lbl { color: #cba6f7; }
 
@@ -1812,7 +1800,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   white-space: nowrap; flex-shrink: 0; pointer-events: none;
   transition: background 0.15s;
 }
-[data-color-mode="dark"] .luliy-ctrl-badge { color: #cba6f7; background: rgba(130,80,223,0.20); }
+[data-color-mode="dark"] .luliy-ctrl-badge { color: #d9c4ff; background: rgba(130,80,223,0.30); }
 
 /* A- / A+ font-size buttons (ctrl panel + mobile dropdown) */
 .luliy-fs-btn {
@@ -2272,7 +2260,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
 /* ══════════════════════════════════════════════════════════
    28  NEW (v10) — gradient headings, blockquotes, card list,
        skeletons, series, search, tag cloud, archive calendar,
-       ambient, trail, fireflies, focus mode, reduce motion
+       trail, fireflies, focus mode, reduce motion
 ══════════════════════════════════════════════════════════ */
 
 /* ── 28.1 Theme gradient headings (background-clip:text) ──── */
@@ -2312,7 +2300,7 @@ body[data-luliy-theme="mono"] #postBody h2 {
 #postBody blockquote p { margin: 0.3em 0; }
 [data-color-mode="dark"] #postBody blockquote { background: var(--th-accent-soft, rgba(130,80,223,0.14)); }
 
-/* ── 28.3 Card list view ──────────────────────────────────── */
+/* ── 28.3 Card list & timeline views ──────────────────────── */
 #luliy-cardview-bar {
   display: flex; justify-content: flex-start; margin: 0 0 14px;
 }
@@ -2320,17 +2308,22 @@ body[data-luliy-theme="mono"] #postBody h2 {
   display: inline-flex; border-radius: 10px; overflow: hidden;
   border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.28));
   background: var(--th-accent-soft, rgba(130,80,223,0.06));
-  cursor: pointer;
 }
-#luliy-cardview-toggle span {
-  padding: 5px 12px; font-size: 15px; color: var(--th-accent, #8250df);
-  transition: background 0.18s, color 0.18s;
+#luliy-cardview-toggle button {
+  padding: 5px 13px; font-size: 15px; color: var(--th-accent, #8250df);
+  background: transparent; border: none; cursor: pointer;
+  transition: background 0.18s, color 0.18s; line-height: 1.2;
 }
+#luliy-cardview-toggle button:hover { background: var(--th-accent-soft, rgba(130,80,223,0.12)); }
 #luliy-cardview-toggle[data-view="grid"] .cv-grid,
-#luliy-cardview-toggle[data-view="list"] .cv-list {
+#luliy-cardview-toggle[data-view="list"] .cv-list,
+#luliy-cardview-toggle[data-view="timeline"] .cv-timeline {
   background: var(--th-accent, #8250df); color: #fff;
 }
-[data-color-mode="dark"] #luliy-cardview-toggle span { color: var(--th-accent, #cba6f7); }
+[data-color-mode="dark"] #luliy-cardview-toggle button { color: var(--th-accent, #cba6f7); }
+[data-color-mode="dark"] #luliy-cardview-toggle[data-view="grid"] .cv-grid,
+[data-color-mode="dark"] #luliy-cardview-toggle[data-view="list"] .cv-list,
+[data-color-mode="dark"] #luliy-cardview-toggle[data-view="timeline"] .cv-timeline { color: #fff; }
 
 /* List layout: single column, show summary row */
 .luliy-card-grid.luliy-card-list {
@@ -2346,6 +2339,79 @@ body[data-luliy-theme="mono"] #postBody h2 {
 .luliy-card-list .luliy-card-tags { order: 2; flex-shrink: 0; }
 .luliy-card-list .luliy-card-deco { display: none; }
 .luliy-card-list .luliy-card-yeardiv { grid-column: 1 / -1; }
+
+/* ── Timeline view: vertical spine with dotted cards ──────── */
+.luliy-card-grid.luliy-card-timeline {
+  grid-template-columns: 1fr !important;
+  position: relative;
+  padding-left: 30px !important;
+  gap: 14px !important;
+}
+.luliy-card-timeline::before {
+  content: ''; position: absolute;
+  left: 9px; top: 6px; bottom: 6px; width: 2px;
+  background: linear-gradient(to bottom,
+    var(--th-accent, #8250df), var(--th-accent-soft, rgba(130,80,223,0.2)));
+  border-radius: 2px;
+}
+.luliy-card-timeline .luliy-card {
+  position: relative; border-radius: 12px;
+}
+.luliy-card-timeline .luliy-card::before {
+  /* the timeline node dot — override the tint layer for this view */
+  content: ''; position: absolute;
+  left: -25px; top: 22px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--th-accent, #8250df);
+  border: 2.5px solid var(--color-canvas-default, #fff);
+  box-shadow: 0 0 0 1.5px var(--th-accent-soft, rgba(130,80,223,0.4));
+  opacity: 1; z-index: 3;
+}
+[data-color-mode="dark"] .luliy-card-timeline .luliy-card::before {
+  border-color: rgba(20,16,34,0.95);
+}
+.luliy-card-timeline .luliy-card-inner {
+  flex-direction: row !important; align-items: center; gap: 14px;
+  min-height: 0 !important; padding: 12px 18px;
+}
+.luliy-card-timeline .luliy-card-title { font-size: 15px; margin: 0; }
+.luliy-card-timeline .luliy-card-date { order: 3; margin-left: auto; flex-shrink: 0; }
+.luliy-card-timeline .luliy-card-tags { order: 2; flex-shrink: 0; }
+.luliy-card-timeline .luliy-card-deco { display: none; }
+.luliy-card-timeline .luliy-card-yeardiv {
+  grid-column: 1 / -1; margin-left: -8px;
+}
+
+/* ── Focus-mode floating exit button ──────────────────────── */
+#luliy-focus-exit {
+  position: fixed; top: 20px; right: 20px;
+  z-index: 100001;
+  padding: 9px 18px; border-radius: 30px;
+  background: var(--th-accent, #8250df); color: #fff;
+  border: none; cursor: pointer;
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  font-family: 'Noto Sans SC', sans-serif;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.30);
+  opacity: 0; transform: translateY(-12px);
+  animation: luliyFocusExitIn 0.4s cubic-bezier(.2,.7,.3,1) 0.1s forwards;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+#luliy-focus-exit:hover { transform: translateY(-2px); box-shadow: 0 9px 28px rgba(0,0,0,0.4); }
+@keyframes luliyFocusExitIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Subtle hint that double-click / F exits, shown briefly on entering focus mode */
+body.luliy-focus-mode::after {
+  content: 'F \u6216\u53cc\u51fb\u9000\u51fa\u4e13\u6ce8\u6a21\u5f0f';   /* F 或双击退出专注模式 */
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.66); color: #fff;
+  padding: 8px 18px; border-radius: 24px; font-size: 12px; letter-spacing: 1px;
+  z-index: 100001; pointer-events: none;
+  animation: luliyFocusHint 3.2s ease forwards;
+}
+@keyframes luliyFocusHint {
+  0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; }
+}
 
 /* ── 28.4 Card skeleton ───────────────────────────────────── */
 .luliy-card-skeleton {
@@ -2578,23 +2644,6 @@ mark.luliy-search-hit.is-current {
   font-size: 9px; line-height: 14px; text-align: center; font-weight: 700;
 }
 
-/* ── 28.10 Ambient chips ──────────────────────────────────── */
-.luliy-ambient-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 10px 6px; }
-.luliy-ambient-chip {
-  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.28));
-  background: var(--th-accent-soft, rgba(130,80,223,0.07));
-  color: var(--th-accent, #8250df);
-  border-radius: 20px; padding: 4px 12px; font-size: 12px; cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
-  font-family: 'Noto Sans SC', sans-serif;
-}
-.luliy-ambient-chip:hover { transform: translateY(-1px); }
-.luliy-ambient-chip.is-on {
-  background: var(--th-accent, #8250df); color: #fff;
-  box-shadow: 0 2px 10px var(--th-accent-soft, rgba(130,80,223,0.4));
-}
-[data-color-mode="dark"] .luliy-ambient-chip { color: var(--th-accent, #cba6f7); }
-[data-color-mode="dark"] .luliy-ambient-chip.is-on { color: #fff; }
 
 /* ── 28.11 Mouse trail ────────────────────────────────────── */
 .luliy-trail-dot {
@@ -2831,7 +2880,6 @@ body.luliy-swipe-right #postBody { animation: luliySwipeR 0.18s ease forwards; }
   #luliy-gallery-edit { opacity: 1; } /* always visible (no hover on touch) */
 
   /* ── Welcome splash extra lines ───────────────────────────── */
-  .luliy-welcome-extra { font-size: 0.8rem; letter-spacing: 2px; }
 
   /* ── v10 mobile tweaks ────────────────────────────────────── */
   #luliy-search-fab { bottom: 158px; right: 14px; width: 40px; height: 40px; }
