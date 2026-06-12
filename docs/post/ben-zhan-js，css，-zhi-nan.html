@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark_colorblind" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js'></script><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js' onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script><script src='https://blog.meekdai.com/Gmeek/plugins/articletoc.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js'></script><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js'></script><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script><meta name='theme-color' content='#8250df'><link rel='apple-touch-icon' href='https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=180'><script>window.addEventListener('load',function(){if(window.Prism){Prism.plugins.autoloader.languages_path='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/';Prism.highlightAll();}if(window.mermaid){mermaid.initialize({startOnLoad:false,securityLevel:'loose',theme:document.documentElement.getAttribute('data-color-mode')==='dark'?'dark':'default'});document.querySelectorAll('pre>code.language-mermaid,code.language-mermaid').forEach(function(code){var block=document.createElement('div');block.className='mermaid';block.textContent=code.textContent.trim();(code.parentElement&&code.parentElement.tagName==='PRE'?code.parentElement:code).replaceWith(block);});if(mermaid.run){mermaid.run({querySelector:'.mermaid'});}else if(mermaid.init){mermaid.init(undefined,document.querySelectorAll('.mermaid'));}}if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}});</script><script src='https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js'></script><script src='https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js'></script><script src='https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js'></script><link rel='stylesheet' href='/enhance.css'><script defer src='/enhance.js'></script>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="# Luliy Blog 增强系统完全指南
+> `enhance.js v10` + `enhance.css v9` — 功能说明 · DIY 方法 · 运行原理
+
+## 1. 系统总览
+
+整个增强系统由两个文件构成，以**模块化方式**挂载在一个 IIFE（立即执行函数）里，避免污染全局命名空间：
+
+```
+enhance.js   →  行为层（DOM 构建 / 事件 / 动画 / 数据读取）
+enhance.css  →  样式层（主题变量 / 布局 / 过渡动画）
+```
+
+**启动流程：**
+
+```
+页面加载开始
+  ↓
+① initLocalStorage()        — 补全缺失的 localStorage 默认值
+② FOUC 防闪烁块             — 立即读取保存的主题/背景，写入 body
+③ initSakura()              — 若已开启，尽早启动 canvas（避免延迟）
+  ↓ DOMContentLoaded
+④ ready() 回调              — 初始化所有模块
+⑤ 页面类型判断              — isPost → initPost()  /  isIndex → initIndex()
+```
+
+所有滚动监听统一经过 **`onScrollRAF`** 调度器，合并到单个 `requestAnimationFrame` 帧里执行，避免多个模块各自注册 scroll 事件造成卡顿。">
+<meta property="og:title" content="本站js，css，指南">
+<meta property="og:description" content="# Luliy Blog 增强系统完全指南
+> `enhance.js v10` + `enhance.css v9` — 功能说明 · DIY 方法 · 运行原理
+
+## 1. 系统总览
+
+整个增强系统由两个文件构成，以**模块化方式**挂载在一个 IIFE（立即执行函数）里，避免污染全局命名空间：
+
+```
+enhance.js   →  行为层（DOM 构建 / 事件 / 动画 / 数据读取）
+enhance.css  →  样式层（主题变量 / 布局 / 过渡动画）
+```
+
+**启动流程：**
+
+```
+页面加载开始
+  ↓
+① initLocalStorage()        — 补全缺失的 localStorage 默认值
+② FOUC 防闪烁块             — 立即读取保存的主题/背景，写入 body
+③ initSakura()              — 若已开启，尽早启动 canvas（避免延迟）
+  ↓ DOMContentLoaded
+④ ready() 回调              — 初始化所有模块
+⑤ 页面类型判断              — isPost → initPost()  /  isIndex → initIndex()
+```
+
+所有滚动监听统一经过 **`onScrollRAF`** 调度器，合并到单个 `requestAnimationFrame` 帧里执行，避免多个模块各自注册 scroll 事件造成卡顿。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://luliy.me/post/ben-zhan-js%EF%BC%8Ccss%EF%BC%8C-zhi-nan.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
+<title>本站js，css，指南</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">本站js，css，指南</h1>
+<div class="title-right">
+    <a href="https://luliy.me" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/luliy6/luliy6.github.io/issues/35" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>Luliy Blog 增强系统完全指南</h1>
+<blockquote>
+<p><code class="notranslate">enhance.js v10</code> + <code class="notranslate">enhance.css v9</code> — 功能说明 · DIY 方法 · 运行原理</p>
+</blockquote>
+<h2>1. 系统总览</h2>
+<p>整个增强系统由两个文件构成，以<strong>模块化方式</strong>挂载在一个 IIFE（立即执行函数）里，避免污染全局命名空间：</p>
+<pre class="notranslate"><code class="notranslate">enhance.js   →  行为层（DOM 构建 / 事件 / 动画 / 数据读取）
+enhance.css  →  样式层（主题变量 / 布局 / 过渡动画）
+</code></pre>
+<p><strong>启动流程：</strong></p>
+<pre class="notranslate"><code class="notranslate">页面加载开始
+  ↓
+① initLocalStorage()        — 补全缺失的 localStorage 默认值
+② FOUC 防闪烁块             — 立即读取保存的主题/背景，写入 body
+③ initSakura()              — 若已开启，尽早启动 canvas（避免延迟）
+  ↓ DOMContentLoaded
+④ ready() 回调              — 初始化所有模块
+⑤ 页面类型判断              — isPost → initPost()  /  isIndex → initIndex()
+</code></pre>
+<p>所有滚动监听统一经过 <strong><code class="notranslate">onScrollRAF</code></strong> 调度器，合并到单个 <code class="notranslate">requestAnimationFrame</code> 帧里执行，避免多个模块各自注册 scroll 事件造成卡顿。</p>
+<hr>
+<h2>2. 快速 DIY：核心配置项 <code class="notranslate">LULIY_OPTS</code></h2>
+<p><code class="notranslate">enhance.js</code> 顶部的 <code class="notranslate">LULIY_OPTS</code> 对象是<strong>唯一需要修改</strong>的主配置区。</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-c1">LULIY_OPTS</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
+  <span class="pl-c">// ① 首页底部画廊：只放 1 张 = 全幅 Banner；放 2 张以上 = 网格</span>
+  <span class="pl-c1">galleryImages</span>: <span class="pl-kos">[</span><span class="pl-s">'https://你的图片链接.jpg'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+  <span class="pl-c1">galleryText</span>: <span class="pl-s">'我将无限进步'</span><span class="pl-kos">,</span>         <span class="pl-c">// 画廊上的文字</span>
+
+  <span class="pl-c">// ② 首页全屏 Hero</span>
+  <span class="pl-c1">heroImage</span>: <span class="pl-s">'https://你的背景图.webp'</span><span class="pl-kos">,</span> <span class="pl-c">// 背景大图</span>
+  <span class="pl-c1">heroTitle</span>: <span class="pl-s">'Luliy'</span><span class="pl-kos">,</span>                  <span class="pl-c">// 大标题</span>
+  <span class="pl-c1">heroSubtitle</span>: <span class="pl-s">'我将无限进步'</span><span class="pl-kos">,</span>         <span class="pl-c">// 副标题</span>
+  <span class="pl-c1">heroHint</span>: <span class="pl-s">'下滑进入 ↓'</span><span class="pl-kos">,</span>              <span class="pl-c">// 向下提示文字</span>
+
+  <span class="pl-c">// ③ 音乐播放列表（跨页面持续播放）</span>
+  <span class="pl-c1">musicTracks</span>: <span class="pl-kos">[</span>
+    <span class="pl-kos">{</span> <span class="pl-c1">name</span>: <span class="pl-s">'曲目名称'</span><span class="pl-kos">,</span> <span class="pl-c1">src</span>: <span class="pl-s">'https://你的mp3链接.mp3'</span> <span class="pl-kos">}</span>
+    <span class="pl-c">// 可添加多首</span>
+  <span class="pl-kos">]</span><span class="pl-kos">,</span>
+
+  <span class="pl-c">// ④ 收藏夹密码（SHA-256 哈希值，明文密码不出现在代码里）</span>
+  <span class="pl-c1">favoritesHash</span>: <span class="pl-s">'SHA256哈希值'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">favoritesPathMatch</span>: <span class="pl-pds"><span class="pl-c1">/</span><span class="pl-s">f</span><span class="pl-s">a</span><span class="pl-s">v</span><span class="pl-s">o</span><span class="pl-s">r</span><span class="pl-s">i</span><span class="pl-s">t</span><span class="pl-s">e</span><span class="pl-s">s</span><span class="pl-c1">/</span>i</span><span class="pl-kos">,</span>    <span class="pl-c">// 匹配收藏夹页面 URL</span>
+
+  <span class="pl-c1">homeUrl</span>: <span class="pl-s">'/'</span>
+<span class="pl-kos">}</span><span class="pl-kos">;</span></pre></div>
+<p><strong>如何生成 SHA-256 密码哈希？</strong><br>
+在浏览器控制台运行：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">crypto</span><span class="pl-kos">.</span><span class="pl-c1">subtle</span><span class="pl-kos">.</span><span class="pl-en">digest</span><span class="pl-kos">(</span><span class="pl-s">'SHA-256'</span><span class="pl-kos">,</span> <span class="pl-k">new</span> <span class="pl-v">TextEncoder</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">encode</span><span class="pl-kos">(</span><span class="pl-s">'你的密码'</span><span class="pl-kos">)</span><span class="pl-kos">)</span>
+  <span class="pl-kos">.</span><span class="pl-en">then</span><span class="pl-kos">(</span><span class="pl-s1">b</span> <span class="pl-c1">=&gt;</span> <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-kos">[</span>...<span class="pl-k">new</span> <span class="pl-v">Uint8Array</span><span class="pl-kos">(</span><span class="pl-s1">b</span><span class="pl-kos">)</span><span class="pl-kos">]</span><span class="pl-kos">.</span><span class="pl-en">map</span><span class="pl-kos">(</span><span class="pl-s1">x</span><span class="pl-c1">=&gt;</span><span class="pl-s1">x</span><span class="pl-kos">.</span><span class="pl-en">toString</span><span class="pl-kos">(</span><span class="pl-c1">16</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">padStart</span><span class="pl-kos">(</span><span class="pl-c1">2</span><span class="pl-kos">,</span><span class="pl-s">'0'</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">join</span><span class="pl-kos">(</span><span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">)</span></pre></div>
+<hr>
+<h2>3. 持久化开关：localStorage 键值表</h2>
+<p>这些键值由访客操作自动写入，也可以在控制台手动设置来调试：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>键名</th>
+<th>默认值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">luliy-sfx</code></td>
+<td><code class="notranslate">'1'</code></td>
+<td>音效开关（<code class="notranslate">'0'</code> = 关闭）</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-sakura</code></td>
+<td><code class="notranslate">'1'</code></td>
+<td>樱花/四季粒子开关</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-sink</code></td>
+<td><code class="notranslate">'default'</code></td>
+<td>当前主题名称</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-bg</code></td>
+<td><code class="notranslate">''</code></td>
+<td>自定义背景图 URL（空 = 默认背景）</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-fontsize</code></td>
+<td><code class="notranslate">'18'</code></td>
+<td>文章字号（px），范围 14–24</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-sans</code></td>
+<td><code class="notranslate">'0'</code></td>
+<td>字体：<code class="notranslate">'0'</code>=默认楷体 / <code class="notranslate">'1'</code>=黑体 / <code class="notranslate">'2'</code>=苍耳今楷</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-music</code></td>
+<td><code class="notranslate">''</code></td>
+<td>用户自添加的曲目（JSON 数组）</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-cardview</code></td>
+<td><code class="notranslate">'grid'</code></td>
+<td>首页卡片视图：<code class="notranslate">grid</code> / <code class="notranslate">list</code> / <code class="notranslate">timeline</code></td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-trail</code></td>
+<td><code class="notranslate">'0'</code></td>
+<td>鼠标拖尾开关</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-firefly</code></td>
+<td><code class="notranslate">'0'</code></td>
+<td>萤火虫开关</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-focus</code></td>
+<td><code class="notranslate">'0'</code></td>
+<td>专注阅读模式</td>
+</tr>
+<tr>
+<td><code class="notranslate">luliy-reduce</code></td>
+<td><code class="notranslate">'0'</code></td>
+<td>强制减少动效（覆盖系统设置）</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>4. 模块逐一说明</h2>
+<hr>
+<h3>M00 首页 Hero 全屏封面</h3>
+<p><strong>功能：</strong> 访客打开首页时，先看到占满屏幕的大图封面，滚动后进入内容区。导航栏在 Hero 范围内完全隐藏，滚出后淡入显示。</p>
+<p><strong>运行原理：</strong></p>
+<ol>
+<li><code class="notranslate">isIndexPage()</code> 检测当前是首页</li>
+<li>用 JS 动态创建 <code class="notranslate">&lt;section id="luliy-hero"&gt;</code> 并插入 <code class="notranslate">body</code> 最前面</li>
+<li>CSS 将其设置为 <code class="notranslate">height: 100vh; position: relative</code></li>
+<li>通过 <code class="notranslate">onScrollRAF</code> 监听滚动，实现：
+<ul>
+<li>内容文字：<code class="notranslate">translateY + opacity</code> 视差淡出</li>
+<li>导航栏：滚动量 &lt; 85vh 时 <code class="notranslate">opacity:0; pointer-events:none</code></li>
+</ul>
+</li>
+</ol>
+<p><strong>DIY 方法：</strong></p>
+<ul>
+<li>修改 <code class="notranslate">LULIY_OPTS.heroImage/heroTitle/heroSubtitle/heroHint</code></li>
+<li>CSS 中 <code class="notranslate">#luliy-hero</code> 调整 <code class="notranslate">background-position</code> 控制焦点</li>
+<li>修改视差系数：<code class="notranslate">p * 60</code>（位移量）和 <code class="notranslate">p * 1.4</code>（淡出速度）</li>
+</ul>
+<hr>
+<h3>M01 localStorage 初始化</h3>
+<p><strong>功能：</strong> 首次访问时为所有持久化选项写入默认值，防止后续读取返回 <code class="notranslate">null</code>。</p>
+<p><strong>运行原理：</strong> 遍历默认值字典，用 <code class="notranslate">localStorage.getItem(k) === null</code> 判断是否已设置，未设置则写入默认值。<strong>只在缺失时写入，不覆盖已有值。</strong></p>
+<hr>
+<h3>M02 阅读进度条</h3>
+<p><strong>功能：</strong> 页面顶部一条细线，随页面滚动从 0% 增长到 100%。</p>
+<p><strong>运行原理：</strong></p>
+<pre class="notranslate"><code class="notranslate">滚动百分比 = scrollY / (scrollHeight - clientHeight) × 100%
+</code></pre>
+<p>进度条宽度通过 <code class="notranslate">bar.style.width</code> 实时更新。颜色跟随当前主题的 <code class="notranslate">--accent</code> CSS 变量。</p>
+<p><strong>DIY 方法：</strong> CSS 中 <code class="notranslate">#luliy-progress-bar</code> 修改高度、颜色、渐变。</p>
+<hr>
+<h3>M03 动态标题</h3>
+<p><strong>功能：</strong> 切换到其他标签页时，标题变为「👀 别走啊，我还在进步！」；切回来时显示「✨ 欢迎回来！」，2 秒后恢复原标题。</p>
+<p><strong>运行原理：</strong> 监听 <code class="notranslate">document.visibilitychange</code> 事件，修改 <code class="notranslate">document.title</code>。</p>
+<p><strong>DIY 方法：</strong> 修改代码中两处 Unicode 字符串：</p>
+<ul>
+<li>离开时：<code class="notranslate">'\uD83D\uDC40 \u522b\u8d70\u554a...'</code></li>
+<li>回来时：<code class="notranslate">'\u2728 \u6b22\u8fce\u56de\u6765\uff01'</code></li>
+</ul>
+<hr>
+<h3>M04 建站运行时计时器</h3>
+<p><strong>功能：</strong> 页面底部显示「🌱 本站已陪伴你无限进步：X天 X小时 X分 X秒」，秒数实时跳动。</p>
+<p><strong>运行原理：</strong></p>
+<ul>
+<li>读取硬编码的建站时间 <code class="notranslate">new Date('2026/05/30 00:00:00')</code></li>
+<li><code class="notranslate">setInterval</code> 每秒计算差值并更新 DOM</li>
+</ul>
+<p><strong>DIY 方法：</strong> 修改建站日期：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">start</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">Date</span><span class="pl-kos">(</span><span class="pl-s">'2026/05/30 00:00:00'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">getTime</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-c">// 改为你的建站日期</span></pre></div>
+<p>修改显示文字中的 Unicode 字符串。</p>
+<hr>
+<h3>M05 暗色模式切换涟漪</h3>
+<p><strong>功能：</strong> 点击日/夜切换按钮时，从点击位置向四周扩散一个圆形涟漪遮罩，完成模式切换的视觉过渡。</p>
+<p><strong>运行原理：</strong></p>
+<ol>
+<li>监听点击事件，识别含 <code class="notranslate">Moon/Sun</code> SVG 或相关 title 的按钮</li>
+<li>计算点击坐标到最远角落的距离作为最终半径</li>
+<li>动态创建一个 <code class="notranslate">position:fixed</code> 的圆形 div，用 CSS <code class="notranslate">transform: scale(0→1)</code> + <code class="notranslate">opacity: 1→0</code> 完成扩散动画</li>
+<li>700ms 后自动移除</li>
+</ol>
+<p><strong>全局暴露：</strong> <code class="notranslate">window._luliyThemeRipple(x, y)</code> — 可从任何地方调用触发涟漪。</p>
+<hr>
+<h3>M07 Web Audio 音效</h3>
+<p><strong>功能：</strong> 点击、切换主题、科技感操作时播放轻微提示音。完全由浏览器 Web Audio API 合成，无需加载音频文件。</p>
+<p><strong>三种音效：</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>类型</th>
+<th>触发场景</th>
+<th>波形</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">click</code></td>
+<td>普通点击</td>
+<td>方波，900Hz→400Hz，60ms</td>
+</tr>
+<tr>
+<td><code class="notranslate">sci</code></td>
+<td>科技操作（全屏等）</td>
+<td>正弦波，440→880→660Hz，250ms</td>
+</tr>
+<tr>
+<td><code class="notranslate">theme</code></td>
+<td>主题切换</td>
+<td>三音和弦（C-E-G），依次延迟</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>DIY 方法：</strong> 修改 <code class="notranslate">playSfx</code> 函数内的频率值和时长。关闭音效：<code class="notranslate">localStorage.setItem('luliy-sfx','0')</code>。</p>
+<hr>
+<h3>M08 点击粒子火花</h3>
+<p><strong>功能：</strong> 每次点击屏幕，从点击位置爆出 6 个彩色小圆点向四周飞散后淡出。</p>
+<p><strong>运行原理：</strong></p>
+<ul>
+<li>监听 <code class="notranslate">document.click</code></li>
+<li>每个粒子是一个 <code class="notranslate">position:fixed</code> 的 7×7px 圆形 div</li>
+<li>用 CSS <code class="notranslate">transform: translate + rotate</code> + <code class="notranslate">transition</code> 完成飞散动画</li>
+<li>颜色从主题调色板随机选取（<code class="notranslate">--card-c1</code> 到 <code class="notranslate">--card-c4</code>）</li>
+<li>700ms 后自动移除</li>
+</ul>
+<hr>
+<h3>M09 导航栏重建（头像 + 时钟）</h3>
+<p><strong>功能：</strong> 将 Gmeek 默认导航栏重构为：左上时钟 — 左图标区 — 中央头像+博客名 — 右图标区 的布局。</p>
+<p><strong>运行原理：</strong></p>
+<ol>
+<li>隐藏原有 header 子元素</li>
+<li>创建 <code class="notranslate">#luliy-nav-rebuilt</code> shell，包含四个区域</li>
+<li>从原 <code class="notranslate">.title-right</code> 中提取导航链接，按数量对半分到左右图标区</li>
+<li>日/夜切换按钮通过代理点击原始按钮保持 Gmeek 功能</li>
+<li>时钟每秒更新 <code class="notranslate">HH:MM:SS</code></li>
+</ol>
+<p><strong>DIY 方法：</strong></p>
+<ul>
+<li>头像图片：修改 <code class="notranslate">avatarImg.src</code> 中的 URL</li>
+<li>博客名：修改 <code class="notranslate">blogName.textContent = 'Luliy'</code></li>
+<li>头像链接目标：修改 <code class="notranslate">avatarLink.href = '/about'</code></li>
+</ul>
+<hr>
+<h3>M10 Hero 卷轴分隔条</h3>
+<p><strong>功能：</strong> 首页内容区顶部的一条可折叠横幅条，随滚动向上收起。</p>
+<p><strong>运行原理：</strong> 监听滚动，用 <code class="notranslate">translateY</code> 和 <code class="notranslate">opacity</code> 实现向上折叠效果，折叠距离基于自身高度动态计算。</p>
+<hr>
+<h3>M11 标签页搜索栏</h3>
+<p><strong>功能：</strong> 在 <code class="notranslate">/tag.html</code> 页面顶部插入搜索框，实时筛选显示的标签，并显示「匹配数/总数」。</p>
+<p><strong>运行原理：</strong></p>
+<ul>
+<li>检测 URL 路径是否匹配 <code class="notranslate">/tag\.html/</code></li>
+<li>等待 <code class="notranslate">#taglabel</code> 元素出现（Gmeek 异步渲染）</li>
+<li>监听 <code class="notranslate">input</code> 事件，遍历所有 <code class="notranslate">.Label</code> 元素，用 <code class="notranslate">style.display</code> 控制显隐</li>
+<li>用 <code class="notranslate">MutationObserver</code> 监听标签列表变化，保持筛选实时有效</li>
+</ul>
+<hr>
+<h3>M12 图片灯箱</h3>
+<p><strong>功能：</strong> 点击文章中的图片，在全屏遮罩中放大显示，点击背景或按 Esc 关闭。</p>
+<p><strong>运行原理：</strong></p>
+<ul>
+<li>监听 <code class="notranslate">#postBody</code> 内 <code class="notranslate">img</code> 的点击事件</li>
+<li>打开时：向灯箱 <code class="notranslate">&lt;img&gt;</code> 写入 src，添加 <code class="notranslate">.is-open</code> 类（CSS 控制显示），锁定 body 滚动</li>
+<li>关闭时：移除类，300ms 后清除 src（等待淡出动画）</li>
+</ul>
+<p><strong>全局暴露：</strong> <code class="notranslate">window._luliyLightboxOpen(src, alt)</code> — 可手动触发打开灯箱。</p>
+<hr>
+<h3>M13 悬浮工具栏 + 统一控制面板</h3>
+<p><strong>功能：</strong> 右侧悬浮的控制按钮，点击展开面板，包含：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>区域</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主题预览</td>
+<td>Day/Night 卡片，点击切换明暗模式</td>
+</tr>
+<tr>
+<td>六个主题</td>
+<td>默认/樱花少女/你的名字/太空旅行/日落黄昏/极简黑白</td>
+</tr>
+<tr>
+<td>效果开关</td>
+<td>樱花效果、背景图更换</td>
+</tr>
+<tr>
+<td>阅读设置</td>
+<td>字号调节（A- / A+）、字体切换（仅文章页）</td>
+</tr>
+<tr>
+<td>音乐播放器</td>
+<td>播放/暂停/上下首/添加曲目/播放列表</td>
+</tr>
+<tr>
+<td>更多功能</td>
+<td>鼠标拖尾、萤火虫、专注模式（文章页）、减少动效</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>运行原理（主题系统）：</strong></p>
+<ol>
+<li><code class="notranslate">SINKS</code> 数组定义 6 个主题的 id、调色板、描述</li>
+<li><code class="notranslate">applySink(id)</code> 执行：设置 <code class="notranslate">body[data-luliy-theme]</code>，并更新 4 个 CSS 变量 <code class="notranslate">--card-c1/c2/c3/c4</code></li>
+<li>CSS 中 <code class="notranslate">[data-luliy-theme="sakura"]</code> 等选择器覆盖对应样式</li>
+</ol>
+<p><strong>运行原理（音乐播放器）：</strong></p>
+<ul>
+<li>使用 <code class="notranslate">&lt;audio&gt;</code> 元素，跨页面通过 <code class="notranslate">localStorage</code> 持久化 <code class="notranslate">{trackIndex, position, isPlaying}</code></li>
+<li>页面卸载时保存播放位置，下一页加载时恢复（受浏览器自动播放策略限制）</li>
+<li>用户可通过「＋」按钮输入 URL 添加曲目，存储在 <code class="notranslate">luliy-music</code> 键</li>
+</ul>
+<p><strong>DIY 方法（添加主题）：</strong><br>
+在 <code class="notranslate">SINKS</code> 数组末尾添加新对象：</p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-kos">{</span>
+  <span class="pl-c1">id</span>: <span class="pl-s">'ocean'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">label</span>: <span class="pl-s">'深海蓝'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">dot</span>: <span class="pl-s">'#006994'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">theme</span>: <span class="pl-s">'ocean'</span><span class="pl-kos">,</span>
+  <span class="pl-c1">cardPalette</span>: <span class="pl-kos">[</span><span class="pl-s">'#006994'</span><span class="pl-kos">,</span> <span class="pl-s">'#0099cc'</span><span class="pl-kos">,</span> <span class="pl-s">'#00ccff'</span><span class="pl-kos">,</span> <span class="pl-s">'#80e5ff'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+  <span class="pl-c1">desc</span>: <span class="pl-s">'深邃海洋，静谧蓝调'</span>
+<span class="pl-kos">}</span></pre></div>
+<p>然后在 CSS 中添加对应的 <code class="notranslate">[data-luliy-theme="ocean"]</code> 样式块。</p>
+<hr>
+<h3>M14 首页卡片重建（三视图 + 骨架屏）</h3>
+<p><strong>功能：</strong></p>
+<ul>
+<li>从 <code class="notranslate">/postList.json</code> 读取文章数据并重建卡片</li>
+<li>支持三种视图切换：<strong>网格</strong>（多列卡片）、<strong>列表</strong>（单列紧凑）、<strong>时间轴</strong>（居中竖线）</li>
+<li>按年份自动插入年份分隔线</li>
+<li>置顶文章标注 📌，多级置顶（<code class="notranslate">pinned</code>/<code class="notranslate">pinned-2</code>/<code class="notranslate">pinned-3</code>）</li>
+<li>加载期间显示<strong>骨架屏</strong>占位，避免布局跳动</li>
+</ul>
+<p><strong>运行原理：</strong></p>
+<ol>
+<li>调用 <code class="notranslate">fetchPosts()</code> 获取 postList.json，解析为统一格式的文章对象数组</li>
+<li>排序：先按 pinLevel 降序，再按日期降序</li>
+<li>遍历数组，检测年份变化插入 <code class="notranslate">.luliy-card-yeardiv</code></li>
+<li><code class="notranslate">applyCardView()</code> 在 <code class="notranslate">.luliy-card-grid</code> 上切换 <code class="notranslate">luliy-card-list</code> / <code class="notranslate">luliy-card-timeline</code> 类</li>
+</ol>
+<p><strong>置顶标签命名规则：</strong></p>
+<ul>
+<li><code class="notranslate">pinned</code> = 一级置顶（最高）</li>
+<li><code class="notranslate">pinned-2</code> = 二级置顶</li>
+<li><code class="notranslate">pinned-3</code> = 三级置顶（数字越大优先级越低）</li>
+</ul>
+<hr>
+<h3>M15 macOS 风格代码块</h3>
+<p><strong>功能：</strong> 为每个 <code class="notranslate">&lt;pre&gt;&lt;code&gt;</code> 块添加 macOS 风格的三色按钮装饰条，并显示语言标签和行号。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>按钮颜色</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔴 红色</td>
+<td>复制代码（HTTPS 下用 Clipboard API，否则降级 execCommand）</td>
+</tr>
+<tr>
+<td>🟡 黄色</td>
+<td>折叠/展开代码块</td>
+</tr>
+<tr>
+<td>🟢 绿色</td>
+<td>全屏阅读（双击代码块也可触发）</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>运行原理：</strong></p>
+<ul>
+<li>遍历 <code class="notranslate">#postBody</code> 内所有 <code class="notranslate">&lt;pre&gt;</code> 元素，跳过已处理的（检查 <code class="notranslate">.mac-strip</code> 是否存在）</li>
+<li>行号：统计 <code class="notranslate">\n</code> 数量，用 <code class="notranslate">&lt;span class="luliy-lineno"&gt;</code> 生成行号列，CSS <code class="notranslate">pre-wrap</code> 保持对齐</li>
+<li>全局只注册一个 Escape 键监听（<code class="notranslate">_codeEscBound</code> 防重复）</li>
+<li><code class="notranslate">MutationObserver</code> 监听 postBody 变化，动态代码块也能被处理</li>
+</ul>
+<hr>
+<h3>M16 樱花飘落 + 流星（四季自适应）</h3>
+<p><strong>功能：</strong> 全屏 Canvas 上持续飘落的粒子，颜色和行为根据当前月份自动变化：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>季节</th>
+<th>月份</th>
+<th>粒子颜色</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>春</td>
+<td>3–5月</td>
+<td>粉色系</td>
+<td>轻柔，微风漂移</td>
+</tr>
+<tr>
+<td>夏</td>
+<td>6–8月</td>
+<td>绿色系</td>
+<td>缓慢，近乎垂直</td>
+</tr>
+<tr>
+<td>秋</td>
+<td>9–11月</td>
+<td>橙红系</td>
+<td>较快，风大</td>
+</tr>
+<tr>
+<td>冬</td>
+<td>12–2月</td>
+<td>白蓝系</td>
+<td>飘轻，稀疏</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><strong>流星：</strong> 随机在顶部生成，对角线快速滑落后淡出（仅夜晚模式触发）</p>
+<p><strong>运行原理：</strong></p>
+<ul>
+<li>使用 <code class="notranslate">requestAnimationFrame</code> 循环，每帧 <code class="notranslate">clearRect</code> 后重绘所有粒子</li>
+<li>每个粒子有 <code class="notranslate">x, y, vx, vy, size, opacity, rotation, rotSpeed</code> 属性</li>
+<li>超出屏幕边界时随机重置到顶部</li>
+<li>Canvas <code class="notranslate">pointer-events:none</code> 不影响页面交互</li>
+</ul>
+<p><strong>DIY 方法：</strong> 修改 <code class="notranslate">SEASON_CONFIG</code> 中各季节的 <code class="notranslate">count</code>（数量）、<code class="notranslate">speedY</code>（下落速度范围）、<code class="notranslate">wind</code>（横漂强度）、<code class="notranslate">opacity</code>（透明度范围）。</p>
+<hr>
+<h3>M17 文章 TOC 滚动高亮 + 阅读进度环</h3>
+<p><strong>功能：</strong></p>
+<ul>
+<li>TOC（目录）随滚动自动高亮当前所在章节</li>
+<li>顶部进度条 + 右下角返回顶部按钮（内含 SVG 圆形进度环）</li>
+<li>TOC 顶部注入「目录」标签和「↑ 回顶」按钮</li>
+</ul>
+<p><strong>运行原理：</strong></p>
+<ol>
+<li><strong>TOC 迁移</strong>：将 <code class="notranslate">articletoc.js</code> 插入到 <code class="notranslate">#postBody</code> 内的 TOC 元素移动到 <code class="notranslate">document.body</code> 直属，避免被 <code class="notranslate">backdrop-filter</code> 或 <code class="notranslate">transform</code> 的父元素创建新层叠上下文，确保 <code class="notranslate">position:fixed</code> 正确工作</li>
+<li><strong>ID 生成</strong>：对没有 id 的标题自动生成 slug（中文保留，英文小写，空格转连字符）</li>
+<li><strong>滚动高亮</strong>：<code class="notranslate">getBoundingClientRect().top &lt;= 110</code> 判断标题是否已滚过视口，取最后一个符合条件的作为当前章节</li>
+<li><strong>进度环</strong>：SVG <code class="notranslate">stroke-dashoffset</code> 随滚动百分比变化</li>
+</ol>
+<hr>
+<h3>M18 移动端汉堡菜单 + 滑动翻页</h3>
+<p><strong>功能：</strong></p>
+<ul>
+<li>移动端顶部右侧三横线汉堡按钮，点击展开导航下拉菜单</li>
+<li>下拉菜单包含：音效开关、主题选择、粒子开关、导航链接</li>
+<li>文章页支持<strong>左右滑动</strong>切换上一篇/下一篇</li>
+</ul>
+<p><strong>运行原理（汉堡菜单）：</strong></p>
+<ul>
+<li>从 <code class="notranslate">.title-right</code> 提取原始导航链接，重新填充到下拉容器</li>
+<li>点击菜单外区域关闭</li>
+</ul>
+<p><strong>运行原理（滑动翻页）：</strong></p>
+<ul>
+<li>监听 <code class="notranslate">touchstart</code> 记录起始坐标</li>
+<li><code class="notranslate">touchend</code> 时计算 <code class="notranslate">dx/dy</code>，要求 <code class="notranslate">|dx| &gt; 120px</code> 且水平方向占主导（比例 &gt; 3:1）</li>
+<li>匹配 <code class="notranslate">.luliy-prevnext</code> 中对应方向的链接，添加滑动动画类后跳转</li>
+</ul>
+<hr>
+<h3>M19 收藏夹密码门</h3>
+<p><strong>功能：</strong> 访问 <code class="notranslate">/favorites</code> 路径时显示密码输入框，通过验证后逐步揭示内容（渐进式模糊→清晰）。</p>
+<p><strong>运行原理：</strong></p>
+<ol>
+<li>URL 匹配 <code class="notranslate">LULIY_OPTS.favoritesPathMatch</code>（默认 <code class="notranslate">/favorites/i</code>）</li>
+<li>显示密码输入框覆盖层</li>
+<li>用户输入后，将密码进行 SHA-256 哈希，与 <code class="notranslate">LULIY_OPTS.favoritesHash</code> 比对</li>
+<li>验证通过：结果存入 <code class="notranslate">sessionStorage</code>（当次会话有效）</li>
+<li>页面内容先完全模糊，验证后逐渐清晰（CSS <code class="notranslate">filter:blur</code> 过渡）</li>
+</ol>
+<p><strong>更改密码：</strong> 重新生成新密码的 SHA-256 哈希值，替换 <code class="notranslate">favoritesHash</code>。</p>
+<hr>
+<h3>M20 首页底部图片展示区</h3>
+<p><strong>功能：</strong> 首页文章列表下方的图片展示区。放 1 张图片 = 全幅 Banner；放 2 张以上 = 响应式网格。</p>
+<p><strong>DIY 方法：</strong> 修改 <code class="notranslate">LULIY_OPTS.galleryImages</code> 数组和 <code class="notranslate">galleryText</code>。</p>
+<hr>
+<h3>M21 文章页初始化（系列导航 + 滚动记忆）</h3>
+<p>这个模块在 <code class="notranslate">isPost = true</code> 时触发，包含三个子功能：</p>
+<p><strong>系列导航（M21b）：</strong></p>
+<ul>
+<li>读取 postList.json，找到当前文章共享标签数最多的同标签文章组（≥2篇）</li>
+<li>在文章顶部插入「📚 系列：标签名 (当前/总数)」面板，列出系列全部文章</li>
+</ul>
+<p><strong>滚动记忆（M21c）：</strong></p>
+<ul>
+<li>离开文章时将滚动百分比保存到 <code class="notranslate">sessionStorage</code></li>
+<li>重新访问时，若上次读到 5%–95% 位置，底部弹出「上次读到 XX%，继续阅读 ↓」提示</li>
+<li>点击提示自动滚到对应位置，6 秒后自动消失</li>
+</ul>
+<p><strong>外链悬停预览（M16b）：</strong></p>
+<ul>
+<li>悬停文章内的外部链接时，在鼠标旁显示小卡片，包含：网站 favicon + 域名 + 路径</li>
+</ul>
+<hr>
+<h3>M22 归档页（时间轴 + 日历）</h3>
+<p><strong>功能：</strong> <code class="notranslate">/archive</code> 页面提供两种视图：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>视图</th>
+<th>样式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>时间轴</td>
+<td>居中竖线，左右交替排列文章节点</td>
+</tr>
+<tr>
+<td>日历</td>
+<td>按月份排列的日历格，发文日期有高亮</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p>顶部 Tab 切换，选择持久化到 <code class="notranslate">localStorage</code>。</p>
+<p><strong>运行原理：</strong></p>
+<ul>
+<li>调用 <code class="notranslate">fetchPosts()</code> 获取所有文章</li>
+<li>时间轴：按年/月分组，DOM 构建为 <code class="notranslate">luliy-timeline-item</code> 节点</li>
+<li>日历：生成指定年月的完整日历格，有文章的日期渲染为可点击节点</li>
+</ul>
+<hr>
+<h3>M23 标签云页面</h3>
+<p><strong>功能：</strong> 在 <code class="notranslate">/tag.html</code> 顶部生成标签云，标签字号根据文章数量动态缩放（13px–35px），颜色来自 postList.json 的 <code class="notranslate">labelColorDict</code>。</p>
+<p><strong>运行原理：</strong></p>
+<ul>
+<li>统计各标签在所有文章中的出现频次</li>
+<li>线性插值映射到字号范围：<code class="notranslate">13 + ratio * 22</code></li>
+<li>点击标签跳转到 <code class="notranslate">/tag.html#标签名</code> 触发 Gmeek 原生筛选</li>
+</ul>
+<hr>
+<h3>M24 文章内搜索浮层</h3>
+<p><strong>功能：</strong> 文章页按 <code class="notranslate">Ctrl/Cmd+F</code>（或右下角🔍按钮）弹出搜索栏，实时高亮匹配文字，<code class="notranslate">↑↓</code> 按钮逐个跳转，<code class="notranslate">Esc</code> 关闭。</p>
+<p><strong>运行原理：</strong></p>
+<ol>
+<li><strong>劫持</strong> 浏览器原生 <code class="notranslate">Ctrl+F</code>（<code class="notranslate">preventDefault</code>）</li>
+<li><code class="notranslate">TreeWalker</code> 遍历 <code class="notranslate">#postBody</code> 中的文本节点（自动跳过 code/pre/script/katex 等）</li>
+<li>找到匹配项后，用 <code class="notranslate">&lt;mark class="luliy-search-hit"&gt;</code> 包裹</li>
+<li>当前聚焦项额外添加 <code class="notranslate">.is-current</code> 类（CSS 高亮色不同）</li>
+<li>关闭时通过 <code class="notranslate">parentNode.replaceChild</code> 还原文本节点，<code class="notranslate">normalize()</code> 合并相邻文本节点</li>
+</ol>
+<hr>
+<h3>M25 鼠标拖尾 + 萤火虫</h3>
+<p><strong>鼠标拖尾：</strong></p>
+<ul>
+<li>每 60ms 在鼠标位置创建一个 emoji 元素（🌸/✧/☀/☁/✨，随主题变化）</li>
+<li>CSS <code class="notranslate">animation</code> 使其旋转淡出，1.1 秒后移除</li>
+<li>触摸设备和减少动效模式下自动禁用</li>
+</ul>
+<p><strong>萤火虫：</strong></p>
+<ul>
+<li>暗色模式 或 太空主题 下，<code class="notranslate">luliy-firefly=1</code> 时激活</li>
+<li>Canvas 上 N 个（最多 26 个）发光粒子自由漂浮</li>
+<li>在鼠标 220px 范围内受到温和吸引力</li>
+<li>使用径向渐变绘制发光效果，亮度随 sin 函数脉动</li>
+</ul>
+<p><strong>减少动效安全网：</strong></p>
+<ul>
+<li>系统设置 <code class="notranslate">prefers-reduced-motion: reduce</code> 或手动设置 <code class="notranslate">luliy-reduce=1</code> 时，自动停止拖尾和萤火虫，并为整个 body 添加 <code class="notranslate">.luliy-reduce-motion</code> 类（CSS 中该类选择器关闭所有过渡）</li>
+</ul>
+<hr>
+<h3>M26 页面切换淡入淡出</h3>
+<p><strong>功能：</strong> 博客内部页面之间跳转时，使用浏览器原生 <strong>View Transitions API</strong> 实现平滑淡入淡出，而非硬跳转。</p>
+<p><strong>运行原理：</strong></p>
+<ol>
+<li>拦截所有同源内部链接的点击事件</li>
+<li>排除：新标签、下载链接、纯 hash 跳转、<code class="notranslate">Ctrl/Cmd/Shift+点击</code></li>
+<li>调用 <code class="notranslate">document.startViewTransition(() =&gt; { location.href = dest })</code></li>
+<li>安全降级：不支持的浏览器直接执行 <code class="notranslate">location.href</code>；1 秒超时保底跳转</li>
+</ol>
+<hr>
+<h2>5. CSS 主题系统</h2>
+<p><code class="notranslate">enhance.css</code> 通过 CSS 变量 + <code class="notranslate">[data-luliy-theme]</code> 属性选择器实现 6 套主题：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* 每个主题定义自己的颜色组 */</span>
+[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"sakura"</span>] {
+  <span class="pl-s1">--accent</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>e05c8a</span>;
+  <span class="pl-s1">--accent-light</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f9a8c9</span>;
+  <span class="pl-s1">--card-border</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">224</span><span class="pl-kos">,</span> <span class="pl-c1">92</span><span class="pl-kos">,</span> <span class="pl-c1">138</span><span class="pl-kos">,</span> <span class="pl-c1">0.18</span>);
+  <span class="pl-c">/* ... */</span>
+}</pre></div>
+<p>同时 JS 更新 4 个卡片渐变变量：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate">--card-c1 <span class="pl-c1">/</span> <span class="pl-c1">-</span><span class="pl-c1">-</span>card<span class="pl-c1">-</span>c2 <span class="pl-c1">/</span> <span class="pl-c1">-</span><span class="pl-c1">-</span>card<span class="pl-c1">-</span>c3 <span class="pl-c1">/</span> <span class="pl-c1">-</span><span class="pl-c1">-</span>card<span class="pl-c1">-</span>c4</pre></div>
+<p>卡片渐变写法：</p>
+<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">luliy-card</span><span class="pl-kos">:</span><span class="pl-c1">nth-child</span>(4n+1) { <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">linear-gradient</span>(<span class="pl-c1">135<span class="pl-smi">deg</span></span><span class="pl-kos">,</span> <span class="pl-en">var</span>(<span class="pl-s1">--card-c1</span>)<span class="pl-kos">,</span> <span class="pl-en">var</span>(<span class="pl-s1">--card-c2</span>)); }</pre></div>
+<hr>
+<h2>6. 性能设计说明</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>技术</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">onScrollRAF</code> 调度器</td>
+<td>所有滚动回调合并到单个 rAF 帧</td>
+</tr>
+<tr>
+<td>FOUC 防闪块</td>
+<td>DOMContentLoaded 前恢复主题/背景，避免闪白</td>
+</tr>
+<tr>
+<td><code class="notranslate">MutationObserver</code></td>
+<td>监听 DOM 变化而非轮询</td>
+</tr>
+<tr>
+<td><code class="notranslate">_codeEscBound</code> 标志</td>
+<td>防止多个代码块重复注册全局 Escape 监听</td>
+</tr>
+<tr>
+<td>Canvas <code class="notranslate">pointer-events:none</code></td>
+<td>樱花/萤火虫 Canvas 不阻止用户点击</td>
+</tr>
+<tr>
+<td>骨架屏</td>
+<td>数据加载期间先渲染占位 UI，再替换</td>
+</tr>
+<tr>
+<td><code class="notranslate">sessionStorage</code> vs <code class="notranslate">localStorage</code></td>
+<td>滚动位置用 session（标签页级别）；偏好设置用 local（长期）</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h2>7. 常见 DIY 场景速查</h2>
+<p><strong>① 换博客头像</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// enhance.js → initHeroCluster() 函数内</span>
+<span class="pl-s1">avatarImg</span><span class="pl-kos">.</span><span class="pl-c1">src</span> <span class="pl-c1">=</span> <span class="pl-s">'https://你的头像URL.jpg'</span><span class="pl-kos">;</span></pre></div>
+<p><strong>② 修改建站时间</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// enhance.js → initUptime() 函数内</span>
+<span class="pl-k">var</span> <span class="pl-s1">start</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">Date</span><span class="pl-kos">(</span><span class="pl-s">'2024/01/01 00:00:00'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">getTime</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<p><strong>③ 添加新音乐曲目</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// LULIY_OPTS.musicTracks 数组</span>
+<span class="pl-kos">{</span> <span class="pl-c1">name</span>: <span class="pl-s">'你的曲目名'</span><span class="pl-kos">,</span> <span class="pl-c1">src</span>: <span class="pl-s">'https://你的mp3.mp3'</span> <span class="pl-kos">}</span></pre></div>
+<p><strong>④ 默认关闭樱花效果</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// enhance.js → initLocalStorage() 的 defs 对象</span>
+<span class="pl-s">'luliy-sakura'</span>: <span class="pl-s">'0'</span>   <span class="pl-c">// 改为 '0'</span></pre></div>
+<p><strong>⑤ 增加主题</strong><br>
+在 <code class="notranslate">SINKS</code> 数组末尾添加对象 + CSS 中添加 <code class="notranslate">[data-luliy-theme="新主题名"]</code> 样式块。</p>
+<p><strong>⑥ 修改首页卡片默认视图</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// defs 对象</span>
+<span class="pl-s">'luliy-cardview'</span>: <span class="pl-s">'list'</span>   <span class="pl-c">// 'grid' | 'list' | 'timeline'</span></pre></div>
+<p><strong>⑦ 默认开启鼠标拖尾</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// defs 对象</span>
+<span class="pl-s">'luliy-trail'</span>: <span class="pl-s">'1'</span></pre></div>
+<p><strong>⑧ 调整字号范围</strong></p>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// applyReadingPrefs() 和 setFs() 函数内</span>
+<span class="pl-s1">px</span> <span class="pl-c1">=</span> <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">min</span><span class="pl-kos">(</span><span class="pl-c1">28</span><span class="pl-kos">,</span> <span class="pl-v">Math</span><span class="pl-kos">.</span><span class="pl-en">max</span><span class="pl-kos">(</span><span class="pl-c1">12</span><span class="pl-kos">,</span> <span class="pl-s1">px</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>  <span class="pl-c">// 改为 12–28px 范围</span></pre></div>
+<hr>
+<p><em>本指南基于 enhance.js v10 + enhance.css v9 编写，如代码有更新部分细节可能变化。</em></p></div>
+<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://luliy.me">Luliy</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if("05/30/2026"!=""){
+    var startSite=new Date("05/30/2026");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行 "+diffDay+" 天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","luliy6/luliy6.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script>function luliyWaitPost(){if(window._luliyInitPost){window._luliyInitPost();}else{setTimeout(luliyWaitPost,50);}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',luliyWaitPost);}else{luliyWaitPost();}</script>
+
+</html>

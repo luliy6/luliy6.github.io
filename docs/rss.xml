@@ -1,5 +1,30 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Luliy</title><link>https://luliy.me</link><description>我将无限进步!</description><copyright>Luliy</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Thu, 11 Jun 2026 18:23:46 +0000</lastBuildDate><managingEditor>Luliy</managingEditor><ttl>60</ttl><webMaster>Luliy</webMaster><item><title>CET短文</title><link>https://luliy.me/post/CET-duan-wen.html</link><description># 四六级必考词汇 · 分类短文
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Luliy</title><link>https://luliy.me</link><description>我将无限进步!</description><copyright>Luliy</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Fri, 12 Jun 2026 12:44:27 +0000</lastBuildDate><managingEditor>Luliy</managingEditor><ttl>60</ttl><webMaster>Luliy</webMaster><item><title>本站js，css，指南</title><link>https://luliy.me/post/ben-zhan-js%EF%BC%8Ccss%EF%BC%8C-zhi-nan.html</link><description># Luliy Blog 增强系统完全指南
+&gt; `enhance.js v10` + `enhance.css v9` — 功能说明 · DIY 方法 · 运行原理
+
+## 1. 系统总览
+
+整个增强系统由两个文件构成，以**模块化方式**挂载在一个 IIFE（立即执行函数）里，避免污染全局命名空间：
+
+```
+enhance.js   →  行为层（DOM 构建 / 事件 / 动画 / 数据读取）
+enhance.css  →  样式层（主题变量 / 布局 / 过渡动画）
+```
+
+**启动流程：**
+
+```
+页面加载开始
+  ↓
+① initLocalStorage()        — 补全缺失的 localStorage 默认值
+② FOUC 防闪烁块             — 立即读取保存的主题/背景，写入 body
+③ initSakura()              — 若已开启，尽早启动 canvas（避免延迟）
+  ↓ DOMContentLoaded
+④ ready() 回调              — 初始化所有模块
+⑤ 页面类型判断              — isPost → initPost()  /  isIndex → initIndex()
+```
+
+所有滚动监听统一经过 **`onScrollRAF`** 调度器，合并到单个 `requestAnimationFrame` 帧里执行，避免多个模块各自注册 scroll 事件造成卡顿。</description><guid isPermaLink="true">https://luliy.me/post/ben-zhan-js%EF%BC%8Ccss%EF%BC%8C-zhi-nan.html</guid><pubDate>Fri, 12 Jun 2026 12:43:52 +0000</pubDate></item><item><title>CET短文</title><link>https://luliy.me/post/CET-duan-wen.html</link><description># 四六级必考词汇 · 分类短文
 
 
 ## 一、时政类 Politics &amp; Current Affairs
