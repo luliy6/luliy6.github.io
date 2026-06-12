@@ -38,6 +38,12 @@
 ══════════════════════════════════════════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
+@font-face {
+  font-family: 'CangEr';
+  src: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/%E4%BB%93%E8%80%B3%E4%BB%8A%E6%A5%B701-W04.ttf') format('truetype');
+  font-display: swap;
+}
+
 
 /* ══════════════════════════════════════════════════════════
    01  CSS Variables + Reset
@@ -75,12 +81,15 @@ html,
    02  Homepage Hero — full-screen, scroll to enter
 ══════════════════════════════════════════════════════════ */
 #luliy-hero {
+  /* Escape any parent padding/margin to be truly full-viewport */
   position: relative;
-  width: 100%;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   height: 100vh;
   min-height: 520px;
   background-size: cover;
-  background-position: center;
+  background-position: center 30%;
   background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
@@ -89,7 +98,6 @@ html,
   text-align: center;
   overflow: hidden;
   z-index: 1;
-  /* push the rest of the page below the fold */
   margin-bottom: 8px;
 }
 #luliy-hero-inner {
@@ -181,6 +189,17 @@ code, pre, kbd, samp,
 #postBody code, #postBody pre,
 .mac-lang, .luliy-date-badge {
   font-family: 'LXGW WenKai Mono', 'LXGW WenKai Screen', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+
+/* ── 苍耳今楷模式: body.luliy-canger ─────────────────────── */
+body.luliy-canger #postBody,
+body.luliy-canger #postBody p,
+body.luliy-canger #postBody li,
+body.luliy-canger #postBody td,
+body.luliy-canger #postBody th,
+body.luliy-canger #postBody blockquote {
+  font-family: 'CangEr', 'LXGW WenKai Screen', serif !important;
 }
 
 /* ── 黑体模式: sans-serif reading toggle (body.luliy-sans) ── */
@@ -286,125 +305,174 @@ a.Label {
 a.Label:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
 a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 /* ══════════════════════════════════════════════════════════
-   05  Navbar — theme-aware liquid glass (6 themes)
+   05  Navbar — high-contrast rebuilt layout
+       Time: top-left  |  Blog name: centred large
+       Nav icons: split left + right of name
 ══════════════════════════════════════════════════════════ */
+
+/* ── Base #header ──────────────────────────────────────── */
 #header {
   position: fixed !important;
-  top: 0 !important; left: 0 !important;
+  top: 0 !important; left: 0 !important; right: 0 !important;
   width: 100% !important;
-  min-height: 56px !important;
-  backdrop-filter: blur(32px) saturate(2.2) brightness(1.06) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(2.2) brightness(1.06) !important;
-  border-top: 1px solid rgba(255,255,255,0.55) !important;
-  padding: 0 clamp(12px, calc((100vw - 1040px)/2 + 20px), 50%) !important;
+  height: 58px !important;
+  padding: 0 !important;
+  background: rgba(10,6,20,0.88) !important;
+  backdrop-filter: blur(22px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.8) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.40) !important;
+  z-index: 9999 !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important;
-  z-index: 9999 !important;
-  box-sizing: border-box !important;
-  gap: 8px !important;
-  flex-wrap: nowrap !important;
   overflow: visible !important;
-  /* Base colors — overridden per theme below */
-  background: rgba(255,255,255,0.16) !important;
-  border-bottom: 1px solid rgba(130,80,223,0.16) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.30) inset, 0 8px 32px rgba(0,0,0,0.13) !important;
-  transition: background 0.45s, border-color 0.45s, box-shadow 0.45s !important;
+  transition: opacity 0.5s ease, background 0.5s ease !important;
 }
 
-/* ── Per-theme navbar tint ───────────────────────────────── */
-body[data-luliy-theme="sakura"] #header {
-  background: rgba(255,220,238,0.20) !important;
-  border-bottom-color: rgba(201,64,112,0.20) !important;
-}
-body[data-luliy-theme="your-name"] #header {
-  background: rgba(210,235,255,0.20) !important;
-  border-bottom-color: rgba(26,89,164,0.18) !important;
-}
-body[data-luliy-theme="space"] #header {
-  background: rgba(4,8,28,0.38) !important;
-  border-bottom-color: rgba(0,229,255,0.22) !important;
-  border-top-color: rgba(0,229,255,0.12) !important;
-  box-shadow: 0 1px 0 rgba(0,229,255,0.06) inset, 0 8px 32px rgba(0,0,0,0.55) !important;
-}
-body[data-luliy-theme="sunset"] #header {
-  background: rgba(255,220,200,0.18) !important;
-  border-bottom-color: rgba(255,126,95,0.22) !important;
-}
-body[data-luliy-theme="mono"] #header {
-  background: rgba(245,245,245,0.24) !important;
-  border-bottom-color: rgba(0,0,0,0.16) !important;
+/* ── Theme-specific top border accent ───────────────────── */
+body[data-luliy-theme="default"] #header  { border-top: 2px solid rgba(130,80,223,0.60) !important; }
+body[data-luliy-theme="sakura"] #header   { border-top: 2px solid rgba(201,64,112,0.60) !important; }
+body[data-luliy-theme="your-name"] #header{ border-top: 2px solid rgba(255,169,77,0.70) !important; }
+body[data-luliy-theme="space"] #header    { border-top: 2px solid rgba(0,229,255,0.60) !important; }
+body[data-luliy-theme="sunset"] #header   { border-top: 2px solid rgba(196,69,105,0.65) !important; }
+body[data-luliy-theme="mono"] #header     { border-top: 2px solid rgba(220,220,220,0.50) !important; }
+
+/* ── Rebuilt shell ──────────────────────────────────────── */
+#luliy-nav-rebuilt {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  position: relative;
 }
 
-/* Dark mode base + per-theme dark overrides */
-[data-color-mode="dark"] #header {
-  background: rgba(8,6,18,0.34) !important;
-  border-top-color: rgba(255,255,255,0.08) !important;
-  border-bottom-color: rgba(130,80,223,0.22) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 32px rgba(0,0,0,0.60) !important;
-}
-[data-color-mode="dark"] body[data-luliy-theme="sakura"] #header {
-  background: rgba(36,8,22,0.44) !important;
-  border-bottom-color: rgba(249,168,201,0.22) !important;
-}
-[data-color-mode="dark"] body[data-luliy-theme="your-name"] #header {
-  background: rgba(4,12,42,0.44) !important;
-  border-bottom-color: rgba(96,165,250,0.22) !important;
-}
-[data-color-mode="dark"] body[data-luliy-theme="space"] #header {
-  background: rgba(1,4,18,0.55) !important;
-  border-bottom-color: rgba(0,229,255,0.28) !important;
-}
-[data-color-mode="dark"] body[data-luliy-theme="sunset"] #header {
-  background: rgba(30,10,18,0.44) !important;
-  border-bottom-color: rgba(254,180,123,0.22) !important;
-}
-[data-color-mode="dark"] body[data-luliy-theme="mono"] #header {
-  background: rgba(12,12,12,0.50) !important;
-  border-bottom-color: rgba(255,255,255,0.12) !important;
+/* ── Time — top-left ────────────────────────────────────── */
+#luliy-nav-time {
+  position: absolute;
+  top: 6px; left: 20px;
+  font-size: 11px;
+  font-family: 'LXGW WenKai Mono', monospace;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 1px;
+  line-height: 1;
+  pointer-events: none;
 }
 
-/* ── Nav text — theme-aware, fully legible ───────────────── */
-#header a, .title-right a, .title-right button {
-  color: rgba(14,8,28,0.90) !important;
-  font-weight: 700;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.35);
-  transition: color 0.2s, background 0.2s;
-}
-[data-color-mode="dark"] #header a,
-[data-color-mode="dark"] .title-right a,
-[data-color-mode="dark"] .title-right button {
-  color: rgba(240,236,255,0.95) !important;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.60);
-}
-/* Space theme: slightly brighter cyan text */
-body[data-luliy-theme="space"] #header a,
-body[data-luliy-theme="space"] .title-right a {
-  color: rgba(200,240,255,0.92) !important;
-  text-shadow: 0 0 8px rgba(0,229,255,0.25);
+/* ── Left icon group ────────────────────────────────────── */
+#luliy-nav-icons-left {
+  display: flex; align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding-right: 14px;
 }
 
-/* ── SVG icons in nav: always follow link text color ──────── */
-.title-right a svg, .title-right a img.icon,
-#header a svg { fill: currentColor !important; color: inherit !important;
-  width: 16px; height: 16px; vertical-align: middle; display: inline-block; }
-
-/* ── Link hover — theme-aware ────────────────────────────── */
-.title-right a:hover, #header a:hover {
-  background: var(--th-accent-soft, rgba(130,80,223,0.10)) !important;
-  color: var(--th-accent, #8250df) !important;
-  text-shadow: none !important;
+/* ── Centre: avatar + blog name ─────────────────────────── */
+#luliy-nav-centre {
+  display: flex; align-items: center; gap: 10px;
+  justify-content: center;
 }
-[data-color-mode="dark"] .title-right a:hover,
-[data-color-mode="dark"] #header a:hover {
-  background: var(--th-accent-hover, rgba(130,80,223,0.24)) !important;
+#luliy-nav-avatar-link {
+  display: flex; align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+#luliy-nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.35);
+  transition: border-color 0.2s, transform 0.2s;
+}
+#luliy-nav-avatar:hover { border-color: var(--th-accent, #8250df); transform: scale(1.08); }
+#luliy-nav-blogname {
+  font-size: 22px; font-weight: 900;
+  letter-spacing: 2px;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  font-family: 'Noto Sans SC', sans-serif;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+  white-space: nowrap;
+}
+#luliy-nav-blogname:hover { color: var(--th-accent, #cba6f7) !important; }
+
+/* ── Right icon group ───────────────────────────────────── */
+#luliy-nav-icons-right {
+  display: flex; align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding-left: 14px;
+}
+
+/* ── Nav icon links (from original .title-right) ─────────── */
+.luliy-nav-icon-link,
+#luliy-nav-icons-left a, #luliy-nav-icons-right a,
+#luliy-nav-icons-left button, #luliy-nav-icons-right button {
+  display: inline-flex !important; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 8px;
+  color: rgba(255,255,255,0.85) !important;
+  text-decoration: none !important; border: none !important;
+  background: rgba(255,255,255,0.08) !important;
+  cursor: pointer; transition: background 0.15s, color 0.15s, transform 0.15s;
+  font-size: 15px;
+}
+.luliy-nav-icon-link:hover,
+#luliy-nav-icons-left a:hover, #luliy-nav-icons-right a:hover,
+#luliy-nav-icons-left button:hover, #luliy-nav-icons-right button:hover {
+  background: rgba(255,255,255,0.18) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+/* SVG icons follow text color */
+#luliy-nav-rebuilt svg { fill: currentColor !important; width: 16px; height: 16px; }
+
+/* ── Hamburger — mobile ─────────────────────────────────── */
+#luliy-nav-ham {
+  display: none; flex-direction: column; justify-content: space-between;
+  width: 26px; height: 18px;
+  background: none; border: none; cursor: pointer; padding: 0;
+  margin-left: auto; z-index: 10001; flex-shrink: 0;
+}
+#luliy-nav-ham span {
+  display: block; width: 100%; height: 2px;
+  background: rgba(255,255,255,0.90); border-radius: 2px;
+  transition: transform 0.28s, opacity 0.28s;
+}
+#luliy-nav-ham.is-open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+#luliy-nav-ham.is-open span:nth-child(2) { opacity: 0; }
+#luliy-nav-ham.is-open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+/* ── Mobile dropdown ────────────────────────────────────── */
+#luliy-nav-dropdown {
+  display: none; position: fixed; top: 58px; left: 0; right: 0;
+  background: rgba(10,7,20,0.985);
+  backdrop-filter: blur(24px) saturate(2); -webkit-backdrop-filter: blur(24px) saturate(2);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 9998;
+  flex-direction: column; padding: 10px 16px 14px; gap: 2px;
+  transform: translateY(-8px); opacity: 0;
+  transition: transform 0.24s cubic-bezier(.4,0,.2,1), opacity 0.24s;
+}
+#luliy-nav-dropdown.is-open { display: flex; transform: translateY(0); opacity: 1; }
+
+/* Dropdown nav items */
+.luliy-nav-item {
+  display: block !important; padding: 10px 14px !important;
+  border-radius: 10px !important; font-size: 15px !important; font-weight: 600 !important;
+  color: #f3f0ff !important; text-decoration: none !important; border: none !important;
+  background: transparent !important; cursor: pointer !important;
+  transition: background 0.16s !important; width: 100% !important; text-align: left !important;
+}
+body[data-luliy-theme="space"] .luliy-nav-item,
+[data-color-mode="dark"] body[data-luliy-theme="space"] .luliy-nav-item { color: #d8f0ff !important; }
+.luliy-nav-item:hover {
+  background: var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
   color: var(--th-accent, #cba6f7) !important;
 }
 
-/* Hide original blogTitle/avatar (hero cluster replaces them) */
-#header .blogTitle, #header .avatar, #header .postTitle { display: none !important; }
-
-/* Hide RSS feed links (exact-match href only to avoid false positives) */
+/* Hide RSS feed links */
 .title-right a[href="rss.xml"],
 .title-right a[href="/rss.xml"],
 .title-right a[href="atom.xml"],
@@ -414,27 +482,13 @@ body[data-luliy-theme="space"] .title-right a {
 .title-right a[href$="rss.xml"],
 .title-right a[href$="atom.xml"] { display: none !important; }
 
-/* Hide "about" nav link (accessed via hero-cluster avatar instead).
-   Scoped to .title-right so it never touches article-body links. */
+/* Hide "about" nav link (accessed via avatar) */
 .title-right a[href="/about"],
 .title-right a[href="/about.html"],
 .title-right a[href="about"],
 .title-right a[href="about.html"],
 .title-right a[href$="/about"],
 .title-right a[href$="/about.html"] { display: none !important; }
-
-/* .title-right layout */
-.title-right {
-  display: flex !important; align-items: center !important; gap: 6px !important;
-  flex: 1 !important; justify-content: center !important;
-  flex-shrink: 1 !important; flex-wrap: wrap !important;
-  z-index: 10000 !important; min-width: 0 !important;
-}
-.title-right a {
-  white-space: nowrap !important; font-size: 15px !important;
-  padding: 5px 11px !important; border-radius: 8px !important;
-  text-decoration: none !important;
-}
 
 /* Scrolled (article page) — transparent */
 #header.header-scrolled {
@@ -444,96 +498,12 @@ body[data-luliy-theme="space"] .title-right a {
   box-shadow: none !important;
 }
 
-/* ── Hamburger button ───────────────────────────────────── */
-#luliy-nav-ham {
-  display: none; flex-direction: column; justify-content: space-between;
-  width: 28px; height: 20px;
-  background: none; border: none; cursor: pointer; padding: 0;
-  margin-left: auto; z-index: 10001; flex-shrink: 0;
-}
-#luliy-nav-ham span {
-  display: block; width: 100%; height: 2px;
-  background: rgba(14,8,28,0.82); border-radius: 2px;
-  transition: transform 0.28s, opacity 0.28s, background 0.28s;
-}
-[data-color-mode="dark"] #luliy-nav-ham span,
-body[data-luliy-theme="space"] #luliy-nav-ham span { background: rgba(220,235,255,0.90); }
-body[data-luliy-theme="sunset"] #luliy-nav-ham span { background: rgba(80,20,10,0.85); }
-[data-color-mode="dark"] body[data-luliy-theme="sunset"] #luliy-nav-ham span { background: rgba(255,210,185,0.90); }
-#luliy-nav-ham.is-open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
-#luliy-nav-ham.is-open span:nth-child(2) { opacity: 0; }
-#luliy-nav-ham.is-open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
-
-/* ── Mobile dropdown ─────────────────────────────────────── */
-#luliy-nav-dropdown {
-  display: none; position: fixed; top: 56px; left: 0; right: 0;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(24px) saturate(2); -webkit-backdrop-filter: blur(24px) saturate(2);
-  border-bottom: 1px solid rgba(255,255,255,0.30);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.16); z-index: 9998;
-  flex-direction: column; padding: 10px 16px 14px; gap: 2px;
-  transform: translateY(-8px); opacity: 0;
-  transition: transform 0.24s cubic-bezier(.4,0,.2,1), opacity 0.24s;
-}
-[data-color-mode="dark"] #luliy-nav-dropdown {
-  background: rgba(10,7,20,0.985); border-bottom-color: rgba(255,255,255,0.10);
-  box-shadow: 0 16px 44px rgba(0,0,0,0.6);
-}
-body[data-luliy-theme="sakura"] #luliy-nav-dropdown { background: rgba(255,230,242,0.96) !important; }
-body[data-luliy-theme="your-name"] #luliy-nav-dropdown { background: rgba(225,240,255,0.96) !important; }
-body[data-luliy-theme="space"] #luliy-nav-dropdown,
-[data-color-mode="dark"] body[data-luliy-theme="space"] #luliy-nav-dropdown { background: rgba(4,8,28,0.97) !important; }
-body[data-luliy-theme="sunset"] #luliy-nav-dropdown { background: rgba(255,240,230,0.96) !important; }
-#luliy-nav-dropdown.is-open { display: flex; transform: translateY(0); opacity: 1; }
-
-/* Dropdown nav items */
-.luliy-nav-item {
-  display: block !important; padding: 10px 14px !important;
-  border-radius: 10px !important; font-size: 15px !important; font-weight: 600 !important;
-  color: #1e1032 !important; text-decoration: none !important; border: none !important;
-  background: transparent !important; cursor: pointer !important;
-  transition: background 0.16s !important; width: 100% !important; text-align: left !important;
-}
-[data-color-mode="dark"] .luliy-nav-item { color: #f3f0ff !important; }
-body[data-luliy-theme="space"] .luliy-nav-item,
-[data-color-mode="dark"] body[data-luliy-theme="space"] .luliy-nav-item { color: #d8f0ff !important; }
-.luliy-nav-item:hover {
-  background: var(--th-accent-soft, rgba(130,80,223,0.10)) !important;
-  color: var(--th-accent, #8250df) !important;
-}
 
 /* ══════════════════════════════════════════════════════════
-   06  Hero cluster (avatar + name + clock in header)
+   06  Hero cluster — replaced by #luliy-nav-rebuilt (styles in 05)
 ══════════════════════════════════════════════════════════ */
-#luliy-hero-cluster {
-  display: flex !important; align-items: center !important; gap: 10px !important;
-  text-decoration: none !important; flex-shrink: 0;
-  padding: 6px 0;
-}
-#luliy-hero-cluster img {
-  width: 36px !important; height: 36px !important;
-  border-radius: 50% !important;
-  border: 2px solid rgba(255,255,255,0.60) !important;
-  box-shadow: 0 2px 8px rgba(130,80,223,0.25) !important;
-  object-fit: cover !important;
-  transition: box-shadow 0.3s, transform 0.3s;
-}
-#luliy-hero-cluster:hover img {
-  box-shadow: 0 0 18px rgba(130,80,223,0.55) !important;
-  transform: scale(1.06);
-}
-#luliy-hero-info { display: flex; flex-direction: column; gap: 1px; }
-#luliy-hero-name {
-  font-size: 14px !important; font-weight: 700 !important;
-  color: rgba(20,10,40,0.88) !important; letter-spacing: 0.4px;
-}
-[data-color-mode="dark"] #luliy-hero-name { color: rgba(230,225,255,0.92) !important; }
-#luliy-avatar-clock {
-  font-size: 10px;
-  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', monospace;
-  color: rgba(30,20,50,0.55); letter-spacing: 0.5px;
-}
-[data-color-mode="dark"] #luliy-avatar-clock { color: rgba(180,175,220,0.60); }
+/* Old #luliy-hero-cluster is no longer created.
+   New styles live in section 05 under #luliy-nav-rebuilt. */
 
 /* ══════════════════════════════════════════════════════════
    07  Hero banner (scroll-fold on homepage)
@@ -1851,13 +1821,15 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   flex: 1; border-radius: 10px; padding: 7px 6px 6px;
   font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
   text-align: center; border: 1px solid transparent;
-  line-height: 1.5; transition: transform 0.2s, box-shadow 0.2s;
-  cursor: default;
+  line-height: 1.5; transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  cursor: pointer;   /* interactive */
+  user-select: none;
 }
 .luliy-ctrl-preview-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.22);
 }
+.luliy-ctrl-preview-card:active { transform: scale(0.96); }
 .luliy-ctrl-preview-card .preview-dot {
   width: 8px; height: 8px; border-radius: 50%;
   margin: 0 auto 3px; display: block;
@@ -2341,45 +2313,105 @@ body[data-luliy-theme="mono"] #postBody h2 {
 .luliy-card-list .luliy-card-yeardiv { grid-column: 1 / -1; }
 
 /* ── Timeline view: vertical spine with dotted cards ──────── */
+/* ── Timeline: centre spine, cards alternate left ↔ right ─── */
 .luliy-card-grid.luliy-card-timeline {
-  grid-template-columns: 1fr !important;
+  display: block !important;      /* leave grid — use normal flow */
   position: relative;
-  padding-left: 30px !important;
-  gap: 14px !important;
+  padding: 0 0 40px !important;
 }
+/* Centre vertical spine */
 .luliy-card-timeline::before {
-  content: ''; position: absolute;
-  left: 9px; top: 6px; bottom: 6px; width: 2px;
+  content: '';
+  position: absolute;
+  left: 50%; top: 0; bottom: 0;
+  width: 2px; margin-left: -1px;
   background: linear-gradient(to bottom,
-    var(--th-accent, #8250df), var(--th-accent-soft, rgba(130,80,223,0.2)));
+    var(--th-accent, #8250df),
+    var(--th-accent-soft, rgba(130,80,223,0.15)));
   border-radius: 2px;
+  pointer-events: none;
 }
-.luliy-card-timeline .luliy-card {
-  position: relative; border-radius: 12px;
+
+/* Year divider — full-width centred header */
+.luliy-card-timeline .luliy-card-yeardiv {
+  display: flex !important;
+  justify-content: center !important;
+  margin: 28px 0 18px !important;
+  grid-column: unset !important;
+  position: relative; z-index: 2;
 }
-.luliy-card-timeline .luliy-card::before {
-  /* the timeline node dot — override the tint layer for this view */
-  content: ''; position: absolute;
-  left: -25px; top: 22px;
-  width: 11px; height: 11px; border-radius: 50%;
+.luliy-card-timeline .luliy-card-yeardiv span {
   background: var(--th-accent, #8250df);
-  border: 2.5px solid var(--color-canvas-default, #fff);
-  box-shadow: 0 0 0 1.5px var(--th-accent-soft, rgba(130,80,223,0.4));
+  color: #fff; padding: 4px 20px;
+  border-radius: 30px;
+  font-size: 14px; font-weight: 800; letter-spacing: 2px;
+  box-shadow: 0 4px 14px var(--th-accent-soft, rgba(130,80,223,0.40));
+}
+.luliy-card-timeline .luliy-card-yeardiv::after { display: none !important; }
+
+/* Individual timeline card — alternates left / right */
+.luliy-card-timeline .luliy-card {
+  position: relative;
+  width: calc(50% - 36px);
+  margin-bottom: 18px;
+  border-radius: 14px;
+  /* default: right side */
+  margin-left: calc(50% + 18px);
+}
+/* Even-indexed cards go to the left */
+.luliy-card-timeline .luliy-card:nth-child(even) {
+  margin-left: 0;
+  margin-right: calc(50% + 18px);
+}
+
+/* Connector dot on the spine */
+.luliy-card-timeline .luliy-card::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--th-accent, #8250df);
+  border: 3px solid var(--color-canvas-default, #fff);
+  box-shadow: 0 0 0 2px var(--th-accent-soft, rgba(130,80,223,0.4));
   opacity: 1; z-index: 3;
+  /* Right-side card: dot on the left */
+  left: auto;
+  right: calc(-36px + 3px);
+}
+/* Left-side card: dot on the right */
+.luliy-card-timeline .luliy-card:nth-child(even)::before {
+  left: calc(-36px + 3px);
+  right: auto;
 }
 [data-color-mode="dark"] .luliy-card-timeline .luliy-card::before {
-  border-color: rgba(20,16,34,0.95);
+  border-color: rgba(10,6,20,0.95);
 }
+
+/* Card inner: compact single row */
 .luliy-card-timeline .luliy-card-inner {
-  flex-direction: row !important; align-items: center; gap: 14px;
-  min-height: 0 !important; padding: 12px 18px;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  padding: 12px 16px !important;
+  gap: 6px !important;
 }
-.luliy-card-timeline .luliy-card-title { font-size: 15px; margin: 0; }
-.luliy-card-timeline .luliy-card-date { order: 3; margin-left: auto; flex-shrink: 0; }
-.luliy-card-timeline .luliy-card-tags { order: 2; flex-shrink: 0; }
+.luliy-card-timeline .luliy-card-title { font-size: 14px; margin: 0; }
+.luliy-card-timeline .luliy-card-date { order: 0; font-size: 11px; }
+.luliy-card-timeline .luliy-card-tags { order: 2; }
 .luliy-card-timeline .luliy-card-deco { display: none; }
-.luliy-card-timeline .luliy-card-yeardiv {
-  grid-column: 1 / -1; margin-left: -8px;
+
+/* Mobile: collapse to single left-aligned column */
+@media (max-width: 768px) {
+  .luliy-card-timeline::before { left: 16px; margin-left: 0; }
+  .luliy-card-timeline .luliy-card,
+  .luliy-card-timeline .luliy-card:nth-child(even) {
+    width: calc(100% - 44px);
+    margin-left: 44px !important;
+    margin-right: 0 !important;
+  }
+  .luliy-card-timeline .luliy-card::before,
+  .luliy-card-timeline .luliy-card:nth-child(even)::before {
+    left: -30px !important; right: auto !important;
+  }
 }
 
 /* ── Focus-mode floating exit button ──────────────────────── */
@@ -2462,7 +2494,18 @@ body.luliy-focus-mode::after {
 }
 .luliy-series-dot:hover { transform: scale(1.4); }
 .luliy-series-dot.is-current { background: var(--th-accent, #8250df); transform: scale(1.3); }
-.luliy-series-list { list-style: none; padding: 0; margin: 0; }
+.luliy-series-list {
+  list-style: none; padding: 0; margin: 0;
+  /* Show 5 items (~5 × 28px), scroll beyond */
+  max-height: calc(5 * 2em + 5 * 8px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--th-accent-soft, rgba(130,80,223,0.20)) transparent;
+}
+.luliy-series-list::-webkit-scrollbar { width: 3px; }
+.luliy-series-list::-webkit-scrollbar-thumb {
+  background: var(--th-accent-soft, rgba(130,80,223,0.28)); border-radius: 2px;
+}
 .luliy-series-list li {
   display: flex; align-items: baseline; gap: 8px; padding: 4px 0; font-size: 13px;
 }
@@ -2663,11 +2706,14 @@ body.luliy-focus-mode #luliy-sakura-canvas,
 body.luliy-focus-mode #luliy-firefly-canvas,
 body.luliy-focus-mode #TOC,
 body.luliy-focus-mode .articletoc,
-body.luliy-focus-mode #luliy-back-top,
 body.luliy-focus-mode #luliy-search-fab,
 body.luliy-focus-mode #luliy-progress-bar,
 body.luliy-focus-mode .luliy-prevnext {
   opacity: 0 !important; pointer-events: none !important;
+}
+/* Focus mode: back-to-top stays visible */
+body.luliy-focus-mode #luliy-back-top.is-visible {
+  opacity: 1 !important; pointer-events: all !important;
 }
 body.luliy-focus-mode #postBody {
   max-width: 720px !important; margin-left: auto !important; margin-right: auto !important;
