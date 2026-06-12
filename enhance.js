@@ -1,6 +1,6 @@
 /* enhance.js - Luliy Blog v10
    Modules:
-   00  Welcome splash (animation sequence)
+   00  Homepage Hero (first-visit full-screen, animation sequence)
    01  localStorage init
    02  Progress bar
    03  Dynamic title
@@ -144,6 +144,12 @@
     /* Only on the homepage / index, not on article or single pages */
     if (!isIndexPage()) return;
     if (document.getElementById('luliy-hero')) return;
+
+    /* First visit of this session only — afterwards homepage shows directly */
+    try {
+      if (sessionStorage.getItem('luliy-hero-shown') === '1') return;
+      sessionStorage.setItem('luliy-hero-shown', '1');
+    } catch (e) {}
 
     var hero = document.createElement('section');
     hero.id = 'luliy-hero';
@@ -959,6 +965,28 @@
     previewNight.addEventListener('click', function(e) {
       e.stopPropagation(); setColorMode('dark'); playSfx('theme');
     });
+
+    /* ── Active-state sync: highlight the card matching current mode ─ */
+    function resolvedMode() {
+      var m = document.documentElement.getAttribute('data-color-mode') || 'light';
+      if (m === 'auto') {
+        m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          ? 'dark' : 'light';
+      }
+      return m;
+    }
+    function syncModePreview() {
+      var m = resolvedMode();
+      previewDay.classList.toggle('is-active', m !== 'dark');
+      previewNight.classList.toggle('is-active', m === 'dark');
+    }
+    syncModePreview();
+    /* Follow external switches (Gmeek circle, OS auto) */
+    try {
+      new MutationObserver(syncModePreview).observe(document.documentElement, {
+        attributes: true, attributeFilter: ['data-color-mode']
+      });
+    } catch (e) {}
 
     function syncThemeRows() {
       var cur = localStorage.getItem('luliy-sink') || 'default';
@@ -1916,6 +1944,7 @@
       drop.innerHTML = '';
 
       /* -- Original nav links (title-right hidden on mobile) -- */
+      try {
       var trNav = document.querySelector('.title-right, [class*="title-right"]');
       if (trNav) {
         var navLinks = Array.from(trNav.querySelectorAll('a')).filter(function (a) {
@@ -1940,6 +1969,7 @@
           drop.appendChild(makeSep());
         }
       }
+      } catch (eNav) {}
 
       /* ── 🔊 SFX toggle ───────────────────────────────────── */
       var sfxOn = localStorage.getItem('luliy-sfx') !== '0';
@@ -3284,29 +3314,37 @@
     else document.addEventListener('DOMContentLoaded', initSakura);
   }
 
+  /* Crash isolation: one broken module must never take down the rest */
+  function safe(fn, name) {
+    try { fn(); }
+    catch (e) {
+      try { console.warn('[luliy] init failed:', name || fn.name, e); } catch (e2) {}
+    }
+  }
+
   ready(function () {
-    initHomeHero();
-    initProgressBar();
-    initDynamicTitle();
-    initUptime();
-    initSfxEvents();
-    initClickSparks();
-    initThemeRipple();
-    initTagEnhance();
-    initHeroCluster();
-    initLightbox();
-    initToolbar();
-    initNavTransparency();
-    initMobileNav();
-    initFavoritesLock();   /* safety net — also called in post init */
+    safe(initHomeHero,        'homeHero');
+    safe(initProgressBar,     'progressBar');
+    safe(initDynamicTitle,    'dynamicTitle');
+    safe(initUptime,          'uptime');
+    safe(initSfxEvents,       'sfx');
+    safe(initClickSparks,     'sparks');
+    safe(initThemeRipple,     'ripple');
+    safe(initTagEnhance,      'tagEnhance');
+    safe(initHeroCluster,     'navbar');
+    safe(initLightbox,        'lightbox');
+    safe(initToolbar,         'toolbar');
+    safe(initNavTransparency, 'navTransparency');
+    safe(initMobileNav,       'mobileNav');
+    safe(initFavoritesLock,   'favLock');   /* safety net — also called in post init */
 
     /* v10 global features */
-    applyReduceMotion();
-    initFocusMode();
-    initViewTransitions();
-    initTagCloud();
-    if (localStorage.getItem('luliy-trail') === '1') initMouseTrail();
-    maybeFireflies();
+    safe(applyReduceMotion,   'reduceMotion');
+    safe(initFocusMode,       'focusMode');
+    safe(initViewTransitions, 'viewTransitions');
+    safe(initTagCloud,        'tagCloud');
+    if (localStorage.getItem('luliy-trail') === '1') safe(initMouseTrail, 'mouseTrail');
+    safe(maybeFireflies,      'fireflies');
 
     /* Re-evaluate fireflies when color mode flips (Gmeek toggles data-color-mode) */
     (function () {
