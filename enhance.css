@@ -147,9 +147,11 @@ html { overflow-x: clip; }
   z-index: 2;
   color: rgba(255,255,255,0.9);
   font-size: 14px; letter-spacing: 3px;
+  -webkit-user-select: none;
   cursor: pointer; user-select: none;
   padding: 8px 18px; border-radius: 30px;
   background: rgba(255,255,255,0.12);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.25);
   animation: luliyHeroBounce 2s ease-in-out infinite, luliyHeroIn 1.3s ease 0.6s both;
@@ -538,10 +540,8 @@ body[data-luliy-theme="space"] .luliy-nav-item,
 
 
 /* ══════════════════════════════════════════════════════════
-   06  Hero cluster — replaced by #luliy-nav-rebuilt (styles in 05)
+   06  (merged into 05 — Navbar rebuild)
 ══════════════════════════════════════════════════════════ */
-/* Old #luliy-hero-cluster is no longer created.
-   New styles live in section 05 under #luliy-nav-rebuilt. */
 
 /* ══════════════════════════════════════════════════════════
    07  Hero banner (scroll-fold on homepage)
@@ -819,6 +819,7 @@ body[data-luliy-theme="space"] .luliy-card:hover .luliy-card-deco {
 .luliy-pinned-grid {
   padding: 16px 16px 24px;
   background: rgba(255,255,255,0.10) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
   backdrop-filter: blur(16px) !important;
   border: 1.5px solid rgba(240,180,41,0.38) !important;
   border-top: 3.5px solid #f0b429 !important;
@@ -1050,6 +1051,7 @@ body[data-luliy-theme="mono"] #postBody blockquote {
   border-radius: 14px !important;
   box-shadow: 0 3px 16px rgba(0,0,0,0.08) !important;
   transition: box-shadow 0.25s, transform 0.25s;
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
 #postBody pre:hover {
@@ -1146,6 +1148,7 @@ pre.has-lineno > .luliy-lineno {
   margin: 0;
   border-right: 1px solid rgba(130,80,223,0.18);
   color: rgba(130,80,223,0.50);
+  -webkit-user-select: none;
   user-select: none;
   white-space: pre;
   font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace !important;
@@ -1212,6 +1215,7 @@ pre.code-fullscreen {
   border-radius: 12px; overflow: visible; margin: 1.5em 0;
   box-shadow: 0 2px 14px rgba(0,0,0,0.08), 0 0 0 1px rgba(130,80,223,0.14);
   background: rgba(255,255,255,0.90);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 /* Rounded corners via corner cells (since overflow:hidden is gone) */
@@ -1457,6 +1461,7 @@ body[data-luliy-theme="mono"] {
   text-transform: uppercase !important;
   border-bottom: 1px solid var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
   font-family: 'Noto Sans SC', sans-serif !important;
+  -webkit-user-select: none;
   user-select: none !important;
 }
 [data-color-mode="dark"] #TOC details > summary,
@@ -1861,6 +1866,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   text-align: center; border: 1px solid transparent;
   line-height: 1.5; transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
   cursor: pointer;   /* interactive */
+  -webkit-user-select: none;
   user-select: none;
 }
 .luliy-ctrl-preview-card:hover {
@@ -1920,6 +1926,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   padding: 14px 18px; border-radius: 12px;
   text-decoration: none !important;
   background: rgba(255,255,255,0.14);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,0.30);
   box-shadow: 0 3px 14px rgba(0,0,0,0.10);
@@ -1943,6 +1950,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
 ══════════════════════════════════════════════════════════ */
 #luliy-lightbox {
   position: fixed; inset: 0; z-index: 99996;
+  -webkit-backdrop-filter: blur(8px);
   background: rgba(0,0,0,0.88); backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none; transition: opacity 0.28s;
@@ -1965,6 +1973,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   position: fixed; bottom: 112px; right: 22px;
   width: 44px; height: 44px; border-radius: 50%;
   background: var(--th-accent-soft, rgba(130,80,223,0.22));
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.35));
   color: var(--th-accent, #8250df); font-size: 18px; font-weight: bold;
@@ -2024,6 +2033,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 16px; border-radius: 8px; margin-bottom: 4px;
   background: rgba(255,255,255,0.10);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.20);
   transition: background 0.2s, transform 0.2s;
@@ -2112,6 +2122,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
 /* Content is hidden + blurred while locked */
 #postBody.luliy-locked {
   filter: blur(14px);
+  -webkit-user-select: none;
   user-select: none;
   pointer-events: none;
   max-height: 60vh;
@@ -2624,6 +2635,7 @@ body.luliy-focus-mode::after {
   position: fixed; bottom: 164px; right: 22px;
   width: 44px; height: 44px; border-radius: 50%;
   background: var(--th-accent-soft, rgba(130,80,223,0.22));
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.35));
   color: var(--th-accent, #8250df); font-size: 17px; cursor: pointer;
@@ -2686,6 +2698,7 @@ mark.luliy-search-hit.is-current {
   display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center;
   padding: 22px; border-radius: 18px;
   background: rgba(255,255,255,0.40);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,0.30);
 }
