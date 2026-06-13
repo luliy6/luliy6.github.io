@@ -85,6 +85,24 @@ html { overflow-x: clip; }
   html { overflow-x: hidden; }
 }
 
+/* Reading-panel width control — widens the article container
+   symmetrically (centred), pushing both edges outward by the
+   user-set delta. Article pages only. */
+body.luliy-post-page .markdown-body,
+body.luliy-post-page #postBody {
+  max-width: calc(100% + var(--luliy-pb-extra, 0px) * 2) !important;
+  margin-left: calc(var(--luliy-pb-extra, 0px) * -1) !important;
+  margin-right: calc(var(--luliy-pb-extra, 0px) * -1) !important;
+}
+@media (max-width: 768px) {
+  /* Never overflow on mobile */
+  body.luliy-post-page .markdown-body,
+  body.luliy-post-page #postBody {
+    max-width: 100% !important;
+    margin-left: 0 !important; margin-right: 0 !important;
+  }
+}
+
 /* ══════════════════════════════════════════════════════════
    02  Homepage Hero — full-screen, scroll to enter
 ══════════════════════════════════════════════════════════ */
@@ -191,6 +209,10 @@ body.luliy-reduce-motion #luliy-hero-hint { animation: none; }
 /* ══════════════════════════════════════════════════════════
    03  Background image — fixed, full viewport
 ══════════════════════════════════════════════════════════ */
+:root {
+  --luliy-bg-blur: 0px;
+  --luliy-pb-extra: 0px;
+}
 body {
   background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png') !important;
   background-size: cover !important;
@@ -198,6 +220,25 @@ body {
   background-attachment: fixed !important;
   background-repeat: no-repeat !important;
   background-color: transparent !important;
+}
+/* Blur overlay: a fixed pseudo-layer that blurs the page background
+   without blurring the content (content sits above it). */
+body.luliy-bg-blurred::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--luliy-bg-url, none);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  filter: blur(var(--luliy-bg-blur, 0px));
+  transform: scale(1.08);   /* hide blurred edges */
+  pointer-events: none;
+}
+body.luliy-bg-blurred {
+  background-image: none !important;   /* hand off to the ::before layer */
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -370,7 +411,7 @@ body[data-luliy-theme="default"] #header  { border-top: 2px solid rgba(130,80,22
 body[data-luliy-theme="sakura"] #header   { border-top: 2px solid rgba(201,64,112,0.60) !important; }
 body[data-luliy-theme="your-name"] #header{ border-top: 2px solid rgba(255,169,77,0.70) !important; }
 body[data-luliy-theme="space"] #header    { border-top: 2px solid rgba(0,229,255,0.60) !important; }
-body[data-luliy-theme="sunset"] #header   { border-top: 2px solid rgba(196,69,105,0.65) !important; }
+body[data-luliy-theme="sunset"] #header   { border-top: 2px solid rgba(232,168,56,0.70) !important; }
 body[data-luliy-theme="mono"] #header     { border-top: 2px solid rgba(220,220,220,0.50) !important; }
 
 /* ── Rebuilt shell ──────────────────────────────────────── */
@@ -976,28 +1017,28 @@ body[data-luliy-theme="space"] #postBody {
 /* ── Sunset: 日落大道 highway dusk gradient glass ─────────── */
 body[data-luliy-theme="sunset"] #postBody {
   background:
-    radial-gradient(130% 70% at 50% 120%, rgba(255,154,60,0.30), transparent 60%),
-    radial-gradient(120% 60% at 80% 110%, rgba(255,107,107,0.20), transparent 55%),
-    linear-gradient(170deg, rgba(255,238,228,0.90), rgba(255,224,212,0.86)) !important;
-  backdrop-filter: blur(26px) saturate(1.55) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(1.55) !important;
-  border: 1px solid rgba(196,69,105,0.34) !important;
-  border-top: 3px solid rgba(255,154,60,0.72) !important;
+    radial-gradient(130% 70% at 50% -10%, rgba(255,214,120,0.42), transparent 55%),
+    radial-gradient(120% 60% at 85% 110%, rgba(240,180,41,0.22), transparent 55%),
+    linear-gradient(170deg, rgba(255,248,228,0.94), rgba(255,238,200,0.90)) !important;
+  backdrop-filter: blur(26px) saturate(1.5) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.5) !important;
+  border: 1px solid rgba(232,168,56,0.36) !important;
+  border-top: 3px solid rgba(240,180,41,0.78) !important;
   border-radius: 20px !important;
   padding: 36px 40px !important;
   margin-bottom: 48px !important;
   box-shadow:
-    0 6px 44px rgba(196,69,105,0.18),
-    0 0 70px rgba(255,154,60,0.12),
-    0 1px 0 rgba(255,255,255,0.6) inset !important;
+    0 6px 44px rgba(217,147,13,0.18),
+    0 0 70px rgba(255,214,120,0.16),
+    0 1px 0 rgba(255,255,255,0.7) inset !important;
 }
 [data-color-mode="dark"] body[data-luliy-theme="sunset"] #postBody {
   background:
-    radial-gradient(130% 70% at 50% 120%, rgba(255,154,60,0.22), transparent 60%),
-    radial-gradient(120% 70% at 15% 0%, rgba(106,48,147,0.30), transparent 55%),
-    linear-gradient(170deg, rgba(45,18,52,0.90), rgba(28,12,38,0.92)) !important;
-  border-color: rgba(255,154,60,0.30) !important;
-  border-top-color: rgba(255,154,60,0.55) !important;
+    radial-gradient(130% 70% at 50% -10%, rgba(255,193,77,0.20), transparent 55%),
+    radial-gradient(120% 70% at 85% 115%, rgba(232,130,30,0.18), transparent 55%),
+    linear-gradient(170deg, rgba(40,30,14,0.92), rgba(28,22,10,0.94)) !important;
+  border-color: rgba(255,193,77,0.30) !important;
+  border-top-color: rgba(255,193,77,0.58) !important;
 }
 
 /* ── Mono: minimalist black & white paper ────────────────── */
@@ -1257,11 +1298,11 @@ body[data-luliy-theme="space"] #postBody th {
 }
 body[data-luliy-theme="sakura"] #postBody th  { background: rgba(253,236,243,0.97); }
 body[data-luliy-theme="your-name"] #postBody th { background: rgba(232,243,253,0.97); }
-body[data-luliy-theme="sunset"] #postBody th  { background: rgba(255,241,231,0.97); }
+body[data-luliy-theme="sunset"] #postBody th  { background: rgba(255,243,214,0.97); }
 body[data-luliy-theme="mono"] #postBody th    { background: rgba(245,245,245,0.98); }
 [data-color-mode="dark"] body[data-luliy-theme="sakura"] #postBody th   { background: rgba(46,16,30,0.97); }
 [data-color-mode="dark"] body[data-luliy-theme="your-name"] #postBody th{ background: rgba(8,20,56,0.97); }
-[data-color-mode="dark"] body[data-luliy-theme="sunset"] #postBody th   { background: rgba(44,18,28,0.97); }
+[data-color-mode="dark"] body[data-luliy-theme="sunset"] #postBody th   { background: rgba(44,34,14,0.97); }
 [data-color-mode="dark"] body[data-luliy-theme="mono"] #postBody th     { background: rgba(24,24,24,0.98); }
 #postBody td {
   padding: 9px 16px; font-size: 14px; color: #111 !important;
@@ -1338,19 +1379,41 @@ body[data-luliy-theme="space"] {
 /* 5  Sunset — dusk orange */
 /* 5  Sunset — 日落大道 highway dusk (purple→magenta→orange) */
 body[data-luliy-theme="sunset"] {
-  --th-h1: #5a1a4d; --th-h1-border: 2px solid rgba(196,69,105,0.42);
-  --th-h2: #c44569; --th-h2-bl: 5px solid #ff9a3c; --th-h2-bg: rgba(255,107,107,0.10);
-  --th-h3: #d6456a; --th-h4: #e05a52; --th-strong: #ff6b6b;
-  --th-accent: #c44569;
-  --th-accent-soft: rgba(196,69,105,0.12);
-  --th-accent-hover: rgba(196,69,105,0.20);
-  /* horizon gradient stops used by the panel + hero */
-  --ss-sky:    #2d1b4e;
-  --ss-purple: #6a3093;
-  --ss-magenta:#c44569;
-  --ss-coral:  #ff6b6b;
-  --ss-orange: #ff9a3c;
-  --ss-glow:   #ffc14d;
+  /* 日落黄昏 — warm amber / golden hour, light theme */
+  --th-h1: #9a5a00; --th-h1-border: 2px solid rgba(232,168,56,0.55);
+  --th-h2: #c47d12; --th-h2-bl: 5px solid #e8a838; --th-h2-bg: rgba(232,168,56,0.12);
+  --th-h3: #b8860b; --th-h4: #a8761a; --th-strong: #d9730d;
+  --th-link: #c2710a;
+  --th-accent: #d9930d;
+  --th-accent-soft: rgba(217,147,13,0.13);
+  --th-accent-hover: rgba(217,147,13,0.22);
+  /* warm gradient stops used by the panel */
+  --ss-sky:    #fff3d6;
+  --ss-amber:  #ffd98a;
+  --ss-gold:   #f0b429;
+  --ss-orange: #e8821e;
+  --ss-glow:   #fff0c4;
+}
+/* Markdown text colours (light) */
+body[data-luliy-theme="sunset"] #postBody a,
+body[data-luliy-theme="sunset"] #postBody a code {
+  color: var(--th-link, #c2710a) !important;
+}
+body[data-luliy-theme="sunset"] #postBody strong,
+body[data-luliy-theme="sunset"] #postBody b {
+  color: var(--th-strong, #d9730d) !important;
+}
+body[data-luliy-theme="sunset"] #postBody h1 { color: var(--th-h1) !important; }
+body[data-luliy-theme="sunset"] #postBody h2 { color: var(--th-h2) !important; }
+body[data-luliy-theme="sunset"] #postBody h3 { color: var(--th-h3) !important; }
+body[data-luliy-theme="sunset"] #postBody h4 { color: var(--th-h4) !important; }
+body[data-luliy-theme="sunset"] #postBody blockquote {
+  border-left: 4px solid var(--th-accent, #e8a838) !important;
+  background: rgba(232,168,56,0.08) !important;
+}
+body[data-luliy-theme="sunset"] #postBody code {
+  background: rgba(232,168,56,0.14) !important;
+  color: #9a5a00 !important;
 }
 
 /* 6  Mono — minimalist black & white */
@@ -1391,10 +1454,22 @@ body[data-luliy-theme="mono"] {
   --th-accent-hover: rgba(0,229,255,0.30);
 }
 [data-color-mode="dark"] body[data-luliy-theme="sunset"] {
-  --th-h1: #ff9a3c; --th-h2: #ffb86c; --th-h3: #ffcb91; --th-h4: #ffd9b0; --th-strong: #ff8787;
-  --th-accent: #ff9a3c;
-  --th-accent-soft: rgba(255,154,60,0.18);
-  --th-accent-hover: rgba(255,154,60,0.32);
+  --th-h1: #ffce6b; --th-h2: #ffd98a; --th-h3: #ffe2a8; --th-h4: #ffecc4; --th-strong: #ffb347;
+  --th-link: #ffcb6b;
+  --th-accent: #ffc14d;
+  --th-accent-soft: rgba(255,193,77,0.18);
+  --th-accent-hover: rgba(255,193,77,0.32);
+}
+[data-color-mode="dark"] body[data-luliy-theme="sunset"] #postBody a,
+[data-color-mode="dark"] body[data-luliy-theme="sunset"] #postBody a code {
+  color: var(--th-link, #ffcb6b) !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="sunset"] #postBody strong {
+  color: var(--th-strong, #ffb347) !important;
+}
+[data-color-mode="dark"] body[data-luliy-theme="sunset"] #postBody code {
+  background: rgba(255,193,77,0.16) !important;
+  color: #ffd98a !important;
 }
 [data-color-mode="dark"] body[data-luliy-theme="mono"] {
   --th-h1: #f0f0f0; --th-h2: #e0e0e0; --th-h3: #cccccc; --th-h4: #bbbbbb; --th-strong: #ffffff;
@@ -2214,85 +2289,45 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
 #luliy-fav-gate-card.shake { animation: luliyShake 0.45s ease; }
 
 /* ══════════════════════════════════════════════════════════
-   26  Music player — embedded in toolbar ctrl panel
+   26  APlayer mini player (top-left, folded by default)
 ══════════════════════════════════════════════════════════ */
-/* Now-playing track name */
-.luliy-music-name {
-  font-size: 12px; font-weight: 700;
-  color: var(--th-accent, #8250df);
-  padding: 4px 12px 2px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 220px;
-  font-family: 'Noto Sans SC', sans-serif;
+#luliy-aplayer.aplayer {
+  position: fixed !important;
+  top: 70px !important;
+  left: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  z-index: 9989 !important;   /* below navbar(9999) + toolbar(9990) */
+  border-radius: 0 10px 10px 0 !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.22) !important;
+  font-family: 'Noto Sans SC', sans-serif !important;
 }
-[data-color-mode="dark"] .luliy-music-name { color: var(--th-accent, #cba6f7); }
-
-/* Transport controls row */
-.luliy-music-ctrls {
-  display: flex; align-items: center; gap: 4px;
-  padding: 2px 10px 4px;
+/* Fixed-mode body folds to the left; thumbnail stays clickable */
+#luliy-aplayer.aplayer.aplayer-fixed .aplayer-body {
+  position: fixed !important;
+  top: 70px !important;
+  left: -66px !important;     /* folded: only the cover ball peeks out */
+  bottom: auto !important;
+  transition: left 0.3s ease !important;
 }
-.luliy-music-btn {
-  width: 30px; height: 30px; border-radius: 50%;
-  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.28));
-  background: var(--th-accent-soft, rgba(130,80,223,0.07));
-  color: var(--th-accent, #8250df);
-  font-size: 12px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, transform 0.15s; flex-shrink: 0;
+#luliy-aplayer.aplayer.aplayer-fixed:hover .aplayer-body,
+#luliy-aplayer.aplayer.aplayer-fixed .aplayer-body:hover {
+  left: 0 !important;          /* expand on hover */
 }
-.luliy-music-btn:hover {
-  background: var(--th-accent-hover, rgba(130,80,223,0.18));
-  transform: scale(1.08);
+#luliy-aplayer.aplayer.aplayer-fixed .aplayer-info {
+  border-top: none !important;
 }
-[data-color-mode="dark"] .luliy-music-btn {
-  color: var(--th-accent, #cba6f7);
-  border-color: var(--th-accent-hover, rgba(130,80,223,0.40));
+#luliy-aplayer.aplayer .aplayer-pic {
+  border-radius: 8px !important;
 }
-
-/* Playlist */
-.luliy-playlist {
-  display: flex; flex-direction: column;
-  max-height: 180px; overflow-y: auto;
-  margin: 2px 6px 4px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--th-accent-soft, rgba(130,80,223,0.20)) transparent;
+/* Theme-accent tint for the played progress */
+#luliy-aplayer.aplayer .aplayer-bar .aplayer-played {
+  background: var(--th-accent, #e8a838) !important;
 }
-.luliy-playlist::-webkit-scrollbar { width: 3px; }
-.luliy-playlist::-webkit-scrollbar-thumb {
-  background: var(--th-accent-soft, rgba(130,80,223,0.28)); border-radius: 2px;
-}
-.luliy-playlist-item {
-  display: flex; align-items: center; gap: 6px;
-  width: 100%; text-align: left;
-  padding: 5px 8px; border-radius: 8px;
-  background: none; border: none; cursor: pointer;
-  transition: background 0.15s;
-}
-.luliy-playlist-item:hover {
-  background: var(--th-accent-soft, rgba(130,80,223,0.10)) !important;
-}
-.luliy-playlist-item.is-playing {
-  background: var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
-}
-.luliy-playlist-icon {
-  font-size: 11px; flex-shrink: 0; width: 14px;
-  color: var(--th-accent, #8250df);
-  transition: color 0.15s;
-}
-[data-color-mode="dark"] .luliy-playlist-icon { color: var(--th-accent, #cba6f7); }
-.luliy-playlist-item.is-playing .luliy-playlist-icon { color: var(--th-accent, #8250df); font-weight: 900; }
-.luliy-playlist-name {
-  font-size: 12px; color: #333; flex: 1;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  font-family: 'Noto Sans SC', sans-serif;
-}
-[data-color-mode="dark"] .luliy-playlist-name { color: #e0daf8; }
-.luliy-playlist-item.is-playing .luliy-playlist-name {
-  color: var(--th-accent, #8250df); font-weight: 700;
-}
-[data-color-mode="dark"] .luliy-playlist-item.is-playing .luliy-playlist-name {
-  color: var(--th-accent, #cba6f7);
+@media (max-width: 768px) {
+  #luliy-aplayer.aplayer,
+  #luliy-aplayer.aplayer.aplayer-fixed .aplayer-body { top: 62px !important; }
 }
 
 /* ══════════════════════════════════════════════════════════
