@@ -996,11 +996,13 @@
       previewDay.style.background   = pal.day[0];
       previewDay.style.color        = pal.day[2];
       previewDay.style.borderColor  = pal.day[1] + '44';
-      previewDay.querySelector('.preview-dot').style.background = pal.day[1];
+      var dayDot = previewDay.querySelector('.preview-dot');
+      if (dayDot) dayDot.style.background = pal.day[1];
       previewNight.style.background  = pal.night[0];
       previewNight.style.color       = pal.night[2];
       previewNight.style.borderColor = pal.night[1] + '44';
-      previewNight.querySelector('.preview-dot').style.background = pal.night[1];
+      var nightDot = previewNight.querySelector('.preview-dot');
+      if (nightDot) nightDot.style.background = pal.night[1];
     }
 
     panel.appendChild(mkSep());
@@ -2370,9 +2372,10 @@
         else {
           err.textContent = '\u5bc6\u7801\u9519\u8bef\uff0c\u8bf7\u91cd\u8bd5';   /* 密码错误，请重试 */
           input.value = '';
-          gate.querySelector('#luliy-fav-gate-card').classList.remove('shake');
+          var gateCard = gate.querySelector('#luliy-fav-gate-card');
+        if (gateCard) gateCard.classList.remove('shake');
           void gate.offsetWidth;
-          gate.querySelector('#luliy-fav-gate-card').classList.add('shake');
+          if (gateCard) gateCard.classList.add('shake');
         }
       }).catch(function () {
         err.textContent = '\u5f53\u524d\u73af\u5883\u4e0d\u652f\u6301\u52a0\u5bc6\u9a8c\u8bc1';
