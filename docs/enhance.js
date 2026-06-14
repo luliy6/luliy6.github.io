@@ -143,75 +143,123 @@
 
   /* ---- 00  Welcome splash (animation sequence) ------------- */
   /* ---- 00  Homepage Hero (full-screen, scroll to enter) --- */
-  /* ---- APlayer mini player (top-left, autoplay, folded) ---- */
+  /* ---- APlayer — draggable mini ball, dark sync, add URL ─────── */
   function initAPlayer() {
     if (document.getElementById('luliy-aplayer')) return;
     var cfg = LULIY_OPTS.aplayer;
     if (!cfg || !cfg.url) return;
 
-    /* Inject APlayer CSS + JS from CDN once */
-    function loadCss(href) {
-      if (document.querySelector('link[href="' + href + '"]')) return;
-      var l = document.createElement('link');
-      l.rel = 'stylesheet'; l.href = href;
-      document.head.appendChild(l);
+    var AKEY = 'luliy-aplayer-state';
+    var APOS = 'luliy-aplayer-pos';
+    var ALIST = 'luliy-aplayer-list';
+
+    /* Drag state */
+    var dragging = false, _dx = 0, _dy = 0, _ox = 0, _oy = 0;
+
+    /* Position: restored from localStorage or default top-left */
+    function loadPos() {
+      try { return JSON.parse(localStorage.getItem(APOS) || 'null'); } catch(e){ return null; }
     }
-    loadCss('https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css');
+    function savePos(x, y) {
+      try { localStorage.setItem(APOS, JSON.stringify({x:x, y:y})); } catch(e){}
+    }
+
+    /* Track list (default + user-added) */
+    function loadTracks() {
+      var base = [{ name: cfg.name||'dark', artist: cfg.artist||'Luliy', url: cfg.url, cover: cfg.cover||'' }];
+      try {
+        var extra = JSON.parse(localStorage.getItem(ALIST) || '[]');
+        if (Array.isArray(extra)) return base.concat(extra);
+      } catch(e) {}
+      return base;
+    }
+
+    /* Wrapper that takes full position control */
+    var wrap = document.createElement('div');
+    wrap.id = 'luliy-aplayer';
+    var pos = loadPos();
+    wrap.style.left = (pos ? pos.x : 16) + 'px';
+    wrap.style.top  = (pos ? pos.y : 76) + 'px';
+    document.body.appendChild(wrap);
+
+    /* ── Drag logic (mouse + touch) ──────────────────────── */
+    function onDragStart(ex, ey) {
+      dragging = true;
+      _ox = parseInt(wrap.style.left) || 16;
+      _oy = parseInt(wrap.style.top)  || 76;
+      _dx = ex - _ox; _dy = ey - _oy;
+      wrap.classList.add('is-dragging');
+    }
+    function onDragMove(ex, ey) {
+      if (!dragging) return;
+      var nx = Math.max(0, Math.min(window.innerWidth  - wrap.offsetWidth,  ex - _dx));
+      var ny = Math.max(0, Math.min(window.innerHeight - wrap.offsetHeight, ey - _dy));
+      wrap.style.left = nx + 'px';
+      wrap.style.top  = ny + 'px';
+    }
+    function onDragEnd() {
+      if (!dragging) return;
+      dragging = false;
+      wrap.classList.remove('is-dragging');
+      savePos(parseInt(wrap.style.left)||16, parseInt(wrap.style.top)||76);
+    }
+    wrap.addEventListener('mousedown', function(e) {
+      if (e.target.closest('input,button,a,.aplayer-controller,.aplayer-list')) return;
+      e.preventDefault(); onDragStart(e.clientX, e.clientY);
+    });
+    document.addEventListener('mousemove', function(e) { onDragMove(e.clientX, e.clientY); });
+    document.addEventListener('mouseup',   onDragEnd);
+    wrap.addEventListener('touchstart', function(e) {
+      if (e.target.closest('input,button,a,.aplayer-controller,.aplayer-list')) return;
+      var t = e.touches[0]; onDragStart(t.clientX, t.clientY);
+    }, { passive: true });
+    document.addEventListener('touchmove', function(e) {
+      if (!dragging) return;
+      var t = e.touches[0]; onDragMove(t.clientX, t.clientY);
+    }, { passive: true });
+    document.addEventListener('touchend', onDragEnd, { passive: true });
 
     function boot() {
       if (!window.APlayer) return;
-      var holder = document.createElement('div');
-      holder.id = 'luliy-aplayer';
-      document.body.appendChild(holder);
       try {
+        var tracks = loadTracks();
+        var saved = null;
+        try { saved = JSON.parse(localStorage.getItem(AKEY) || 'null'); } catch(e){}
+        var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark';
+
         var ap = new window.APlayer({
-          container: holder,
-          fixed: true,
-          mini: true,             /* mini ball only — no white bar */
+          container: wrap,
+          fixed: false, mini: true,
           autoplay: true,
-          theme: '#e8a838',
-          preload: 'auto',
-          volume: 0.6,
-          audio: [{
-            name:   cfg.name || 'Music',
-            artist: cfg.artist || '',
-            url:    cfg.url,
-            cover:  cfg.cover || ''
-          }]
+          theme: isDark ? '#1c1530' : '#ffffff',
+          preload: 'auto', volume: 0.6,
+          audio: tracks
         });
         root._luliyAPlayer = ap;
-        /* mini:true keeps it as a small ball natively */
+        root._luliyAPlayerReload = function() {
+          try { ap.list.clear(); loadTracks().forEach(function(t){ ap.list.add(t); }); } catch(e){}
+        };
 
-        /* ── Cross-page resume ───────────────────────────────
-           Restore last position + play state, then keep saving. */
-        var SKEY = 'luliy-aplayer-state';
-        var saved = null;
-        try { saved = JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch (e) {}
-        var au = ap.audio;   /* underlying <audio> element */
-
+        /* ── Cross-page resume ────────────────────────────── */
+        var au = ap.audio;
         function persist() {
-          try {
-            localStorage.setItem(SKEY, JSON.stringify({
-              pos: au && au.currentTime || 0,
-              playing: au ? !au.paused : false,
-              t: Date.now()
-            }));
-          } catch (e) {}
+          try { localStorage.setItem(AKEY, JSON.stringify({
+            pos: au && au.currentTime || 0,
+            playing: au ? !au.paused : false, t: Date.now()
+          })); } catch(e){}
         }
-        /* Seek to saved position once metadata is ready */
         if (saved && saved.pos > 0 && au) {
-          var seekOnce = function () {
-            try { if (saved.pos < au.duration) au.currentTime = saved.pos; } catch (e) {}
-            au.removeEventListener('loadedmetadata', seekOnce);
+          var seekOnce = function() {
+            try { if (saved.pos < au.duration) au.currentTime = saved.pos; } catch(e){}
+            au && au.removeEventListener('loadedmetadata', seekOnce);
           };
           if (au.readyState >= 1) seekOnce();
           else au.addEventListener('loadedmetadata', seekOnce);
         }
-        /* Save every 3s during playback + on page leave */
         if (au) {
-          au.addEventListener('timeupdate', function () {
+          au.addEventListener('timeupdate', function() {
             var now = Date.now();
-            if (!au._lastSave || now - au._lastSave > 3000) { au._lastSave = now; persist(); }
+            if (!au._ls || now - au._ls > 3000) { au._ls = now; persist(); }
           });
           au.addEventListener('pause', persist);
           au.addEventListener('play', persist);
@@ -219,30 +267,31 @@
         window.addEventListener('pagehide', persist);
         window.addEventListener('beforeunload', persist);
 
-        /* Decide whether to auto-resume play:
-           only resume if it was playing before (or no saved state). */
         var shouldPlay = !saved || saved.playing !== false;
         if (shouldPlay) {
           var p = ap.play && ap.play();
-          if (p && p.catch) {
-            p.catch(function () {
-              var once = function () { try { ap.play(); } catch (e) {} };
-              document.addEventListener('click', once, { once: true });
-              document.addEventListener('touchstart', once, { once: true, passive: true });
-            });
-          }
-        } else {
-          /* Was paused — keep it paused but at the right position */
-          try { ap.pause(); } catch (e) {}
+          if (p && p.catch) p.catch(function() {
+            var once = function() { try { ap.play(); } catch(e){} };
+            document.addEventListener('click', once, { once: true });
+            document.addEventListener('touchstart', once, { once: true, passive: true });
+          });
+        } else { try { ap.pause(); } catch(e){} }
+
+        /* ── Theme sync (dark / light) ────────────────────── */
+        function syncApTheme() {
+          var dark = document.documentElement.getAttribute('data-color-mode') === 'dark';
+          wrap.classList.toggle('aplayer-dark', dark);
         }
-      } catch (e) {
-        try { console.warn('[luliy] APlayer init failed', e); } catch (e2) {}
-      }
+        syncApTheme();
+        try {
+          new MutationObserver(syncApTheme).observe(document.documentElement,
+            { attributes: true, attributeFilter: ['data-color-mode'] });
+        } catch(e){}
+
+      } catch(e) { console.warn('[luliy] APlayer failed', e); }
     }
 
     if (window.APlayer) { boot(); return; }
-    var existing = document.querySelector('script[src*="APlayer.min.js"]');
-    if (existing) { existing.addEventListener('load', boot); return; }
     var sc = document.createElement('script');
     sc.src = 'https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js';
     sc.onload = boot;
@@ -1509,6 +1558,7 @@
         applyCardView();
       }
       root._luliyRerenderCards = renderRegular;
+      root._luliyTeardownTimeline = teardownTimeline;
       renderRegular();
 
     }).catch(function () { fallbackDomCards(nav); });
@@ -1902,149 +1952,190 @@
     }
   }
 
-  /* ---- 18  Mobile nav hamburger + dropdown ---------------- */
+  /* ---- 18  Mobile nav — right-side drawer ────────────────────── */
   function initMobileNav() {
     if (document.getElementById('luliy-nav-ham')) return;
 
+    /* ── Hamburger button ───────────────────────────────────── */
     var ham = document.createElement('button');
     ham.id = 'luliy-nav-ham'; ham.type = 'button';
     ham.setAttribute('aria-label', '\u83dc\u5355');
     ham.innerHTML = '<span></span><span></span><span></span>';
 
-    var drop = document.createElement('div');
-    drop.id = 'luliy-nav-dropdown';
+    /* ── Backdrop overlay ──────────────────────────────────── */
+    var backdrop = document.createElement('div');
+    backdrop.id = 'luliy-drawer-backdrop';
+    document.body.appendChild(backdrop);
 
-    /* Populate dropdown from .title-right, skipping "about" */
-    function makeSep() {
-      var hr = document.createElement('hr');
-      hr.style.cssText = 'border:none;border-top:1px solid rgba(130,80,223,0.15);margin:4px 0;';
-      return hr;
-    }
-    function makeDropLabel(text) {
-      var d = document.createElement('div');
-      d.className = 'luliy-drop-label';
-      d.textContent = text;
-      return d;
-    }
+    /* ── Right-side drawer ─────────────────────────────────── */
+    var drawer = document.createElement('div');
+    drawer.id = 'luliy-nav-drawer';
 
-    function populateDrop() {
-      drop.innerHTML = '';
+    /* Drawer header */
+    var dHead = document.createElement('div');
+    dHead.id = 'luliy-drawer-head';
+    var dTitle = document.createElement('span');
+    dTitle.id = 'luliy-drawer-title';
+    dTitle.textContent = 'Luliy';
+    var dClose = document.createElement('button');
+    dClose.id = 'luliy-drawer-close'; dClose.type = 'button';
+    dClose.setAttribute('aria-label', '\u5173\u95ed');
+    dClose.innerHTML = '&#x2715;';
+    dHead.appendChild(dTitle); dHead.appendChild(dClose);
+    drawer.appendChild(dHead);
 
-      /* -- Nav links: stashed by navbar rebuild (title-right is emptied) -- */
-      try {
-        var navMeta = (root._luliyNavLinks || []).filter(function (m) { return m.href || m.absHref; });
-        if (navMeta.length) {
-          navMeta.forEach(function (m) {
-            var item = document.createElement('a');
-            item.className = 'luliy-nav-item';
-            item.href = m.absHref || m.href;
-            var label = m.label;
-            if (!label) {
-              var p = (m.href || '').replace(/^\//, '').replace(/\.html$/, '');
-              label = p || '\u94fe\u63a5';
-            }
-            item.textContent = label;
-            drop.appendChild(item);
-          });
-          drop.appendChild(makeSep());
-        }
-      } catch (eNav) {}
+    /* Drawer body (scrollable) */
+    var dBody = document.createElement('div');
+    dBody.id = 'luliy-drawer-body';
 
-      /* ── ☀/☾ Day / Night toggle ────────────────────────── */
-      var dnItem = document.createElement('button');
-      dnItem.className = 'luliy-nav-item luliy-drop-toggle';
-      dnItem.type = 'button';
-      function _resolvedMode() {
-        var m = document.documentElement.getAttribute('data-color-mode') || 'light';
-        if (m === 'auto') {
-          m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-        }
-        return m;
-      }
-      function _dnLabel() {
-        return (_resolvedMode() === 'dark' ? '\u263E' : '\u2600\uFE0F') +
-          ' \u6a21\u5f0f\u00b7' + (_resolvedMode() === 'dark' ? '\u591c\u95f4' : '\u767d\u5929');
-      }
-      dnItem.textContent = _dnLabel();
-      dnItem.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var circle = document.querySelector('.circle');
-        if (circle) circle.click();
-        setTimeout(function () { dnItem.textContent = _dnLabel(); }, 60);
+    /* ── Section: Navigation links ─────────────────────────── */
+    var navLinks = (root._luliyNavLinks || []).filter(function(m){ return m.href || m.absHref; });
+    if (navLinks.length) {
+      var sec1 = document.createElement('div');
+      sec1.className = 'luliy-drawer-sec';
+      var sec1Title = document.createElement('div');
+      sec1Title.className = 'luliy-drawer-sec-title';
+      sec1Title.textContent = '\u5bfc\u822a';  /* 导航 */
+      sec1.appendChild(sec1Title);
+      navLinks.forEach(function(m) {
+        var a = document.createElement('a');
+        a.className = 'luliy-drawer-link';
+        a.href = m.absHref || m.href;
+        var label = m.label || (m.href||'').replace(/^\//,'').replace(/\.html$/,'') || '\u94fe\u63a5';
+        a.textContent = label;
+        sec1.appendChild(a);
       });
-      drop.appendChild(dnItem);
-
-      drop.appendChild(makeSep());
-
-      /* ── ✨ Theme picker ──────────────────────────────────── */
-      drop.appendChild(makeDropLabel('\u98ce\u683c\u4e3b\u9898'));
-      var currentTheme = localStorage.getItem('luliy-sink') || 'default';
-      SINKS.forEach(function (s) {
-        var themeItem = document.createElement('button');
-        themeItem.className = 'luliy-nav-item' + (currentTheme === s.id ? ' is-active' : '');
-        themeItem.type = 'button';
-        themeItem.innerHTML =
-          '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' +
-          s.dot + ';margin-right:8px;vertical-align:middle;flex-shrink:0"></span>' + s.label;
-        themeItem.style.display = 'flex';
-        themeItem.style.alignItems = 'center';
-        themeItem.addEventListener('click', function () {
-          applySink(s.id);
-          /* Update active state inline */
-          drop.querySelectorAll('.luliy-nav-item').forEach(function (el) {
-            el.classList.remove('is-active');
-          });
-          themeItem.classList.add('is-active');
-          playSfx('click');
-          /* Don't close so user can see selection */
-        });
-        drop.appendChild(themeItem);
-      });
-
-      return true;
+      dBody.appendChild(sec1);
     }
 
-    function openDrop() {
-      populateDrop();
-      drop.classList.add('is-open');
+    /* ── Section: Theme grid (2×3 dot grid) ────────────────── */
+    var sec2 = document.createElement('div');
+    sec2.className = 'luliy-drawer-sec';
+    var sec2Title = document.createElement('div');
+    sec2Title.className = 'luliy-drawer-sec-title';
+    sec2Title.textContent = '\u4e3b\u9898\u98ce\u683c';  /* 主题风格 */
+    sec2.appendChild(sec2Title);
+
+    var themeGrid = document.createElement('div');
+    themeGrid.className = 'luliy-drawer-theme-grid';
+    SINKS.forEach(function(s) {
+      var cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'luliy-drawer-theme-cell' +
+        (localStorage.getItem('luliy-sink') === s.id ? ' is-active' : '');
+      cell.innerHTML =
+        '<span class="luliy-drawer-theme-dot" style="background:' + s.dot + '"></span>' +
+        '<span class="luliy-drawer-theme-name">' + s.label + '</span>';
+      cell.addEventListener('click', function() {
+        applySink(s.id);
+        themeGrid.querySelectorAll('.luliy-drawer-theme-cell').forEach(function(c){ c.classList.remove('is-active'); });
+        cell.classList.add('is-active');
+        playSfx('click');
+      });
+      themeGrid.appendChild(cell);
+    });
+    sec2.appendChild(themeGrid);
+    dBody.appendChild(sec2);
+
+    /* ── Section: Day / Night ─────────────────────────────── */
+    var sec3 = document.createElement('div');
+    sec3.className = 'luliy-drawer-sec';
+    var sec3Title = document.createElement('div');
+    sec3Title.className = 'luliy-drawer-sec-title';
+    sec3Title.textContent = '\u663e\u793a\u6a21\u5f0f';  /* 显示模式 */
+    sec3.appendChild(sec3Title);
+
+    var dnWrap = document.createElement('div');
+    dnWrap.className = 'luliy-drawer-dn-wrap';
+
+    function _resolvedMode() {
+      var m = document.documentElement.getAttribute('data-color-mode') || 'light';
+      if (m === 'auto') m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      return m;
+    }
+
+    var dayBtn = document.createElement('button');
+    dayBtn.type = 'button'; dayBtn.className = 'luliy-drawer-dn-btn';
+    dayBtn.innerHTML = '\u2600\uFE0F<span>\u767d\u5929</span>';  /* ☀️ 白天 */
+
+    var nightBtn = document.createElement('button');
+    nightBtn.type = 'button'; nightBtn.className = 'luliy-drawer-dn-btn';
+    nightBtn.innerHTML = '\u263E<span>\u591c\u95f4</span>';  /* ☾ 夜间 */
+
+    function syncDnBtns() {
+      var m = _resolvedMode();
+      dayBtn.classList.toggle('is-active', m !== 'dark');
+      nightBtn.classList.toggle('is-active', m === 'dark');
+    }
+    syncDnBtns();
+
+    /* Use native Gmeek circle to toggle — it handles all storage/class sync */
+    dayBtn.addEventListener('click', function() {
+      var cur = _resolvedMode();
+      if (cur !== 'dark') return;
+      var circle = document.querySelector('.circle');
+      if (circle) circle.click();
+      setTimeout(syncDnBtns, 80);
+    });
+    nightBtn.addEventListener('click', function() {
+      var cur = _resolvedMode();
+      if (cur === 'dark') return;
+      var circle = document.querySelector('.circle');
+      if (circle) circle.click();
+      setTimeout(syncDnBtns, 80);
+    });
+
+    /* Sync when system / Gmeek changes mode externally */
+    try {
+      new MutationObserver(syncDnBtns).observe(document.documentElement,
+        { attributes: true, attributeFilter: ['data-color-mode'] });
+    } catch(e) {}
+
+    dnWrap.appendChild(dayBtn); dnWrap.appendChild(nightBtn);
+    sec3.appendChild(dnWrap);
+    dBody.appendChild(sec3);
+
+    drawer.appendChild(dBody);
+    document.body.appendChild(drawer);
+
+    /* ── Open / close ──────────────────────────────────────── */
+    function openDrawer() {
+      drawer.classList.add('is-open');
+      backdrop.classList.add('is-open');
       ham.classList.add('is-open');
+      document.body.classList.add('luliy-drawer-open');
     }
-    function closeDrop() {
-      drop.classList.remove('is-open');
+    function closeDrawer() {
+      drawer.classList.remove('is-open');
+      backdrop.classList.remove('is-open');
       ham.classList.remove('is-open');
+      document.body.classList.remove('luliy-drawer-open');
     }
 
-    ham.addEventListener('click', function (e) {
+    ham.addEventListener('click', function(e) {
       e.stopPropagation();
-      drop.classList.contains('is-open') ? closeDrop() : openDrop();
+      drawer.classList.contains('is-open') ? closeDrawer() : openDrawer();
     });
+    dClose.addEventListener('click', closeDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDrawer(); });
 
-    document.addEventListener('click', function (e) {
-      if (!ham.contains(e.target) && !drop.contains(e.target)) closeDrop();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeDrop();
-    });
-
-    /* Insert ham into header, drop into body */
+    /* Inject ham into header */
     function injectHam() {
       var header = document.getElementById('header');
       if (header && !document.getElementById('luliy-nav-ham')) {
-        header.appendChild(ham);
-        document.body.appendChild(drop);
-        return true;
+        header.appendChild(ham); return true;
       }
       return false;
     }
     if (!injectHam()) {
       var tries = 0;
-      var iv = setInterval(function () {
-        if (injectHam() || ++tries > 20) clearInterval(iv);
-      }, 200);
+      var iv = setInterval(function() { if (injectHam() || ++tries > 20) clearInterval(iv); }, 200);
     }
   }
 
   /* ---- 20  Homepage bottom gallery banner ------------------
+    /* ---- 20  Homepage bottom gallery banner ------------------
      · 1 image  → full-width banner
      · 2+ images → responsive grid
      · ✎ button → add custom image URLs (stored in localStorage)
@@ -2246,24 +2337,27 @@
 
     var kids = Array.prototype.slice.call(pbody.children);
     if (!kids.length) return;
-    requestAnimationFrame(function () {
-      kids.forEach(function (el) {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(22px)';
-        el.style.filter = 'blur(6px)';
-        el.style.transition = 'none';
-      });
+    /* Wait 120ms so initial paint (theme + bg) has settled before animating */
+    setTimeout(function() {
       requestAnimationFrame(function () {
-        kids.forEach(function (el, i) {
-          el.style.transition =
-            'opacity 0.6s ease, transform 0.6s cubic-bezier(.2,.7,.3,1), filter 0.6s ease';
-          el.style.transitionDelay = Math.min(i * 0.05, 1.2) + 's';
-          el.style.opacity = '';
-          el.style.transform = '';
-          el.style.filter = '';
+        kids.forEach(function (el) {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(18px)';
+          el.style.filter = 'blur(4px)';
+          el.style.transition = 'none';
+        });
+        requestAnimationFrame(function () {
+          kids.forEach(function (el, i) {
+            el.style.transition =
+              'opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1), filter 0.4s ease';
+            el.style.transitionDelay = Math.min(i * 0.04, 0.8) + 's';
+            el.style.opacity = '';
+            el.style.transform = '';
+            el.style.filter = '';
+          });
         });
       });
-    });
+    }, 120);
     /* Cleanup inline styles after the animation completes */
     setTimeout(function () {
       kids.forEach(function (el) {
@@ -2761,10 +2855,25 @@
     head.style.cursor = 'pointer';
     head.title = '\u70b9\u51fb\u5c55\u5f00/\u6536\u8d77\u7cfb\u5217\u5217\u8868';  /* 点击展开/收起系列列表 */
     head.addEventListener('click', function (e) {
-      /* let dot/link clicks navigate; only toggle on head background */
       if (e.target.closest('a')) return;
       var collapsed = box.classList.toggle('is-collapsed');
-      ul.classList.toggle('is-collapsed', collapsed);
+      if (collapsed) {
+        /* Collapse: set explicit height then animate to 0 */
+        ul.style.maxHeight = ul.scrollHeight + 'px';
+        ul.classList.add('is-collapsed');
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() { ul.style.maxHeight = '0'; });
+        });
+      } else {
+        /* Expand: animate to scrollHeight then remove explicit max-height */
+        ul.classList.remove('is-collapsed');
+        ul.style.maxHeight = ul.scrollHeight + 'px';
+        var onEnd = function() {
+          ul.removeEventListener('transitionend', onEnd);
+          ul.style.maxHeight = '';
+        };
+        ul.addEventListener('transitionend', onEnd);
+      }
     });
 
     pbody.insertBefore(box, pbody.firstChild);
@@ -2939,10 +3048,35 @@
         fab.classList.toggle('is-visible', (window.scrollY || 0) > 300);
       });
     }
+
+    /* ── TOC floating button (same style as back-top / search) ── */
+    if (!document.getElementById('luliy-toc-fab')) {
+      var tocFab = document.createElement('button');
+      tocFab.id = 'luliy-toc-fab';
+      tocFab.type = 'button';
+      tocFab.setAttribute('aria-label', '\u6587\u7ae0\u76ee\u5f55');  /* 文章目录 */
+      tocFab.textContent = '\u2630';   /* ☰ */
+      var tocOpen = false;
+      tocFab.classList.add('is-visible');   /* always visible on article pages */
+      tocFab.addEventListener('click', function() {
+        tocOpen = !tocOpen;
+        tocFab.classList.toggle('is-active', tocOpen);
+        /* Toggle TOC panel visibility */
+        var toc = document.querySelector('#TOC, .articletoc, .toc, #articleTOC, [class*="ArticleTOC"]');
+        if (toc) {
+          toc.classList.toggle('luliy-toc-open', tocOpen);
+          playSfx('click');
+        }
+      });
+      document.body.appendChild(tocFab);
+    }
   }
 
   /* ---- 23  Tag cloud page --------------------------------- */
   function initTagCloud() {
+    /* Hide Gmeek native tag list (SideNav / label-list) when our cloud renders */
+    var natives = document.querySelectorAll('.SideNav, .SideNav-item, [class*="label-list"]');
+    natives.forEach(function(el) { el.style.display = 'none'; });
     if (!/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
     var pbody = document.getElementById('postBody') ||
       document.querySelector('.SideNav, .markdown-body, #content');
@@ -3137,17 +3271,24 @@
       if (url.pathname === location.pathname) return;
       e.preventDefault();
       var dest = url.href;
-      /* Use View Transition — location change happens inside the callback */
+      /* Tag direction for CSS animation */
+      var dir = (url.pathname === '/' || url.pathname === '/index.html') ? 'home'
+              : (location.pathname === '/' || location.pathname === '/index.html') ? 'post'
+              : (url.pathname > location.pathname) ? 'next' : 'prev';
+      document.documentElement.setAttribute('data-vt-dir', dir);
       try {
         var vt = document.startViewTransition(function () {
+          /* Cleanup infinite-scroll observers before navigation */
+          if (root._luliyTeardownTimeline) root._luliyTeardownTimeline();
           location.href = dest;
-          /* Return a never-resolving promise — the navigation itself ends the transition */
           return new Promise(function () {});
         });
-        /* Safety timeout: if transition stalls > 1s, navigate anyway */
-        setTimeout(function () { location.href = dest; }, 1000);
+        setTimeout(function () {
+          document.documentElement.removeAttribute('data-vt-dir');
+          location.href = dest;
+        }, 1000);
       } catch (err) {
-        /* Fallback if startViewTransition throws */
+        document.documentElement.removeAttribute('data-vt-dir');
         location.href = dest;
       }
     });
