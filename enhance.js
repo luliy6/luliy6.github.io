@@ -296,10 +296,10 @@
           /* Day/Night toggle — drives Gmeek's native circle */
           var dnBtn = document.createElement('button');
           dnBtn.type = 'button'; dnBtn.className = 'luliy-ap-tool luliy-ap-dn';
-          dnBtn.title = '\\u5207\\u6362\\u767d\\u5929/\\u591c\\u95f4';  /* 切换白天/夜间 */
+          dnBtn.title = '切换白天/夜间';  /* 切换白天/夜间 */
           function setDnIcon() {
             var dark = document.documentElement.getAttribute('data-color-mode') === 'dark';
-            dnBtn.textContent = dark ? '\\u263E' : '\\u2600\\uFE0F';
+            dnBtn.textContent = dark ? '☾' : '☀️';
           }
           setDnIcon();
           dnBtn.addEventListener('click', function(e) {
@@ -316,14 +316,14 @@
           /* Add-music button — prompts for a direct URL */
           var addBtn = document.createElement('button');
           addBtn.type = 'button'; addBtn.className = 'luliy-ap-tool luliy-ap-add';
-          addBtn.textContent = '\\u002b';   /* + */
-          addBtn.title = '\\u6dfb\\u52a0\\u97f3\\u4e50\\u76f4\\u94fe';  /* 添加音乐直链 */
+          addBtn.textContent = '+';   /* + */
+          addBtn.title = '添加音乐直链';  /* 添加音乐直链 */
           addBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            var url = window.prompt('\\u8f93\\u5165\\u97f3\\u4e50\\u76f4\\u94fe URL\\uff08mp3/m4a \\u7b49\\uff09\\uff1a');  /* 输入音乐直链 URL */
+            var url = window.prompt('输入音乐直链 URL（mp3/m4a 等）：');  /* 输入音乐直链 URL */
             if (!url) return;
             url = url.trim(); if (!url) return;
-            var name = window.prompt('\\u6b4c\\u66f2\\u540d\\u79f0\\uff08\\u53ef\\u9009\\uff09\\uff1a') || '\\u81ea\\u5b9a\\u4e49';  /* 歌曲名称（可选） */
+            var name = window.prompt('歌曲名称（可选）：') || '自定义';  /* 歌曲名称（可选） */
             try {
               var list = JSON.parse(localStorage.getItem(ALIST) || '[]');
               if (!Array.isArray(list)) list = [];
@@ -705,6 +705,30 @@
 
       centre.appendChild(avatarLink);
       centre.appendChild(blogName);
+
+      /* ── Day/Night toggle — always visible (esp. mobile) ──── */
+      var dnNav = document.createElement('button');
+      dnNav.id = 'luliy-nav-dn';
+      dnNav.type = 'button';
+      dnNav.setAttribute('aria-label', '\u5207\u6362\u767d\u5929/\u591c\u95f4');
+      function _navMode() {
+        var m = document.documentElement.getAttribute('data-color-mode') || 'light';
+        if (m === 'auto') m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        return m;
+      }
+      function _navDnIcon() { dnNav.textContent = _navMode() === 'dark' ? '\u263E' : '\u2600\uFE0F'; }
+      _navDnIcon();
+      dnNav.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var circle = document.querySelector('.circle');
+        if (circle) circle.click();
+        setTimeout(_navDnIcon, 80);
+      });
+      try {
+        new MutationObserver(_navDnIcon).observe(document.documentElement,
+          { attributes: true, attributeFilter: ['data-color-mode'] });
+      } catch (e) {}
+      centre.appendChild(dnNav);
 
       /* ── MOVE original nav elements from .title-right ──────
          Moving (not cloning) keeps every native Gmeek listener —
@@ -1882,6 +1906,7 @@
       }
 
       toc._luliySpy = true;
+      root._luliyTOC = toc;   /* exact reference for the fab toggle */
 
       if (!toc.querySelector('.luliy-toc-injected-hdr')) {
         var hdr = document.createElement('div');
@@ -1900,6 +1925,20 @@
         hdr.appendChild(lbl); hdr.appendChild(totop);
         toc.insertBefore(hdr, toc.firstChild);
       }
+
+      /* If the TOC is/contains a <details>, force it permanently open and
+         hide its native <summary> (we provide our own header), so there's
+         no second "目录" label and the list is always rendered. The fab
+         controls visibility via .luliy-toc-open. */
+      var detEls = [];
+      if (toc.tagName === 'DETAILS') detEls.push(toc);
+      toc.querySelectorAll('details').forEach(function (d) { detEls.push(d); });
+      detEls.forEach(function (d) {
+        d.open = true;
+        d.addEventListener('toggle', function () { if (!d.open) d.open = true; });
+        var sm = d.querySelector(':scope > summary');
+        if (sm) sm.style.display = 'none';
+      });
 
       /* Auto-expand TOC panel on article load */
       setTimeout(function () {
@@ -2147,6 +2186,60 @@
     dnWrap.appendChild(dayBtn); dnWrap.appendChild(nightBtn);
     sec3.appendChild(dnWrap);
     dBody.appendChild(sec3);
+
+    /* ── Section: Reading (font size + font family) ───────── */
+    if (document.getElementById('postBody')) {
+      var sec4 = document.createElement('div');
+      sec4.className = 'luliy-drawer-sec';
+      var sec4Title = document.createElement('div');
+      sec4Title.className = 'luliy-drawer-sec-title';
+      sec4Title.textContent = '\u9605\u8bfb';  /* 阅读 */
+      sec4.appendChild(sec4Title);
+
+      /* Font size: A−  18px  A+ */
+      var fsRow = document.createElement('div');
+      fsRow.className = 'luliy-drawer-fs';
+      var fsMinus = document.createElement('button');
+      fsMinus.type = 'button'; fsMinus.className = 'luliy-drawer-fs-btn'; fsMinus.textContent = 'A-';
+      var fsVal = document.createElement('span');
+      fsVal.className = 'luliy-drawer-fs-val';
+      var fsPlus = document.createElement('button');
+      fsPlus.type = 'button'; fsPlus.className = 'luliy-drawer-fs-btn'; fsPlus.textContent = 'A+';
+      function dCurFs() { return parseInt(localStorage.getItem('luliy-fontsize') || '18', 10) || 18; }
+      function dSetFs(px) {
+        px = Math.min(24, Math.max(14, px));
+        localStorage.setItem('luliy-fontsize', String(px));
+        if (root._luliyApplyReadingPrefs) root._luliyApplyReadingPrefs();
+        fsVal.textContent = px + 'px';
+      }
+      fsVal.textContent = dCurFs() + 'px';
+      fsMinus.addEventListener('click', function () { dSetFs(dCurFs() - 1); });
+      fsPlus.addEventListener('click', function () { dSetFs(dCurFs() + 1); });
+      fsRow.appendChild(fsMinus); fsRow.appendChild(fsVal); fsRow.appendChild(fsPlus);
+      sec4.appendChild(fsRow);
+
+      /* Font family: 默认 / 黑体 / 苍耳 */
+      var fontRow = document.createElement('div');
+      fontRow.className = 'luliy-drawer-font';
+      var _fonts = [['0', '\u9ed8\u8ba4'], ['1', '\u9ed1\u4f53'], ['2', '\u82cd\u8033']];
+      function dSetFont(v) {
+        localStorage.setItem('luliy-sans', v);
+        if (root._luliyApplyReadingPrefs) root._luliyApplyReadingPrefs();
+        fontRow.querySelectorAll('button').forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-v') === v);
+        });
+      }
+      _fonts.forEach(function (f) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'luliy-drawer-font-btn';
+        b.setAttribute('data-v', f[0]); b.textContent = f[1];
+        if ((localStorage.getItem('luliy-sans') || '0') === f[0]) b.classList.add('is-active');
+        b.addEventListener('click', function () { dSetFont(f[0]); });
+        fontRow.appendChild(b);
+      });
+      sec4.appendChild(fontRow);
+      dBody.appendChild(sec4);
+    }
 
     drawer.appendChild(dBody);
     document.body.appendChild(drawer);
@@ -3114,8 +3207,9 @@
       tocFab.addEventListener('click', function() {
         tocOpen = !tocOpen;
         tocFab.classList.toggle('is-active', tocOpen);
-        /* Toggle TOC panel visibility */
-        var toc = document.querySelector('#TOC, .articletoc, .toc, #articleTOC, [class*="ArticleTOC"]');
+        /* Toggle the exact moved TOC (fallback to query) */
+        var toc = root._luliyTOC ||
+          document.querySelector('#TOC, .articletoc, .toc, #articleTOC, [class*="ArticleTOC"]');
         if (toc) {
           toc.classList.toggle('luliy-toc-open', tocOpen);
           playSfx('click');
