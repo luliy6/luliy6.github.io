@@ -475,6 +475,19 @@ body[data-luliy-theme="mono"] #header     { border-top: 2px solid rgba(220,220,2
 }
 #luliy-nav-blogname:hover { color: var(--th-accent, #cba6f7) !important; }
 
+/* ── Navbar day/night toggle (always visible) ───────────── */
+#luliy-nav-dn {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; line-height: 1; margin-left: 4px;
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+  transition: background 0.18s, transform 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+#luliy-nav-dn:hover { background: rgba(255,255,255,0.26); transform: scale(1.1); }
+
 /* ── Right icon group ───────────────────────────────────── */
 #luliy-nav-icons-right {
   display: flex; align-items: center;
@@ -643,6 +656,34 @@ body.luliy-drawer-open { overflow: hidden; }
   background: var(--th-accent-soft, rgba(130,80,223,0.25));
   border-color: var(--th-accent, #8250df);
   color: #fff;
+}
+
+/* ── Drawer: font size + font family ────────────────────── */
+.luliy-drawer-fs {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.luliy-drawer-fs-btn {
+  width: 40px; height: 36px; border-radius: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: background 0.18s;
+}
+.luliy-drawer-fs-btn:hover { background: var(--th-accent-soft, rgba(130,80,223,0.30)); }
+.luliy-drawer-fs-val {
+  flex: 1; text-align: center; color: rgba(255,255,255,0.85);
+  font-size: 13px; font-family: 'LXGW WenKai Mono', monospace;
+}
+.luliy-drawer-font { display: flex; gap: 8px; }
+.luliy-drawer-font-btn {
+  flex: 1; padding: 9px 0; border-radius: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.70); font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif; transition: background 0.18s, color 0.18s;
+}
+.luliy-drawer-font-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.luliy-drawer-font-btn.is-active {
+  background: var(--th-accent-soft, rgba(130,80,223,0.25));
+  border-color: var(--th-accent, #8250df); color: #fff;
 }
 
 /* .luliy-nav-item deprecated — replaced by drawer */
