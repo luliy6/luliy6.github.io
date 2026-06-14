@@ -288,6 +288,59 @@
             { attributes: true, attributeFilter: ['data-color-mode'] });
         } catch(e){}
 
+        /* ── Mini control strip: day/night + add-music ────── */
+        if (!wrap.querySelector('.luliy-ap-tools')) {
+          var tools = document.createElement('div');
+          tools.className = 'luliy-ap-tools';
+
+          /* Day/Night toggle — drives Gmeek's native circle */
+          var dnBtn = document.createElement('button');
+          dnBtn.type = 'button'; dnBtn.className = 'luliy-ap-tool luliy-ap-dn';
+          dnBtn.title = '\\u5207\\u6362\\u767d\\u5929/\\u591c\\u95f4';  /* 切换白天/夜间 */
+          function setDnIcon() {
+            var dark = document.documentElement.getAttribute('data-color-mode') === 'dark';
+            dnBtn.textContent = dark ? '\\u263E' : '\\u2600\\uFE0F';
+          }
+          setDnIcon();
+          dnBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var circle = document.querySelector('.circle');
+            if (circle) circle.click();
+            setTimeout(setDnIcon, 80);
+          });
+          try {
+            new MutationObserver(setDnIcon).observe(document.documentElement,
+              { attributes: true, attributeFilter: ['data-color-mode'] });
+          } catch(e){}
+
+          /* Add-music button — prompts for a direct URL */
+          var addBtn = document.createElement('button');
+          addBtn.type = 'button'; addBtn.className = 'luliy-ap-tool luliy-ap-add';
+          addBtn.textContent = '\\u002b';   /* + */
+          addBtn.title = '\\u6dfb\\u52a0\\u97f3\\u4e50\\u76f4\\u94fe';  /* 添加音乐直链 */
+          addBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var url = window.prompt('\\u8f93\\u5165\\u97f3\\u4e50\\u76f4\\u94fe URL\\uff08mp3/m4a \\u7b49\\uff09\\uff1a');  /* 输入音乐直链 URL */
+            if (!url) return;
+            url = url.trim(); if (!url) return;
+            var name = window.prompt('\\u6b4c\\u66f2\\u540d\\u79f0\\uff08\\u53ef\\u9009\\uff09\\uff1a') || '\\u81ea\\u5b9a\\u4e49';  /* 歌曲名称（可选） */
+            try {
+              var list = JSON.parse(localStorage.getItem(ALIST) || '[]');
+              if (!Array.isArray(list)) list = [];
+              var track = { name: name, artist: 'Luliy', url: url, cover: cfg.cover || '' };
+              list.push(track);
+              localStorage.setItem(ALIST, JSON.stringify(list));
+              ap.list.add(track);          /* live-add without reload */
+              ap.list.switch(ap.list.audios.length - 1);
+              ap.play();
+            } catch(err) { try { console.warn('[luliy] add track failed', err); } catch(e2){} }
+          });
+
+          tools.appendChild(dnBtn);
+          tools.appendChild(addBtn);
+          wrap.appendChild(tools);
+        }
+
       } catch(e) { console.warn('[luliy] APlayer failed', e); }
     }
 
@@ -3074,10 +3127,12 @@
 
   /* ---- 23  Tag cloud page --------------------------------- */
   function initTagCloud() {
-    /* Hide Gmeek native tag list (SideNav / label-list) when our cloud renders */
+    var onTagPage = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
+    if (!onTagPage) return;
+    /* Hide Gmeek native tag list ONLY on the tag page (not homepage,
+       where .SideNav is the post list) */
     var natives = document.querySelectorAll('.SideNav, .SideNav-item, [class*="label-list"]');
     natives.forEach(function(el) { el.style.display = 'none'; });
-    if (!/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
     var pbody = document.getElementById('postBody') ||
       document.querySelector('.SideNav, .markdown-body, #content');
     var mount = document.getElementById('content') || document.body;

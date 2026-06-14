@@ -23,12 +23,34 @@
 <script>
 (function(){
   try{
-    var t=localStorage.getItem('luliy-sink')||'default';
-    var b=localStorage.getItem('luliy-bg');
-    document.documentElement.setAttribute('data-luliy-sink-pre',t);
-    if(b){document.addEventListener('DOMContentLoaded',function(){
-      if(document.body)document.body.style.setProperty('background-image','url("'+b+'")',"important");
-    });}
+    var d=document.documentElement;
+    var sink=localStorage.getItem('luliy-sink')||'default';
+    var map={'default':'default','sakura':'sakura','your-name':'your-name','space':'space','sunset':'sunset','mono':'mono'};
+    var theme=map[sink]||'default';
+    var bg=localStorage.getItem('luliy-bg');
+    var blur=parseInt(localStorage.getItem('luliy-bgblur')||'0',10)||0;
+    var pw=parseInt(localStorage.getItem('luliy-pbwidth')||'0',10)||0;
+    var sans=localStorage.getItem('luliy-sans')||'0';
+    var defBg='https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png';
+    var url=bg||defBg;
+    /* inline critical vars + theme attr BEFORE first paint to kill FOUC */
+    d.style.setProperty('--luliy-bg-url','url(\''+url+'\')');
+    d.style.setProperty('--luliy-bg-blur',blur+'px');
+    d.style.setProperty('--luliy-pb-extra',pw+'px');
+    var css='html,body{background-image:url(\''+url+'\')!important;background-size:cover!important;background-position:center!important;background-attachment:fixed!important;}';
+    var st=document.createElement('style');st.id='luliy-fouc';st.textContent=css;
+    (d.head||d).appendChild(st);
+    /* set theme + font class on <html> now; JS will mirror to body */
+    d.setAttribute('data-luliy-theme',theme);
+    if(blur>0)d.setAttribute('data-luliy-bgblur','1');
+    document.addEventListener('DOMContentLoaded',function(){
+      if(document.body){
+        document.body.setAttribute('data-luliy-theme',theme);
+        if(blur>0)document.body.classList.add('luliy-bg-blurred');
+        if(sans==='1')document.body.classList.add('luliy-sans');
+        if(sans==='2')document.body.classList.add('luliy-canger');
+      }
+    });
   }catch(e){}
 })();
 </script>
