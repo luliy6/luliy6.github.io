@@ -184,14 +184,59 @@
         if (holder.classList) holder.classList.add('aplayer-fixed');
         var body = holder.querySelector('.aplayer-body');
         if (body) body.style.left = '-66px';   /* APlayer's folded position */
-        /* Autoplay fallback: resume on first user gesture if blocked */
-        var p = ap.play && ap.play();
-        if (p && p.catch) {
-          p.catch(function () {
-            var once = function () { try { ap.play(); } catch (e) {} };
-            document.addEventListener('click', once, { once: true });
-            document.addEventListener('touchstart', once, { once: true, passive: true });
+
+        /* ── Cross-page resume ───────────────────────────────
+           Restore last position + play state, then keep saving. */
+        var SKEY = 'luliy-aplayer-state';
+        var saved = null;
+        try { saved = JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch (e) {}
+        var au = ap.audio;   /* underlying <audio> element */
+
+        function persist() {
+          try {
+            localStorage.setItem(SKEY, JSON.stringify({
+              pos: au && au.currentTime || 0,
+              playing: au ? !au.paused : false,
+              t: Date.now()
+            }));
+          } catch (e) {}
+        }
+        /* Seek to saved position once metadata is ready */
+        if (saved && saved.pos > 0 && au) {
+          var seekOnce = function () {
+            try { if (saved.pos < au.duration) au.currentTime = saved.pos; } catch (e) {}
+            au.removeEventListener('loadedmetadata', seekOnce);
+          };
+          if (au.readyState >= 1) seekOnce();
+          else au.addEventListener('loadedmetadata', seekOnce);
+        }
+        /* Save every 3s during playback + on page leave */
+        if (au) {
+          au.addEventListener('timeupdate', function () {
+            var now = Date.now();
+            if (!au._lastSave || now - au._lastSave > 3000) { au._lastSave = now; persist(); }
           });
+          au.addEventListener('pause', persist);
+          au.addEventListener('play', persist);
+        }
+        window.addEventListener('pagehide', persist);
+        window.addEventListener('beforeunload', persist);
+
+        /* Decide whether to auto-resume play:
+           only resume if it was playing before (or no saved state). */
+        var shouldPlay = !saved || saved.playing !== false;
+        if (shouldPlay) {
+          var p = ap.play && ap.play();
+          if (p && p.catch) {
+            p.catch(function () {
+              var once = function () { try { ap.play(); } catch (e) {} };
+              document.addEventListener('click', once, { once: true });
+              document.addEventListener('touchstart', once, { once: true, passive: true });
+            });
+          }
+        } else {
+          /* Was paused — keep it paused but at the right position */
+          try { ap.pause(); } catch (e) {}
         }
       } catch (e) {
         try { console.warn('[luliy] APlayer init failed', e); } catch (e2) {}
@@ -880,6 +925,45 @@
       return row;
     }
 
+    /* Slider row:  label  [====O====]  value
+       opts = { emoji, label, min, max, step, value, format(v), onInput(v) } */
+    function mkSlider(opts) {
+      var row = document.createElement('div');
+      row.className = 'luliy-ctrl-row luliy-ctrl-slider';
+      row.style.cursor = 'default';
+      var top = document.createElement('div');
+      top.className = 'luliy-slider-top';
+      var lbl = document.createElement('span');
+      lbl.className = 'luliy-ctrl-lbl';
+      lbl.textContent = (opts.emoji ? opts.emoji + ' ' : '') + opts.label;
+      var bdg = document.createElement('span');
+      bdg.className = 'luliy-ctrl-badge';
+      top.appendChild(lbl); top.appendChild(bdg);
+      var rng = document.createElement('input');
+      rng.type = 'range';
+      rng.className = 'luliy-range';
+      rng.min = String(opts.min); rng.max = String(opts.max);
+      rng.step = String(opts.step || 1); rng.value = String(opts.value);
+      function fmt(v) { return opts.format ? opts.format(v) : String(v); }
+      bdg.textContent = fmt(opts.value);
+      function fill() {
+        var pct = (rng.value - opts.min) / (opts.max - opts.min) * 100;
+        rng.style.setProperty('--luliy-range-pct', pct + '%');
+      }
+      fill();
+      rng.addEventListener('input', function (e) {
+        e.stopPropagation();
+        var v = parseFloat(rng.value);
+        bdg.textContent = fmt(v);
+        fill();
+        if (opts.onInput) opts.onInput(v);
+      });
+      rng.addEventListener('click', function (e) { e.stopPropagation(); });
+      row.appendChild(top); row.appendChild(rng);
+      row._range = rng; row._bdg = bdg;
+      return row;
+    }
+
     /* SFX */
     var sfxOn  = localStorage.getItem('luliy-sfx') !== '0';
     var sfxRow = mkRow(sfxOn ? '\uD83D\uDD0A' : '\uD83D\uDD07', '\u97f3\u6548', sfxOn ? '\u5f00\u542f' : '\u5173\u95ed');
@@ -1058,37 +1142,18 @@
     });
     panel.appendChild(bgRow);
 
-    /* Background blur slider:  −  Npx  +  */
-    var blurRow = document.createElement('div');
-    blurRow.className = 'luliy-ctrl-row';
-    blurRow.style.cursor = 'default';
-    var blurLbl = document.createElement('span');
-    blurLbl.className = 'luliy-ctrl-lbl';
-    blurLbl.textContent = '\uD83C\uDF2B\uFE0F \u80cc\u666f\u6a21\u7cca';   /* 🌫️ 背景模糊 */
-    var blurCtrls = document.createElement('span');
-    blurCtrls.style.cssText = 'display:flex;align-items:center;gap:6px';
-    function mkBtn(txt) {
-      var b = document.createElement('button');
-      b.type = 'button'; b.textContent = txt; b.className = 'luliy-fs-btn';
-      return b;
-    }
-    var blurMinus = mkBtn('\u2212');   /* − */
-    var blurVal = document.createElement('span');
-    blurVal.className = 'luliy-ctrl-badge';
-    var blurPlus = mkBtn('\uff0b');    /* ＋ */
-    blurCtrls.appendChild(blurMinus); blurCtrls.appendChild(blurVal); blurCtrls.appendChild(blurPlus);
-    blurRow.appendChild(blurLbl); blurRow.appendChild(blurCtrls);
-    panel.appendChild(blurRow);
-    function curBlur() { return parseInt(localStorage.getItem('luliy-bgblur') || '0', 10) || 0; }
-    function setBlur(px) {
-      px = Math.min(20, Math.max(0, px));
-      localStorage.setItem('luliy-bgblur', String(px));
-      if (root._luliyApplyBgBlur) root._luliyApplyBgBlur();
-      blurVal.textContent = px + 'px';
-    }
-    blurVal.textContent = curBlur() + 'px';
-    blurMinus.addEventListener('click', function (e) { e.stopPropagation(); setBlur(curBlur() - 2); playSfx('click'); });
-    blurPlus.addEventListener('click',  function (e) { e.stopPropagation(); setBlur(curBlur() + 2); playSfx('click'); });
+    /* Background blur — slider 0..20px */
+    var blurSlider = mkSlider({
+      emoji: '\uD83C\uDF2B\uFE0F', label: '\u80cc\u666f\u6a21\u7cca',   /* 🌫️ 背景模糊 */
+      min: 0, max: 20, step: 1,
+      value: parseInt(localStorage.getItem('luliy-bgblur') || '0', 10) || 0,
+      format: function (v) { return v + 'px'; },
+      onInput: function (v) {
+        localStorage.setItem('luliy-bgblur', String(v));
+        if (root._luliyApplyBgBlur) root._luliyApplyBgBlur();
+      }
+    });
+    panel.appendChild(blurSlider);
 
     /* ── Reading settings (article pages only) ───────────── */
     if (document.getElementById('postBody')) {
@@ -1144,37 +1209,18 @@
       });
       panel.appendChild(sansRow);
 
-      /* Reading-panel width slider:  −  +Npx  +  (centred, extends both sides) */
-      var pwRow = document.createElement('div');
-      pwRow.className = 'luliy-ctrl-row';
-      pwRow.style.cursor = 'default';
-      var pwLbl = document.createElement('span');
-      pwLbl.className = 'luliy-ctrl-lbl';
-      pwLbl.textContent = '\u2194\uFE0F \u9605\u8bfb\u5bbd\u5ea6';   /* ↔️ 阅读宽度 */
-      var pwCtrls = document.createElement('span');
-      pwCtrls.style.cssText = 'display:flex;align-items:center;gap:6px';
-      function mkPwBtn(txt) {
-        var b = document.createElement('button');
-        b.type = 'button'; b.textContent = txt; b.className = 'luliy-fs-btn';
-        return b;
-      }
-      var pwMinus = mkPwBtn('\u2212');
-      var pwVal = document.createElement('span');
-      pwVal.className = 'luliy-ctrl-badge';
-      var pwPlus = mkPwBtn('\uff0b');
-      pwCtrls.appendChild(pwMinus); pwCtrls.appendChild(pwVal); pwCtrls.appendChild(pwPlus);
-      pwRow.appendChild(pwLbl); pwRow.appendChild(pwCtrls);
-      panel.appendChild(pwRow);
-      function curPw() { return parseInt(localStorage.getItem('luliy-pbwidth') || '0', 10) || 0; }
-      function setPw(d) {
-        d = Math.min(400, Math.max(0, d));
-        localStorage.setItem('luliy-pbwidth', String(d));
-        if (root._luliyApplyPbWidth) root._luliyApplyPbWidth();
-        pwVal.textContent = '+' + d;
-      }
-      pwVal.textContent = '+' + curPw();
-      pwMinus.addEventListener('click', function (e) { e.stopPropagation(); setPw(curPw() - 40); playSfx('click'); });
-      pwPlus.addEventListener('click',  function (e) { e.stopPropagation(); setPw(curPw() + 40); playSfx('click'); });
+      /* Reading-panel width — slider 0..400px (extends both sides) */
+      var pwSlider = mkSlider({
+        emoji: '\u2194\uFE0F', label: '\u9605\u8bfb\u5bbd\u5ea6',   /* ↔️ 阅读宽度 */
+        min: 0, max: 400, step: 20,
+        value: parseInt(localStorage.getItem('luliy-pbwidth') || '0', 10) || 0,
+        format: function (v) { return '+' + v; },
+        onInput: function (v) {
+          localStorage.setItem('luliy-pbwidth', String(v));
+          if (root._luliyApplyPbWidth) root._luliyApplyPbWidth();
+        }
+      });
+      panel.appendChild(pwSlider);
     }
 
     /* ── ⚙ Extras: card view / cursor trail / fireflies / focus / reduce-motion ── */
@@ -1962,6 +2008,47 @@
         setTimeout(showBgPicker, 80);
       });
       drop.appendChild(bgItem);
+
+      /* ── 🌫️ Background blur slider (mobile) ─────────────── */
+      function mkMobSlider(label, min, max, step, val, fmt, onInput) {
+        var wrap = document.createElement('div');
+        wrap.className = 'luliy-nav-item luliy-drop-slider';
+        wrap.style.cursor = 'default';
+        var top = document.createElement('div');
+        top.className = 'luliy-slider-top';
+        var lb = document.createElement('span'); lb.textContent = label;
+        var vb = document.createElement('span'); vb.className = 'luliy-ctrl-badge';
+        vb.textContent = fmt(val);
+        top.appendChild(lb); top.appendChild(vb);
+        var rng = document.createElement('input');
+        rng.type = 'range'; rng.className = 'luliy-range';
+        rng.min = String(min); rng.max = String(max); rng.step = String(step); rng.value = String(val);
+        function fill() { rng.style.setProperty('--luliy-range-pct', ((rng.value - min) / (max - min) * 100) + '%'); }
+        fill();
+        rng.addEventListener('input', function (e) {
+          e.stopPropagation();
+          var v = parseFloat(rng.value); vb.textContent = fmt(v); fill(); onInput(v);
+        });
+        rng.addEventListener('click', function (e) { e.stopPropagation(); });
+        wrap.appendChild(top); wrap.appendChild(rng);
+        return wrap;
+      }
+      drop.appendChild(mkMobSlider(
+        '\uD83C\uDF2B\uFE0F \u80cc\u666f\u6a21\u7cca', 0, 20, 1,
+        parseInt(localStorage.getItem('luliy-bgblur') || '0', 10) || 0,
+        function (v) { return v + 'px'; },
+        function (v) { localStorage.setItem('luliy-bgblur', String(v)); if (root._luliyApplyBgBlur) root._luliyApplyBgBlur(); }
+      ));
+
+      /* ── ↔️ Reading width slider (mobile, article pages) ── */
+      if (document.getElementById('postBody')) {
+        drop.appendChild(mkMobSlider(
+          '\u2194\uFE0F \u9605\u8bfb\u5bbd\u5ea6', 0, 400, 20,
+          parseInt(localStorage.getItem('luliy-pbwidth') || '0', 10) || 0,
+          function (v) { return '+' + v; },
+          function (v) { localStorage.setItem('luliy-pbwidth', String(v)); if (root._luliyApplyPbWidth) root._luliyApplyPbWidth(); }
+        ));
+      }
 
       /* ── 📋 TOC (only on article pages) ─────────────────── */
       if (document.getElementById('postBody')) {
