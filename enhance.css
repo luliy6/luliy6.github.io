@@ -591,24 +591,26 @@ body[data-luliy-theme="space"] .luliy-nav-item,
   margin: 72px auto 0 auto;
   width: 95%; max-width: 1040px;
   padding: 16px 28px;
-  background: rgba(255,255,255,0.18) !important;
+  background: var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
   backdrop-filter: blur(20px) saturate(1.8) !important;
   -webkit-backdrop-filter: blur(20px) saturate(1.8) !important;
-  border: 1px solid rgba(255,255,255,0.38);
+  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.30));
   border-radius: 14px;
   text-align: center;
-  font-size: 14px; font-weight: 700; letter-spacing: 2px;
-  color: rgba(20,10,40,0.75);
-  box-shadow: 0 4px 20px rgba(130,80,223,0.10);
+  font-size: 14px; font-weight: 800; letter-spacing: 2px;
+  color: var(--th-accent, #8250df);
+  text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+  box-shadow: 0 4px 20px var(--th-accent-soft, rgba(130,80,223,0.12));
   box-sizing: border-box;
   will-change: transform, opacity;
   position: relative; z-index: 100;
   font-family: 'LXGW WenKai Screen', 'LXGW WenKai', serif;
 }
 [data-color-mode="dark"] #luliy-hero-banner {
-  background: rgba(14,10,28,0.38) !important;
-  border-color: rgba(130,80,223,0.28);
-  color: rgba(200,195,240,0.82);
+  background: rgba(14,10,28,0.55) !important;
+  border-color: var(--th-accent-soft, rgba(130,80,223,0.40));
+  color: var(--th-accent, #cba6f7);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1169,72 +1171,6 @@ body[data-luliy-theme="space"] .mac-strip {
 [data-color-mode="dark"] .mac-lang,
 body[data-luliy-theme="space"] .mac-lang { color: rgba(160,140,255,0.70); }
 
-/* ── Line numbers gutter — perfect baseline alignment ─────── */
-pre.has-lineno {
-  display: flex !important;
-  align-items: stretch !important;
-  padding: 0 !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  /* Shared metrics — both children inherit these exactly */
-  --lno-fs: 0.9em;
-  --lno-lh: 1.7;
-  --lno-pad-y: 1em;
-  tab-size: 4; -moz-tab-size: 4;
-}
-pre.has-lineno > .luliy-lineno {
-  flex-shrink: 0;
-  text-align: right;
-  padding: var(--lno-pad-y) 0.7em var(--lno-pad-y) 1em;
-  margin: 0;
-  border-right: 1px solid rgba(130,80,223,0.18);
-  color: rgba(130,80,223,0.50);
-  -webkit-user-select: none;
-  user-select: none;
-  white-space: pre;
-  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace !important;
-  font-size: var(--lno-fs) !important;
-  line-height: var(--lno-lh) !important;
-  background: inherit;
-  min-width: 2.4em;
-  box-sizing: border-box;
-  vertical-align: top;
-}
-pre.has-lineno > code {
-  flex: 1 1 auto; min-width: 0;
-  display: block;
-  padding: var(--lno-pad-y) 1em var(--lno-pad-y) 0.9em !important;
-  margin: 0 !important;
-  font-family: 'LXGW WenKai Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace !important;
-  font-size: var(--lno-fs) !important;
-  line-height: var(--lno-lh) !important;
-  box-sizing: border-box;
-  overflow: visible;
-  /* Critical: never wrap, so each visual line maps 1:1 to a number */
-  white-space: pre !important;
-  word-break: normal !important;
-  word-wrap: normal !important;
-  tab-size: 4; -moz-tab-size: 4;
-  vertical-align: top;
-}
-/* Neutralise any Prism/Primer top-padding that would offset code vs gutter */
-pre.has-lineno > code > * { line-height: inherit !important; }
-[data-color-mode="dark"] pre.has-lineno > .luliy-lineno,
-body[data-luliy-theme="space"] pre.has-lineno > .luliy-lineno {
-  border-right-color: rgba(130,80,223,0.32);
-  color: rgba(160,140,255,0.45);
-}
-body[data-luliy-theme="mono"] pre.has-lineno > .luliy-lineno {
-  border-right-color: rgba(0,0,0,0.18);
-  color: rgba(0,0,0,0.35);
-}
-[data-color-mode="dark"] body[data-luliy-theme="mono"] pre.has-lineno > .luliy-lineno {
-  border-right-color: rgba(255,255,255,0.18);
-  color: rgba(255,255,255,0.30);
-}
-/* Folded / fullscreen interplay */
-pre.is-folded > .luliy-lineno { visibility: hidden; }
-
 /* Folded state */
 pre.is-folded { max-height: 40px !important; overflow: hidden !important; }
 pre.is-folded > code { visibility: hidden; }
@@ -1258,7 +1194,13 @@ pre.code-fullscreen {
   background: rgba(255,255,255,0.90);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  table-layout: auto;
 }
+/* Last column absorbs remaining width so no white gap appears when
+   the reading panel is widened. */
+#postBody table td:last-child,
+#postBody table th:last-child { width: auto; }
+#postBody table td, #postBody table th { word-break: break-word; }
 /* Rounded corners via corner cells (since overflow:hidden is gone) */
 #postBody thead tr:first-child th:first-child { border-top-left-radius: 12px; }
 #postBody thead tr:first-child th:last-child  { border-top-right-radius: 12px; }
@@ -1490,9 +1432,9 @@ body[data-luliy-theme="mono"] {
   top: 130px !important;   /* below ctrl pill btn: 76px + ~44px + gap */
   right: 20px !important;
   left: auto !important;
-  bottom: 20px !important;
+  bottom: 220px !important;  /* clear the search/back-top buttons below */
   width: 244px !important;
-  max-height: calc(100vh - 155px) !important;
+  max-height: calc(100vh - 355px) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   z-index: 9992 !important;   /* above toolbar (9990) + panel (9991) */
@@ -1671,24 +1613,18 @@ body[data-luliy-theme="mono"] {
     font-size: 12px !important;
   }
 }
-/* ── Very narrow: hide fixed TOC (< 900px), toggled via dropdown ─ */
+/* ── Mobile: let the native ArticleTOC button control its own panel ─ */
 @media (max-width: 899px) {
-  /* Hidden by default — dropdown toggle adds .toc-visible */
-  #TOC:not(.toc-visible), .articletoc:not(.toc-visible),
-  .toc:not(.toc-visible), #articleTOC:not(.toc-visible) {
-    display: none !important;
-  }
-  /* When revealed via dropdown */
-  #TOC.toc-visible, .articletoc.toc-visible,
-  .toc.toc-visible, #articleTOC.toc-visible {
-    display: block !important;
-    position: fixed !important;
+  /* The native articletoc.js renders a collapsible panel; just make sure
+     it sits above content and spans full width when open. Don't force-hide. */
+  #TOC, .articletoc, .toc, #articleTOC,
+  [id*="articleTOC"], [class*="ArticleTOC"] {
     top: 56px !important; right: 0 !important; left: 0 !important;
+    bottom: auto !important;
     width: 100% !important;
+    max-height: 60vh !important;
     border-radius: 0 0 18px 18px !important;
     z-index: 9997 !important;
-    max-height: 55vh !important;
-    overflow-y: auto !important;
   }
 }
 
@@ -2097,7 +2033,7 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none;
   transition: opacity 0.28s, transform 0.28s, color 0.3s, background 0.3s, border-color 0.3s;
-  z-index: 9989;
+  z-index: 9994;   /* above TOC(9992) so clicks always land */
   isolation: isolate;   /* stacking context keeps SVG ring contained */
 }
 #luliy-back-top.is-visible { opacity: 1; pointer-events: all; }
@@ -2333,43 +2269,43 @@ body[data-luliy-theme="mono"] .articletoc a.luliy-toc-active,
 /* ══════════════════════════════════════════════════════════
    26  APlayer mini player (top-left, folded by default)
 ══════════════════════════════════════════════════════════ */
+/* APlayer mini-ball mode — top-left, only the round cover shows */
 #luliy-aplayer.aplayer {
   position: fixed !important;
-  top: 70px !important;
-  left: 0 !important;
+  top: 76px !important;
+  left: 16px !important;
   right: auto !important;
   bottom: auto !important;
   margin: 0 !important;
+  width: auto !important;
   z-index: 9989 !important;   /* below navbar(9999) + toolbar(9990) */
-  border-radius: 0 10px 10px 0 !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.22) !important;
+  background: transparent !important;
+  box-shadow: none !important;
   font-family: 'Noto Sans SC', sans-serif !important;
 }
-/* Fixed-mode body folds to the left; thumbnail stays clickable */
-#luliy-aplayer.aplayer.aplayer-fixed .aplayer-body {
-  position: fixed !important;
-  top: 70px !important;
-  left: -66px !important;     /* folded: only the cover ball peeks out */
-  bottom: auto !important;
-  transition: left 0.3s ease !important;
-}
-#luliy-aplayer.aplayer.aplayer-fixed:hover .aplayer-body,
-#luliy-aplayer.aplayer.aplayer-fixed .aplayer-body:hover {
-  left: 0 !important;          /* expand on hover */
-}
-#luliy-aplayer.aplayer.aplayer-fixed .aplayer-info {
-  border-top: none !important;
+/* The mini ball itself */
+#luliy-aplayer.aplayer.aplayer-narrow .aplayer-body,
+#luliy-aplayer.aplayer .aplayer-miniswitcher,
+#luliy-aplayer.aplayer .aplayer-pic {
+  border-radius: 50% !important;
 }
 #luliy-aplayer.aplayer .aplayer-pic {
-  border-radius: 8px !important;
+  width: 48px !important; height: 48px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
 }
-/* Theme-accent tint for the played progress */
+/* When expanded (list/lrc), give it a normal card look */
+#luliy-aplayer.aplayer .aplayer-info {
+  border-top: none !important;
+}
 #luliy-aplayer.aplayer .aplayer-bar .aplayer-played {
   background: var(--th-accent, #e8a838) !important;
 }
+#luliy-aplayer.aplayer .aplayer-volume-bar .aplayer-volume {
+  background: var(--th-accent, #e8a838) !important;
+}
 @media (max-width: 768px) {
-  #luliy-aplayer.aplayer,
-  #luliy-aplayer.aplayer.aplayer-fixed .aplayer-body { top: 62px !important; }
+  #luliy-aplayer.aplayer { top: 66px !important; left: 12px !important; }
+  #luliy-aplayer.aplayer .aplayer-pic { width: 42px !important; height: 42px !important; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2661,19 +2597,27 @@ body.luliy-focus-mode::after {
   background: var(--th-accent, #8250df); color: #fff;
   padding: 2px 9px; border-radius: 20px;
 }
-.luliy-series-dots { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.luliy-series-dots { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .luliy-series-dot {
-  width: 10px; height: 10px; border-radius: 50%;
+  width: 12px; height: 12px; border-radius: 50%;
   background: var(--th-accent-soft, rgba(130,80,223,0.25));
-  transition: transform 0.2s;
+  transition: transform 0.2s; cursor: pointer;
 }
-.luliy-series-dot:hover { transform: scale(1.4); }
-.luliy-series-dot.is-current { background: var(--th-accent, #8250df); transform: scale(1.3); }
+.luliy-series-dot:hover { transform: scale(1.5); }
+.luliy-series-dot.is-current { background: var(--th-accent, #8250df); transform: scale(1.35); }
+/* Collapsed: hide the title list, show only dots */
+.luliy-series.is-collapsed .luliy-series-dots { margin-bottom: 0; }
+.luliy-series-list.is-collapsed {
+  max-height: 0 !important; overflow: hidden !important;
+  opacity: 0; margin: 0; padding: 0;
+  transition: max-height 0.3s ease, opacity 0.25s ease;
+}
 .luliy-series-list {
-  list-style: none; padding: 0; margin: 0;
+  list-style: none; padding: 0; margin: 8px 0 0;
   /* Show 5 items (~5 × 28px), scroll beyond */
   max-height: calc(5 * 2em + 5 * 8px);
-  overflow-y: auto;
+  overflow-y: auto; opacity: 1;
+  transition: max-height 0.3s ease, opacity 0.25s ease;
   scrollbar-width: thin;
   scrollbar-color: var(--th-accent-soft, rgba(130,80,223,0.20)) transparent;
 }
@@ -2718,7 +2662,7 @@ body.luliy-focus-mode::after {
   color: var(--th-accent, #8250df); font-size: 17px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none;
-  transition: opacity 0.28s, transform 0.28s; z-index: 9989;
+  transition: opacity 0.28s, transform 0.28s; z-index: 9994;
 }
 #luliy-search-fab.is-visible { opacity: 1; pointer-events: all; }
 #luliy-search-fab:hover { transform: translateY(-3px); }
@@ -2893,9 +2837,14 @@ body.luliy-focus-mode #luliy-back-top.is-visible {
   opacity: 1 !important; pointer-events: all !important;
 }
 body.luliy-focus-mode #postBody {
-  /* Base focus width 720px + user's reading-width delta (both sides) */
-  max-width: calc(720px + var(--luliy-pb-extra, 0px) * 2) !important;
-  margin-left: auto !important; margin-right: auto !important;
+  /* Escape the narrow parent: base 720px + user reading-width delta,
+     centred via viewport units so the parent's ~340px can't clamp it. */
+  width: min(calc(720px + var(--luliy-pb-extra, 0px) * 2), calc(100vw - 48px)) !important;
+  max-width: none !important;
+  position: relative !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin-left: 0 !important; margin-right: 0 !important;
 }
 
 /* ── 28.13 Reduce motion ──────────────────────────────────── */
@@ -2910,12 +2859,6 @@ body.luliy-reduce-motion * {
 @media (prefers-reduced-motion: reduce) {
   #luliy-sakura-canvas, .luliy-trail-dot { display: none !important; }
 }
-
-/* ── 28.14 Swipe transition hint ──────────────────────────── */
-body.luliy-swipe-left  #postBody { animation: luliySwipeL 0.18s ease forwards; }
-body.luliy-swipe-right #postBody { animation: luliySwipeR 0.18s ease forwards; }
-@keyframes luliySwipeL { to { transform: translateX(-40px); opacity: 0.5; } }
-@keyframes luliySwipeR { to { transform: translateX(40px);  opacity: 0.5; } }
 
 /* ── 28.15 View Transitions cross-page fade ───────────────── */
 @media (prefers-reduced-motion: no-preference) {
@@ -2992,9 +2935,6 @@ body.luliy-swipe-right #postBody { animation: luliySwipeR 0.18s ease forwards; }
   .luliy-ctrl-slider { padding-top: 12px !important; padding-bottom: 14px !important; }
 
   /* APlayer: smaller folded ball, clears the navbar */
-  #luliy-aplayer.aplayer { top: 62px !important; }
-  #luliy-aplayer.aplayer.aplayer-fixed .aplayer-body { top: 62px !important; left: -60px !important; }
-  #luliy-aplayer.aplayer.aplayer-fixed:active .aplayer-body { left: 0 !important; }
 
   /* Dropdown slider rows: full-width column layout */
   .luliy-drop-slider {
