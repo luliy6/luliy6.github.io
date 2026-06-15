@@ -676,16 +676,13 @@
     });
   }
 
-  /* ---- 09  Navbar — avatar+name centred, clock + drawer-toggle
-            far-left, singlePage/exlink icons spread either side ---- */
+  /* ---- 09  Navbar — rebuilt: avatar+name centred, time top-left, icons spread */
   function initHeroCluster() {
     function tryBuild() {
       var header = document.getElementById('header'); if (!header) return false;
       if (document.getElementById('luliy-nav-rebuilt')) return true;
 
-      /* Wait briefly for Gmeek to render nav links, but don't block
-         forever — after a few tries, build anyway (links are collected
-         from the whole header as a fallback below). */
+      /* Wait briefly for Gmeek to render nav links */
       var trProbe = header.querySelector('.title-right, [class*="title-right"]');
       var probeCount = trProbe ? trProbe.querySelectorAll('a, button, .circle').length
                                : header.querySelectorAll('a, button, .circle').length;
@@ -694,12 +691,9 @@
         return false;
       }
 
-      /* Mark header as rebuilt so CSS can target it */
       header.setAttribute('data-luliy-nav', '1');
 
-      /* ── Collect nav links BEFORE hiding anything ─────────
-         (hiding header children first could hide the links'
-         container and lose the singlePage/exlink buttons). */
+      /* ── Collect nav links BEFORE hiding anything ───────── */
       var tr = header.querySelector('.title-right, [class*="title-right"]');
       var rawLinks = [];
       if (tr) rawLinks = Array.from(tr.querySelectorAll('a, button, .circle'));
@@ -707,158 +701,199 @@
         rawLinks = Array.from(header.querySelectorAll('a, button, .circle'));
       }
 
-      /* Now hide every existing child (links are captured above) */
+      /* Hide every existing child (links captured above) */
       Array.from(header.children).forEach(function (el) {
         var id = el.id || '';
         if (id === 'luliy-toolbar' || id === 'luliy-nav-rebuilt' || id === 'luliy-nav-ham') return;
         el.style.display = 'none';
       });
 
-      /* Outer rebuilt shell */
+      /* Filter: drop RSS + about (about lives behind avatar) + circle */
+      var circleBtn = null;
+      var links = rawLinks.filter(function (a) {
+        var id = a.id || '';
+        if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return false;
+        var href = a.getAttribute('href') || '';
+        if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
+        if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
+        if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
+        return true;
+      });
+      /* Stash metadata for the mobile drawer + quick bar */
+      root._luliyNavLinks = links.map(function (a) {
+        return {
+          href: a.getAttribute('href') || '',
+          absHref: a.href || '',
+          label: a.getAttribute('title') || (a.textContent || '').trim(),
+          target: a.getAttribute('target') || '',
+          html: a.innerHTML
+        };
+      });
+
+      /* ════════ Build the new hero card (design-image layout) ════════ */
       var shell = document.createElement('div');
       shell.id = 'luliy-nav-rebuilt';
 
-      /* ── Far-left: drawer-toggle button (opens the shortcut drawer) ── */
-      var drawerBtn = document.createElement('button');
-      drawerBtn.id = 'luliy-nav-drawer-toggle';
-      drawerBtn.type = 'button';
-      drawerBtn.setAttribute('aria-label', '\u5feb\u6377\u83dc\u5355');  /* 快捷菜单 */
-      drawerBtn.innerHTML =
-        '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 2.75C1 2.336 1.336 2 ' +
-        '1.75 2h3.5c.414 0 .75.336.75.75v3.5c0 .414-.336.75-.75.75h-3.5A.75.75 0 0 1 1 ' +
-        '6.25v-3.5Zm9 0c0-.414.336-.75.75-.75h3.5c.414 0 .75.336.75.75v3.5c0 .414-.336' +
-        '.75-.75.75h-3.5a.75.75 0 0 1-.75-.75v-3.5ZM1 11.75c0-.414.336-.75.75-.75h3.5c' +
-        '.414 0 .75.336.75.75v3.5c0 .414-.336.75-.75.75h-3.5a.75.75 0 0 1-.75-.75v-3.5Z' +
-        'm9 0c0-.414.336-.75.75-.75h3.5c.414 0 .75.336.75.75v3.5c0 .414-.336.75-.75.75h' +
-        '-3.5a.75.75 0 0 1-.75-.75v-3.5Z"/></svg>';
-      drawerBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        /* Resolved lazily — initMobileNav (module 18) runs after this one. */
-        if (root._luliyToggleDrawer) root._luliyToggleDrawer();
-      });
-
-      /* ── Far-left: clock ────────────────────────────────── */
-      var timeEl = document.createElement('div');
-      timeEl.id = 'luliy-nav-time';
-      function pad(n) { return String(n).padStart(2, '0'); }
-      function updTime() {
-        var n = new Date();
-        timeEl.textContent = pad(n.getHours()) + ':' + pad(n.getMinutes()) + ':' + pad(n.getSeconds());
-      }
-      updTime();
-      if (root._luliyClockTimer) clearInterval(root._luliyClockTimer);  /* no duplicate timers */
-      root._luliyClockTimer = setInterval(updTime, 1000);
-
-      /* ── Centre: avatar + blog name ─────────────────────── */
-      var centre = document.createElement('div');
-      centre.id = 'luliy-nav-centre';
+      /* ── LEFT: avatar + name + divider + time/date ───────── */
+      var leftZone = document.createElement('div');
+      leftZone.id = 'luliy-hero-left';
 
       var avatarLink = document.createElement('a');
       avatarLink.href = '/about'; avatarLink.id = 'luliy-nav-avatar-link';
+      avatarLink.setAttribute('aria-label', '\u5173\u4e8e');
       var avatarImg = document.createElement('img');
       avatarImg.src = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/Luliy.jpg';
-      avatarImg.id = 'luliy-nav-avatar'; avatarImg.alt = 'Luliy'; avatarImg.loading = 'eager';
+      avatarImg.id = 'luliy-nav-avatar'; avatarImg.alt = 'Luliy';
       avatarLink.appendChild(avatarImg);
 
       var blogName = document.createElement('a');
       blogName.href = '/'; blogName.id = 'luliy-nav-blogname';
       blogName.textContent = 'Luliy';
 
-      centre.appendChild(avatarLink);
-      centre.appendChild(blogName);
+      var divider = document.createElement('span');
+      divider.id = 'luliy-hero-divider';
 
-      /* ── Process the collected links ──────────────────────
-         Clone (not move) so the rebuild survives later DOM churn. */
-      var iconsLeft  = document.createElement('div');
-      var iconsRight = document.createElement('div');
-      iconsLeft.id  = 'luliy-nav-icons-left';
-      iconsRight.id = 'luliy-nav-icons-right';
+      /* Time + date block (live Beijing time, UTC+8) */
+      var timeBlock = document.createElement('div');
+      timeBlock.id = 'luliy-hero-timeblock';
+      var timeRow = document.createElement('div');
+      timeRow.id = 'luliy-hero-time';
+      var clockIcon = document.createElement('span');
+      clockIcon.id = 'luliy-hero-clock';
+      clockIcon.innerHTML = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.4"/><path d="M8 4.4V8l2.6 1.6" stroke-linecap="round"/></svg>';
+      var timeText = document.createElement('span');
+      timeText.id = 'luliy-hero-time-text';
+      timeRow.appendChild(clockIcon); timeRow.appendChild(timeText);
+      var dateText = document.createElement('div');
+      dateText.id = 'luliy-hero-date';
+      timeBlock.appendChild(timeRow); timeBlock.appendChild(dateText);
 
-      /* Pull out Gmeek's native day/night .circle (may be a div) first. */
-      var circleBtn = null;
-      var captured = rawLinks.filter(function (a) {
-        if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
-        var id = a.id || '';
-        if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return false;
-        return true;
-      });
+      var WEEK = ['\u65e5','\u4e00','\u4e8c','\u4e09','\u56db','\u4e94','\u516d'];
+      function updTime() {
+        /* Beijing time = UTC+8 regardless of viewer's timezone */
+        var now = new Date();
+        var bj = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000));
+        var hh = String(bj.getHours()).padStart(2, '0');
+        var mm = String(bj.getMinutes()).padStart(2, '0');
+        var ss = String(bj.getSeconds()).padStart(2, '0');
+        timeText.textContent = hh + ':' + mm + ':' + ss;
+        dateText.textContent =
+          bj.getFullYear() + ' / ' +
+          String(bj.getMonth() + 1).padStart(2, '0') + ' / ' +
+          String(bj.getDate()).padStart(2, '0') + '\u3000\u5468' + WEEK[bj.getDay()];
+      }
+      updTime(); setInterval(updTime, 1000);
 
-      /* Capture EVERY remaining link (singlePage + exlink + rss) for the
-         drawer, preserving Gmeek's SVG icons + real labels. The isRss /
-         isAbout flags let the drawer and the inline navbar each pick
-         exactly what they want — so the icons are never "missing". */
-      root._luliyNavLinks = captured.map(function (a) {
-        var href = a.getAttribute('href') || '';
-        return {
-          href:    href,
-          absHref: a.href || '',
-          label:   a.getAttribute('title') || (a.textContent || '').trim(),
-          html:    a.innerHTML,                                    /* SVG icon markup */
-          isRss:   /rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href),
-          isAbout: /\/about(\.html)?$|^about(\.html)?$/.test(href)
-        };
-      });
+      leftZone.appendChild(avatarLink);
+      leftZone.appendChild(blogName);
+      leftZone.appendChild(divider);
+      leftZone.appendChild(timeBlock);
 
-      /* Inline navbar icons = everything except About (the avatar links
-         there already) and RSS (kept in the drawer only). */
-      var links = captured.filter(function (a) {
-        var href = a.getAttribute('href') || '';
-        if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
-        if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
-        return true;
-      });
-
-      /* Split evenly: first half left, second half right. */
-      var half = Math.ceil(links.length / 2);
+      /* ── CENTRE-BOTTOM: link capsule bar ─────────────────── */
+      var capsule = document.createElement('div');
+      capsule.id = 'luliy-hero-capsule';
       links.forEach(function (a, i) {
+        if (i > 0) {
+          var sep = document.createElement('span');
+          sep.className = 'luliy-hero-cap-sep';
+          capsule.appendChild(sep);
+        }
         var c = a.cloneNode(true);
-        c.classList.add('luliy-nav-icon-link');
-        c.style.display = ''; c.style.visibility = '';
+        c.classList.add('luliy-hero-cap-link');
         c.removeAttribute('id');
-        (i < half ? iconsLeft : iconsRight).appendChild(c);
+        c.style.display = ''; c.style.visibility = '';
+        /* add a text label after the icon */
+        var lbl = a.getAttribute('title') || (a.textContent || '').trim();
+        if (lbl) {
+          var span = document.createElement('span');
+          span.className = 'luliy-hero-cap-txt';
+          span.textContent = lbl;
+          c.appendChild(span);
+        }
+        capsule.appendChild(c);
       });
-      /* Place the native circle next to the blog name — MOVE this one
-         (not clone) so its native day/night click handler still works. */
+
+      /* ── RIGHT: settings slot (existing toolbar pill moves here) ─ */
+      var rightZone = document.createElement('div');
+      rightZone.id = 'luliy-hero-right';
+      /* the #luliy-toolbar pill is relocated here after it's built */
+      root._luliyHeroRightSlot = rightZone;
+
+      /* ── Native day/night circle: tuck beside the name ───── */
       if (circleBtn) {
         circleBtn.id = 'luliy-nav-circle';
-        circleBtn.classList.add('luliy-nav-icon-link');
-        circleBtn.style.display = '';
-        circleBtn.style.visibility = '';
-        centre.appendChild(circleBtn);
+        circleBtn.classList.add('luliy-hero-circle');
+        circleBtn.style.display = ''; circleBtn.style.visibility = '';
+        leftZone.appendChild(circleBtn);
       }
 
-      shell.appendChild(drawerBtn);
-      shell.appendChild(timeEl);
-      shell.appendChild(iconsLeft);
-      shell.appendChild(centre);
-      shell.appendChild(iconsRight);
-
+      shell.appendChild(leftZone);
+      shell.appendChild(capsule);
+      shell.appendChild(rightZone);
       header.insertBefore(shell, header.firstChild);
 
-      /* ── Self-heal: if the icon groups ended up empty but Gmeek's
-         hidden .title-right still holds links, recover them now. */
-      if (iconsLeft.children.length === 0 && iconsRight.children.length === 0) {
+      /* Self-heal: capsule empty but links exist → rebuild from title-right */
+      if (capsule.querySelectorAll('.luliy-hero-cap-link').length === 0) {
         var late = header.querySelector('.title-right, [class*="title-right"]');
         if (late) {
-          var lateLinks = Array.from(late.querySelectorAll('a, button, .circle'))
-            .filter(function (a) {
-              var href = a.getAttribute('href') || '';
-              if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
-              if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
-              if (a.classList && a.classList.contains('circle')) return false;
-              return true;
-            });
-          var lh = Math.ceil(lateLinks.length / 2);
-          lateLinks.forEach(function (a, i) {
+          Array.from(late.querySelectorAll('a')).filter(function (a) {
+            var href = a.getAttribute('href') || '';
+            if (/rss\.xml$|\/rss$|\/feed/.test(href)) return false;
+            if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
+            return true;
+          }).forEach(function (a, i) {
+            if (i > 0) {
+              var sep = document.createElement('span');
+              sep.className = 'luliy-hero-cap-sep'; capsule.appendChild(sep);
+            }
             var c = a.cloneNode(true);
-            c.classList.add('luliy-nav-icon-link');
+            c.classList.add('luliy-hero-cap-link'); c.removeAttribute('id');
             c.style.display = ''; c.style.visibility = '';
-            c.removeAttribute('id');
-            (i < lh ? iconsLeft : iconsRight).appendChild(c);
+            var lbl = a.getAttribute('title') || (a.textContent || '').trim();
+            if (lbl) { var s = document.createElement('span'); s.className = 'luliy-hero-cap-txt'; s.textContent = lbl; c.appendChild(s); }
+            capsule.appendChild(c);
           });
         }
       }
+
+      /* Relocate the toolbar pill into the hero right slot, if ready */
+      relocatePill();
+
+      /* Build the mobile quick-link bar (always-visible icon row) */
+      buildMobileQuickBar();
+
       return true;
+    }
+
+    /* Move the existing #luliy-toolbar pill into the hero right slot */
+    function relocatePill() {
+      var slot = root._luliyHeroRightSlot;
+      var pill = document.getElementById('luliy-toolbar');
+      if (slot && pill && pill.parentElement !== slot) {
+        slot.appendChild(pill);
+      }
+    }
+    root._luliyRelocatePill = relocatePill;
+
+    /* Mobile quick-link bar: a compact icon row under the navbar so
+       singlePage/exlink are reachable without opening the drawer. */
+    function buildMobileQuickBar() {
+      if (document.getElementById('luliy-quickbar')) return;
+      var metas = (root._luliyNavLinks || []).filter(function (m) { return m.href || m.absHref; });
+      if (!metas.length) return;
+      var bar = document.createElement('div');
+      bar.id = 'luliy-quickbar';
+      metas.forEach(function (m) {
+        var a = document.createElement('a');
+        a.className = 'luliy-quick-link';
+        a.href = m.absHref || m.href;
+        if (m.target) a.target = m.target;
+        a.title = m.label || '';
+        a.setAttribute('aria-label', m.label || '');
+        a.innerHTML = m.html || (m.label || '');
+        bar.appendChild(a);
+      });
+      document.body.appendChild(bar);
     }
 
     if (!tryBuild()) {
@@ -867,6 +902,17 @@
         if (tryBuild() || ++tries > 30) clearInterval(iv);
       }, 200);
     }
+    /* In case the pill is built after the hero, retry relocation a few times */
+    var pn = 0;
+    var piv = setInterval(function () {
+      if (root._luliyRelocatePill) root._luliyRelocatePill();
+      if (document.getElementById('luliy-toolbar') &&
+          document.getElementById('luliy-toolbar').parentElement &&
+          document.getElementById('luliy-toolbar').parentElement.id === 'luliy-hero-right') {
+        clearInterval(piv);
+      }
+      if (++pn > 30) clearInterval(piv);
+    }, 200);
   }
 
   /* ---- 10  Hero banner (homepage, scroll-fold) ------------ */
@@ -2142,41 +2188,6 @@
     var dBody = document.createElement('div');
     dBody.id = 'luliy-drawer-body';
 
-    /* ── Section: Shortcuts (singlePage + exlink) ──────────────
-       Built from the links captured by the navbar (module 09).
-       Rendered as an icon grid so every page is one tap away. */
-    var _shortcuts = (root._luliyNavLinks || []).filter(function (m) {
-      return !m.isRss && (m.href || m.absHref);
-    });
-    if (_shortcuts.length) {
-      var sec0 = document.createElement('div');
-      sec0.className = 'luliy-drawer-sec';
-      var sec0Title = document.createElement('div');
-      sec0Title.className = 'luliy-drawer-sec-title';
-      sec0Title.textContent = '\u5feb\u6377\u65b9\u5f0f';  /* 快捷方式 */
-      sec0.appendChild(sec0Title);
-
-      var scGrid = document.createElement('div');
-      scGrid.className = 'luliy-drawer-shortcut-grid';
-      _shortcuts.forEach(function (m) {
-        var a = document.createElement('a');
-        a.className = 'luliy-drawer-shortcut';
-        a.href = m.absHref || m.href;
-        if (/^https?:/i.test(m.absHref) && m.absHref.indexOf(location.origin) !== 0) {
-          a.target = '_blank'; a.rel = 'noopener';   /* exlink → new tab */
-        }
-        var raw   = (m.href || '').replace(/^\//, '').replace(/\.html$/, '');
-        var label = m.label || raw || '\u94fe\u63a5';
-        var ico   = m.html  || '\u2022';
-        a.innerHTML =
-          '<span class="luliy-drawer-shortcut-ico">' + ico + '</span>' +
-          '<span class="luliy-drawer-shortcut-txt">' + label + '</span>';
-        scGrid.appendChild(a);
-      });
-      sec0.appendChild(scGrid);
-      dBody.appendChild(sec0);
-    }
-
     /* ── Section: Navigation links ─────────────────────────── */
     var navLinks = (root._luliyNavLinks || []).filter(function(m){ return m.href || m.absHref; });
     if (navLinks.length) {
@@ -2353,13 +2364,6 @@
       ham.classList.remove('is-open');
       document.body.classList.remove('luliy-drawer-open');
     }
-
-    /* Expose so the navbar's left drawer-toggle (module 09) can drive it. */
-    root._luliyOpenDrawer   = openDrawer;
-    root._luliyCloseDrawer  = closeDrawer;
-    root._luliyToggleDrawer = function () {
-      if (drawer.classList.contains('is-open')) closeDrawer(); else openDrawer();
-    };
 
     ham.addEventListener('click', function(e) {
       e.stopPropagation();

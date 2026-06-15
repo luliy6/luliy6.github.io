@@ -387,160 +387,214 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
        Nav icons: split left + right of name
 ══════════════════════════════════════════════════════════ */
 
-/* ── Base #header ──────────────────────────────────────── */
+/* ── Base #header — hosts the floating hero card ─────────── */
 #header {
   position: fixed !important;
   top: 0 !important; left: 0 !important; right: 0 !important;
   width: 100% !important;
-  height: 58px !important;
-  padding: 0 !important;
-  background: rgba(10,6,20,0.88) !important;
-  backdrop-filter: blur(22px) saturate(1.8) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(1.8) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.10) !important;
-  box-shadow: 0 2px 20px rgba(0,0,0,0.40) !important;
+  height: auto !important;
+  min-height: 84px !important;
+  padding: 12px 20px 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   z-index: 9999 !important;
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
   overflow: visible !important;
-  transition: opacity 0.5s ease, background 0.5s ease !important;
 }
 
-/* ── Theme-specific top border accent ───────────────────── */
-body[data-luliy-theme="default"] #header  { border-top: 2px solid rgba(130,80,223,0.60) !important; }
-body[data-luliy-theme="sakura"] #header   { border-top: 2px solid rgba(201,64,112,0.60) !important; }
-body[data-luliy-theme="your-name"] #header{ border-top: 2px solid rgba(255,169,77,0.70) !important; }
-body[data-luliy-theme="space"] #header    { border-top: 2px solid rgba(0,229,255,0.60) !important; }
-body[data-luliy-theme="sunset"] #header   { border-top: 2px solid rgba(232,168,56,0.70) !important; }
-body[data-luliy-theme="mono"] #header     { border-top: 2px solid rgba(220,220,220,0.50) !important; }
-
-/* ── Rebuilt shell ──────────────────────────────────────── */
+/* ════════ Hero card — frosted glass, theme-aware ════════ */
 #luliy-nav-rebuilt {
   width: 100%;
-  height: 100%;
+  max-width: 1180px;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  grid-template-rows: 1fr;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "left capsule right";
   align-items: center;
-  padding: 0 20px;
+  gap: 18px;
+  padding: 14px 22px;
   box-sizing: border-box;
+  border-radius: 22px;
   position: relative;
+  /* Grey frosted glass */
+  background: var(--th-hero-bg, rgba(245,245,250,0.62));
+  -webkit-backdrop-filter: blur(28px) saturate(1.7);
+  backdrop-filter: blur(28px) saturate(1.7);
+  border: 1px solid var(--th-hero-border, rgba(255,255,255,0.55));
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.6) inset;
 }
+[data-color-mode="dark"] #luliy-nav-rebuilt {
+  background: var(--th-hero-bg, rgba(18,16,26,0.66));
+  border-color: var(--th-hero-border, rgba(255,255,255,0.10));
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.06) inset;
+}
+/* Theme accent top border on the card */
+body[data-luliy-theme="default"] #luliy-nav-rebuilt  { border-top: 2px solid rgba(130,80,223,0.55); }
+body[data-luliy-theme="sakura"] #luliy-nav-rebuilt   { border-top: 2px solid rgba(201,64,112,0.55); }
+body[data-luliy-theme="your-name"] #luliy-nav-rebuilt{ border-top: 2px solid rgba(255,169,77,0.65); }
+body[data-luliy-theme="space"] #luliy-nav-rebuilt    { border-top: 2px solid rgba(0,229,255,0.55); }
+body[data-luliy-theme="sunset"] #luliy-nav-rebuilt   { border-top: 2px solid rgba(232,168,56,0.65); }
+body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgba(150,150,150,0.5); }
 
-/* ── Far-left: drawer-toggle button ─────────────────────── */
-#luliy-nav-drawer-toggle {
-  position: absolute;
-  left: 14px; top: 50%;
-  transform: translateY(-50%);
-  width: 38px; height: 38px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border: none; border-radius: 10px;
-  background: rgba(255,255,255,0.10);
-  color: rgba(255,255,255,0.88);
-  cursor: pointer; z-index: 5;
-  transition: background 0.18s, transform 0.18s, color 0.18s;
-  -webkit-tap-highlight-color: transparent;
+/* ── LEFT: avatar + name + divider + time ────────────────── */
+#luliy-hero-left {
+  grid-area: left;
+  display: flex; align-items: center; gap: 16px;
 }
-#luliy-nav-drawer-toggle:hover {
-  background: rgba(255,255,255,0.20);
-  color: #fff;
-  transform: translateY(-50%) scale(1.08);
-}
-#luliy-nav-drawer-toggle:active { transform: translateY(-50%) scale(0.94); }
-#luliy-nav-drawer-toggle svg { width: 18px; height: 18px; fill: currentColor; }
-
-/* ── Clock — far-left, beside the drawer toggle ─────────── */
-#luliy-nav-time {
-  position: absolute;
-  top: 50%; left: 62px;
-  transform: translateY(-50%);
-  font-size: 16px;                 /* was 13px — slightly larger */
-  font-family: 'LXGW WenKai Mono', monospace;
-  color: rgba(255,255,255,0.72);
-  letter-spacing: 1.5px;
-  line-height: 1;
-  pointer-events: none;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Left icon group ────────────────────────────────────── */
-#luliy-nav-icons-left {
-  display: flex; align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-  padding-right: 14px;
-}
-
-/* ── Centre: avatar + blog name ─────────────────────────── */
-#luliy-nav-centre {
-  display: flex; align-items: center; gap: 10px;
-  justify-content: center;
-}
-#luliy-nav-avatar-link {
-  display: flex; align-items: center;
-  text-decoration: none;
-  flex-shrink: 0;
-}
+#luliy-nav-avatar-link { display: flex; align-items: center; flex-shrink: 0; text-decoration: none; }
 #luliy-nav-avatar {
-  width: 32px; height: 32px; border-radius: 50%;
+  width: 60px; height: 60px; border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.35);
+  border: 3px solid var(--th-hero-avatar-ring, rgba(255,255,255,0.85));
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   transition: border-color 0.2s, transform 0.2s;
 }
-#luliy-nav-avatar:hover { border-color: var(--th-accent, #8250df); transform: scale(1.08); }
+#luliy-nav-avatar:hover { border-color: var(--th-accent, #8250df); transform: scale(1.05); }
 #luliy-nav-blogname {
-  font-size: 22px; font-weight: 900;
-  letter-spacing: 2px;
-  color: #ffffff !important;
+  font-size: 32px; font-weight: 900; letter-spacing: 1px;
+  color: var(--th-hero-fg, #1a1430) !important;
   text-decoration: none !important;
   font-family: 'Noto Sans SC', sans-serif;
-  text-shadow: 0 2px 14px rgba(0,0,0,0.6);
-  white-space: nowrap;
+  white-space: nowrap; line-height: 1;
 }
-#luliy-nav-blogname:hover { color: var(--th-accent, #cba6f7) !important; }
+[data-color-mode="dark"] #luliy-nav-blogname { color: var(--th-hero-fg, #fff) !important; }
+#luliy-nav-blogname:hover { color: var(--th-accent, #8250df) !important; }
+#luliy-hero-divider {
+  width: 1px; height: 38px;
+  background: var(--th-hero-divider, rgba(0,0,0,0.14));
+  flex-shrink: 0;
+}
+[data-color-mode="dark"] #luliy-hero-divider { background: rgba(255,255,255,0.16); }
+#luliy-hero-timeblock { display: flex; flex-direction: column; gap: 3px; }
+#luliy-hero-time {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 22px; font-weight: 700;
+  font-family: 'LXGW WenKai Mono', 'Noto Sans SC', monospace;
+  color: var(--th-accent, #8250df);
+  line-height: 1;
+}
+#luliy-hero-clock { display: inline-flex; color: var(--th-accent, #8250df); }
+#luliy-hero-date {
+  font-size: 12px; letter-spacing: 0.5px;
+  color: var(--th-hero-muted, rgba(0,0,0,0.45));
+  font-family: 'LXGW WenKai Mono', monospace;
+}
+[data-color-mode="dark"] #luliy-hero-date { color: rgba(255,255,255,0.5); }
 
-/* ── Native Gmeek day/night circle — kept beside blog name ─ */
-#luliy-nav-circle {
-  width: 30px; height: 30px; border-radius: 50%;
+/* Day/night circle — beside the time block */
+#luliy-nav-circle, .luliy-hero-circle {
+  width: 34px; height: 34px; border-radius: 50%;
   display: inline-flex !important; align-items: center; justify-content: center;
-  flex-shrink: 0; margin-left: 6px;
-  background: rgba(255,255,255,0.14) !important;
-  color: #fff !important; cursor: pointer;
+  flex-shrink: 0;
+  background: var(--th-accent-soft, rgba(130,80,223,0.12)) !important;
+  color: var(--th-accent, #8250df) !important; cursor: pointer;
   transition: background 0.18s, transform 0.18s;
 }
-#luliy-nav-circle:hover { background: rgba(255,255,255,0.26) !important; transform: scale(1.1); }
-#luliy-nav-circle svg { fill: currentColor !important; width: 16px; height: 16px; }
+#luliy-nav-circle:hover { background: var(--th-accent-hover, rgba(130,80,223,0.24)) !important; transform: scale(1.1); }
+#luliy-nav-circle svg, .luliy-hero-circle svg { fill: currentColor !important; width: 17px; height: 17px; }
 
-
-/* ── Right icon group ───────────────────────────────────── */
-#luliy-nav-icons-right {
+/* ── CENTRE-BOTTOM: link capsule bar ─────────────────────── */
+#luliy-hero-capsule {
+  grid-area: capsule;
+  justify-self: center;
+  align-self: end;
   display: flex; align-items: center;
-  justify-content: flex-start;
-  gap: 4px;
-  padding-left: 14px;
+  gap: 2px;
+  padding: 8px 14px;
+  border-radius: 16px;
+  background: var(--th-hero-capsule, rgba(255,255,255,0.45));
+  border: 1px solid var(--th-hero-border, rgba(255,255,255,0.5));
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
-
-/* ── Nav icon links (from original .title-right) ─────────── */
-.luliy-nav-icon-link,
-#luliy-nav-icons-left a, #luliy-nav-icons-right a,
-#luliy-nav-icons-left button, #luliy-nav-icons-right button {
-  display: inline-flex !important; align-items: center; justify-content: center;
-  width: 36px; height: 36px; border-radius: 8px;
-  color: rgba(255,255,255,0.85) !important;
+#luliy-hero-capsule::-webkit-scrollbar { display: none; }
+[data-color-mode="dark"] #luliy-hero-capsule {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.10);
+}
+.luliy-hero-cap-link {
+  display: inline-flex !important; align-items: center; gap: 7px;
+  padding: 7px 14px; border-radius: 11px;
+  color: var(--th-hero-fg, #2a2440) !important;
   text-decoration: none !important; border: none !important;
-  background: rgba(255,255,255,0.08) !important;
-  cursor: pointer; transition: background 0.15s, color 0.15s, transform 0.15s;
-  font-size: 15px;
+  background: transparent !important;
+  font-size: 14px; font-weight: 600;
+  font-family: 'Noto Sans SC', sans-serif;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
 }
-.luliy-nav-icon-link:hover,
-#luliy-nav-icons-left a:hover, #luliy-nav-icons-right a:hover,
-#luliy-nav-icons-left button:hover, #luliy-nav-icons-right button:hover {
-  background: rgba(255,255,255,0.18) !important;
-  color: #fff !important;
+[data-color-mode="dark"] .luliy-hero-cap-link { color: var(--th-hero-fg, rgba(245,242,255,0.92)) !important; }
+.luliy-hero-cap-link:hover {
+  background: var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
+  color: var(--th-accent, #8250df) !important;
   transform: translateY(-1px);
 }
-/* SVG icons follow text color */
-#luliy-nav-rebuilt svg { fill: currentColor !important; width: 16px; height: 16px; }
+[data-color-mode="dark"] .luliy-hero-cap-link:hover { color: #fff !important; }
+.luliy-hero-cap-link svg { width: 17px; height: 17px; }
+.luliy-hero-cap-txt { text-transform: capitalize; }
+.luliy-hero-cap-sep {
+  width: 1px; height: 18px; flex-shrink: 0;
+  background: var(--th-hero-divider, rgba(0,0,0,0.1));
+}
+[data-color-mode="dark"] .luliy-hero-cap-sep { background: rgba(255,255,255,0.12); }
+
+/* ── RIGHT: settings slot (the toolbar pill relocates here) ─ */
+#luliy-hero-right {
+  grid-area: right;
+  display: flex; align-items: center; justify-content: flex-end;
+  min-width: 56px;
+}
+
+/* When the pill lives in the hero, neutralise its fixed positioning */
+#luliy-hero-right #luliy-toolbar {
+  position: relative !important;
+  top: auto !important; right: auto !important; bottom: auto !important; left: auto !important;
+}
+/* Panel drops down-left from the pill when it lives in the hero */
+#luliy-hero-right #luliy-ctrl-panel {
+  top: calc(100% + 10px) !important;
+  right: 0 !important;
+}
+
+/* ── Mobile quick-link bar (singlePage/exlink shortcuts) ──── */
+#luliy-quickbar {
+  display: none;   /* shown only on mobile via media query */
+  position: fixed;
+  top: 78px; left: 8px; right: 8px;
+  z-index: 9998;
+  align-items: center; gap: 4px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--th-hero-bg, rgba(245,245,250,0.72));
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid var(--th-hero-border, rgba(255,255,255,0.5));
+  box-shadow: 0 6px 22px rgba(0,0,0,0.14);
+}
+#luliy-quickbar::-webkit-scrollbar { display: none; }
+[data-color-mode="dark"] #luliy-quickbar {
+  background: rgba(18,16,26,0.78);
+  border-color: rgba(255,255,255,0.10);
+}
+.luliy-quick-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: 10px;
+  color: var(--th-hero-fg, #2a2440) !important;
+  background: var(--th-accent-soft, rgba(130,80,223,0.10));
+  text-decoration: none !important;
+  transition: background 0.15s, transform 0.15s;
+}
+[data-color-mode="dark"] .luliy-quick-link { color: rgba(245,242,255,0.92) !important; }
+.luliy-quick-link:active { transform: scale(0.92); }
+.luliy-quick-link svg { width: 18px; height: 18px; fill: currentColor; }
+
 
 /* ── Hamburger — mobile ─────────────────────────────────── */
 #luliy-nav-ham {
@@ -627,40 +681,6 @@ body.luliy-drawer-open { overflow: hidden; }
   font-size: 10px; font-weight: 700; letter-spacing: 2px;
   color: rgba(255,255,255,0.35); text-transform: uppercase;
   margin-bottom: 10px; font-family: 'Noto Sans SC', sans-serif;
-}
-
-/* Shortcuts (singlePage + exlink) — icon tiles */
-.luliy-drawer-shortcut-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-.luliy-drawer-shortcut {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 12px 6px; border-radius: 12px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.80) !important;
-  text-decoration: none !important;
-  transition: background 0.15s, border-color 0.15s, transform 0.15s, color 0.15s;
-}
-.luliy-drawer-shortcut:hover {
-  background: rgba(255,255,255,0.13);
-  border-color: var(--th-accent, #8250df);
-  color: #fff !important;
-  transform: translateY(-2px);
-}
-.luliy-drawer-shortcut-ico {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px;
-}
-.luliy-drawer-shortcut-ico svg { width: 18px; height: 18px; fill: currentColor; }
-.luliy-drawer-shortcut-txt {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
-  text-transform: capitalize; text-align: center;
-  font-family: 'Noto Sans SC', sans-serif;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 100%;
 }
 
 /* Nav links */
@@ -778,35 +798,10 @@ body.luliy-drawer-open { overflow: hidden; }
   box-shadow: 0 1px 12px rgba(0,0,0,0.25) !important;
 }
 
+
 /* ══════════════════════════════════════════════════════════
-   06  Nav text links — singlePage / exlink pill style
-   ↗ arrow 在 navbar 内 suppressed；文字链接自适应宽度
+   06  (merged into 05 — Navbar rebuild)
 ══════════════════════════════════════════════════════════ */
-
-/* 压制导航栏内所有链接的 ↗ after 内容 */
-#luliy-nav-rebuilt a::after,
-#luliy-nav-icons-left a::after,
-#luliy-nav-icons-right a::after {
-  content: none !important;
-}
-
-/* 没有 SVG 图标的文字链接（singlePage / exlink）
-   改为自适应宽度的胶囊样式，不再挤进 36px 小方块 */
-#luliy-nav-icons-left a:not(:has(svg)),
-#luliy-nav-icons-right a:not(:has(svg)) {
-  width: auto !important;
-  min-width: 0 !important;
-  padding: 0 12px !important;
-  font-size: 12px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.5px !important;
-  white-space: nowrap !important;
-  border-radius: 999px !important;
-  font-family: 'Noto Sans SC', sans-serif !important;
-  max-width: 90px !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
 
 /* ══════════════════════════════════════════════════════════
    07  Hero banner (scroll-fold on homepage)
@@ -1123,7 +1118,7 @@ body[data-luliy-theme="space"] .luliy-card:hover .luliy-card-deco {
 /* Post pages need extra top margin to clear fixed header */
 body.luliy-post-page #content,
 body.luliy-post-page .main {
-  margin-top: 72px !important;
+  margin-top: 104px !important;
 }
 
 /* Misc */
@@ -3082,44 +3077,45 @@ body.luliy-reduce-motion * {
   .luliy-range::-moz-range-thumb { width: 22px; height: 22px; }
   .luliy-ctrl-slider { padding-top: 12px !important; padding-bottom: 14px !important; }
 
-  /* APlayer: smaller folded ball, clears the navbar */
-
-
-
-  /* ── Rebuilt navbar mobile layout ─────────────────────── */
-  /* Hamburger: absolute right, vertically centred */
+  /* ── Hero card mobile layout ──────────────────────────── */
+  #header { padding: 8px 10px 0 !important; min-height: 0 !important; }
   #luliy-nav-ham {
     display: flex !important;
     position: absolute !important;
-    right: 16px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
+    right: 14px !important;
+    top: 18px !important;
     margin: 0 !important;
+    z-index: 2;
   }
-  /* Icon groups collapse — their links live in the dropdown */
-  #luliy-nav-icons-left, #luliy-nav-icons-right { display: none !important; }
-  /* Left drawer-toggle hidden on mobile — the right hamburger opens it */
-  #luliy-nav-drawer-toggle { display: none !important; }
-  /* Centre group fills the bar */
+  /* Compact single-row hero: avatar + name + time on left, ham on right */
   #luliy-nav-rebuilt {
     grid-template-columns: 1fr !important;
-    padding: 0 52px !important;   /* clearance for ham */
+    grid-template-areas: "left" !important;
+    gap: 0 !important;
+    padding: 12px 50px 12px 14px !important;
+    border-radius: 18px !important;
   }
-  #luliy-nav-blogname { font-size: 18px !important; letter-spacing: 1.5px !important; }
-  #luliy-nav-avatar { width: 28px !important; height: 28px !important; }
-  /* Compact top-left clock, nudged up slightly larger (was 11px) */
-  #luliy-nav-time {
-    font-size: 13px !important;
-    left: 12px !important; top: 4px !important;
-    transform: none !important;   /* cancel the desktop vertical-centre */
-  }
-  /* Never resurrect the original title-right (replaced by rebuilt nav) */
+  #luliy-hero-left { gap: 10px !important; }
+  #luliy-nav-avatar { width: 44px !important; height: 44px !important; }
+  #luliy-nav-blogname { font-size: 22px !important; }
+  #luliy-hero-divider { height: 28px !important; }
+  #luliy-hero-time { font-size: 16px !important; }
+  #luliy-hero-date { font-size: 10px !important; }
+  #luliy-nav-circle, .luliy-hero-circle { width: 30px !important; height: 30px !important; }
+  /* The desktop capsule + settings slot hide on mobile (links live in
+     the quick-bar below + the drawer; settings live in the drawer too) */
+  #luliy-hero-capsule { display: none !important; }
+  #luliy-hero-right { display: none !important; }
+  /* Never resurrect the original title-right */
   .title-right { display: none !important; }
-  /* Toolbar hidden on mobile — sfx/theme/sakura/TOC live in dropdown */
+  /* Toolbar pill hidden on mobile (settings live in the drawer) */
   #luliy-toolbar { display: none !important; }
 
+  /* Quick-link bar visible on mobile (singlePage/exlink shortcuts) */
+  #luliy-quickbar { display: flex !important; }
+
   #content, .main { padding: 0 12px !important; }
-  body.luliy-post-page #content { margin-top: 64px !important; }
+  body.luliy-post-page #content { margin-top: 118px !important; }
   #luliy-hero-banner { margin-top: 64px; font-size: 12px; padding: 12px 16px; }
 
   .luliy-card-grid { grid-template-columns: 1fr; }
