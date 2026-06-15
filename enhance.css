@@ -94,6 +94,59 @@ body.luliy-post-page #postBody {
   margin-left: calc(var(--luliy-pb-extra, 0px) * -1) !important;
   margin-right: calc(var(--luliy-pb-extra, 0px) * -1) !important;
 }
+
+
+.luliy-series-prog b { font-size: 15px; }
+.luliy-series-prog-sep { opacity: 0.7; margin: 0 1px; }
+/* Ensure it's visible in day mode on light panels */
+body[data-luliy-theme="sunset"] .luliy-series-prog { background: #d9930d; }
+body[data-luliy-theme="mono"] .luliy-series-prog   { background: #333; }
+body[data-luliy-theme="your-name"] .luliy-series-prog { background: #1e6fd4; }
+body[data-luliy-theme="sakura"] .luliy-series-prog  { background: #c94070; }
+body[data-luliy-theme="space"] .luliy-series-prog   { background: #0070b8; }
+
+/* ── Tag page article list cards ──────────────────────────── */
+#luliy-tag-articles {
+  margin-top: 20px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.luliy-tag-list-card {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 16px 20px; border-radius: 14px;
+  text-decoration: none !important;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(130,80,223,0.10);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+}
+[data-color-mode="dark"] .luliy-tag-list-card {
+  background: rgba(22,16,36,0.72);
+  border-color: rgba(130,80,223,0.18);
+}
+.luliy-tag-list-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(130,80,223,0.18);
+  background: rgba(255,255,255,0.88);
+}
+[data-color-mode="dark"] .luliy-tag-list-card:hover { background: rgba(28,20,44,0.88); }
+.luliy-tag-card-meta {
+  font-size: 12px; opacity: 0.60;
+  font-family: 'LXGW WenKai Mono', monospace;
+  color: var(--th-accent, #8250df);
+}
+.luliy-tag-card-title {
+  font-size: 16px; font-weight: 700;
+  color: #1a1430;
+  line-height: 1.4;
+}
+[data-color-mode="dark"] .luliy-tag-card-title { color: rgba(245,240,255,0.95); }
+.luliy-tag-card-labels { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.luliy-tag-bubble.is-active {
+  background: var(--tag-c, #8250df) !important;
+  color: #fff !important;
+  transform: scale(1.12);
+}
 @media (max-width: 768px) {
   /* Never overflow on mobile */
   body.luliy-post-page .markdown-body,
@@ -410,12 +463,12 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   width: 100%;
   max-width: 1180px;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   grid-template-rows: auto auto;
   grid-template-areas:
-    "left  right"
-    "capsule capsule";
-  gap: 10px 16px;
+    "left  subtitle  right"
+    "capsule capsule capsule";
+  gap: 10px 12px;
   padding: 14px 20px 12px;
   box-sizing: border-box;
   border-radius: 22px;
@@ -560,6 +613,44 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 #luliy-hero-right #luliy-ctrl-panel {
   top: calc(100% + 10px) !important;
   right: 0 !important;
+}
+
+
+/* ── SubTitle (between circle and settings) ──────────────── */
+#luliy-hero-subtitle {
+  grid-area: subtitle;
+  align-self: center; justify-self: center;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.5px;
+  color: var(--th-accent, #8250df);
+  opacity: 0.82;
+  cursor: pointer;
+  padding: 5px 10px; border-radius: 20px;
+  background: var(--th-accent-soft, rgba(130,80,223,0.10));
+  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.20));
+  transition: opacity 0.2s, background 0.2s, transform 0.2s;
+  white-space: nowrap; flex-shrink: 0;
+  -webkit-user-select: none; user-select: none;
+}
+#luliy-hero-subtitle:hover { opacity: 1; transform: scale(1.05); background: var(--th-accent-soft, rgba(130,80,223,0.18)); }
+[data-color-mode="dark"] #luliy-hero-subtitle { color: var(--th-accent, #cba6f7); }
+
+/* ── Black hole animation ─────────────────────────────────── */
+#luliy-blackhole {
+  position: fixed; width: 0; height: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none; z-index: 9999999;
+  background: radial-gradient(circle at 50%, #fff 0%, #888 15%, #000 55%, transparent 100%);
+  transition: none;
+}
+#luliy-blackhole.flash {
+  width: 280px; height: 280px;
+  animation: luliyBhFlash 0.45s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes luliyBhFlash {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
+  50%  { transform: translate(-50%,-50%) scale(1.4); opacity: 0.9; }
+  100% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
 }
 
 /* ── Mobile quick-link bar (singlePage/exlink shortcuts) ──── */
@@ -809,7 +900,7 @@ body.luliy-drawer-open { overflow: hidden; }
    07  Hero banner (scroll-fold on homepage)
 ══════════════════════════════════════════════════════════ */
 #luliy-hero-banner {
-  margin: 72px auto 0 auto;
+  margin: 168px auto 0 auto;
   width: 95%; max-width: 1040px;
   padding: 16px 28px;
   background: var(--th-accent-soft, rgba(130,80,223,0.14)) !important;
