@@ -682,6 +682,13 @@
       var header = document.getElementById('header'); if (!header) return false;
       if (document.getElementById('luliy-nav-rebuilt')) return true;
 
+      /* Wait until Gmeek has actually rendered the nav links into
+         .title-right — otherwise we'd rebuild an empty navbar and the
+         singlePage / exlink buttons would be lost. */
+      var trProbe = header.querySelector('.title-right, [class*="title-right"]');
+      var probeLinks = trProbe ? trProbe.querySelectorAll('a, button, .circle') : [];
+      if (!trProbe || probeLinks.length === 0) return false;
+
       /* Mark header as rebuilt so CSS can target it */
       header.setAttribute('data-luliy-nav', '1');
       header.id = 'header'; /* keep Gmeek id */
@@ -740,7 +747,7 @@
       iconsLeft.id  = 'luliy-nav-icons-left';
       iconsRight.id = 'luliy-nav-icons-right';
 
-      var links = tr ? Array.from(tr.querySelectorAll('a, button')) : [];
+      var links = tr ? Array.from(tr.querySelectorAll('a, button, .circle')) : [];
       /* About + RSS never appear as icons (about lives behind the avatar) */
       links = links.filter(function (a) {
         var href = a.getAttribute('href') || '';
@@ -748,8 +755,8 @@
         if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
         return true;
       });
-      /* Pull out Gmeek's native day/night .circle so it can stay visible
-         on mobile (icon groups collapse there, but the circle must not). */
+      /* Pull out Gmeek's native day/night .circle (may be a div) so it
+         can stay visible on mobile (icon groups collapse there). */
       var circleBtn = null;
       links = links.filter(function (a) {
         if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
