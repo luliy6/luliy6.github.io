@@ -78,6 +78,35 @@
       location.pathname === '/index.html' ||
       location.pathname === '';
   }
+
+  /* Resolve + directly set the colour mode (no page jump, instant). */
+  function _luliyResolveMode() {
+    var m = document.documentElement.getAttribute('data-color-mode') || 'light';
+    if (m === 'auto') {
+      m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ? 'dark' : 'light';
+    }
+    return m;
+  }
+  function _luliySetMode(mode) {
+    var htmlEl = document.documentElement;
+    if (_luliyResolveMode() === mode) return;
+    /* Directly flip the attribute + Gmeek's storage key — no reload. */
+    htmlEl.setAttribute('data-color-mode', mode);
+    try { localStorage.setItem('meek_theme', mode); } catch (e) {}
+    /* Keep Gmeek's own <body> class in sync if it uses one. */
+    try {
+      document.body.setAttribute('data-color-mode', mode);
+    } catch (e) {}
+    if (root._luliyThemeRipple) root._luliyThemeRipple(
+      window.innerWidth / 2, window.innerHeight / 2);
+  }
+  function _luliyToggleMode() {
+    _luliySetMode(_luliyResolveMode() === 'dark' ? 'light' : 'dark');
+  }
+  root._luliySetMode = _luliySetMode;
+  root._luliyToggleMode = _luliyToggleMode;
+  root._luliyResolveMode = _luliyResolveMode;
   function isArchivePage() {
     return location.pathname.includes('archive');
   }
@@ -277,53 +306,22 @@
           });
         } else { try { ap.pause(); } catch(e){} }
 
-        /* ── Theme sync (dark / light) ────────────────────── */
-        function syncApTheme() {
-          var dark = document.documentElement.getAttribute('data-color-mode') === 'dark';
-          wrap.classList.toggle('aplayer-dark', dark);
-        }
-        syncApTheme();
-        try {
-          new MutationObserver(syncApTheme).observe(document.documentElement,
-            { attributes: true, attributeFilter: ['data-color-mode'] });
-        } catch(e){}
-
-        /* ── Mini control strip: day/night + add-music ────── */
+        /* ── Mini control strip: add-music + hide-to-side ──── */
         if (!wrap.querySelector('.luliy-ap-tools')) {
           var tools = document.createElement('div');
           tools.className = 'luliy-ap-tools';
 
-          /* Day/Night toggle — drives Gmeek's native circle */
-          var dnBtn = document.createElement('button');
-          dnBtn.type = 'button'; dnBtn.className = 'luliy-ap-tool luliy-ap-dn';
-          dnBtn.title = '切换白天/夜间';  /* 切换白天/夜间 */
-          function setDnIcon() {
-            var dark = document.documentElement.getAttribute('data-color-mode') === 'dark';
-            dnBtn.textContent = dark ? '☾' : '☀️';
-          }
-          setDnIcon();
-          dnBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            var circle = document.querySelector('.circle');
-            if (circle) circle.click();
-            setTimeout(setDnIcon, 80);
-          });
-          try {
-            new MutationObserver(setDnIcon).observe(document.documentElement,
-              { attributes: true, attributeFilter: ['data-color-mode'] });
-          } catch(e){}
-
           /* Add-music button — prompts for a direct URL */
           var addBtn = document.createElement('button');
           addBtn.type = 'button'; addBtn.className = 'luliy-ap-tool luliy-ap-add';
-          addBtn.textContent = '+';   /* + */
-          addBtn.title = '添加音乐直链';  /* 添加音乐直链 */
+          addBtn.textContent = '+';
+          addBtn.title = '添加音乐直链';
           addBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            var url = window.prompt('输入音乐直链 URL（mp3/m4a 等）：');  /* 输入音乐直链 URL */
+            var url = window.prompt('输入音乐直链 URL（mp3/m4a 等）：');
             if (!url) return;
             url = url.trim(); if (!url) return;
-            var name = window.prompt('歌曲名称（可选）：') || '自定义';  /* 歌曲名称（可选） */
+            var name = window.prompt('歌曲名称（可选）：') || '自定义';
             try {
               var list = JSON.parse(localStorage.getItem(ALIST) || '[]');
               if (!Array.isArray(list)) list = [];
@@ -336,8 +334,33 @@
             } catch(err) { try { console.warn('[luliy] add track failed', err); } catch(e2){} }
           });
 
-          tools.appendChild(dnBtn);
+          /* Hide-to-side button — collapses the player to a thin edge tab */
+          var hideBtn = document.createElement('button');
+          hideBtn.type = 'button'; hideBtn.className = 'luliy-ap-tool luliy-ap-hide';
+          hideBtn.textContent = '‹';
+          hideBtn.title = '收起到侧边';
+          var AHIDE = 'luliy-aplayer-hidden';
+          function applyHidden(hidden) {
+            wrap.classList.toggle('is-tucked', hidden);
+            hideBtn.textContent = hidden ? '›' : '‹';
+            hideBtn.title = hidden ? '展开播放器' : '收起到侧边';
+            try { localStorage.setItem(AHIDE, hidden ? '1' : '0'); } catch(e){}
+          }
+          hideBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            applyHidden(!wrap.classList.contains('is-tucked'));
+          });
+          /* Restore saved hidden state */
+          try { if (localStorage.getItem(AHIDE) === '1') applyHidden(true); } catch(e){}
+          /* Tapping a tucked player re-expands it */
+          wrap.addEventListener('click', function(e) {
+            if (wrap.classList.contains('is-tucked') && !e.target.closest('.luliy-ap-tool')) {
+              applyHidden(false);
+            }
+          });
+
           tools.appendChild(addBtn);
+          tools.appendChild(hideBtn);
           wrap.appendChild(tools);
         }
 
@@ -706,29 +729,6 @@
       centre.appendChild(avatarLink);
       centre.appendChild(blogName);
 
-      /* ── Day/Night toggle — always visible (esp. mobile) ──── */
-      var dnNav = document.createElement('button');
-      dnNav.id = 'luliy-nav-dn';
-      dnNav.type = 'button';
-      dnNav.setAttribute('aria-label', '\u5207\u6362\u767d\u5929/\u591c\u95f4');
-      function _navMode() {
-        var m = document.documentElement.getAttribute('data-color-mode') || 'light';
-        if (m === 'auto') m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-        return m;
-      }
-      function _navDnIcon() { dnNav.textContent = _navMode() === 'dark' ? '\u263E' : '\u2600\uFE0F'; }
-      _navDnIcon();
-      dnNav.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var circle = document.querySelector('.circle');
-        if (circle) circle.click();
-        setTimeout(_navDnIcon, 80);
-      });
-      try {
-        new MutationObserver(_navDnIcon).observe(document.documentElement,
-          { attributes: true, attributeFilter: ['data-color-mode'] });
-      } catch (e) {}
-      centre.appendChild(dnNav);
 
       /* ── MOVE original nav elements from .title-right ──────
          Moving (not cloning) keeps every native Gmeek listener —
@@ -748,6 +748,13 @@
         if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
         return true;
       });
+      /* Pull out Gmeek's native day/night .circle so it can stay visible
+         on mobile (icon groups collapse there, but the circle must not). */
+      var circleBtn = null;
+      links = links.filter(function (a) {
+        if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
+        return true;
+      });
       /* Stash metadata for the mobile dropdown (title-right empties out) */
       root._luliyNavLinks = links.map(function (a) {
         return {
@@ -763,6 +770,12 @@
         if (i < half) iconsLeft.appendChild(a);   /* appendChild MOVES the node */
         else iconsRight.appendChild(a);
       });
+      /* Place the native circle next to the blog name — always visible */
+      if (circleBtn) {
+        circleBtn.id = 'luliy-nav-circle';
+        circleBtn.classList.add('luliy-nav-icon-link');
+        centre.appendChild(circleBtn);
+      }
 
       shell.appendChild(timeEl);
       shell.appendChild(iconsLeft);
@@ -1889,159 +1902,133 @@
       });
     }
 
-    function trySetup() {
-      var toc = document.querySelector('#TOC, .articletoc, .toc, .ArticleTOC, #articleTOC, #postBody > nav, [id*="articleTOC"], [class*="ArticleTOC"]');
-      if (!toc) return false;
-      if (toc._luliySpy) return true;
+    /* ── Rebuilt button-style TOC ─────────────────────────────
+       Reads headings straight from #postBody (independent of the
+       articletoc.js plugin), builds our own panel that pops up from
+       the TOC button, highlights the current section, and jumps on
+       click. Fully theme-styled, high contrast in both modes.       */
+    buildLuliyTOC(pbody);
+  }
 
-      /* ── Extract TOC from inside #postBody → append to body ──
-         articletoc.js inserts the TOC inline inside #postBody.
-         We move it to document.body so position:fixed works correctly,
-         it renders OUTSIDE the article glass card, AND its z-index is
-         evaluated in the root stacking context (ancestors with
-         backdrop-filter/transform would otherwise trap it below the
-         toolbar panel).                                              */
-      if (toc.parentElement !== document.body) {
-        document.body.appendChild(toc);
+  function buildLuliyTOC(pbody) {
+    if (document.getElementById('luliy-toc-panel')) return;
+
+    var heads = Array.prototype.slice.call(
+      pbody.querySelectorAll('h1, h2, h3, h4'));
+    /* Need at least 2 headings to be useful */
+    if (heads.length < 2) return;
+
+    /* Ensure every heading has a stable id */
+    heads.forEach(function (h, i) {
+      if (!h.id) {
+        var slug = (h.textContent || '').trim().toLowerCase()
+          .replace(/[\s\u3000]+/g, '-')
+          .replace(/[^\w\u4e00-\u9fff-]/g, '').slice(0, 40) || ('h-' + i);
+        var base = slug, n = 1;
+        while (document.getElementById(slug)) slug = base + '-' + (n++);
+        h.id = slug;
       }
+    });
 
-      toc._luliySpy = true;
-      root._luliyTOC = toc;   /* exact reference for the fab toggle */
+    /* ── Panel ─────────────────────────────────────────────── */
+    var panel = document.createElement('nav');
+    panel.id = 'luliy-toc-panel';
+    panel.setAttribute('aria-label', '\u6587\u7ae0\u76ee\u5f55');
 
-      if (!toc.querySelector('.luliy-toc-injected-hdr')) {
-        var hdr = document.createElement('div');
-        hdr.className = 'luliy-toc-injected-hdr';
-        var lbl = document.createElement('span');
-        lbl.className = 'luliy-toc-injected-label';
-        lbl.textContent = '\u76ee\u5f55';
-        var totop = document.createElement('button');
-        totop.type = 'button';
-        totop.className = 'luliy-toc-injected-totop';
-        totop.textContent = '\u2191 \u56de\u9876';
-        totop.addEventListener('click', function () {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          playSfx('click');
-        });
-        hdr.appendChild(lbl); hdr.appendChild(totop);
-        toc.insertBefore(hdr, toc.firstChild);
+    var hdr = document.createElement('div');
+    hdr.className = 'luliy-toc-hdr';
+    var hLbl = document.createElement('span');
+    hLbl.className = 'luliy-toc-hdr-label';
+    hLbl.textContent = '\u76ee\u5f55';   /* 目录 */
+    var hTop = document.createElement('button');
+    hTop.type = 'button'; hTop.className = 'luliy-toc-hdr-top';
+    hTop.textContent = '\u2191 \u56de\u9876';   /* ↑ 回顶 */
+    hTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    hdr.appendChild(hLbl); hdr.appendChild(hTop);
+    panel.appendChild(hdr);
+
+    var listWrap = document.createElement('div');
+    listWrap.className = 'luliy-toc-list';
+    var linkFor = {};
+    heads.forEach(function (h) {
+      var a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.className = 'luliy-toc-item luliy-toc-lv' + (h.tagName.charAt(1));
+      a.textContent = (h.textContent || '').trim();
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = document.getElementById(h.id);
+        if (target) {
+          var y = target.getBoundingClientRect().top + window.pageYOffset - 80;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+        playSfx('click');
+      });
+      linkFor[h.id] = a;
+      listWrap.appendChild(a);
+    });
+    panel.appendChild(listWrap);
+    document.body.appendChild(panel);
+
+    /* ── Toggle button ─────────────────────────────────────── */
+    var fab = document.createElement('button');
+    fab.id = 'luliy-toc-fab';
+    fab.type = 'button';
+    fab.setAttribute('aria-label', '\u6587\u7ae0\u76ee\u5f55');
+    fab.textContent = '\u2630';   /* ☰ */
+    fab.classList.add('is-visible');
+    var open = false;
+    function setOpen(v) {
+      open = v;
+      fab.classList.toggle('is-active', open);
+      panel.classList.toggle('is-open', open);
+    }
+    fab.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!open);
+      playSfx('click');
+    });
+    /* Close when clicking outside */
+    document.addEventListener('click', function (e) {
+      if (!open) return;
+      if (e.target === fab || fab.contains(e.target)) return;
+      if (panel.contains(e.target)) return;
+      setOpen(false);
+    });
+    document.body.appendChild(fab);
+
+    /* ── Scroll-spy highlight ──────────────────────────────── */
+    var curId = null;
+    function onScroll() {
+      var best = null, bestTop = -Infinity;
+      var probe = 120;   /* px from top counts as "current" */
+      for (var i = 0; i < heads.length; i++) {
+        var top = heads[i].getBoundingClientRect().top;
+        if (top <= probe && top > bestTop) { bestTop = top; best = heads[i]; }
       }
-
-      /* If the TOC is/contains a <details>, force it permanently open and
-         hide its native <summary> (we provide our own header), so there's
-         no second "目录" label and the list is always rendered. The fab
-         controls visibility via .luliy-toc-open. */
-      var detEls = [];
-      if (toc.tagName === 'DETAILS') detEls.push(toc);
-      toc.querySelectorAll('details').forEach(function (d) { detEls.push(d); });
-      detEls.forEach(function (d) {
-        d.open = true;
-        d.addEventListener('toggle', function () { if (!d.open) d.open = true; });
-        var sm = d.querySelector(':scope > summary');
-        if (sm) sm.style.display = 'none';
-      });
-
-      /* Auto-expand TOC panel on article load */
-      setTimeout(function () {
-        /* Case 1: inside a <details> element */
-        var det = toc;
-        while (det && det !== document.body) {
-          if (det.tagName === 'DETAILS') { det.open = true; break; }
-          det = det.parentElement;
-        }
-        /* Case 2: parent/container is hidden */
-        var container = toc.parentElement;
-        if (container) {
-          var cs = window.getComputedStyle(container);
-          if (cs.display === 'none') container.style.display = 'block';
-          if (cs.visibility === 'hidden') container.style.visibility = 'visible';
-        }
-        /* Case 3: a sibling/ancestor toggle button with aria-expanded=false */
-        var root = (toc.parentElement || document.body);
-        root.querySelectorAll('button[aria-expanded="false"], button[aria-controls]').forEach(function (btn) {
-          var ctrl = btn.getAttribute('aria-controls');
-          if (ctrl) {
-            var target = document.getElementById(ctrl);
-            if (target && (target === toc || target.contains(toc) || toc.contains(target))) {
-              btn.click();
-            }
-          }
-        });
-        /* Case 4: ensure the TOC wrapper itself is visible */
-        toc.style.display = '';
-        toc.style.visibility = '';
-      }, 600);
-
-      /* Assign IDs to headings */
-      var allH = Array.from(pbody.querySelectorAll('h1,h2,h3,h4'));
-      allH.forEach(function (h, i) {
-        if (!h.id) {
-          var slug = (h.textContent || '').trim()
-            .toLowerCase()
-            .replace(/[\s\u3000]+/g, '-')
-            .replace(/[^\w\u4e00-\u9fff-]/g, '')
-            .slice(0, 40) || ('h-' + i);
-          var base = slug, n = 1;
-          while (document.getElementById(slug)) slug = base + '-' + (n++);
-          h.id = slug;
-        }
-      });
-
-      var headings = allH.filter(function (h) { return h.id; });
-      var links = Array.from(toc.querySelectorAll('a[href^="#"]'));
-      if (!headings.length || !links.length) return true;
-
-      /* ── Strip inline colour the articletoc plugin sets on links /
-         their inner spans — otherwise it overrides the themed,
-         dark-mode-readable colours from enhance.css.               */
-      links.forEach(function (a) {
-        a.style.removeProperty('color');
-        a.style.removeProperty('background');
-        a.style.removeProperty('background-color');
-        a.querySelectorAll('*').forEach(function (el) {
-          el.style.removeProperty('color');
-          el.style.removeProperty('background');
-          el.style.removeProperty('background-color');
-        });
-      });
-      /* Also strip from any non-link list items / spans in the TOC */
-      toc.querySelectorAll('li, span, summary, div').forEach(function (el) {
-        if (el.classList.contains('luliy-toc-injected-hdr') ||
-            el.classList.contains('luliy-toc-injected-label') ||
-            el.classList.contains('luliy-toc-injected-totop')) return;
-        var c = el.style && el.style.color;
-        if (c) el.style.removeProperty('color');
-      });
-
-      var lastActiveId = null;
-      function onScroll() {
-        var activeH = null;
-        for (var i = 0; i < headings.length; i++) {
-          if (headings[i].getBoundingClientRect().top <= 110) activeH = headings[i];
-          else break;
-        }
-        if (!activeH && headings.length) activeH = headings[0];
-        var newId = activeH ? activeH.id : null;
-        if (newId === lastActiveId) return;
-        lastActiveId = newId;
-        links.forEach(function (a) { a.classList.remove('active', 'luliy-toc-active'); });
-        if (activeH) {
-          for (var j = 0; j < links.length; j++) {
-            if (links[j].getAttribute('href') === '#' + activeH.id) {
-              links[j].classList.add('active', 'luliy-toc-active'); break;
+      if (!best) best = heads[0];
+      if (best && best.id !== curId) {
+        if (curId && linkFor[curId]) linkFor[curId].classList.remove('is-current');
+        curId = best.id;
+        if (linkFor[curId]) {
+          linkFor[curId].classList.add('is-current');
+          /* keep current item in view within the panel */
+          var it = linkFor[curId];
+          if (panel.classList.contains('is-open')) {
+            var pr = listWrap.getBoundingClientRect();
+            var ir = it.getBoundingClientRect();
+            if (ir.top < pr.top || ir.bottom > pr.bottom) {
+              it.scrollIntoView({ block: 'nearest' });
             }
           }
         }
       }
-      onScrollRAF(onScroll);
-      return true;
     }
-
-    if (!trySetup()) {
-      var n = 0;
-      var iv = setInterval(function () {
-        if (trySetup() || ++n > 20) clearInterval(iv);
-      }, 400);
-    }
+    onScrollRAF(onScroll);
+    onScroll();
+    root._luliyTOC = panel;
   }
 
   /* ---- 18  Mobile nav — right-side drawer ────────────────────── */
@@ -2161,20 +2148,14 @@
     }
     syncDnBtns();
 
-    /* Use native Gmeek circle to toggle — it handles all storage/class sync */
+    /* Directly set the mode — instant, no page jump */
     dayBtn.addEventListener('click', function() {
-      var cur = _resolvedMode();
-      if (cur !== 'dark') return;
-      var circle = document.querySelector('.circle');
-      if (circle) circle.click();
-      setTimeout(syncDnBtns, 80);
+      _luliySetMode('light');
+      syncDnBtns();
     });
     nightBtn.addEventListener('click', function() {
-      var cur = _resolvedMode();
-      if (cur === 'dark') return;
-      var circle = document.querySelector('.circle');
-      if (circle) circle.click();
-      setTimeout(syncDnBtns, 80);
+      _luliySetMode('dark');
+      syncDnBtns();
     });
 
     /* Sync when system / Gmeek changes mode externally */
@@ -3194,39 +3175,13 @@
         fab.classList.toggle('is-visible', (window.scrollY || 0) > 300);
       });
     }
-
-    /* ── TOC floating button (same style as back-top / search) ── */
-    if (!document.getElementById('luliy-toc-fab')) {
-      var tocFab = document.createElement('button');
-      tocFab.id = 'luliy-toc-fab';
-      tocFab.type = 'button';
-      tocFab.setAttribute('aria-label', '\u6587\u7ae0\u76ee\u5f55');  /* 文章目录 */
-      tocFab.textContent = '\u2630';   /* ☰ */
-      var tocOpen = false;
-      tocFab.classList.add('is-visible');   /* always visible on article pages */
-      tocFab.addEventListener('click', function() {
-        tocOpen = !tocOpen;
-        tocFab.classList.toggle('is-active', tocOpen);
-        /* Toggle the exact moved TOC (fallback to query) */
-        var toc = root._luliyTOC ||
-          document.querySelector('#TOC, .articletoc, .toc, #articleTOC, [class*="ArticleTOC"]');
-        if (toc) {
-          toc.classList.toggle('luliy-toc-open', tocOpen);
-          playSfx('click');
-        }
-      });
-      document.body.appendChild(tocFab);
-    }
   }
 
   /* ---- 23  Tag cloud page --------------------------------- */
   function initTagCloud() {
     var onTagPage = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
     if (!onTagPage) return;
-    /* Hide Gmeek native tag list ONLY on the tag page (not homepage,
-       where .SideNav is the post list) */
-    var natives = document.querySelectorAll('.SideNav, .SideNav-item, [class*="label-list"]');
-    natives.forEach(function(el) { el.style.display = 'none'; });
+    /* Keep Gmeek's native article/tag list intact — do NOT hide it. */
     var pbody = document.getElementById('postBody') ||
       document.querySelector('.SideNav, .markdown-body, #content');
     var mount = document.getElementById('content') || document.body;
