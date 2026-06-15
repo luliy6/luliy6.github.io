@@ -778,10 +778,35 @@ body.luliy-drawer-open { overflow: hidden; }
   box-shadow: 0 1px 12px rgba(0,0,0,0.25) !important;
 }
 
-
 /* ══════════════════════════════════════════════════════════
-   06  (merged into 05 — Navbar rebuild)
+   06  Nav text links — singlePage / exlink pill style
+   ↗ arrow 在 navbar 内 suppressed；文字链接自适应宽度
 ══════════════════════════════════════════════════════════ */
+
+/* 压制导航栏内所有链接的 ↗ after 内容 */
+#luliy-nav-rebuilt a::after,
+#luliy-nav-icons-left a::after,
+#luliy-nav-icons-right a::after {
+  content: none !important;
+}
+
+/* 没有 SVG 图标的文字链接（singlePage / exlink）
+   改为自适应宽度的胶囊样式，不再挤进 36px 小方块 */
+#luliy-nav-icons-left a:not(:has(svg)),
+#luliy-nav-icons-right a:not(:has(svg)) {
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  white-space: nowrap !important;
+  border-radius: 999px !important;
+  font-family: 'Noto Sans SC', sans-serif !important;
+  max-width: 90px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
 
 /* ══════════════════════════════════════════════════════════
    07  Hero banner (scroll-fold on homepage)
