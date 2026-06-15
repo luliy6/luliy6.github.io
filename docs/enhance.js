@@ -781,6 +781,9 @@
       var half = Math.ceil(links.length / 2);
       links.forEach(function (a, i) {
         a.classList.add('luliy-nav-icon-link');
+        /* Clear any inline display:none Gmeek/we set on the link itself */
+        a.style.display = '';
+        a.style.visibility = '';
         if (i < half) iconsLeft.appendChild(a);   /* appendChild MOVES the node */
         else iconsRight.appendChild(a);
       });
@@ -788,6 +791,8 @@
       if (circleBtn) {
         circleBtn.id = 'luliy-nav-circle';
         circleBtn.classList.add('luliy-nav-icon-link');
+        circleBtn.style.display = '';
+        circleBtn.style.visibility = '';
         centre.appendChild(circleBtn);
       }
 
@@ -797,6 +802,29 @@
       shell.appendChild(iconsRight);
 
       header.insertBefore(shell, header.firstChild);
+
+      /* ── Self-heal: if the icon groups ended up empty but Gmeek's
+         hidden .title-right still holds links, recover them now. This
+         guards against any ordering/timing edge case. */
+      if (iconsLeft.children.length === 0 && iconsRight.children.length === 0) {
+        var late = header.querySelector('.title-right, [class*="title-right"]');
+        if (late) {
+          var lateLinks = Array.from(late.querySelectorAll('a, button, .circle'))
+            .filter(function (a) {
+              var href = a.getAttribute('href') || '';
+              if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
+              if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
+              if (a.classList && a.classList.contains('circle')) return false;
+              return true;
+            });
+          var lh = Math.ceil(lateLinks.length / 2);
+          lateLinks.forEach(function (a, i) {
+            a.classList.add('luliy-nav-icon-link');
+            a.style.display = ''; a.style.visibility = '';
+            (i < lh ? iconsLeft : iconsRight).appendChild(a);
+          });
+        }
+      }
       return true;
     }
 
