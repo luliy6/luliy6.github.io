@@ -682,22 +682,34 @@
       var header = document.getElementById('header'); if (!header) return false;
       if (document.getElementById('luliy-nav-rebuilt')) return true;
 
-      /* Wait until Gmeek has actually rendered the nav links into
-         .title-right — otherwise we'd rebuild an empty navbar and the
-         singlePage / exlink buttons would be lost. */
+      /* Wait briefly for Gmeek to render nav links, but don't block
+         forever — after a few tries, build anyway (links are collected
+         from the whole header as a fallback below). */
       var trProbe = header.querySelector('.title-right, [class*="title-right"]');
-      var probeLinks = trProbe ? trProbe.querySelectorAll('a, button, .circle') : [];
-      if (!trProbe || probeLinks.length === 0) return false;
+      var probeCount = trProbe ? trProbe.querySelectorAll('a, button, .circle').length
+                               : header.querySelectorAll('a, button, .circle').length;
+      if (probeCount === 0 && (tryBuild._waits || 0) < 8) {
+        tryBuild._waits = (tryBuild._waits || 0) + 1;
+        return false;
+      }
 
       /* Mark header as rebuilt so CSS can target it */
       header.setAttribute('data-luliy-nav', '1');
       header.id = 'header'; /* keep Gmeek id */
 
-      /* Hide every existing child except .title-right SVG nav links */
+      /* ── Collect nav links BEFORE hiding anything ─────────
+         (hiding header children first could hide the links'
+         container and lose the singlePage/exlink buttons). */
+      var tr = header.querySelector('.title-right, [class*="title-right"]');
+      var rawLinks = [];
+      if (tr) rawLinks = Array.from(tr.querySelectorAll('a, button, .circle'));
+      if (rawLinks.length === 0) {
+        rawLinks = Array.from(header.querySelectorAll('a, button, .circle'));
+      }
+
+      /* Now hide every existing child (links are captured above) */
       Array.from(header.children).forEach(function (el) {
         var id = el.id || '';
-        var cls = el.className || '';
-        /* Keep our toolbar + existing title-right (we relocate its links) */
         if (id === 'luliy-toolbar' || id === 'luliy-nav-rebuilt' || id === 'luliy-nav-ham') return;
         el.style.display = 'none';
       });
@@ -736,27 +748,22 @@
       centre.appendChild(avatarLink);
       centre.appendChild(blogName);
 
-
-      /* ── MOVE original nav elements from .title-right ──────
-         Moving (not cloning) keeps every native Gmeek listener —
-         the day/night circle toggles + swaps its icon exactly as
-         stock Gmeek does. No re-trigger hacks, no duplicate IDs. */
-      var tr = header.querySelector('.title-right, [class*="title-right"]');
+      /* ── Process the collected links ──────────────────────
+         Moving (not cloning) keeps every native Gmeek listener. */
       var iconsLeft  = document.createElement('div');
       var iconsRight = document.createElement('div');
       iconsLeft.id  = 'luliy-nav-icons-left';
       iconsRight.id = 'luliy-nav-icons-right';
 
-      var links = tr ? Array.from(tr.querySelectorAll('a, button, .circle')) : [];
-      /* About + RSS never appear as icons (about lives behind the avatar) */
-      links = links.filter(function (a) {
+      var links = rawLinks.filter(function (a) {
+        var id = a.id || '';
+        if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return false;
         var href = a.getAttribute('href') || '';
         if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
         if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
         return true;
       });
-      /* Pull out Gmeek's native day/night .circle (may be a div) so it
-         can stay visible on mobile (icon groups collapse there). */
+      /* Pull out Gmeek's native day/night .circle (may be a div) */
       var circleBtn = null;
       links = links.filter(function (a) {
         if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
