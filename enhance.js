@@ -677,6 +677,46 @@
   }
 
   /* ---- 09  Navbar — rebuilt: avatar+name centred, time top-left, icons spread */
+  /* Black-hole animation: page implodes to click point, explodes back */
+  function triggerBlackHole(cx, cy) {
+    if (document.getElementById('luliy-blackhole')) return; /* debounce */
+    var body = document.body;
+    /* Position transform-origin at click point */
+    var ox = (cx / (window.innerWidth  || 1) * 100).toFixed(1) + '%';
+    var oy = (cy / (window.innerHeight || 1) * 100).toFixed(1) + '%';
+
+    /* Create the black hole overlay */
+    var bh = document.createElement('div');
+    bh.id = 'luliy-blackhole';
+    bh.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;';
+    document.body.appendChild(bh);
+
+    /* Phase 1 – implode everything to click point */
+    body.style.transformOrigin = ox + ' ' + oy;
+    body.style.transition = 'transform 0.55s cubic-bezier(.55,0,1,.45), filter 0.55s ease';
+    body.style.transform = 'scale(0) rotate(540deg)';
+    body.style.filter = 'brightness(0)';
+
+    /* Phase 2 – flash the black hole */
+    setTimeout(function () {
+      bh.classList.add('flash');
+    }, 480);
+
+    /* Phase 3 – explode back out */
+    setTimeout(function () {
+      body.style.transition = 'transform 0.65s cubic-bezier(.2,.7,.3,1), filter 0.45s ease-out';
+      body.style.transform  = '';
+      body.style.filter     = '';
+    }, 900);
+
+    /* Cleanup */
+    setTimeout(function () {
+      body.style.transition      = '';
+      body.style.transformOrigin = '';
+      bh.remove();
+    }, 1600);
+  }
+
   function initHeroCluster() {
     function tryBuild() {
       var header = document.getElementById('header'); if (!header) return false;
@@ -827,7 +867,17 @@
         leftZone.appendChild(circleBtn);
       }
 
+      /* ── subTitle: middle column between left and right ─── */
+      var subTitleEl = document.createElement('span');
+      subTitleEl.id = 'luliy-hero-subtitle';
+      subTitleEl.textContent = LULIY_OPTS.heroSubtitle || '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65';
+      subTitleEl.title = '\u70b9\u51fb\u89e6\u53d1\u9ed1\u6d1e\u52a8\u753b';
+      subTitleEl.addEventListener('click', function(e) {
+        triggerBlackHole(e.clientX, e.clientY);
+      });
+
       shell.appendChild(leftZone);
+      shell.appendChild(subTitleEl);
       shell.appendChild(capsule);
       shell.appendChild(rightZone);
       header.insertBefore(shell, header.firstChild);
@@ -879,23 +929,26 @@
        it never covers page content. Restores on hover or scroll-to-top. */
     function initHeroScrollFade() {
       var shell = document.getElementById('luliy-nav-rebuilt');
+      var header = document.getElementById('header');
       if (!shell) return;
       var fading = false;
+      function applyOpacity(op) {
+        shell.style.opacity  = String(op);
+        shell.style.pointerEvents = op <= 0.01 ? 'none' : '';
+        /* Also clear the header's own background so no black box shows */
+        if (header) header.style.background = 'transparent';
+      }
       function onScroll() {
         var sy = window.scrollY || window.pageYOffset || 0;
-        var t  = Math.min(1, sy / 120);   /* fully transparent after 120px */
-        shell.style.opacity = String(1 - t);
-        shell.style.pointerEvents = t >= 1 ? 'none' : '';
+        var t  = Math.min(1, sy / 120);
+        applyOpacity(1 - t);
         fading = t > 0;
       }
-      shell.addEventListener('mouseenter', function () {
-        shell.style.opacity = '1';
-        shell.style.pointerEvents = '';
-      });
-      shell.addEventListener('mouseleave', function () {
-        if (fading) onScroll();
-      });
+      shell.addEventListener('mouseenter', function () { applyOpacity(1); });
+      shell.addEventListener('mouseleave', function () { if (fading) onScroll(); });
       onScrollRAF(onScroll);
+      /* Apply immediately in case page is loaded already scrolled */
+      onScroll();
     }
 
     /* Mobile quick-link bar: a compact icon row under the navbar so
@@ -1160,6 +1213,8 @@
     document.querySelectorAll('.luliy-sink-opt').forEach(function (b) {
       b.classList.toggle('is-active', b.getAttribute('data-sink') === s.id);
     });
+    /* Restart themed particles with new theme colours */
+    if (root._luliyInitThemeParticles) root._luliyInitThemeParticles();
   }
 
   /* ---- Nav transparency on scroll (article pages) --------- */
@@ -2030,6 +2085,155 @@
   }
   root._luliyStopSakura = stopSakura;
 
+  /* ---- 16b  Theme particles + meteors (all themes) -------- */
+  var _particleRAF = null;
+  var _meteorCanvas = null;
+
+  /* Per-theme config: { pColor, mColor, pShape, pCount } */
+  var THEME_PARTICLE_CFG = {
+    'default':   { pColor: 'rgba(130,80,223,VAL)',  mColor: '#c3a6ff', pShape: 'star',    pCount: 22 },
+    'sakura':    { pColor: 'rgba(255,160,180,VAL)',  mColor: '#ffb3c6', pShape: 'circle',  pCount: 0 },  /* sakuraPlus handles petals */
+    'your-name': { pColor: 'rgba(255,169,77,VAL)',   mColor: '#ffe066', pShape: 'comet',   pCount: 14 },
+    'space':     { pColor: 'rgba(200,230,255,VAL)',  mColor: '#e0f4ff', pShape: 'circle',  pCount: 30 },
+    'sunset':    { pColor: 'rgba(232,168,56,VAL)',   mColor: '#ffd98a', pShape: 'circle',  pCount: 20 },
+    'mono':      { pColor: 'rgba(180,180,180,VAL)',  mColor: '#e8e8e8', pShape: 'square',  pCount: 16 }
+  };
+
+  function initThemeParticles() {
+    stopThemeParticles();
+    if (prefersReduce && prefersReduce()) return;
+    var theme = (document.body && document.body.getAttribute('data-luliy-theme')) || 'default';
+    var cfg = THEME_PARTICLE_CFG[theme] || THEME_PARTICLE_CFG['default'];
+    var canvas = document.createElement('canvas');
+    canvas.id = 'luliy-meteor-canvas';
+    canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:1;';
+    document.body.appendChild(canvas);
+    _meteorCanvas = canvas;
+    var ctx = canvas.getContext('2d');
+    var W, H;
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    /* Particles */
+    var particles = [];
+    var pCount = cfg.pCount;
+    for (var i = 0; i < pCount; i++) {
+      particles.push({
+        x: Math.random() * 1500, y: Math.random() * 900,
+        r: 2 + Math.random() * 3,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -0.1 - Math.random() * 0.4,
+        life: Math.random()
+      });
+    }
+
+    /* Meteors */
+    var meteors = [];
+    var nextMeteor = Date.now() + 2000 + Math.random() * 3000;
+
+    function spawnMeteor() {
+      meteors.push({
+        x: Math.random() * W + W * 0.2,
+        y: -30,
+        vx: -4 - Math.random() * 5,
+        vy: 3 + Math.random() * 4,
+        len: 80 + Math.random() * 120,
+        life: 1, decay: 0.022 + Math.random() * 0.015
+      });
+    }
+
+    function drawStar(ctx, x, y, r) {
+      var sp = 5, outer = r, inner = r * 0.45;
+      ctx.beginPath();
+      for (var i = 0; i < sp * 2; i++) {
+        var a = (i * Math.PI) / sp - Math.PI / 2;
+        var rr = i % 2 === 0 ? outer : inner;
+        if (i === 0) ctx.moveTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
+        else ctx.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
+      }
+      ctx.closePath(); ctx.fill();
+    }
+
+    function tick() {
+      if (!document.getElementById('luliy-meteor-canvas')) { _particleRAF = null; return; }
+      ctx.clearRect(0, 0, W, H);
+
+      /* Draw particles */
+      particles.forEach(function (p) {
+        p.x += p.vx; p.y += p.vy; p.life += 0.004;
+        if (p.life > 1) p.life = 0;
+        if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
+        if (p.x < -10 || p.x > W + 10) { p.x = Math.random() * W; p.y = Math.random() * H; }
+        var alpha = Math.sin(p.life * Math.PI) * 0.85;
+        if (alpha <= 0) return;
+        ctx.fillStyle = cfg.pColor.replace('VAL', alpha.toFixed(2));
+        if (cfg.pShape === 'star') drawStar(ctx, p.x, p.y, p.r);
+        else if (cfg.pShape === 'square') {
+          ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+        } else {
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        }
+      });
+
+      /* Spawn meteors */
+      var now = Date.now();
+      if (now >= nextMeteor) {
+        spawnMeteor();
+        nextMeteor = now + 3000 + Math.random() * 6000;
+      }
+
+      /* Draw meteors */
+      for (var mi = meteors.length - 1; mi >= 0; mi--) {
+        var m = meteors[mi];
+        m.x += m.vx; m.y += m.vy; m.life -= m.decay;
+        if (m.life <= 0 || m.y > H + 40 || m.x < -200) {
+          meteors.splice(mi, 1); continue;
+        }
+        var angle = Math.atan2(m.vy, m.vx);
+        var grad = ctx.createLinearGradient(
+          m.x, m.y,
+          m.x - Math.cos(angle) * m.len,
+          m.y - Math.sin(angle) * m.len
+        );
+        grad.addColorStop(0, cfg.mColor.replace(')', ',' + m.life + ')').replace('rgb','rgba'));
+        /* Handle hex mColor */
+        function hexToRgba(hex, a) {
+          var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+          return 'rgba('+r+','+g+','+b+','+a+')';
+        }
+        var mColorHead = hexToRgba(cfg.mColor, m.life);
+        var mColorTail = hexToRgba(cfg.mColor, 0);
+        var grad2 = ctx.createLinearGradient(m.x, m.y, m.x - Math.cos(angle) * m.len, m.y - Math.sin(angle) * m.len);
+        grad2.addColorStop(0, mColorHead);
+        grad2.addColorStop(1, mColorTail);
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(m.x - Math.cos(angle) * m.len, m.y - Math.sin(angle) * m.len);
+        ctx.strokeStyle = grad2;
+        ctx.lineWidth = 2.5 * m.life;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        /* Head glow */
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, 3 * m.life, 0, Math.PI * 2);
+        ctx.fillStyle = mColorHead;
+        ctx.fill();
+      }
+      _particleRAF = requestAnimationFrame(tick);
+    }
+    _particleRAF = requestAnimationFrame(tick);
+  }
+
+  function stopThemeParticles() {
+    if (_particleRAF) { cancelAnimationFrame(_particleRAF); _particleRAF = null; }
+    var c = document.getElementById('luliy-meteor-canvas');
+    if (c && c.parentNode) c.parentNode.removeChild(c);
+    _meteorCanvas = null;
+  }
+  root._luliyInitThemeParticles = initThemeParticles;
+  root._luliyStopThemeParticles = stopThemeParticles;
+
 /* ---- 17  ArticleTOC scroll-spy + back-to-top ------------ */
   function initArticleTocSpy() {
     if (!document.getElementById('postBody')) return;
@@ -2216,29 +2420,40 @@
     var dBody = document.createElement('div');
     dBody.id = 'luliy-drawer-body';
 
-    /* ── Section: Navigation links ─────────────────────────── */
-    var navLinks = (root._luliyNavLinks || []).filter(function(m){ return m.href || m.absHref; });
-    if (navLinks.length) {
-      var sec1 = document.createElement('div');
-      sec1.className = 'luliy-drawer-sec';
-      var sec1Title = document.createElement('div');
-      sec1Title.className = 'luliy-drawer-sec-title';
-      sec1Title.textContent = '\u5bfc\u822a';  /* 导航 */
-      sec1.appendChild(sec1Title);
-      navLinks.forEach(function(m) {
+    /* ── Section: Navigation links (lazy — hero may not be built yet) ─ */
+    var sec1 = document.createElement('div');
+    sec1.id = 'luliy-drawer-nav-sec';
+    sec1.className = 'luliy-drawer-sec';
+    var sec1Title = document.createElement('div');
+    sec1Title.className = 'luliy-drawer-sec-title';
+    sec1Title.textContent = '\u5bfc\u822a';  /* 导航 */
+    sec1.appendChild(sec1Title);
+    dBody.insertBefore(sec1, dBody.firstChild);
+
+    function populateDrawerLinks() {
+      var metas = (root._luliyNavLinks || []).filter(function(m){ return m.href || m.absHref; });
+      if (!metas.length) return false;
+      /* Remove old links if any */
+      sec1.querySelectorAll('.luliy-drawer-link').forEach(function(el){ el.remove(); });
+      metas.forEach(function(m) {
         var a = document.createElement('a');
         a.className = 'luliy-drawer-link';
         a.href = m.absHref || m.href;
+        if (m.target) a.target = m.target;
         var label = m.label || (m.href||'').replace(/^\//,'').replace(/\.html$/,'') || '\u94fe\u63a5';
         if (m.html) {
           a.innerHTML = '<span class="luliy-drawer-link-ico">' + m.html + '</span>' +
                         '<span class="luliy-drawer-link-txt">' + label + '</span>';
-        } else {
-          a.textContent = label;
-        }
+        } else { a.textContent = label; }
         sec1.appendChild(a);
       });
-      dBody.appendChild(sec1);
+      return true;
+    }
+    if (!populateDrawerLinks()) {
+      /* Hero hasn't built yet — retry until it does */
+      var dlN = 0, dlIv = setInterval(function () {
+        if (populateDrawerLinks() || ++dlN > 30) clearInterval(dlIv);
+      }, 200);
     }
 
     /* ── Section: Theme grid (2×3 dot grid) ────────────────── */
@@ -3099,7 +3314,7 @@
     var head = document.createElement('div');
     head.className = 'luliy-series-head';
     head.innerHTML = '\uD83D\uDCDA \u7cfb\u5217\uff1a<b>' + esc(best) + '</b> ' +
-      '<span class="luliy-series-prog">' + (pos + 1) + ' / ' + bestList.length + '</span>';
+      '<span class="luliy-series-prog"><b>' + (pos + 1) + '</b><span class="luliy-series-prog-sep">/</span>' + bestList.length + '</span>';
     box.appendChild(head);
 
     /* Progress dots */
@@ -3378,8 +3593,12 @@
         bubble.style.setProperty('--tag-c', colors[t]);
         bubble.innerHTML = esc(t) + '<sup>' + freq[t] + '</sup>';
         bubble.addEventListener('click', function (e) {
-          /* Let the native Gmeek tag filter still work via hash */
+          e.preventDefault();
           playSfx('click');
+          /* Filter the article list below by this tag */
+          if (root._luliyRenderTagList) root._luliyRenderTagList(t);
+          cloud.querySelectorAll('.luliy-tag-bubble').forEach(function(b){ b.classList.remove('is-active'); });
+          bubble.classList.add('is-active');
         });
         cloud.appendChild(bubble);
       });
@@ -3392,6 +3611,47 @@
       } else if (mount) {
         mount.insertBefore(wrap, mount.firstChild);
       }
+
+      /* ── Article list in list-view card style ─────────────── */
+      function renderTagArticleList(filterTag) {
+        var ex = document.getElementById('luliy-tag-articles');
+        if (ex) ex.remove();
+        var filtered = filterTag
+          ? posts.filter(function(p){ return (p.labels||[]).some(function(l){ return (l.name||l)===filterTag; }) && !(p.labels||[]).some(function(l){ return /^pinned/.test(l.name||l); }); })
+          : posts.filter(function(p){ return !(p.labels||[]).some(function(l){ return /^pinned/.test(l.name||l); }); });
+        filtered.sort(function(a,b){ return String(b.created).localeCompare(String(a.created)); });
+        var listWrap = document.createElement('div');
+        listWrap.id = 'luliy-tag-articles';
+        filtered.forEach(function(p) {
+          var card = document.createElement('a');
+          card.className = 'luliy-tag-list-card';
+          card.href = buildPostLink(p.link);
+          var meta = document.createElement('div');
+          meta.className = 'luliy-tag-card-meta';
+          var d = p.created ? new Date(p.created) : null;
+          meta.textContent = d ? (d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0')) : '';
+          var titleEl = document.createElement('div');
+          titleEl.className = 'luliy-tag-card-title';
+          titleEl.textContent = p.title || p.postTitle || p.name || '';
+          var labelsEl = document.createElement('div');
+          labelsEl.className = 'luliy-tag-card-labels';
+          (p.labels||[]).filter(function(l){ return !/^pinned/.test(l.name||l); }).forEach(function(l) {
+            var tb = document.createElement('span');
+            tb.className = 'luliy-card-label';
+            tb.textContent = l.name || l;
+            tb.style.setProperty('--lc', '#'+((l.color||'0969da')+'').replace(/^#/,''));
+            labelsEl.appendChild(tb);
+          });
+          card.appendChild(meta); card.appendChild(titleEl);
+          if (labelsEl.children.length) card.appendChild(labelsEl);
+          listWrap.appendChild(card);
+        });
+        var target = sidenav ? sidenav.parentNode : mount;
+        if (sidenav) { sidenav.parentNode.insertBefore(listWrap, sidenav.nextSibling); }
+        else { mount.appendChild(listWrap); }
+      }
+      renderTagArticleList(null);
+      root._luliyRenderTagList = renderTagArticleList;
     }).catch(function () {});
   }
 
@@ -3675,6 +3935,7 @@
     safe(initToolbar,         'toolbar');
     safe(initNavTransparency, 'navTransparency');
     safe(initMobileNav,       'mobileNav');
+    safe(initThemeParticles,  'themeParticles');
     safe(initFavoritesLock,   'favLock');   /* safety net — also called in post init */
 
     /* v10 global features */
