@@ -676,7 +676,8 @@
     });
   }
 
-  /* ---- 09  Navbar — rebuilt: avatar+name centred, time top-left, icons spread */
+  /* ---- 09  Navbar — avatar+name centred, clock + drawer-toggle
+            far-left, singlePage/exlink icons spread either side ---- */
   function initHeroCluster() {
     function tryBuild() {
       var header = document.getElementById('header'); if (!header) return false;
@@ -695,7 +696,6 @@
 
       /* Mark header as rebuilt so CSS can target it */
       header.setAttribute('data-luliy-nav', '1');
-      header.id = 'header'; /* keep Gmeek id */
 
       /* ── Collect nav links BEFORE hiding anything ─────────
          (hiding header children first could hide the links'
@@ -718,17 +718,36 @@
       var shell = document.createElement('div');
       shell.id = 'luliy-nav-rebuilt';
 
-      /* ── Top-left: time ─────────────────────────────────── */
+      /* ── Far-left: drawer-toggle button (opens the shortcut drawer) ── */
+      var drawerBtn = document.createElement('button');
+      drawerBtn.id = 'luliy-nav-drawer-toggle';
+      drawerBtn.type = 'button';
+      drawerBtn.setAttribute('aria-label', '\u5feb\u6377\u83dc\u5355');  /* 快捷菜单 */
+      drawerBtn.innerHTML =
+        '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 2.75C1 2.336 1.336 2 ' +
+        '1.75 2h3.5c.414 0 .75.336.75.75v3.5c0 .414-.336.75-.75.75h-3.5A.75.75 0 0 1 1 ' +
+        '6.25v-3.5Zm9 0c0-.414.336-.75.75-.75h3.5c.414 0 .75.336.75.75v3.5c0 .414-.336' +
+        '.75-.75.75h-3.5a.75.75 0 0 1-.75-.75v-3.5ZM1 11.75c0-.414.336-.75.75-.75h3.5c' +
+        '.414 0 .75.336.75.75v3.5c0 .414-.336.75-.75.75h-3.5a.75.75 0 0 1-.75-.75v-3.5Z' +
+        'm9 0c0-.414.336-.75.75-.75h3.5c.414 0 .75.336.75.75v3.5c0 .414-.336.75-.75.75h' +
+        '-3.5a.75.75 0 0 1-.75-.75v-3.5Z"/></svg>';
+      drawerBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        /* Resolved lazily — initMobileNav (module 18) runs after this one. */
+        if (root._luliyToggleDrawer) root._luliyToggleDrawer();
+      });
+
+      /* ── Far-left: clock ────────────────────────────────── */
       var timeEl = document.createElement('div');
       timeEl.id = 'luliy-nav-time';
+      function pad(n) { return String(n).padStart(2, '0'); }
       function updTime() {
         var n = new Date();
-        timeEl.textContent =
-          String(n.getHours()).padStart(2,'0') + ':' +
-          String(n.getMinutes()).padStart(2,'0') + ':' +
-          String(n.getSeconds()).padStart(2,'0');
+        timeEl.textContent = pad(n.getHours()) + ':' + pad(n.getMinutes()) + ':' + pad(n.getSeconds());
       }
-      updTime(); setInterval(updTime, 1000);
+      updTime();
+      if (root._luliyClockTimer) clearInterval(root._luliyClockTimer);  /* no duplicate timers */
+      root._luliyClockTimer = setInterval(updTime, 1000);
 
       /* ── Centre: avatar + blog name ─────────────────────── */
       var centre = document.createElement('div');
@@ -738,7 +757,7 @@
       avatarLink.href = '/about'; avatarLink.id = 'luliy-nav-avatar-link';
       var avatarImg = document.createElement('img');
       avatarImg.src = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/Luliy.jpg';
-      avatarImg.id = 'luliy-nav-avatar'; avatarImg.alt = 'Luliy';
+      avatarImg.id = 'luliy-nav-avatar'; avatarImg.alt = 'Luliy'; avatarImg.loading = 'eager';
       avatarLink.appendChild(avatarImg);
 
       var blogName = document.createElement('a');
@@ -749,39 +768,47 @@
       centre.appendChild(blogName);
 
       /* ── Process the collected links ──────────────────────
-         Moving (not cloning) keeps every native Gmeek listener. */
+         Clone (not move) so the rebuild survives later DOM churn. */
       var iconsLeft  = document.createElement('div');
       var iconsRight = document.createElement('div');
       iconsLeft.id  = 'luliy-nav-icons-left';
       iconsRight.id = 'luliy-nav-icons-right';
 
-      var links = rawLinks.filter(function (a) {
+      /* Pull out Gmeek's native day/night .circle (may be a div) first. */
+      var circleBtn = null;
+      var captured = rawLinks.filter(function (a) {
+        if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
         var id = a.id || '';
         if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return false;
+        return true;
+      });
+
+      /* Capture EVERY remaining link (singlePage + exlink + rss) for the
+         drawer, preserving Gmeek's SVG icons + real labels. The isRss /
+         isAbout flags let the drawer and the inline navbar each pick
+         exactly what they want — so the icons are never "missing". */
+      root._luliyNavLinks = captured.map(function (a) {
+        var href = a.getAttribute('href') || '';
+        return {
+          href:    href,
+          absHref: a.href || '',
+          label:   a.getAttribute('title') || (a.textContent || '').trim(),
+          html:    a.innerHTML,                                    /* SVG icon markup */
+          isRss:   /rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href),
+          isAbout: /\/about(\.html)?$|^about(\.html)?$/.test(href)
+        };
+      });
+
+      /* Inline navbar icons = everything except About (the avatar links
+         there already) and RSS (kept in the drawer only). */
+      var links = captured.filter(function (a) {
         var href = a.getAttribute('href') || '';
         if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
         if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
         return true;
       });
-      /* Pull out Gmeek's native day/night .circle (may be a div) */
-      var circleBtn = null;
-      links = links.filter(function (a) {
-        if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
-        return true;
-      });
-      /* Stash metadata for the mobile dropdown (title-right empties out) */
-      root._luliyNavLinks = links.map(function (a) {
-        return {
-          href: a.getAttribute('href') || '',
-          absHref: a.href || '',
-          label: a.getAttribute('title') || (a.textContent || '').trim(),
-          html: a.innerHTML   /* preserve the SVG icon markup */
-        };
-      });
-      /* Split evenly: first half left, second half right.
-         CLONE the nodes (not move) so the rebuild is robust against any
-         later DOM churn from Gmeek/plugins — the originals stay put in
-         the hidden .title-right, the clones live in our visible groups. */
+
+      /* Split evenly: first half left, second half right. */
       var half = Math.ceil(links.length / 2);
       links.forEach(function (a, i) {
         var c = a.cloneNode(true);
@@ -800,6 +827,7 @@
         centre.appendChild(circleBtn);
       }
 
+      shell.appendChild(drawerBtn);
       shell.appendChild(timeEl);
       shell.appendChild(iconsLeft);
       shell.appendChild(centre);
@@ -2114,6 +2142,41 @@
     var dBody = document.createElement('div');
     dBody.id = 'luliy-drawer-body';
 
+    /* ── Section: Shortcuts (singlePage + exlink) ──────────────
+       Built from the links captured by the navbar (module 09).
+       Rendered as an icon grid so every page is one tap away. */
+    var _shortcuts = (root._luliyNavLinks || []).filter(function (m) {
+      return !m.isRss && (m.href || m.absHref);
+    });
+    if (_shortcuts.length) {
+      var sec0 = document.createElement('div');
+      sec0.className = 'luliy-drawer-sec';
+      var sec0Title = document.createElement('div');
+      sec0Title.className = 'luliy-drawer-sec-title';
+      sec0Title.textContent = '\u5feb\u6377\u65b9\u5f0f';  /* 快捷方式 */
+      sec0.appendChild(sec0Title);
+
+      var scGrid = document.createElement('div');
+      scGrid.className = 'luliy-drawer-shortcut-grid';
+      _shortcuts.forEach(function (m) {
+        var a = document.createElement('a');
+        a.className = 'luliy-drawer-shortcut';
+        a.href = m.absHref || m.href;
+        if (/^https?:/i.test(m.absHref) && m.absHref.indexOf(location.origin) !== 0) {
+          a.target = '_blank'; a.rel = 'noopener';   /* exlink → new tab */
+        }
+        var raw   = (m.href || '').replace(/^\//, '').replace(/\.html$/, '');
+        var label = m.label || raw || '\u94fe\u63a5';
+        var ico   = m.html  || '\u2022';
+        a.innerHTML =
+          '<span class="luliy-drawer-shortcut-ico">' + ico + '</span>' +
+          '<span class="luliy-drawer-shortcut-txt">' + label + '</span>';
+        scGrid.appendChild(a);
+      });
+      sec0.appendChild(scGrid);
+      dBody.appendChild(sec0);
+    }
+
     /* ── Section: Navigation links ─────────────────────────── */
     var navLinks = (root._luliyNavLinks || []).filter(function(m){ return m.href || m.absHref; });
     if (navLinks.length) {
@@ -2290,6 +2353,13 @@
       ham.classList.remove('is-open');
       document.body.classList.remove('luliy-drawer-open');
     }
+
+    /* Expose so the navbar's left drawer-toggle (module 09) can drive it. */
+    root._luliyOpenDrawer   = openDrawer;
+    root._luliyCloseDrawer  = closeDrawer;
+    root._luliyToggleDrawer = function () {
+      if (drawer.classList.contains('is-open')) closeDrawer(); else openDrawer();
+    };
 
     ham.addEventListener('click', function(e) {
       e.stopPropagation();
