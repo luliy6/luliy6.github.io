@@ -875,6 +875,29 @@
     }
     root._luliyRelocatePill = relocatePill;
 
+    /* Scroll-fade: hero card fades to fully transparent on scroll so
+       it never covers page content. Restores on hover or scroll-to-top. */
+    function initHeroScrollFade() {
+      var shell = document.getElementById('luliy-nav-rebuilt');
+      if (!shell) return;
+      var fading = false;
+      function onScroll() {
+        var sy = window.scrollY || window.pageYOffset || 0;
+        var t  = Math.min(1, sy / 120);   /* fully transparent after 120px */
+        shell.style.opacity = String(1 - t);
+        shell.style.pointerEvents = t >= 1 ? 'none' : '';
+        fading = t > 0;
+      }
+      shell.addEventListener('mouseenter', function () {
+        shell.style.opacity = '1';
+        shell.style.pointerEvents = '';
+      });
+      shell.addEventListener('mouseleave', function () {
+        if (fading) onScroll();
+      });
+      onScrollRAF(onScroll);
+    }
+
     /* Mobile quick-link bar: a compact icon row under the navbar so
        singlePage/exlink are reachable without opening the drawer. */
     function buildMobileQuickBar() {
@@ -899,8 +922,13 @@
     if (!tryBuild()) {
       var tries = 0;
       var iv = setInterval(function () {
-        if (tryBuild() || ++tries > 30) clearInterval(iv);
+        if (tryBuild() || ++tries > 30) {
+          clearInterval(iv);
+          initHeroScrollFade();
+        }
       }, 200);
+    } else {
+      initHeroScrollFade();
     }
     /* In case the pill is built after the hero, retry relocation a few times */
     var pn = 0;
