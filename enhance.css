@@ -410,11 +410,13 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   width: 100%;
   max-width: 1180px;
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-template-areas: "left capsule right";
-  align-items: center;
-  gap: 18px;
-  padding: 14px 22px;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "left  right"
+    "capsule capsule";
+  gap: 10px 16px;
+  padding: 14px 20px 12px;
   box-sizing: border-box;
   border-radius: 22px;
   position: relative;
@@ -424,6 +426,7 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
   backdrop-filter: blur(28px) saturate(1.7);
   border: 1px solid var(--th-hero-border, rgba(255,255,255,0.55));
   box-shadow: 0 10px 40px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.6) inset;
+  transition: opacity 0.4s ease;
 }
 [data-color-mode="dark"] #luliy-nav-rebuilt {
   background: var(--th-hero-bg, rgba(18,16,26,0.66));
@@ -495,19 +498,18 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 #luliy-nav-circle:hover { background: var(--th-accent-hover, rgba(130,80,223,0.24)) !important; transform: scale(1.1); }
 #luliy-nav-circle svg, .luliy-hero-circle svg { fill: currentColor !important; width: 17px; height: 17px; }
 
-/* ── CENTRE-BOTTOM: link capsule bar ─────────────────────── */
+/* ── CENTRE-BOTTOM: link capsule bar — full-width row 2 ─── */
 #luliy-hero-capsule {
   grid-area: capsule;
-  justify-self: center;
-  align-self: end;
   display: flex; align-items: center;
-  gap: 2px;
-  padding: 8px 14px;
-  border-radius: 16px;
+  justify-content: center;
+  gap: 0;
+  padding: 6px 8px;
+  border-radius: 14px;
   background: var(--th-hero-capsule, rgba(255,255,255,0.45));
   border: 1px solid var(--th-hero-border, rgba(255,255,255,0.5));
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-  max-width: 100%;
+  width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -518,13 +520,13 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 }
 .luliy-hero-cap-link {
   display: inline-flex !important; align-items: center; gap: 7px;
-  padding: 7px 14px; border-radius: 11px;
+  padding: 7px 12px; border-radius: 11px;
   color: var(--th-hero-fg, #2a2440) !important;
   text-decoration: none !important; border: none !important;
   background: transparent !important;
-  font-size: 14px; font-weight: 600;
+  font-size: 13px; font-weight: 600;
   font-family: 'Noto Sans SC', sans-serif;
-  white-space: nowrap;
+  white-space: nowrap; flex: 1; justify-content: center;
   transition: background 0.15s, color 0.15s, transform 0.15s;
 }
 [data-color-mode="dark"] .luliy-hero-cap-link { color: var(--th-hero-fg, rgba(245,242,255,0.92)) !important; }
@@ -546,7 +548,7 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 #luliy-hero-right {
   grid-area: right;
   display: flex; align-items: center; justify-content: flex-end;
-  min-width: 56px;
+  min-width: 56px; align-self: center;
 }
 
 /* When the pill lives in the hero, neutralise its fixed positioning */
