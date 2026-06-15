@@ -607,7 +607,8 @@ body.luliy-drawer-open { overflow: hidden; }
 
 /* Nav links */
 .luliy-drawer-link {
-  display: block; padding: 10px 14px; border-radius: 10px;
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 14px; border-radius: 10px;
   font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.82) !important;
   text-decoration: none !important;
   transition: background 0.15s, color 0.15s;
@@ -616,6 +617,12 @@ body.luliy-drawer-open { overflow: hidden; }
 .luliy-drawer-link:hover {
   background: rgba(255,255,255,0.08); color: #fff !important;
 }
+.luliy-drawer-link-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; flex-shrink: 0;
+}
+.luliy-drawer-link-ico svg { width: 16px; height: 16px; fill: currentColor; }
+.luliy-drawer-link-txt { text-transform: capitalize; }
 
 /* Theme grid: 2 columns */
 .luliy-drawer-theme-grid {
