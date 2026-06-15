@@ -774,20 +774,24 @@
         return {
           href: a.getAttribute('href') || '',
           absHref: a.href || '',
-          label: a.getAttribute('title') || (a.textContent || '').trim()
+          label: a.getAttribute('title') || (a.textContent || '').trim(),
+          html: a.innerHTML   /* preserve the SVG icon markup */
         };
       });
-      /* Split evenly: first half left, second half right */
+      /* Split evenly: first half left, second half right.
+         CLONE the nodes (not move) so the rebuild is robust against any
+         later DOM churn from Gmeek/plugins — the originals stay put in
+         the hidden .title-right, the clones live in our visible groups. */
       var half = Math.ceil(links.length / 2);
       links.forEach(function (a, i) {
-        a.classList.add('luliy-nav-icon-link');
-        /* Clear any inline display:none Gmeek/we set on the link itself */
-        a.style.display = '';
-        a.style.visibility = '';
-        if (i < half) iconsLeft.appendChild(a);   /* appendChild MOVES the node */
-        else iconsRight.appendChild(a);
+        var c = a.cloneNode(true);
+        c.classList.add('luliy-nav-icon-link');
+        c.style.display = ''; c.style.visibility = '';
+        c.removeAttribute('id');
+        (i < half ? iconsLeft : iconsRight).appendChild(c);
       });
-      /* Place the native circle next to the blog name — always visible */
+      /* Place the native circle next to the blog name — MOVE this one
+         (not clone) so its native day/night click handler still works. */
       if (circleBtn) {
         circleBtn.id = 'luliy-nav-circle';
         circleBtn.classList.add('luliy-nav-icon-link');
@@ -804,8 +808,7 @@
       header.insertBefore(shell, header.firstChild);
 
       /* ── Self-heal: if the icon groups ended up empty but Gmeek's
-         hidden .title-right still holds links, recover them now. This
-         guards against any ordering/timing edge case. */
+         hidden .title-right still holds links, recover them now. */
       if (iconsLeft.children.length === 0 && iconsRight.children.length === 0) {
         var late = header.querySelector('.title-right, [class*="title-right"]');
         if (late) {
@@ -819,9 +822,11 @@
             });
           var lh = Math.ceil(lateLinks.length / 2);
           lateLinks.forEach(function (a, i) {
-            a.classList.add('luliy-nav-icon-link');
-            a.style.display = ''; a.style.visibility = '';
-            (i < lh ? iconsLeft : iconsRight).appendChild(a);
+            var c = a.cloneNode(true);
+            c.classList.add('luliy-nav-icon-link');
+            c.style.display = ''; c.style.visibility = '';
+            c.removeAttribute('id');
+            (i < lh ? iconsLeft : iconsRight).appendChild(c);
           });
         }
       }
@@ -2123,7 +2128,12 @@
         a.className = 'luliy-drawer-link';
         a.href = m.absHref || m.href;
         var label = m.label || (m.href||'').replace(/^\//,'').replace(/\.html$/,'') || '\u94fe\u63a5';
-        a.textContent = label;
+        if (m.html) {
+          a.innerHTML = '<span class="luliy-drawer-link-ico">' + m.html + '</span>' +
+                        '<span class="luliy-drawer-link-txt">' + label + '</span>';
+        } else {
+          a.textContent = label;
+        }
         sec1.appendChild(a);
       });
       dBody.appendChild(sec1);
