@@ -427,16 +427,40 @@ body[data-luliy-theme="mono"] #header     { border-top: 2px solid rgba(220,220,2
   position: relative;
 }
 
-/* ── Time — top-left ────────────────────────────────────── */
+/* ── Far-left: drawer-toggle button ─────────────────────── */
+#luliy-nav-drawer-toggle {
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  width: 38px; height: 38px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; border-radius: 10px;
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.88);
+  cursor: pointer; z-index: 5;
+  transition: background 0.18s, transform 0.18s, color 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+#luliy-nav-drawer-toggle:hover {
+  background: rgba(255,255,255,0.20);
+  color: #fff;
+  transform: translateY(-50%) scale(1.08);
+}
+#luliy-nav-drawer-toggle:active { transform: translateY(-50%) scale(0.94); }
+#luliy-nav-drawer-toggle svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* ── Clock — far-left, beside the drawer toggle ─────────── */
 #luliy-nav-time {
   position: absolute;
-  top: 5px; left: 20px;
-  font-size: 13px;
+  top: 50%; left: 62px;
+  transform: translateY(-50%);
+  font-size: 16px;                 /* was 13px — slightly larger */
   font-family: 'LXGW WenKai Mono', monospace;
-  color: rgba(255,255,255,0.55);
-  letter-spacing: 1px;
+  color: rgba(255,255,255,0.72);
+  letter-spacing: 1.5px;
   line-height: 1;
   pointer-events: none;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Left icon group ────────────────────────────────────── */
@@ -603,6 +627,40 @@ body.luliy-drawer-open { overflow: hidden; }
   font-size: 10px; font-weight: 700; letter-spacing: 2px;
   color: rgba(255,255,255,0.35); text-transform: uppercase;
   margin-bottom: 10px; font-family: 'Noto Sans SC', sans-serif;
+}
+
+/* Shortcuts (singlePage + exlink) — icon tiles */
+.luliy-drawer-shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.luliy-drawer-shortcut {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 6px; border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.80) !important;
+  text-decoration: none !important;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, color 0.15s;
+}
+.luliy-drawer-shortcut:hover {
+  background: rgba(255,255,255,0.13);
+  border-color: var(--th-accent, #8250df);
+  color: #fff !important;
+  transform: translateY(-2px);
+}
+.luliy-drawer-shortcut-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+}
+.luliy-drawer-shortcut-ico svg { width: 18px; height: 18px; fill: currentColor; }
+.luliy-drawer-shortcut-txt {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+  text-transform: capitalize; text-align: center;
+  font-family: 'Noto Sans SC', sans-serif;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Nav links */
@@ -3015,6 +3073,8 @@ body.luliy-reduce-motion * {
   }
   /* Icon groups collapse — their links live in the dropdown */
   #luliy-nav-icons-left, #luliy-nav-icons-right { display: none !important; }
+  /* Left drawer-toggle hidden on mobile — the right hamburger opens it */
+  #luliy-nav-drawer-toggle { display: none !important; }
   /* Centre group fills the bar */
   #luliy-nav-rebuilt {
     grid-template-columns: 1fr !important;
@@ -3022,7 +3082,12 @@ body.luliy-reduce-motion * {
   }
   #luliy-nav-blogname { font-size: 18px !important; letter-spacing: 1.5px !important; }
   #luliy-nav-avatar { width: 28px !important; height: 28px !important; }
-  #luliy-nav-time { font-size: 11px !important; left: 12px !important; top: 4px !important; }
+  /* Compact top-left clock, nudged up slightly larger (was 11px) */
+  #luliy-nav-time {
+    font-size: 13px !important;
+    left: 12px !important; top: 4px !important;
+    transform: none !important;   /* cancel the desktop vertical-centre */
+  }
   /* Never resurrect the original title-right (replaced by rebuilt nav) */
   .title-right { display: none !important; }
   /* Toolbar hidden on mobile — sfx/theme/sakura/TOC live in dropdown */
