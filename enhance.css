@@ -3020,16 +3020,29 @@ body.luliy-focus-mode #header,
 body.luliy-focus-mode #luliy-toolbar,
 body.luliy-focus-mode #luliy-sakura-canvas,
 body.luliy-focus-mode #luliy-firefly-canvas,
-body.luliy-focus-mode #TOC,
-body.luliy-focus-mode .articletoc,
+body.luliy-focus-mode #luliy-meteor-canvas,
+body.luliy-focus-mode #luliy-aplayer,
+body.luliy-focus-mode #luliy-quickbar,
 body.luliy-focus-mode #luliy-search-fab,
 body.luliy-focus-mode #luliy-progress-bar,
 body.luliy-focus-mode .luliy-prevnext {
   opacity: 0 !important; pointer-events: none !important;
 }
-/* Focus mode: back-to-top stays visible */
+/* Hard-hide canvases + music ball so no residual motion/sound UI shows */
+body.luliy-focus-mode #luliy-meteor-canvas,
+body.luliy-focus-mode #luliy-sakura-canvas,
+body.luliy-focus-mode #luliy-firefly-canvas,
+body.luliy-focus-mode #luliy-aplayer,
+body.luliy-focus-mode .luliy-trail-dot {
+  display: none !important;
+}
+/* Focus mode KEEPS the TOC (fab + panel) and back-to-top */
+body.luliy-focus-mode #luliy-toc-fab.is-visible,
 body.luliy-focus-mode #luliy-back-top.is-visible {
   opacity: 1 !important; pointer-events: all !important;
+}
+body.luliy-focus-mode #luliy-toc-panel.is-open {
+  opacity: 1 !important; pointer-events: auto !important;
 }
 body.luliy-focus-mode #postBody {
   /* Escape the narrow parent using viewport units */
