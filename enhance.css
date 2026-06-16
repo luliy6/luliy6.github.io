@@ -96,15 +96,6 @@ body.luliy-post-page #postBody {
 }
 
 
-.luliy-series-prog b { font-size: 15px; }
-.luliy-series-prog-sep { opacity: 0.7; margin: 0 1px; }
-/* Ensure it's visible in day mode on light panels */
-body[data-luliy-theme="sunset"] .luliy-series-prog { background: #d9930d; }
-body[data-luliy-theme="mono"] .luliy-series-prog   { background: #333; }
-body[data-luliy-theme="your-name"] .luliy-series-prog { background: #1e6fd4; }
-body[data-luliy-theme="sakura"] .luliy-series-prog  { background: #c94070; }
-body[data-luliy-theme="space"] .luliy-series-prog   { background: #0070b8; }
-
 /* ── Tag page article list cards ──────────────────────────── */
 #luliy-tag-articles {
   margin-top: 20px;
@@ -418,6 +409,19 @@ body[data-luliy-theme="space"] #postBody blockquote {
   border-left-color: rgba(0,200,255,0.50) !important;
 }
 
+/* ── Focus-visible (keyboard accessibility) ─────────────── */
+:focus-visible {
+  outline: 2px solid var(--th-accent, #8250df);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--th-accent, #8250df);
+  outline-offset: 3px;
+}
+/* Suppress outline for mouse/touch users */
+:focus:not(:focus-visible) { outline: none; }
+
 /* Global selections & external link indicator */
 ::selection { background: #f0b429; color: #000; }
 a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; }
@@ -634,30 +638,17 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 #luliy-hero-subtitle:hover { opacity: 1; transform: scale(1.05); background: var(--th-accent-soft, rgba(130,80,223,0.18)); }
 [data-color-mode="dark"] #luliy-hero-subtitle { color: var(--th-accent, #cba6f7); }
 
-/* ── Black hole animation ─────────────────────────────────── */
+/* ── Black hole animation — canvas overlay ────────────────── */
 #luliy-blackhole {
-  position: fixed; width: 0; height: 0;
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  pointer-events: none; z-index: 9999999;
-  background: radial-gradient(circle at 50%, #fff 0%, #888 15%, #000 55%, transparent 100%);
-  transition: none;
-}
-#luliy-blackhole.flash {
-  width: 280px; height: 280px;
-  animation: luliyBhFlash 0.45s cubic-bezier(.2,.7,.3,1) both;
-}
-@keyframes luliyBhFlash {
-  0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
-  50%  { transform: translate(-50%,-50%) scale(1.4); opacity: 0.9; }
-  100% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+  /* Canvas element: positioned by JS, pointer-events block during anim */
+  cursor: none;
 }
 
 /* ── Mobile quick-link bar (singlePage/exlink shortcuts) ──── */
 #luliy-quickbar {
   display: none;   /* shown only on mobile via media query */
   position: fixed;
-  top: 78px; left: 8px; right: 8px;
+  top: 118px; left: 8px; right: 8px;
   z-index: 9998;
   align-items: center; gap: 4px;
   padding: 8px 10px;
@@ -2767,9 +2758,18 @@ body.luliy-focus-mode::after {
 .luliy-series-head b { color: var(--th-accent, #8250df); }
 .luliy-series-prog {
   float: right; font-size: 12px; font-family: 'LXGW WenKai Mono', monospace;
-  background: var(--th-accent, #8250df); color: #fff;
-  padding: 2px 9px; border-radius: 20px;
+  background: var(--th-accent, #8250df); color: #fff !important;
+  padding: 3px 10px; border-radius: 20px;
+  font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
+.luliy-series-prog b { font-size: 14px; }
+.luliy-series-prog-sep { opacity: 0.7; margin: 0 2px; }
+/* Per-theme high-contrast badge colours */
+body[data-luliy-theme="sunset"] .luliy-series-prog   { background: #d9930d; }
+body[data-luliy-theme="mono"] .luliy-series-prog     { background: #444; }
+body[data-luliy-theme="your-name"] .luliy-series-prog{ background: #1e6fd4; }
+body[data-luliy-theme="sakura"] .luliy-series-prog   { background: #c94070; }
+body[data-luliy-theme="space"] .luliy-series-prog    { background: #0070b8; }
 .luliy-series-dots { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .luliy-series-dot {
   width: 12px; height: 12px; border-radius: 50%;
