@@ -967,37 +967,38 @@
       var shell = document.getElementById('luliy-nav-rebuilt');
       var header = document.getElementById('header');
       if (!shell) return;
+      /* Header is always fully transparent — only the hero card carries
+         the glass background, and it fades out completely on scroll. */
+      if (header) header.style.background = 'transparent';
       var fading = false;
       function applyOpacity(op) {
-        shell.style.opacity  = String(op);
-        shell.style.pointerEvents = op <= 0.01 ? 'none' : '';
-        /* Clear the header's own background so no black box shows */
-        if (header) {
-          header.style.background = 'transparent';
-          header.classList.toggle('header-scrolled', (window.scrollY || 0) > 100);
-        }
+        shell.style.opacity = String(op);
+        shell.style.pointerEvents = op <= 0.02 ? 'none' : '';
       }
       function onScroll() {
         var sy = window.scrollY || window.pageYOffset || 0;
-        var t  = Math.min(1, sy / 120);
+        var t  = Math.min(1, sy / 140);   /* fully transparent past 140px */
         applyOpacity(1 - t);
         fading = t > 0;
       }
       shell.addEventListener('mouseenter', function () { applyOpacity(1); });
       shell.addEventListener('mouseleave', function () { if (fading) onScroll(); });
       onScrollRAF(onScroll);
-      /* Apply immediately in case page is loaded already scrolled */
       onScroll();
     }
 
     /* Mobile quick-link bar: a compact icon row under the navbar so
        singlePage/exlink are reachable without opening the drawer. */
     function buildMobileQuickBar() {
-      if (document.getElementById('luliy-quickbar')) return;
       var metas = (root._luliyNavLinks || []).filter(function (m) { return m.href || m.absHref; });
-      if (!metas.length) return;
-      var bar = document.createElement('div');
-      bar.id = 'luliy-quickbar';
+      if (!metas.length) return false;
+      var bar = document.getElementById('luliy-quickbar');
+      if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'luliy-quickbar';
+        document.body.appendChild(bar);
+      }
+      bar.innerHTML = '';
       metas.forEach(function (m) {
         var a = document.createElement('a');
         a.className = 'luliy-quick-link';
@@ -1005,11 +1006,12 @@
         if (m.target) a.target = m.target;
         a.title = m.label || '';
         a.setAttribute('aria-label', m.label || '');
-        a.innerHTML = m.html || (m.label || '');
+        a.innerHTML = (m.html || '') + '<span class="luliy-quick-txt">' + (m.label || '') + '</span>';
         bar.appendChild(a);
       });
-      document.body.appendChild(bar);
+      return true;
     }
+    root._luliyBuildQuickBar = buildMobileQuickBar;
 
     if (!tryBuild()) {
       var tries = 0;
@@ -1022,16 +1024,18 @@
     } else {
       initHeroScrollFade();
     }
-    /* In case the pill is built after the hero, retry relocation a few times */
+    /* In case the pill / nav links are ready after the hero, retry a few times */
     var pn = 0;
     var piv = setInterval(function () {
       if (root._luliyRelocatePill) root._luliyRelocatePill();
-      if (document.getElementById('luliy-toolbar') &&
+      if (root._luliyBuildQuickBar) root._luliyBuildQuickBar();
+      var pillDone = document.getElementById('luliy-toolbar') &&
           document.getElementById('luliy-toolbar').parentElement &&
-          document.getElementById('luliy-toolbar').parentElement.id === 'luliy-hero-right') {
-        clearInterval(piv);
-      }
-      if (++pn > 30) clearInterval(piv);
+          document.getElementById('luliy-toolbar').parentElement.id === 'luliy-hero-right';
+      var qbDone = document.getElementById('luliy-quickbar') &&
+          document.getElementById('luliy-quickbar').children.length > 0;
+      if (pillDone && qbDone) clearInterval(piv);
+      if (++pn > 40) clearInterval(piv);
     }, 200);
   }
 
