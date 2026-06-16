@@ -69,10 +69,7 @@
   --luliy-pb-extra: 0px;
 }
 
-/* ★ 手机端=桌面端双保险（CSS侧）：即便 viewport meta 未被 JS 成功修改，
-   min-width:1024px 也能让布局以桌面宽度渲染，所有移动端断点不再命中。
-   与 JS 的 forceDesktopViewport() 配合使用。 */
-html { scroll-behavior: smooth; zoom: 1.1; min-width: 1024px; }
+html { scroll-behavior: smooth; zoom: 1.1; }
 *, *::before, *::after { box-sizing: border-box; }
 
 /* Force page containers transparent so bg shows through */
@@ -625,15 +622,7 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 
 
 /* ── SubTitle row (mobRow): links | subtitle | links ─────── */
-#luliy-hero-mobrow {
-  grid-area: subtitle;
-  display: flex; align-items: center; justify-content: center;
-  gap: 12px;
-}
-/* Desktop: link columns hidden (capsule handles links); only subtitle shows */
-.luliy-mobrow-col { display: none; }
-
-/* ── SubTitle (between circle and settings) ──────────────── */
+/* ── 副标题（=导航切换按钮，仍用于 hero A 套） ─────────────── */
 #luliy-hero-subtitle {
   align-self: center; justify-self: center;
   font-size: 13px; font-weight: 600; letter-spacing: 0.5px;
@@ -650,198 +639,7 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 #luliy-hero-subtitle:hover { opacity: 1; transform: scale(1.05); background: var(--th-accent-soft, rgba(130,80,223,0.18)); }
 [data-color-mode="dark"] #luliy-hero-subtitle { color: var(--th-accent, #cba6f7); }
 
-/* ── Black hole animation — canvas overlay ────────────────── */
-#luliy-blackhole {
-  /* Canvas element: positioned by JS, pointer-events block during anim */
-  cursor: none;
-}
-
-/* ── Mobile quick-link bar (singlePage/exlink shortcuts) ──── */
-
-
-
-/* ── Hamburger — mobile ─────────────────────────────────── */
-#luliy-nav-ham {
-  display: none; flex-direction: column; justify-content: space-between;
-  /* 44x44 touch target (Apple HIG min); bars stay 26x18 via padding */
-  width: 44px; height: 44px;
-  padding: 13px 9px;
-  box-sizing: border-box;
-  background: none; border: none; cursor: pointer;
-  margin-left: auto; z-index: 10001; flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-#luliy-nav-ham span {
-  display: block; width: 100%; height: 2px;
-  background: rgba(255,255,255,0.90); border-radius: 2px;
-  transition: transform 0.28s, opacity 0.28s;
-}
-#luliy-nav-ham.is-open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-#luliy-nav-ham.is-open span:nth-child(2) { opacity: 0; }
-#luliy-nav-ham.is-open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-
-/* ── Mobile dropdown ────────────────────────────────────── */
-/* ── Right-side drawer ─────────────────────────────────────── */
-#luliy-drawer-backdrop {
-  display: none; position: fixed; inset: 0; z-index: 10000;
-  background: rgba(0,0,0,0.45);
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-  opacity: 0; transition: opacity 0.28s ease;
-}
-#luliy-drawer-backdrop.is-open {
-  display: block; opacity: 1;
-}
-body.luliy-drawer-open { overflow: hidden; }
-
-#luliy-nav-drawer {
-  position: fixed; top: 0; right: 0; bottom: 0;
-  width: min(84vw, 320px);
-  z-index: 10001;
-  display: flex; flex-direction: column;
-  background: rgba(14,10,28,0.97);
-  -webkit-backdrop-filter: blur(32px) saturate(2);
-  backdrop-filter: blur(32px) saturate(2);
-  border-left: 1px solid rgba(255,255,255,0.10);
-  box-shadow: -8px 0 40px rgba(0,0,0,0.55);
-  transform: translateX(100%);
-  transition: transform 0.32s cubic-bezier(.4,0,.2,1);
-  overflow: hidden;
-}
-#luliy-nav-drawer.is-open { transform: translateX(0); }
-
-#luliy-drawer-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  flex-shrink: 0;
-}
-#luliy-drawer-title {
-  font-size: 18px; font-weight: 900; letter-spacing: 2px;
-  color: #fff; font-family: 'Noto Sans SC', sans-serif;
-}
-#luliy-drawer-close {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.70); font-size: 16px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
-}
-#luliy-drawer-close:hover { background: rgba(255,255,255,0.18); color: #fff; }
-
-#luliy-drawer-body {
-  flex: 1; overflow-y: auto; padding: 12px 0 32px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.15) transparent;
-}
-#luliy-drawer-body::-webkit-scrollbar { width: 3px; }
-#luliy-drawer-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-
-.luliy-drawer-sec { padding: 12px 20px; }
-.luliy-drawer-sec + .luliy-drawer-sec {
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.luliy-drawer-sec-title {
-  font-size: 10px; font-weight: 700; letter-spacing: 2px;
-  color: rgba(255,255,255,0.35); text-transform: uppercase;
-  margin-bottom: 10px; font-family: 'Noto Sans SC', sans-serif;
-}
-
-/* Nav links */
-/* Drawer nav links: 2-column grid (two-row arrangement) */
-.luliy-drawer-link-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-.luliy-drawer-link {
-  display: flex; align-items: center; gap: 9px;
-  padding: 10px 12px; border-radius: 10px;
-  font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.82) !important;
-  text-decoration: none !important;
-  background: rgba(255,255,255,0.05);
-  transition: background 0.15s, color 0.15s, transform 0.15s;
-}
-.luliy-drawer-link:hover {
-  background: rgba(255,255,255,0.10); color: #fff !important;
-}
-.luliy-drawer-link:active { transform: scale(0.96); }
-.luliy-drawer-link-ico {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 20px; height: 20px; flex-shrink: 0;
-}
-.luliy-drawer-link-ico svg { width: 16px; height: 16px; fill: currentColor; }
-.luliy-drawer-link-txt { text-transform: capitalize; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Theme grid: 2 columns */
-.luliy-drawer-theme-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-}
-.luliy-drawer-theme-cell {
-  display: flex; align-items: center; gap: 9px;
-  padding: 9px 12px; border-radius: 10px;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
-  cursor: pointer; transition: background 0.15s, border-color 0.15s;
-  font-size: 12px; color: rgba(255,255,255,0.70);
-  font-family: 'Noto Sans SC', sans-serif;
-}
-.luliy-drawer-theme-cell:hover { background: rgba(255,255,255,0.12); color: #fff; }
-.luliy-drawer-theme-cell.is-active {
-  background: rgba(255,255,255,0.14);
-  border-color: var(--th-accent, #8250df);
-  color: #fff;
-}
-.luliy-drawer-theme-dot {
-  width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
-}
-.luliy-drawer-theme-name { font-size: 12px; font-weight: 600; white-space: nowrap; }
-
-/* Day/Night toggle */
-.luliy-drawer-dn-wrap { display: flex; gap: 10px; }
-.luliy-drawer-dn-btn {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 12px 8px; border-radius: 12px;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10);
-  color: rgba(255,255,255,0.60); font-size: 20px; cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, color 0.18s;
-}
-.luliy-drawer-dn-btn span { font-size: 11px; font-weight: 600; letter-spacing: 1px; font-family: 'Noto Sans SC', sans-serif; }
-.luliy-drawer-dn-btn:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); }
-.luliy-drawer-dn-btn.is-active {
-  background: var(--th-accent-soft, rgba(130,80,223,0.25));
-  border-color: var(--th-accent, #8250df);
-  color: #fff;
-}
-
-/* ── Drawer: font size + font family ────────────────────── */
-.luliy-drawer-fs {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-}
-.luliy-drawer-fs-btn {
-  width: 40px; height: 36px; border-radius: 10px;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 700; cursor: pointer;
-  transition: background 0.18s;
-}
-.luliy-drawer-fs-btn:hover { background: var(--th-accent-soft, rgba(130,80,223,0.30)); }
-.luliy-drawer-fs-val {
-  flex: 1; text-align: center; color: rgba(255,255,255,0.85);
-  font-size: 13px; font-family: 'LXGW WenKai Mono', monospace;
-}
-.luliy-drawer-font { display: flex; gap: 8px; }
-.luliy-drawer-font-btn {
-  flex: 1; padding: 9px 0; border-radius: 10px;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.70); font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: 'Noto Sans SC', sans-serif; transition: background 0.18s, color 0.18s;
-}
-.luliy-drawer-font-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
-.luliy-drawer-font-btn.is-active {
-  background: var(--th-accent-soft, rgba(130,80,223,0.25));
-  border-color: var(--th-accent, #8250df); color: #fff;
-}
-
+/* mobRow / 旧汉堡 / 旧抽屉 / 黑洞 CSS 已删除，新抽屉见 section 35 */
 /* .luliy-nav-item deprecated — replaced by drawer */
 
 /* Hide RSS feed links */
@@ -2469,10 +2267,6 @@ body[data-luliy-theme="mono"] {
   position: absolute; top: 50%; right: 2px; transform: translateY(-50%);
   background: var(--th-accent, #8250df);
 }
-@media (max-width: 768px) {
-  /* APlayer keeps its JS-controlled drag position; only size adjusts */
-  #luliy-aplayer .aplayer-pic { width: 44px !important; height: 44px !important; }
-}
 
 
 /* ══════════════════════════════════════════════════════════
@@ -3179,118 +2973,32 @@ body.luliy-reduce-motion * {
    27  Responsive (mobile)
 ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* ── Touch-friendly sliders ───────────────────────────── */
+  /* ══ 仅保留：触摸优化 + 表格横滑 + 内容排版（旧 hero/汉堡/mobrow 已删，导航改用抽屉）══ */
+
+  /* ── 触摸优化：滑块加大 ───────────────────────────── */
   .luliy-range { height: 8px; touch-action: pan-y; }
   .luliy-range::-webkit-slider-thumb { width: 22px; height: 22px; }
   .luliy-range::-moz-range-thumb { width: 22px; height: 22px; }
   .luliy-ctrl-slider { padding-top: 12px !important; padding-bottom: 14px !important; }
 
-  /* ══════ Mobile hero — rebuilt: clean, balanced ══════ */
-  #header { padding: 8px 8px 0 !important; min-height: 0 !important; }
-  #luliy-nav-ham {
-    display: flex !important;
-    position: absolute !important;
-    right: 12px !important;
-    top: 14px !important;
-    margin: 0 !important;
-    z-index: 3;
-  }
-  /* Two-row hero: [avatar+name+time] then [links | subtitle | links] */
-  #luliy-nav-rebuilt {
-    grid-template-columns: 1fr !important;
-    grid-template-areas:
-      "left"
-      "subtitle" !important;
-    gap: 10px 0 !important;
-    padding: 12px 48px 12px 14px !important;
-    border-radius: 18px !important;
-    max-width: 100% !important;
-  }
-  #luliy-hero-left { gap: 10px !important; flex-wrap: nowrap !important; }
-  #luliy-nav-avatar { width: 42px !important; height: 42px !important; border-width: 2px !important; }
-  #luliy-nav-blogname { font-size: 20px !important; }
-  #luliy-hero-divider { height: 26px !important; }
-  #luliy-hero-time { font-size: 15px !important; }
-  #luliy-hero-date { font-size: 9px !important; }
-  #luliy-nav-circle, .luliy-hero-circle { width: 28px !important; height: 28px !important; }
-  /* mobRow: links flank the centred subtitle */
-  #luliy-hero-mobrow {
-    grid-area: subtitle !important;
-    display: flex !important; align-items: center !important;
-    justify-content: space-between !important;
-    gap: 8px !important; width: 100% !important;
-  }
-  .luliy-mobrow-col {
-    display: flex !important; flex-direction: column !important;
-    gap: 5px !important; flex: 1 !important;
-  }
-  .luliy-mobrow-left  { align-items: flex-start !important; }
-  .luliy-mobrow-right { align-items: flex-end !important; }
-  .luliy-mobrow-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 11px; border-radius: 14px;
-    background: var(--th-accent-soft, rgba(130,80,223,0.12));
-    color: var(--th-hero-fg, #2a2440) !important;
-    text-decoration: none !important;
-    font-size: 12px; font-weight: 600; white-space: nowrap;
-    max-width: 100%;
-    transition: background 0.15s, transform 0.15s;
-  }
-  [data-color-mode="dark"] .luliy-mobrow-link { color: rgba(245,242,255,0.92) !important; }
-  .luliy-mobrow-link:active { transform: scale(0.94); background: var(--th-accent, #8250df); color: #fff !important; }
-  .luliy-mobrow-link svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
-  .luliy-mobrow-txt { overflow: hidden; text-overflow: ellipsis; text-transform: capitalize; }
-  #luliy-hero-subtitle {
-    flex-shrink: 0; font-size: 12px !important; padding: 5px 14px !important;
-  }
-  /* Desktop-only zones hidden on mobile */
-  #luliy-hero-capsule { display: none !important; }
-  #luliy-hero-right { display: none !important; }
-  .title-right { display: none !important; }
-  #luliy-toolbar { display: none !important; }
-
+  /* ── 内容排版：窄屏字号/单列 ──────────────────────── */
   #content, .main { padding: 0 12px !important; }
-  body.luliy-post-page #content { margin-top: 150px !important; }
-  body:not(.luliy-post-page) #content,
-  body:not(.luliy-post-page) .main { margin-top: 140px !important; }
-  #luliy-hero-banner { margin-top: 130px; font-size: 12px; padding: 12px 16px; }
-
   .luliy-card-grid { grid-template-columns: 1fr; }
   .luliy-prevnext { flex-direction: column; }
-
   #postBody { font-size: 16px !important; line-height: 1.82 !important; }
   #postBody h1 { font-size: 1.5rem !important; }
   #postBody h2 { font-size: 1.2rem !important; }
   #postBody pre { font-size: 13px !important; }
 
-  body[data-luliy-theme="sakura"] #postBody,
-  body[data-luliy-theme="your-name"] #postBody,
-  body[data-luliy-theme="space"] #postBody,
-  body[data-luliy-theme="sunset"] #postBody,
-  body[data-luliy-theme="mono"] #postBody {
-    padding: 20px 16px !important;
-    border-radius: 14px !important;
-  }
-
-  #luliy-back-top { right: 14px; bottom: 94px; }
-
-  #luliy-home-gallery { height: 140px; border-radius: 14px; }
-  #luliy-home-gallery-text { font-size: 14px; }
-
-  /* ── Article reading: full-width on mobile ─────────────────── */
+  /* 文章页全宽 */
   body.luliy-post-page #content,
   body.luliy-post-page .main {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100% !important; max-width: 100% !important;
     padding: 0 !important;
-    margin-top: 56px !important;
   }
   body.luliy-post-page #postBody {
-    border-radius: 0 !important;
-    padding: 20px 15px !important;
-    margin-bottom: 0 !important;
+    border-radius: 0 !important; padding: 20px 15px !important; margin-bottom: 0 !important;
   }
-  /* All themes: remove rounded corners on mobile */
   body[data-luliy-theme="default"] #postBody,
   body:not([data-luliy-theme]) #postBody,
   body[data-luliy-theme="sakura"] #postBody,
@@ -3298,35 +3006,18 @@ body.luliy-reduce-motion * {
   body[data-luliy-theme="space"] #postBody,
   body[data-luliy-theme="sunset"] #postBody,
   body[data-luliy-theme="mono"] #postBody {
-    border-radius: 0 !important;
-    padding: 20px 15px !important;
+    border-radius: 0 !important; padding: 20px 15px !important;
   }
 
-  /* ── Tables: horizontal scroll on mobile ──────────────────── */
-  #postBody table {
-    display: block !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    white-space: nowrap !important;
-    max-width: 100% !important;
-  }
-  #postBody table td,
-  #postBody table th {
-    white-space: nowrap !important;
-  }
-  /* Sticky header off on mobile (table becomes its own scroll box) */
-  #postBody th { position: static !important; }
-
-  /* ── Gallery grid: smaller tiles ──────────────────────────── */
+  /* ── 表格横向滚动（≥600px 时；<600px 由 section 31 卡片化接管）─── */
+  #luliy-back-top { right: 14px; bottom: 94px; }
+  #luliy-home-gallery { height: 140px; border-radius: 14px; }
+  #luliy-home-gallery-text { font-size: 14px; }
   #luliy-home-gallery.is-grid { grid-template-columns: repeat(2, 1fr); }
   #luliy-home-gallery.is-grid .luliy-gallery-cell { height: 110px; }
-  #luliy-gallery-edit { opacity: 1; } /* always visible (no hover on touch) */
+  #luliy-gallery-edit { opacity: 1; }
 
-  /* ── Welcome splash extra lines ───────────────────────────── */
-
-  /* ── v10 mobile tweaks ────────────────────────────────────── */
   #luliy-search-fab { bottom: 158px; right: 14px; width: 40px; height: 40px; }
-  #luliy-back-top { right: 14px; bottom: 108px; }
   #luliy-search-bar { top: 64px; width: 94vw; }
   .luliy-tag-bubble { padding: 4px 11px; }
   .cal-grid { gap: 3px; }
@@ -3334,14 +3025,11 @@ body.luliy-reduce-motion * {
   .cal-badge { min-width: 12px; height: 12px; font-size: 8px; line-height: 12px; }
   .luliy-archive-head { flex-direction: column; align-items: flex-start; }
   .luliy-series-prog { float: none; display: inline-block; margin-left: 6px; }
-  /* List view stacks date below on small screens */
   .luliy-card-list .luliy-card-inner { flex-wrap: wrap; }
   .luliy-card-list .luliy-card-date { order: 4; margin-left: 0; width: 100%; }
-
-  /* ── Favorites gate card ──────────────────────────────────── */
   #luliy-fav-gate-card { padding: 28px 22px 22px; }
 
-  /* ── Background button ─────────────────────────────────────── */
+  /* 背景按钮（控制面板内） */
   #luliy-bg-btn {
     display: inline-flex !important; align-items: center !important; gap: 5px !important;
     padding: 10px 16px !important; border-radius: 10px !important;
@@ -3354,7 +3042,6 @@ body.luliy-reduce-motion * {
   #luliy-bg-btn:hover { background: rgba(130,80,223,0.09) !important; }
   [data-color-mode="dark"] #luliy-bg-btn { color: #e0daf8 !important; }
   [data-color-mode="dark"] #luliy-bg-btn:hover { background: rgba(130,80,223,0.18) !important; }
-
 }
 /* ══════════════════════════════════════════════════════════
    29  移动端性能优化（手机适配 / 滚动流畅度）  ★新增
@@ -3387,83 +3074,12 @@ body.luliy-reduce-motion * {
     -webkit-backdrop-filter: blur(10px) saturate(1.4) !important;
     backdrop-filter: blur(10px) saturate(1.4) !important;
   }
-  /* 抽屉打开时常驻于前台，模糊半径同样下调 */
-  #luliy-nav-drawer {
-    -webkit-backdrop-filter: blur(16px) saturate(1.6) !important;
-    backdrop-filter: blur(16px) saturate(1.6) !important;
-  }
 
   /* (3) 文章容器：移动端去掉常驻的 will-change，避免长页面把整篇文章
      永久提升为合成层、白白占用大量显存。 */
   #luliy-hero-banner { will-change: auto !important; }
 }
 
-/* ══════════════════════════════════════════════════════════
-   30  移动端快捷导航栏（singlePage + exlink）  ★新增
-   桌面端隐藏；仅 ≤768px 显示为一行可横向滚动的快捷胶囊。
-══════════════════════════════════════════════════════════ */
-#luliy-mobile-quicklinks { display: none; }
-
-@media (max-width: 768px) {
-  #luliy-mobile-quicklinks {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;   /* iOS 惯性滚动 */
-    scrollbar-width: none;               /* Firefox 隐藏滚动条 */
-    padding: 4px 12px 10px;
-    margin: 0 0 6px;
-  }
-  #luliy-mobile-quicklinks::-webkit-scrollbar { display: none; }
-
-  .luliy-mql-pill {
-    flex: 0 0 auto;                      /* 不压缩，超出则横向滚动 */
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 14px; border-radius: 20px;
-    font-size: 13px; font-weight: 600; white-space: nowrap;
-    text-decoration: none !important;
-    color: var(--th-accent, #8250df) !important;
-    background: var(--th-accent-soft, rgba(130,80,223,0.12));
-    border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.22));
-    font-family: 'Noto Sans SC', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s, background 0.15s, color 0.15s;
-  }
-  [data-color-mode="dark"] .luliy-mql-pill {
-    color: var(--th-accent, #cba6f7) !important;
-    background: var(--th-accent-soft, rgba(130,80,223,0.20));
-    border-color: var(--th-accent-soft, rgba(130,80,223,0.30));
-  }
-  .luliy-mql-pill:active {
-    transform: scale(0.94);
-    background: var(--th-accent, #8250df);
-    color: #fff !important;
-  }
-  /* 外链加一个 ↗ 角标，与内部页区分 */
-  .luliy-mql-pill.is-ext .luliy-mql-txt::after {
-    content: ' \2197';
-    font-size: 0.85em; opacity: 0.7;
-  }
-  .luliy-mql-ico {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 16px; height: 16px; flex-shrink: 0;
-  }
-  .luliy-mql-ico svg { width: 15px; height: 15px; fill: currentColor; }
-  /* 无图标链接的占位圆点 */
-  .luliy-mql-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: currentColor; opacity: 0.75;
-  }
-  .luliy-mql-txt { text-transform: capitalize; }
-
-  /* 去重：导航快捷已由上方快捷栏统一呈现时（body.luliy-has-mql），
-     隐藏 hero 卡片内重复的左右链接列，仅保留居中副标题。
-     —— 用 id+class 提高优先级以覆盖前面的 .luliy-mobrow-col 规则；
-     —— 仅在快捷栏确实生成（有 luliy-has-mql 标记）时才隐藏，
-        若快捷栏因故未生成，hero 内链接仍作为兜底保留。 */
-  body.luliy-has-mql #luliy-hero-mobrow .luliy-mobrow-col { display: none !important; }
-  body.luliy-has-mql #luliy-hero-mobrow { justify-content: center !important; }
-}
 
 /* ══════════════════════════════════════════════════════════
    31  响应式表格——窄屏卡片化  ★新增
@@ -3586,4 +3202,224 @@ body.luliy-reduce-motion * {
   background: rgba(130,80,223,0.12);
   border-color: rgba(130,80,223,0.22);
   color: var(--th-accent, #cba6f7);
+}
+
+/* ══════════════════════════════════════════════════════════
+   35  左滑抽屉导航 + ☰ 按钮 + 双导航模式  ★全新
+══════════════════════════════════════════════════════════ */
+
+/* ── 双导航模式显隐 ──
+   body.luliy-nav-hero   → 显示桌面 hero 导航栏，隐藏 ☰
+   body.luliy-nav-drawer → 隐藏 hero 导航栏，显示 ☰ */
+body.luliy-nav-drawer #luliy-nav-rebuilt { display: none !important; }
+body.luliy-nav-drawer #header { min-height: 0 !important; padding: 0 !important; background: transparent !important; }
+body.luliy-nav-hero   #luliy-ham-btn { display: none !important; }
+
+/* drawer 模式：右下角浮动工具条的「触发按钮」隐藏（设置已搬进抽屉，避免两处重复）。
+   只隐藏触发钮 #luliy-ctrl-btn，不隐藏 #luliy-ctrl-panel 本体（它此时在抽屉里）。 */
+body.luliy-nav-drawer #luliy-ctrl-btn { display: none !important; }
+
+/* drawer 模式下内容上移（不再被 hero 占位） */
+body.luliy-nav-drawer #content,
+body.luliy-nav-drawer .main { margin-top: 64px !important; }
+body.luliy-nav-drawer.luliy-post-page #content { margin-top: 60px !important; }
+body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
+
+/* ── ☰「更多」按钮（固定左上角）── */
+#luliy-ham-btn {
+  position: fixed; top: 14px; left: 14px; z-index: 10002;
+  width: 44px; height: 44px; padding: 12px 10px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  box-sizing: border-box; cursor: pointer;
+  background: rgba(20,16,34,0.55);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: background 0.2s, transform 0.2s;
+}
+#luliy-ham-btn:hover { background: rgba(40,30,60,0.75); transform: scale(1.05); }
+#luliy-ham-btn span {
+  display: block; width: 100%; height: 2px; border-radius: 2px;
+  background: rgba(255,255,255,0.92);
+  transition: transform 0.28s, opacity 0.28s;
+}
+#luliy-ham-btn.is-open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+#luliy-ham-btn.is-open span:nth-child(2) { opacity: 0; }
+#luliy-ham-btn.is-open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+[data-color-mode="light"] #luliy-ham-btn { background: rgba(255,255,255,0.65); border-color: rgba(0,0,0,0.10); }
+[data-color-mode="light"] #luliy-ham-btn span { background: rgba(40,30,60,0.88); }
+
+/* ── 遮罩 ── */
+#luliy-drawer-mask {
+  position: fixed; inset: 0; z-index: 10003;
+  background: rgba(0,0,0,0.45);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+#luliy-drawer-mask.is-open { opacity: 1; visibility: visible; }
+
+/* ── 抽屉本体（从左滑入）── */
+#luliy-drawer {
+  position: fixed; top: 0; left: 0; z-index: 10004;
+  width: 300px; max-width: 86vw; height: 100%;
+  display: flex; flex-direction: column;
+  background: rgba(16,12,28,0.92);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6);
+  border-right: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 6px 0 40px rgba(0,0,0,0.45);
+  transform: translateX(-105%);
+  transition: transform 0.34s cubic-bezier(.4,.0,.2,1);
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+#luliy-drawer.is-open { transform: translateX(0); }
+[data-color-mode="light"] #luliy-drawer { background: rgba(248,246,252,0.94); border-right-color: rgba(0,0,0,0.08); }
+
+/* 抽屉滚动条 */
+#luliy-drawer::-webkit-scrollbar { width: 6px; }
+#luliy-drawer::-webkit-scrollbar-thumb { background: rgba(130,80,223,0.4); border-radius: 3px; }
+
+/* ── 抽屉顶部信息区 ── */
+#luliy-drawer-head {
+  position: relative;
+  padding: 26px 20px 18px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+[data-color-mode="light"] #luliy-drawer-head { border-bottom-color: rgba(0,0,0,0.06); }
+.ldh-avatar { display: inline-block; width: 72px; height: 72px; border-radius: 50%; overflow: hidden; border: 2px solid var(--th-accent, #8250df); }
+.ldh-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ldh-name {
+  display: block; margin: 10px 0 0; font-size: 20px; font-weight: 700;
+  color: #fff; text-decoration: none; letter-spacing: 0.5px;
+}
+[data-color-mode="light"] .ldh-name { color: #1e1032; }
+.ldh-accent { width: 36px; height: 3px; border-radius: 2px; margin: 8px auto 14px; background: var(--th-accent, #8250df); }
+.ldh-time { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--th-accent, #cba6f7); font-size: 17px; font-weight: 600; }
+.ldh-time .ldh-clock { display: inline-flex; }
+.ldh-date { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 3px; letter-spacing: 0.5px; }
+[data-color-mode="light"] .ldh-date { color: rgba(40,30,60,0.6); }
+
+/* 抽屉里的导航模式切换按钮 */
+#luliy-drawer-modebtn {
+  margin-top: 14px; width: 100%;
+  padding: 9px 12px; border-radius: 10px;
+  background: var(--th-accent-soft, rgba(130,80,223,0.18));
+  border: 1px solid var(--th-accent, #8250df);
+  color: var(--th-accent, #cba6f7); font-size: 13px; font-weight: 600;
+  font-family: 'Noto Sans SC', sans-serif; cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+}
+#luliy-drawer-modebtn:hover { background: var(--th-accent, #8250df); color: #fff; }
+#luliy-drawer-modebtn:active { transform: scale(0.97); }
+
+/* ── 折叠分区 ── */
+.luliy-drawer-section { border-bottom: 1px solid rgba(255,255,255,0.06); }
+[data-color-mode="light"] .luliy-drawer-section { border-bottom-color: rgba(0,0,0,0.05); }
+.lds-header {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 15px 20px; background: none; border: none; cursor: pointer;
+  color: #fff; font-size: 14px; font-weight: 700; font-family: 'Noto Sans SC', sans-serif;
+  letter-spacing: 0.5px; transition: background 0.15s;
+}
+[data-color-mode="light"] .lds-header { color: #1e1032; }
+.lds-header:hover { background: rgba(130,80,223,0.10); }
+.lds-arrow { font-size: 18px; opacity: 0.6; transition: transform 0.28s; }
+.luliy-drawer-section.is-open .lds-arrow { transform: rotate(90deg); }
+.lds-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.34s cubic-bezier(.4,.0,.2,1);
+}
+.luliy-drawer-section.is-open .lds-body { max-height: 1200px; }
+
+/* 快捷访问链接 */
+.lds-body > .lds-link:first-child { margin-top: 2px; }
+.lds-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 22px; text-decoration: none;
+  color: rgba(255,255,255,0.82); font-size: 14px;
+  transition: background 0.15s, color 0.15s, padding-left 0.15s;
+}
+[data-color-mode="light"] .lds-link { color: rgba(40,30,60,0.82); }
+.lds-link:hover { background: var(--th-accent-soft, rgba(130,80,223,0.14)); color: var(--th-accent, #cba6f7); padding-left: 26px; }
+[data-color-mode="light"] .lds-link:hover { color: var(--th-accent, #8250df); }
+.lds-link:active { background: var(--th-accent, #8250df); color: #fff; }
+.lds-link-ico { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex-shrink: 0; }
+.lds-link-ico svg { width: 18px; height: 18px; fill: currentColor; }
+.lds-link-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.7; }
+.lds-link-txt { text-transform: capitalize; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 主题分区网格 */
+.lds-theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 6px 16px 14px; }
+.luliy-drawer-theme-cell {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 12px; border-radius: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+[data-color-mode="light"] .luliy-drawer-theme-cell { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.06); }
+.luliy-drawer-theme-cell:hover { background: rgba(130,80,223,0.16); }
+.luliy-drawer-theme-cell:active { transform: scale(0.96); }
+.luliy-drawer-theme-cell.is-active { background: var(--th-accent-soft, rgba(130,80,223,0.22)); border-color: var(--th-accent, #8250df); }
+.ldt-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(255,255,255,0.18); }
+.ldt-name { font-size: 12px; font-weight: 600; white-space: nowrap; color: rgba(255,255,255,0.85); }
+[data-color-mode="light"] .ldt-name { color: rgba(40,30,60,0.85); }
+
+/* 设置分区：嵌入的浮动面板 */
+.lds-settings-host { padding: 4px 12px 14px; }
+#luliy-ctrl-panel.in-drawer {
+  position: static !important;
+  display: block !important;
+  width: 100% !important; max-width: 100% !important;
+  margin: 0 !important; box-shadow: none !important;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  border: none !important; transform: none !important;
+  opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;
+}
+/* 面板搬进抽屉后，隐藏其内部重复的「主题预览卡 + 风格主题选择」（抽屉已有主题分区） */
+#luliy-ctrl-panel.in-drawer .luliy-ctrl-theme-preview { display: none !important; }
+
+/* ── APlayer 完整模式微调（恢复原生进度条/音量/列表后宽度更大）── */
+#luliy-aplayer {
+  position: fixed; z-index: 9000;
+  width: 320px; max-width: 92vw;
+}
+#luliy-aplayer.is-dragging { opacity: 0.92; cursor: grabbing; }
+#luliy-aplayer .aplayer { margin: 0; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.30); }
+/* 抽屉打开时把 APlayer 降到遮罩之下，避免遮挡（用 body class，兼容性优于 :has） */
+body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
+
+/* ══════════════════════════════════════════════════════════
+   36  桌面端 hero 导航栏响应式补强  ★
+   需求：桌面端任何窗口尺寸下，hero 元素可随窗口缩放，但绝不被
+   遮挡/隐藏/折叠/裁剪。用 min-width:0 + flex 收缩 + 文字省略实现。
+══════════════════════════════════════════════════════════ */
+#luliy-nav-rebuilt { overflow: visible; }   /* 不裁剪子元素 */
+
+/* 左区(头像+名+时间)允许整体收缩，名字过长省略而非溢出 */
+#luliy-hero-left { min-width: 0; }
+#luliy-nav-blogname {
+  min-width: 0; max-width: 30vw;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* 中间副标题(切换按钮)允许收缩，不挤压两侧 */
+#luliy-hero-subtitle { min-width: 0; }
+
+/* 链接胶囊：本就整行、可横向滚动，确保不被裁掉、滚动条隐藏 */
+#luliy-hero-capsule { min-width: 0; max-width: 100%; overflow-x: auto; }
+
+/* 右区(设置pill)不收缩、始终可见 */
+#luliy-hero-right { flex-shrink: 0; }
+
+/* 中窄桌面(769~1024)：缩小间距与字号，保持单行不折叠 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #luliy-nav-rebuilt { padding: 12px 18px 10px; gap: 10px 14px; }
+  #luliy-nav-blogname { font-size: 20px; max-width: 24vw; }
+  #luliy-hero-time { font-size: 15px; }
+  #luliy-hero-subtitle { font-size: 12px; padding: 4px 10px; }
+  .luliy-hero-cap-link { padding: 5px 10px; font-size: 13px; }
 }
