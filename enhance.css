@@ -465,17 +465,17 @@ a.Label * { vertical-align: middle !important; line-height: 1 !important; }
 /* ════════ Hero card — frosted glass, theme-aware ════════ */
 #luliy-nav-rebuilt {
   width: 100%;
-  max-width: 1180px;
+  max-width: 1480px;
   display: grid;
   grid-template-columns: auto 1fr auto;
   grid-template-rows: auto auto;
   grid-template-areas:
     "left  subtitle  right"
     "capsule capsule capsule";
-  gap: 10px 12px;
-  padding: 14px 20px 12px;
+  gap: 12px 20px;
+  padding: 14px 28px 12px;
   box-sizing: border-box;
-  border-radius: 22px;
+  border-radius: 24px;
   position: relative;
   /* Grey frosted glass */
   background: var(--th-hero-bg, rgba(245,245,250,0.62));
@@ -648,14 +648,14 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 #luliy-quickbar {
   display: none;   /* shown only on mobile via media query */
   position: fixed;
-  top: 118px; left: 8px; right: 8px;
+  top: 110px; left: 8px; right: 8px;
   z-index: 9998;
-  align-items: center; gap: 4px;
+  align-items: center; gap: 6px;
   padding: 8px 10px;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow-x: auto;
   scrollbar-width: none;
-  background: var(--th-hero-bg, rgba(245,245,250,0.72));
+  background: var(--th-hero-bg, rgba(245,245,250,0.78));
   -webkit-backdrop-filter: blur(20px) saturate(1.6);
   backdrop-filter: blur(20px) saturate(1.6);
   border: 1px solid var(--th-hero-border, rgba(255,255,255,0.5));
@@ -663,21 +663,24 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 }
 #luliy-quickbar::-webkit-scrollbar { display: none; }
 [data-color-mode="dark"] #luliy-quickbar {
-  background: rgba(18,16,26,0.78);
+  background: rgba(18,16,26,0.82);
   border-color: rgba(255,255,255,0.10);
 }
 .luliy-quick-link {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 38px; height: 38px; flex-shrink: 0;
-  border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 14px; flex-shrink: 0;
+  border-radius: 18px;
   color: var(--th-hero-fg, #2a2440) !important;
-  background: var(--th-accent-soft, rgba(130,80,223,0.10));
+  background: var(--th-accent-soft, rgba(130,80,223,0.12));
   text-decoration: none !important;
+  font-size: 13px; font-weight: 600; white-space: nowrap;
+  font-family: 'Noto Sans SC', sans-serif;
   transition: background 0.15s, transform 0.15s;
 }
 [data-color-mode="dark"] .luliy-quick-link { color: rgba(245,242,255,0.92) !important; }
-.luliy-quick-link:active { transform: scale(0.92); }
-.luliy-quick-link svg { width: 18px; height: 18px; fill: currentColor; }
+.luliy-quick-link:active { transform: scale(0.94); background: var(--th-accent, #8250df); }
+.luliy-quick-link svg { width: 17px; height: 17px; fill: currentColor; flex-shrink: 0; }
+.luliy-quick-txt { text-transform: capitalize; }
 
 
 /* ── Hamburger — mobile ─────────────────────────────────── */
@@ -877,9 +880,9 @@ body.luliy-drawer-open { overflow: hidden; }
 
 /* Scrolled (article page) — lighter dark glass, still legible */
 #header.header-scrolled {
-  background: rgba(10,6,20,0.62) !important;
-  border-bottom-color: rgba(255,255,255,0.05) !important;
-  box-shadow: 0 1px 12px rgba(0,0,0,0.25) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 
@@ -1206,7 +1209,9 @@ body.luliy-post-page .main {
 }
 
 /* Misc */
-.subTitle { display: none !important; }
+.subTitle, .SubTitle, #subTitle,
+.title-right ~ .subTitle, header + .subTitle,
+#content > .subTitle, .main > .subTitle { display: none !important; }
 .avatar { cursor: pointer; }
 .archive-page #postBody { max-width: 700px; }
 .SideNav-item .text-bold, #postBody .SideNav-item a {
@@ -3183,46 +3188,54 @@ body.luliy-reduce-motion * {
   .luliy-range::-moz-range-thumb { width: 22px; height: 22px; }
   .luliy-ctrl-slider { padding-top: 12px !important; padding-bottom: 14px !important; }
 
-  /* ── Hero card mobile layout ──────────────────────────── */
-  #header { padding: 8px 10px 0 !important; min-height: 0 !important; }
+  /* ══════ Mobile hero — rebuilt: clean, balanced ══════ */
+  #header { padding: 8px 8px 0 !important; min-height: 0 !important; }
   #luliy-nav-ham {
     display: flex !important;
     position: absolute !important;
-    right: 14px !important;
-    top: 18px !important;
+    right: 12px !important;
+    top: 14px !important;
     margin: 0 !important;
-    z-index: 2;
+    z-index: 3;
   }
-  /* Compact single-row hero: avatar + name + time on left, ham on right */
+  /* Single-row top: avatar + name + time | (ham floats top-right) */
   #luliy-nav-rebuilt {
     grid-template-columns: 1fr !important;
-    grid-template-areas: "left" !important;
-    gap: 0 !important;
-    padding: 12px 50px 12px 14px !important;
+    grid-template-areas:
+      "left"
+      "subtitle" !important;
+    gap: 8px 0 !important;
+    padding: 12px 48px 12px 14px !important;
     border-radius: 18px !important;
+    max-width: 100% !important;
   }
-  #luliy-hero-left { gap: 10px !important; }
-  #luliy-nav-avatar { width: 44px !important; height: 44px !important; }
-  #luliy-nav-blogname { font-size: 22px !important; }
-  #luliy-hero-divider { height: 28px !important; }
-  #luliy-hero-time { font-size: 16px !important; }
-  #luliy-hero-date { font-size: 10px !important; }
-  #luliy-nav-circle, .luliy-hero-circle { width: 30px !important; height: 30px !important; }
-  /* The desktop capsule + settings slot hide on mobile (links live in
-     the quick-bar below + the drawer; settings live in the drawer too) */
+  #luliy-hero-left { gap: 10px !important; flex-wrap: nowrap !important; }
+  #luliy-nav-avatar { width: 42px !important; height: 42px !important; border-width: 2px !important; }
+  #luliy-nav-blogname { font-size: 20px !important; }
+  #luliy-hero-divider { height: 26px !important; }
+  #luliy-hero-time { font-size: 15px !important; }
+  #luliy-hero-date { font-size: 9px !important; }
+  #luliy-nav-circle, .luliy-hero-circle { width: 28px !important; height: 28px !important; }
+  /* subtitle: own row, centred, tappable for the black-hole effect */
+  #luliy-hero-subtitle {
+    grid-area: subtitle !important;
+    justify-self: center !important;
+    font-size: 12px !important; padding: 4px 14px !important;
+  }
+  /* Desktop-only zones hidden on mobile (links live in quick bar + drawer) */
   #luliy-hero-capsule { display: none !important; }
   #luliy-hero-right { display: none !important; }
-  /* Never resurrect the original title-right */
   .title-right { display: none !important; }
-  /* Toolbar pill hidden on mobile (settings live in the drawer) */
   #luliy-toolbar { display: none !important; }
 
-  /* Quick-link bar visible on mobile (singlePage/exlink shortcuts) */
+  /* Quick-link bar — horizontal scrollable icon+label row */
   #luliy-quickbar { display: flex !important; }
 
   #content, .main { padding: 0 12px !important; }
-  body.luliy-post-page #content { margin-top: 118px !important; }
-  #luliy-hero-banner { margin-top: 64px; font-size: 12px; padding: 12px 16px; }
+  body.luliy-post-page #content { margin-top: 168px !important; }
+  body:not(.luliy-post-page) #content,
+  body:not(.luliy-post-page) .main { margin-top: 158px !important; }
+  #luliy-hero-banner { margin-top: 150px; font-size: 12px; padding: 12px 16px; }
 
   .luliy-card-grid { grid-template-columns: 1fr; }
   .luliy-prevnext { flex-direction: column; }
