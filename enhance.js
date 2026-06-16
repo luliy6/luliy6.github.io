@@ -600,7 +600,8 @@
   }
 
   /* ---- 06  Static background (particles removed) ---------- */
-  function initParticles() { /* static bg set in CSS */ }
+  /* 清理：原 initParticles() 是个从未被任何地方调用的空函数，已删除。
+     静态背景完全由 CSS 负责，动态粒子由 initThemeParticles() 处理。 */
 
   /* ---- 07  Web Audio SFX ---------------------------------- */
   var _actx = null;
@@ -1418,12 +1419,8 @@
     /* Make day/night cards interactive — click to switch colour mode */
     function setColorMode(mode) {
       var htmlEl = document.documentElement;
-      /* Normalise current mode ('auto' resolves via media query) */
-      var cur = htmlEl.getAttribute('data-color-mode') || 'light';
-      if (cur === 'auto') {
-        cur = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-          ? 'dark' : 'light';
-      }
+      /* 复用统一的模式解析函数，消除重复的 matchMedia 内联逻辑 */
+      var cur = _luliyResolveMode();
       if (cur === mode) { syncThemeRows(); return; }   /* already there */
 
       /* Prefer Gmeek's own toggle (keeps its storage in sync) … */
@@ -1452,14 +1449,8 @@
     });
 
     /* ── Active-state sync: highlight the card matching current mode ─ */
-    function resolvedMode() {
-      var m = document.documentElement.getAttribute('data-color-mode') || 'light';
-      if (m === 'auto') {
-        m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-          ? 'dark' : 'light';
-      }
-      return m;
-    }
+    /* 复用统一的模式解析函数（原内联实现已合并到 _luliyResolveMode） */
+    function resolvedMode() { return _luliyResolveMode(); }
     function syncModePreview() {
       var m = resolvedMode();
       previewDay.classList.toggle('is-active', m !== 'dark');
@@ -2258,23 +2249,19 @@
           meteors.splice(mi, 1); continue;
         }
         var angle = Math.atan2(m.vy, m.vx);
-        var grad = ctx.createLinearGradient(
-          m.x, m.y,
-          m.x - Math.cos(angle) * m.len,
-          m.y - Math.sin(angle) * m.len
-        );
-        grad.addColorStop(0, cfg.mColor.replace(')', ',' + m.life + ')').replace('rgb','rgba'));
-        /* Handle hex mColor */
-        /* Pre-computed head/tail colours (hex → rgba done once per meteor) */
+        /* 性能优化：尾点坐标只计算一次（原代码重复算了 3 次 cos/sin），
+           并删除了原先「创建后从未使用」的 grad 渐变对象——它在每帧、
+           每颗流星上都会被白白分配一次，是纯粹的死代码。 */
+        var tailX = m.x - Math.cos(angle) * m.len;
+        var tailY = m.y - Math.sin(angle) * m.len;
         var mHead = hexToRgba(cfg.mColor, m.life);
-        var mTail = hexToRgba(cfg.mColor, 0);
-        var grad2 = ctx.createLinearGradient(m.x, m.y, m.x - Math.cos(angle) * m.len, m.y - Math.sin(angle) * m.len);
-        grad2.addColorStop(0, mHead);
-        grad2.addColorStop(1, mTail);
+        var grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+        grad.addColorStop(0, mHead);
+        grad.addColorStop(1, hexToRgba(cfg.mColor, 0));
         ctx.beginPath();
         ctx.moveTo(m.x, m.y);
-        ctx.lineTo(m.x - Math.cos(angle) * m.len, m.y - Math.sin(angle) * m.len);
-        ctx.strokeStyle = grad2;
+        ctx.lineTo(tailX, tailY);
+        ctx.strokeStyle = grad;
         ctx.lineWidth = 2.5 * m.life;
         ctx.lineCap = 'round';
         ctx.stroke();
@@ -2563,11 +2550,8 @@
     var dnWrap = document.createElement('div');
     dnWrap.className = 'luliy-drawer-dn-wrap';
 
-    function _resolvedMode() {
-      var m = document.documentElement.getAttribute('data-color-mode') || 'light';
-      if (m === 'auto') m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-      return m;
-    }
+    /* 复用统一的模式解析函数 */
+    function _resolvedMode() { return _luliyResolveMode(); }
 
     var dayBtn = document.createElement('button');
     dayBtn.type = 'button'; dayBtn.className = 'luliy-drawer-dn-btn';
@@ -2960,7 +2944,10 @@
 
     /* Reading time estimate */
     if (!document.getElementById('luliy-readmeta')) {
-      var wc = pbody.innerText.length;
+      /* 性能优化：用 textContent 替代 innerText。innerText 会触发一次
+         同步布局重排（计算渲染后的可见文本），而字数估算并不需要这种
+         精度，textContent 直接读取、零重排。 */
+      var wc = (pbody.textContent || '').length;
       var rt = document.createElement('p');
       rt.id = 'luliy-readmeta';
       rt.innerHTML =
