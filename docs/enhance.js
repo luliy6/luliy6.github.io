@@ -397,7 +397,7 @@
     title.textContent = LULIY_OPTS.heroTitle || 'Luliy';
 
     var sub = document.createElement('p');
-    sub.id = 'luliy-hero-subtitle';
+    sub.id = 'luliy-hero-intro-sub';
     sub.textContent = LULIY_OPTS.heroSubtitle || '';
 
     inner.appendChild(title);
@@ -677,44 +677,80 @@
   }
 
   /* ---- 09  Navbar — rebuilt: avatar+name centred, time top-left, icons spread */
-  /* Black-hole animation: page implodes to click point, explodes back */
+  /* Black-hole animation: canvas overlay — doesn't break fixed elements */
+  var _bhActive = false;
   function triggerBlackHole(cx, cy) {
-    if (document.getElementById('luliy-blackhole')) return; /* debounce */
-    var body = document.body;
-    /* Position transform-origin at click point */
-    var ox = (cx / (window.innerWidth  || 1) * 100).toFixed(1) + '%';
-    var oy = (cy / (window.innerHeight || 1) * 100).toFixed(1) + '%';
+    if (_bhActive) return;
+    _bhActive = true;
 
-    /* Create the black hole overlay */
-    var bh = document.createElement('div');
-    bh.id = 'luliy-blackhole';
-    bh.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;';
-    document.body.appendChild(bh);
+    /* Snapshot the page into a canvas, then animate it */
+    var W = window.innerWidth, H = window.innerHeight;
+    var overlay = document.createElement('canvas');
+    overlay.id = 'luliy-blackhole';
+    overlay.width = W; overlay.height = H;
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999999;pointer-events:all;';
+    document.body.appendChild(overlay);
+    var ctx = overlay.getContext('2d');
 
-    /* Phase 1 – implode everything to click point */
-    body.style.transformOrigin = ox + ' ' + oy;
-    body.style.transition = 'transform 0.55s cubic-bezier(.55,0,1,.45), filter 0.55s ease';
-    body.style.transform = 'scale(0) rotate(540deg)';
-    body.style.filter = 'brightness(0)';
+    /* Draw a solid background matching current mode */
+    var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark';
+    ctx.fillStyle = isDark ? '#0a0616' : '#f5f5fa';
+    ctx.fillRect(0, 0, W, H);
 
-    /* Phase 2 – flash the black hole */
-    setTimeout(function () {
-      bh.classList.add('flash');
-    }, 480);
+    /* Animate the "page" being sucked into (cx, cy) using scale+rotate */
+    var start = null;
+    var SUCK = 600, PAUSE = 200, EXPLODE = 600;
+    var total = SUCK + PAUSE + EXPLODE;
 
-    /* Phase 3 – explode back out */
-    setTimeout(function () {
-      body.style.transition = 'transform 0.65s cubic-bezier(.2,.7,.3,1), filter 0.45s ease-out';
-      body.style.transform  = '';
-      body.style.filter     = '';
-    }, 900);
+    function easeIn(t) { return t * t * t; }
+    function easeOut(t) { return 1 - Math.pow(1-t,3); }
 
-    /* Cleanup */
-    setTimeout(function () {
-      body.style.transition      = '';
-      body.style.transformOrigin = '';
-      bh.remove();
-    }, 1600);
+    function frame(ts) {
+      if (!start) start = ts;
+      var elapsed = ts - start;
+      ctx.clearRect(0, 0, W, H);
+
+      if (elapsed < SUCK) {
+        /* Phase 1: suck in — darken + scale toward click point */
+        var t = easeIn(elapsed / SUCK);
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(t * Math.PI * 3);
+        ctx.scale(1 - t * 0.98, 1 - t * 0.98);
+        ctx.translate(-cx, -cy);
+        /* Fill with darkening overlay */
+        ctx.fillStyle = 'rgba(0,0,0,' + (t * 0.92) + ')';
+        ctx.fillRect(0, 0, W, H);
+        /* White core at click point */
+        var coreR = t * 60;
+        var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR + 1);
+        g.addColorStop(0, 'rgba(255,255,255,' + t + ')');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+        requestAnimationFrame(frame);
+
+      } else if (elapsed < SUCK + PAUSE) {
+        /* Phase 2: white flash */
+        var flash = (elapsed - SUCK) / PAUSE;
+        ctx.fillStyle = 'rgba(255,255,255,' + (1 - flash * 0.5) + ')';
+        ctx.fillRect(0, 0, W, H);
+        requestAnimationFrame(frame);
+
+      } else if (elapsed < total) {
+        /* Phase 3: explode out */
+        var t2 = easeOut((elapsed - SUCK - PAUSE) / EXPLODE);
+        ctx.fillStyle = 'rgba(0,0,0,' + (1 - t2) * 0.85 + ')';
+        ctx.fillRect(0, 0, W, H);
+        requestAnimationFrame(frame);
+
+      } else {
+        overlay.remove();
+        _bhActive = false;
+      }
+    }
+    requestAnimationFrame(frame);
   }
 
   function initHeroCluster() {
@@ -842,9 +878,9 @@
         c.classList.add('luliy-hero-cap-link');
         c.removeAttribute('id');
         c.style.display = ''; c.style.visibility = '';
-        /* add a text label after the icon */
         var lbl = a.getAttribute('title') || (a.textContent || '').trim();
         if (lbl) {
+          c.setAttribute('aria-label', lbl);
           var span = document.createElement('span');
           span.className = 'luliy-hero-cap-txt';
           span.textContent = lbl;
@@ -935,8 +971,11 @@
       function applyOpacity(op) {
         shell.style.opacity  = String(op);
         shell.style.pointerEvents = op <= 0.01 ? 'none' : '';
-        /* Also clear the header's own background so no black box shows */
-        if (header) header.style.background = 'transparent';
+        /* Clear the header's own background so no black box shows */
+        if (header) {
+          header.style.background = 'transparent';
+          header.classList.toggle('header-scrolled', (window.scrollY || 0) > 100);
+        }
       }
       function onScroll() {
         var sy = window.scrollY || window.pageYOffset || 0;
@@ -1219,15 +1258,7 @@
 
   /* ---- Nav transparency on scroll (article pages) --------- */
   function initNavTransparency() {
-    /* Only apply scroll-fade on article pages — not on homepage/index
-       where transparent nav makes links invisible over content.       */
-    if (!document.getElementById('postBody')) return;
-    var header = document.getElementById('header');
-    if (!header) return;
-    onScrollRAF(function () {
-      var st = window.scrollY || window.pageYOffset || 0;
-      header.classList.toggle('header-scrolled', st > 100);
-    });
+    /* Merged into initHeroScrollFade — no-op here to avoid dual scroll handlers */
   }
 
   function initToolbar() {
@@ -2099,6 +2130,14 @@
     'mono':      { pColor: 'rgba(180,180,180,VAL)',  mColor: '#e8e8e8', pShape: 'square',  pCount: 16 }
   };
 
+  /* Hoist hexToRgba outside the animation loop — called once per meteor */
+  function hexToRgba(hex, alpha) {
+    var r = parseInt(hex.slice(1,3),16);
+    var g = parseInt(hex.slice(3,5),16);
+    var b = parseInt(hex.slice(5,7),16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
   function initThemeParticles() {
     stopThemeParticles();
     if (prefersReduce && prefersReduce()) return;
@@ -2198,15 +2237,12 @@
         );
         grad.addColorStop(0, cfg.mColor.replace(')', ',' + m.life + ')').replace('rgb','rgba'));
         /* Handle hex mColor */
-        function hexToRgba(hex, a) {
-          var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-          return 'rgba('+r+','+g+','+b+','+a+')';
-        }
-        var mColorHead = hexToRgba(cfg.mColor, m.life);
-        var mColorTail = hexToRgba(cfg.mColor, 0);
+        /* Pre-computed head/tail colours (hex → rgba done once per meteor) */
+        var mHead = hexToRgba(cfg.mColor, m.life);
+        var mTail = hexToRgba(cfg.mColor, 0);
         var grad2 = ctx.createLinearGradient(m.x, m.y, m.x - Math.cos(angle) * m.len, m.y - Math.sin(angle) * m.len);
-        grad2.addColorStop(0, mColorHead);
-        grad2.addColorStop(1, mColorTail);
+        grad2.addColorStop(0, mHead);
+        grad2.addColorStop(1, mTail);
         ctx.beginPath();
         ctx.moveTo(m.x, m.y);
         ctx.lineTo(m.x - Math.cos(angle) * m.len, m.y - Math.sin(angle) * m.len);
@@ -2214,10 +2250,9 @@
         ctx.lineWidth = 2.5 * m.life;
         ctx.lineCap = 'round';
         ctx.stroke();
-        /* Head glow */
         ctx.beginPath();
         ctx.arc(m.x, m.y, 3 * m.life, 0, Math.PI * 2);
-        ctx.fillStyle = mColorHead;
+        ctx.fillStyle = mHead;
         ctx.fill();
       }
       _particleRAF = requestAnimationFrame(tick);
@@ -2343,12 +2378,15 @@
       setOpen(!open);
       playSfx('click');
     });
-    /* Close when clicking outside */
+    /* Close on outside click or Escape key */
     document.addEventListener('click', function (e) {
       if (!open) return;
       if (e.target === fab || fab.contains(e.target)) return;
       if (panel.contains(e.target)) return;
       setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (open && (e.key === 'Escape' || e.keyCode === 27)) { setOpen(false); playSfx('click'); }
     });
     document.body.appendChild(fab);
 
@@ -3775,6 +3813,8 @@
     if (!document.startViewTransition) return;
     if (prefersReduce()) return;
     document.addEventListener('click', function (e) {
+      /* Don't intercept navigation during black-hole animation */
+      if (_bhActive) return;
       var a = e.target.closest('a');
       if (!a) return;
       var href = a.getAttribute('href');
