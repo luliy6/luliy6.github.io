@@ -95,6 +95,25 @@
   /* 尽早执行一次（脚本加载即生效，减少手机端先渲染移动版再跳变的闪烁） */
   try { forceDesktopViewport(); } catch (e) {}
 
+  /* ★ 需求②：点击效果全局跟鼠标——zoom 坐标校正。
+     页面设了 html{zoom:1.1}，导致 event.clientX/Y 和 fixed 元素定位之间
+     存在 1.1 倍偏差（越往右偏得越多，典型线性偏移）。
+     所有用鼠标坐标做 fixed 定位的地方（点击炸开、鼠标拖尾等）
+     都应先调用 zoomPos(clientX, clientY) 获取校正后坐标。 */
+  function getZoomFactor() {
+    try {
+      /* 读取 html 元素实际的 zoom 值（CSS zoom 不反映在 devicePixelRatio 里） */
+      var z = parseFloat(
+        window.getComputedStyle(document.documentElement).zoom || '1'
+      );
+      return isFinite(z) && z > 0 ? z : 1;
+    } catch (e) { return 1; }
+  }
+  function zoomPos(cx, cy) {
+    var z = getZoomFactor();
+    return { x: cx / z, y: cy / z };
+  }
+
   function isIndexPage() {
     return location.pathname === '/' ||
       location.pathname === '/index.html' ||
@@ -610,13 +629,15 @@
     document.addEventListener('click', function (e) {
       var b = e.target.closest('button');
       if (b && (b.innerHTML.includes('Moon') || b.innerHTML.includes('Sun') ||
-        (b.title && /dark|light|theme|\u4e3b\u9898/i.test(b.title)))) ripple(e.clientX, e.clientY);
+        (b.title && /dark|light|theme|\u4e3b\u9898/i.test(b.title)))) {
+        var p = zoomPos(e.clientX, e.clientY); ripple(p.x, p.y);
+      }
     });
     setTimeout(function () {
       document.querySelectorAll('.title-right .circle').forEach(function (el) {
         if (el._luliyRipple) return;
         el._luliyRipple = true;
-        el.addEventListener('click', function (e) { ripple(e.clientX, e.clientY); });
+        el.addEventListener('click', function (e) { var p = zoomPos(e.clientX, e.clientY); ripple(p.x, p.y); });
       });
     }, 800);
   }
@@ -753,7 +774,9 @@
       /* 仅在空白区域触发：跳过链接/按钮/表单等可交互元素，避免干扰操作 */
       var t = e.target;
       if (t && t.closest && t.closest('a,button,input,textarea,select,label,summary,[role="button"],[contenteditable]')) return;
-      burst(e.clientX, e.clientY);
+      /* ★ zoom 坐标校正：html{zoom:1.1} 下 clientX/Y 需除以缩放因子才能精确跟手 */
+      var p = zoomPos(e.clientX, e.clientY);
+      burst(p.x, p.y);
     });
   }
 
@@ -990,7 +1013,8 @@
       subTitleEl.textContent = LULIY_OPTS.heroSubtitle || '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65';
       subTitleEl.title = '\u70b9\u51fb\u89e6\u53d1\u9ed1\u6d1e\u52a8\u753b';
       subTitleEl.addEventListener('click', function(e) {
-        triggerBlackHole(e.clientX, e.clientY);
+        var p = zoomPos(e.clientX, e.clientY);
+        triggerBlackHole(p.x, p.y);
       });
 
       /* ── Mobile subtitle row: links | subTitle | links ───
@@ -1098,8 +1122,10 @@
         return 1 - Math.min(1, sy / 140);   /* 下拉越多越透明，>140px 全透明 */
       }
       function render() {
-        /* 鼠标在顶部热区 → 完全不透明；否则按滚动位置淡出 */
-        var op = nearTop ? 1 : scrollOpacity();
+        /* ★ 透明度开关：若用户关闭了导航透明度功能，始终保持完全不透明 */
+        var shell = document.getElementById('luliy-nav-rebuilt');
+        var fadeOff = shell && shell._luliyFadeEnabled === false;
+        var op = (nearTop || fadeOff) ? 1 : scrollOpacity();
         shell.style.opacity = String(op);
         /* 透明时放行点击穿透（不挡下方内容）；不透明时恢复可点 */
         shell.style.pointerEvents = (op <= 0.02) ? 'none' : '';
@@ -1478,6 +1504,57 @@
       });
       panel.appendChild(row);
     });
+
+    /* ★ 需求④：导航栏透明度开关——在夜间模式按钮左侧加一个按钮
+       状态存 localStorage('luliy-nav-fade')，默认开启('1')。
+       关闭后 initHeroScrollFade 不再绑定透明度，导航栏始终完全不透明。 */
+    var FADE_KEY = 'luliy-nav-fade';
+    function isFadeEnabled() { return localStorage.getItem(FADE_KEY) !== '0'; }
+    /* 切换函数——供按钮点击和初始化共用 */
+    function applyFadeState(enabled) {
+      localStorage.setItem(FADE_KEY, enabled ? '1' : '0');
+      var shell = document.getElementById('luliy-nav-rebuilt');
+      if (shell) {
+        if (enabled) {
+          /* 恢复透明度逻辑：触发一次虚拟 scroll 事件让现有 render() 重新计算 */
+          shell._luliyFadeEnabled = true;
+          window.dispatchEvent(new Event('scroll'));
+        } else {
+          /* 关闭：立刻把导航栏设为完全不透明，停止响应滚动 */
+          shell._luliyFadeEnabled = false;
+          shell.style.opacity = '1';
+          shell.style.pointerEvents = '';
+        }
+      }
+    }
+    /* 透明度开关行（图标：半透明方块感 SVG） */
+    var fadeRow = document.createElement('button');
+    fadeRow.type = 'button';
+    fadeRow.className = 'luliy-ctrl-row luliy-fade-toggle-row';
+    fadeRow.id = 'luliy-fade-toggle-btn';
+    var fadeIcon = '<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">' +
+      '<rect x="1" y="1" width="8" height="8" rx="1.5" opacity="0.9"/>' +
+      '<rect x="7" y="7" width="8" height="8" rx="1.5" opacity="0.35"/>' +
+      '</svg>';
+    function refreshFadeRow() {
+      var on = isFadeEnabled();
+      fadeRow.innerHTML =
+        '<span class="luliy-ctrl-lbl">' + fadeIcon +
+        ' \u5bfc\u822a\u900f\u660e\u5ea6</span>' +   /* 导航透明度 */
+        '<span class="luliy-ctrl-badge luliy-fade-badge">' +
+        (on ? '\u5f00\u542f' : '\u5173\u95ed') + '</span>';  /* 开启/关闭 */
+      fadeRow.classList.toggle('is-active', on);
+      applyFadeState(on);
+    }
+    refreshFadeRow();
+    fadeRow.addEventListener('click', function () {
+      var next = !isFadeEnabled();
+      localStorage.setItem(FADE_KEY, next ? '1' : '0');
+      refreshFadeRow();
+      playSfx && playSfx('click');
+    });
+    panel.appendChild(fadeRow);
+    panel.appendChild(mkSep());
 
     /* Day / Night theme preview cards */
     var previewWrap = document.createElement('div');
@@ -3148,6 +3225,19 @@
     /* Mark body for post-page margin CSS */
     document.body.classList.add('luliy-post-page');
 
+    /* ★ 需求⑤：文章页默认背景模糊 11px
+       仅在用户本次会话没有主动设置过背景模糊时才应用默认值，
+       避免覆盖用户自己调整的偏好（通过控制面板背景按钮调整后存入 localStorage）。 */
+    (function () {
+      var stored = localStorage.getItem('luliy-bg-blur');
+      /* stored 为 null 表示用户从未设置过，应用默认 11px */
+      if (stored === null) {
+        var px = 11;
+        document.documentElement.style.setProperty('--luliy-bg-blur', px + 'px');
+        document.body.classList.toggle('luliy-bg-blurred', px > 0);
+      }
+    })();
+
     var pbody = document.getElementById('postBody');
 
     /* External links → new tab */
@@ -3167,6 +3257,49 @@
 
     /* Global article progressive reveal */
     revealArticle();
+
+    /* ★ 需求⑦：响应式表格——注入 data-label，窄屏卡片化时 CSS::before 用它显示列标题 */
+    pbody.querySelectorAll('table').forEach(function (table) {
+      if (table._luliyLabeled) return;
+      table._luliyLabeled = true;
+      var headers = [];
+      var ths = table.querySelectorAll('thead th');
+      ths.forEach(function (th) { headers.push((th.textContent || '').trim()); });
+      if (!headers.length) {
+        /* 无 thead 时用第一行 td 作为伪标题 */
+        var firstRow = table.querySelector('tr');
+        if (firstRow) firstRow.querySelectorAll('td').forEach(function (td) {
+          headers.push((td.textContent || '').trim());
+        });
+      }
+      table.querySelectorAll('tbody tr').forEach(function (tr) {
+        tr.querySelectorAll('td').forEach(function (td, i) {
+          if (headers[i]) td.setAttribute('data-label', headers[i]);
+        });
+      });
+    });
+
+    /* ★ 需求⑧：文末字数 + 阅读时长信息条 */
+    if (!document.getElementById('luliy-post-footer-bar')) {
+      var rawText = (pbody.textContent || '').trim();
+      var charCount = rawText.length;
+      var wordCount = rawText.replace(/[\u4e00-\u9fa5]/g, 'W').split(/\s+/).filter(Boolean).length;
+      /* 中文按 300 字/分钟，英文按 200 词/分钟；取两者较大值 */
+      var minRead = Math.max(1, Math.round(charCount / 300));
+      var bar = document.createElement('div');
+      bar.id = 'luliy-post-footer-bar';
+      bar.innerHTML =
+        '<span class="lpfb-item">' +
+          '<svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M0 2.75A.75.75 0 0 1 .75 2h14.5a.75.75 0 0 1 0 1.5H.75A.75.75 0 0 1 0 2.75Zm0 5A.75.75 0 0 1 .75 7h14.5a.75.75 0 0 1 0 1.5H.75A.75.75 0 0 1 0 7.75Zm0 5a.75.75 0 0 1 .75-.75h8.5a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75Z"/></svg>' +
+          ' <b>' + charCount.toLocaleString() + '</b> \u5b57' +   /* 字 */
+        '</span>' +
+        '<span class="lpfb-sep">\xB7</span>' +
+        '<span class="lpfb-item">' +
+          '<svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm7-3.25v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5a.75.75 0 0 1 1.5 0Z"/></svg>' +
+          ' \u7ea6 <b>' + minRead + '</b> \u5206\u949f\u9605\u8bfb' +  /* 约 N 分钟阅读 */
+        '</span>';
+      pbody.appendChild(bar);
+    }
 
     /* Reading time estimate */
     if (!document.getElementById('luliy-readmeta')) {
@@ -3979,8 +4112,10 @@
       var s = document.createElement('span');
       s.className = 'luliy-trail-dot';
       s.textContent = glyph;
-      s.style.left = e.clientX + 'px';
-      s.style.top = e.clientY + 'px';
+      /* ★ zoom 校正：fixed 定位需除以 html zoom 才能精确跟手 */
+      var p = zoomPos(e.clientX, e.clientY);
+      s.style.left = p.x + 'px';
+      s.style.top  = p.y + 'px';
       s.style.setProperty('--rot', (Math.random() * 360) + 'deg');
       document.body.appendChild(s);
       _trailNodes.push(s);
@@ -4074,6 +4209,123 @@
     else stopFireflies();
   }
 
+  /* ---- 25b  键盘快捷键 ------------------------------------- */
+  function initKeyboardShortcuts() {
+    /* 判断当前焦点是否在输入区（避免干扰打字） */
+    function inInput() {
+      var el = document.activeElement;
+      if (!el) return false;
+      var tag = el.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' ||
+             el.isContentEditable || el.closest('[contenteditable]');
+    }
+
+    /* 平滑滚动辅助 */
+    function smoothScrollBy(dy) {
+      window.scrollBy({ top: dy, behavior: 'smooth' });
+    }
+    function smoothScrollTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ←/→：上/下一篇（仅文章页，读取 .luliy-prevnext 里的链接） */
+    function goPrevNext(dir) {
+      /* dir=-1 上一篇(左), dir=1 下一篇(右) */
+      var nav = document.querySelector('.luliy-prevnext');
+      if (!nav) return;
+      var anchors = nav.querySelectorAll('a[href]');
+      if (!anchors.length) return;
+      /* 上一篇在 index=0（left 对齐），下一篇在 index=1（right 对齐） */
+      var target = anchors[dir < 0 ? 0 : anchors.length - 1];
+      if (target && target.href) { location.href = target.href; }
+    }
+
+    /* 唤起页内搜索（复用现有的搜索覆盖层） */
+    function openSearch() {
+      /* initInPageSearch 暴露了 _luliyOpenSearch */
+      if (root._luliyOpenSearch) { root._luliyOpenSearch(); return; }
+      /* 兜底：直接触发 Ctrl+F */
+      var ev = new KeyboardEvent('keydown', { key: 'f', ctrlKey: true, bubbles: true });
+      document.dispatchEvent(ev);
+    }
+
+    /* 切换日/夜模式 */
+    function toggleDayNight() {
+      var cur = _luliyResolveMode();
+      if (root._luliySetMode) root._luliySetMode(cur === 'dark' ? 'light' : 'dark');
+      else {
+        var next = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-color-mode', next);
+        try { localStorage.setItem('meek_theme', next); } catch(e) {}
+      }
+      if (playSfx) playSfx('theme');
+    }
+
+    document.addEventListener('keydown', function (e) {
+      /* 屏蔽修饰键组合（让浏览器快捷键正常工作） */
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (inInput()) return;
+
+      var k = e.key;
+
+      if (k === '/') {
+        /* / 唤起搜索 */
+        e.preventDefault();
+        openSearch();
+      } else if (k === 'j' || k === 'J') {
+        /* j 向下翻一屏 */
+        e.preventDefault();
+        smoothScrollBy(window.innerHeight * 0.85);
+      } else if (k === 'k' || k === 'K') {
+        /* k 向上翻一屏 */
+        e.preventDefault();
+        smoothScrollBy(-window.innerHeight * 0.85);
+      } else if (k === 'g' || k === 'G') {
+        /* g 回顶 */
+        e.preventDefault();
+        smoothScrollTop();
+      } else if (k === 't' || k === 'T') {
+        /* t 切换日/夜 */
+        e.preventDefault();
+        toggleDayNight();
+      } else if (k === 'ArrowLeft') {
+        /* ← 上一篇（仅文章页） */
+        if (document.querySelector('.luliy-prevnext')) {
+          e.preventDefault();
+          goPrevNext(-1);
+        }
+      } else if (k === 'ArrowRight') {
+        /* → 下一篇（仅文章页） */
+        if (document.querySelector('.luliy-prevnext')) {
+          e.preventDefault();
+          goPrevNext(1);
+        }
+      }
+    });
+
+    /* 在页面上显示一个快捷键提示（仅首次访问，3 秒后自动消失） */
+    if (!localStorage.getItem('luliy-kb-hint')) {
+      setTimeout(function () {
+        var toast = document.createElement('div');
+        toast.id = 'luliy-kb-toast';
+        toast.innerHTML =
+          '<b>\u952e\u76d8\u5feb\u6377\u952e</b>: ' +   /* 键盘快捷键 */
+          '<kbd>/</kbd>\u641c\u7d22 ' +       /* 搜索 */
+          '<kbd>j</kbd><kbd>k</kbd>\u7ffb\u9875 ' + /* 翻页 */
+          '<kbd>g</kbd>\u56de\u9876 ' +        /* 回顶 */
+          '<kbd>t</kbd>\u5207\u6362\u4e3b\u9898 ' +  /* 切换主题 */
+          '<kbd>\u2190\u2192</kbd>\u4e0a\u4e0b\u7bc7'; /* 上下篇 */
+        document.body.appendChild(toast);
+        requestAnimationFrame(function () { toast.classList.add('is-visible'); });
+        setTimeout(function () {
+          toast.classList.remove('is-visible');
+          setTimeout(function () { toast.remove(); }, 400);
+        }, 3500);
+        localStorage.setItem('luliy-kb-hint', '1');
+      }, 2000);
+    }
+  }
+
   /* ---- 26  View Transitions (cross-page fade) ------------- */
   function initViewTransitions() {
     if (!document.startViewTransition) return;
@@ -4155,9 +4407,11 @@
     }
     function moveTip(e) {
       if (!tip) return;
-      var x = e.clientX + 14, y = e.clientY + 16;
+      /* ★ zoom 校正：fixed tooltip 需除以 html zoom 才能精准跟鼠标 */
+      var p = zoomPos(e.clientX, e.clientY);
+      var x = p.x + 14, y = p.y + 16;
       var w = 240;
-      if (x + w > window.innerWidth) x = e.clientX - w - 14;
+      if (x + w > window.innerWidth / getZoomFactor()) x = p.x - w - 14;
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
     }
     function hideTip() { if (tip) tip.classList.remove('is-on'); }
@@ -4243,6 +4497,7 @@
     safe(initNavTransparency, 'navTransparency');
     safe(initMobileNav,       'mobileNav');
     safe(initMobileQuickLinks, 'mobileQuickLinks');   /* ★ 移动端 singlePage+exlink 快捷栏 */
+    safe(initKeyboardShortcuts, 'keyboardShortcuts'); /* ★ 键盘快捷键 / j k g t ←→ */
     safe(initThemeParticles,  'themeParticles');
     safe(initFavoritesLock,   'favLock');   /* safety net — also called in post init */
 
