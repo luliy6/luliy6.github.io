@@ -72,7 +72,7 @@
 /* ★ 手机端=桌面端双保险（CSS侧）：即便 viewport meta 未被 JS 成功修改，
    min-width:1024px 也能让布局以桌面宽度渲染，所有移动端断点不再命中。
    与 JS 的 forceDesktopViewport() 配合使用。 */
-html { scroll-behavior: smooth; zoom: 1.1; }
+html { scroll-behavior: smooth; zoom: 1.1; min-width: 1024px; }
 *, *::before, *::after { box-sizing: border-box; }
 
 /* Force page containers transparent so bg shows through */
