@@ -73,6 +73,28 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+
+  /* ★ 需求：手机端取消全部移动端专属处理，与桌面端完全一致。
+     做法：把 viewport 宽度强制为一个桌面宽度。手机浏览器据此按桌面布局
+     渲染——所有 @media(max-width:768px) 不再命中、JS 里基于 innerWidth 的
+     判断也都走桌面分支，于是移动端汉堡菜单/重排/快捷栏等会自动失效，
+     页面呈现与桌面一致（可像浏览桌面网页那样缩放、平移）。
+     注意：桌面浏览器本身会忽略 viewport meta，因此此设置只影响手机，
+           桌面端不受任何影响。
+     DESKTOP_WIDTH 可按喜好调整：调小 → 字更大但更窄；调大 → 更接近宽屏桌面。 */
+  var DESKTOP_WIDTH = 1024;
+  function forceDesktopViewport() {
+    var m = document.querySelector('meta[name="viewport"]');
+    if (!m) {
+      m = document.createElement('meta');
+      m.setAttribute('name', 'viewport');
+      (document.head || document.documentElement).appendChild(m);
+    }
+    m.setAttribute('content', 'width=' + DESKTOP_WIDTH);
+  }
+  /* 尽早执行一次（脚本加载即生效，减少手机端先渲染移动版再跳变的闪烁） */
+  try { forceDesktopViewport(); } catch (e) {}
+
   function isIndexPage() {
     return location.pathname === '/' ||
       location.pathname === '/index.html' ||
@@ -656,27 +678,82 @@
     }, true);
   }
 
-  /* ---- 08  Click sparks ----------------------------------- */
+  /* ---- 08  Click burst — 彩色圆点向外炸开 + 扩散圆环 -----------
+     替换原 click sparks。参考用户上传的两张图：
+       图1(开始)=圆点又大又聚在中心；图2(结束)=圆点变小、向四周扩散消失。
+     效果：点击空白处 → 一簇高饱和彩色圆点从点击点向外飞散，边飞边缩小淡出；
+           同时一圈圆环放大约 12 倍扩散淡出；外加几颗四角星点缀(呼应图2)。
+     参数：炸开距离 60~160px；圆环放大倍数 12。
+     实现用 WAAPI(element.animate)，transform/opacity 走合成器，流畅且省 CPU。 */
   function initClickSparks() {
-    var colors = ['#ff6b9d', '#ffcd3c', '#6bceff', '#a78bfa', '#34d399'];
+    /* 取自参考图的配色：品红/红/绿/青/黄/珊瑚/蓝/紫 */
+    var COLORS = ['#ff1b8d', '#ff1744', '#00e676', '#1de9b6',
+                  '#ffd740', '#ffab91', '#2979ff', '#7c4dff'];
+    var DOT_COUNT  = 20;            /* 圆点数量 */
+    var DIST_MIN   = 60, DIST_MAX = 160;   /* 炸开距离范围(px) */
+    var RING_SCALE = 12;            /* 圆环放大倍数 */
+    var STAR_COUNT = 4;             /* 四角星数量 */
+    function rand(a, b) { return a + Math.random() * (b - a); }
+    function pick()     { return COLORS[(Math.random() * COLORS.length) | 0]; }
+
+    function burst(x, y) {
+      var els = [];
+      /* 统一创建一个定位在点击点、居中对齐的元素 */
+      function make(extra) {
+        var el = document.createElement('div');
+        el.style.cssText = 'position:fixed;left:' + x + 'px;top:' + y + 'px;' +
+          'pointer-events:none;z-index:99999;border-radius:50%;will-change:transform,opacity;' + extra;
+        document.body.appendChild(el); els.push(el);
+        return el;
+      }
+
+      /* 扩散圆环：从小圆放大 RING_SCALE 倍并淡出 */
+      var rs = 18;
+      var ring = make('width:' + rs + 'px;height:' + rs + 'px;margin:' + (-rs / 2) + 'px 0 0 ' + (-rs / 2) +
+        'px;background:transparent;border:2px solid rgba(255,27,141,0.55);');
+      ring.animate(
+        [{ transform: 'scale(1)', opacity: 0.9 }, { transform: 'scale(' + RING_SCALE + ')', opacity: 0 }],
+        { duration: 640, easing: 'cubic-bezier(.15,.6,.3,1)', fill: 'forwards' }
+      );
+
+      /* 彩色圆点：起始大而聚(scale 1)，向外飞 DIST 距离并缩小淡出 */
+      for (var i = 0; i < DOT_COUNT; i++) {
+        var sz = rand(10, 22);     /* 起始直径较大，呼应图1 */
+        var dot = make('width:' + sz + 'px;height:' + sz + 'px;margin:' + (-sz / 2) + 'px 0 0 ' + (-sz / 2) +
+          'px;background:' + pick() + ';');
+        var ang = rand(0, Math.PI * 2), dist = rand(DIST_MIN, DIST_MAX);
+        dot.animate(
+          [{ transform: 'translate(0,0) scale(1)', opacity: 1 },
+           { transform: 'translate(' + (Math.cos(ang) * dist) + 'px,' + (Math.sin(ang) * dist) + 'px) scale(0.15)', opacity: 0 }],
+          { duration: rand(620, 900), easing: 'cubic-bezier(.12,.7,.25,1)', fill: 'forwards' }
+        );
+      }
+
+      /* 四角星点缀：在中等距离闪现后旋转消失 */
+      for (var s = 0; s < STAR_COUNT; s++) {
+        var ssz = rand(9, 16), sa = rand(0, Math.PI * 2), soff = rand(24, 92);
+        var sx = Math.cos(sa) * soff, sy = Math.sin(sa) * soff;
+        var star = make('width:' + ssz + 'px;height:' + ssz + 'px;margin:' + (-ssz / 2) + 'px 0 0 ' + (-ssz / 2) +
+          'px;background:' + pick() + ';border-radius:0;' +
+          'clip-path:polygon(50% 0%,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0% 50%,39% 39%);');
+        star.animate(
+          [{ transform: 'translate(' + (sx * 0.3) + 'px,' + (sy * 0.3) + 'px) scale(0) rotate(0deg)', opacity: 0 },
+           { transform: 'translate(' + (sx * 0.7) + 'px,' + (sy * 0.7) + 'px) scale(1) rotate(45deg)', opacity: 1, offset: 0.4 },
+           { transform: 'translate(' + sx + 'px,' + sy + 'px) scale(0.2) rotate(90deg)', opacity: 0 }],
+          { duration: rand(720, 1000), easing: 'ease-out', fill: 'forwards' }
+        );
+      }
+
+      /* 动画结束后统一清理 DOM */
+      setTimeout(function () { for (var k = 0; k < els.length; k++) els[k].remove(); }, 1050);
+    }
+
     document.addEventListener('click', function (e) {
-      for (var i = 0; i < 12; i++) (function () {
-        var s = document.createElement('div');
-        var angle = Math.random() * 360, dist = Math.random() * 50 + 16;
-        s.style.cssText =
-          'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;' +
-          'width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:99999;' +
-          'background:' + colors[Math.floor(Math.random() * colors.length)] +
-          ';transform:translate(-50%,-50%);transition:transform 0.6s ease,opacity 0.6s ease;';
-        document.body.appendChild(s);
-        requestAnimationFrame(function () {
-          s.style.transform =
-            'translate(calc(-50% + ' + (Math.cos(angle * Math.PI / 180) * dist) + 'px),' +
-            'calc(-50% + ' + (Math.sin(angle * Math.PI / 180) * dist) + 'px))';
-          s.style.opacity = '0';
-        });
-        setTimeout(function () { s.remove(); }, 700);
-      })();
+      if (prefersReduce && prefersReduce()) return;   /* 尊重「减少动态效果」 */
+      /* 仅在空白区域触发：跳过链接/按钮/表单等可交互元素，避免干扰操作 */
+      var t = e.target;
+      if (t && t.closest && t.closest('a,button,input,textarea,select,label,summary,[role="button"],[contenteditable]')) return;
+      burst(e.clientX, e.clientY);
     });
   }
 
@@ -4150,6 +4227,7 @@
   }
 
   ready(function () {
+    safe(forceDesktopViewport, 'forceDesktop');   /* ★ 最先执行：手机端=桌面端，须先于依赖宽度的逻辑 */
     safe(initHomeHero,        'homeHero');
     safe(initAPlayer,         'aplayer');
     safe(initProgressBar,     'progressBar');

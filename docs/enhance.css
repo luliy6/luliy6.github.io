@@ -1477,10 +1477,14 @@ pre.code-fullscreen {
    rounded corners are applied to the corner cells instead.
 ══════════════════════════════════════════════════════════ */
 #postBody table {
-  width: 100%; border-collapse: separate; border-spacing: 0;
+  /* 需求：阅读宽度拉大后表格要跟着填满 → width 加 !important 覆盖 Gmeek 默认 */
+  width: 100% !important; border-collapse: separate; border-spacing: 0;
   border-radius: 12px; overflow: visible; margin: 1.5em 0;
   box-shadow: 0 2px 14px rgba(0,0,0,0.08), 0 0 0 1px rgba(130,80,223,0.14);
-  background: rgba(255,255,255,0.90);
+  /* 需求：表格背景不再固定白色，叠加一层主题强调色(--th-accent-soft)使其随主题继承 */
+  background:
+    linear-gradient(var(--th-accent-soft, rgba(130,80,223,0.10)), var(--th-accent-soft, rgba(130,80,223,0.10))),
+    rgba(255,255,255,0.88);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   table-layout: auto;
@@ -1497,10 +1501,14 @@ pre.code-fullscreen {
 #postBody tr:last-child td:last-child  { border-bottom-right-radius: 12px; }
 [data-color-mode="dark"] #postBody table,
 body[data-luliy-theme="space"] #postBody table {
-  background: rgba(18,14,32,0.90);
+  /* 深色 / 星空主题：深色底上同样叠加主题色调 */
+  background:
+    linear-gradient(var(--th-accent-soft, rgba(0,200,255,0.12)), var(--th-accent-soft, rgba(0,200,255,0.12))),
+    rgba(18,14,32,0.90);
   box-shadow: 0 2px 16px rgba(0,0,0,0.50), 0 0 0 1px rgba(130,80,223,0.22);
 }
-#postBody thead tr { background: linear-gradient(90deg, rgba(130,80,223,0.10), rgba(9,105,218,0.08)); }
+/* 表头渐变也跟随主题强调色（原为固定紫色） */
+#postBody thead tr { background: linear-gradient(90deg, var(--th-accent-soft, rgba(130,80,223,0.10)), transparent); }
 [data-color-mode="dark"] #postBody thead tr,
 body[data-luliy-theme="space"] #postBody thead tr {
   background: linear-gradient(90deg, rgba(130,80,223,0.26), rgba(9,105,218,0.20));
