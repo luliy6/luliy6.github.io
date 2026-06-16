@@ -63,6 +63,10 @@
   --th-h3:         #2a1a4a;
   --th-h4:         #3a2a5a;
   --th-strong:     #8250df;
+
+  /* 合并自原第二个 :root 块（消除重复声明） */
+  --luliy-bg-blur: 0px;
+  --luliy-pb-extra: 0px;
 }
 
 html { scroll-behavior: smooth; zoom: 1.1; }
@@ -253,10 +257,7 @@ body.luliy-reduce-motion #luliy-hero-hint { animation: none; }
 /* ══════════════════════════════════════════════════════════
    03  Background image — fixed, full viewport
 ══════════════════════════════════════════════════════════ */
-:root {
-  --luliy-bg-blur: 0px;
-  --luliy-pb-extra: 0px;
-}
+/* 注：--luliy-bg-blur / --luliy-pb-extra 已合并到顶部主 :root 块 */
 body {
   background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png') !important;
   background-size: cover !important;
@@ -3340,4 +3341,45 @@ body.luliy-reduce-motion * {
   [data-color-mode="dark"] #luliy-bg-btn { color: #e0daf8 !important; }
   [data-color-mode="dark"] #luliy-bg-btn:hover { background: rgba(130,80,223,0.18) !important; }
 
+}
+/* ══════════════════════════════════════════════════════════
+   29  移动端性能优化（手机适配 / 滚动流畅度）  ★新增
+   说明：本块只在 ≤768px 生效，且置于文件末尾，因此其 !important
+   规则在同等优先级下会覆盖前面的基础声明，桌面端完全不受影响。
+══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* (1) 关闭 background-attachment:fixed。
+     iOS Safari 对 fixed 背景支持极差（实际会退化为 scroll，并造成
+     大面积重绘 / 滚动卡顿）。显式设为 scroll 既修复 iOS 表现，也消除
+     移动端滚动时的重绘开销。 */
+  body { background-attachment: scroll !important; }
+  body.luliy-bg-blurred::before { background-attachment: scroll !important; }
+
+  /* (2) 降低毛玻璃模糊半径。
+     手机 GPU/合成器对 backdrop-filter 极敏感，首页一屏多张 blur(24px)
+     卡片同时合成是滚动掉帧的首要原因。移动端把半径降到 ~8-10px：
+     观感几乎一致，合成成本大幅下降。 */
+  .luliy-card {
+    -webkit-backdrop-filter: blur(8px) saturate(1.5) !important;
+    backdrop-filter: blur(8px) saturate(1.5) !important;
+  }
+  #luliy-nav-rebuilt {
+    -webkit-backdrop-filter: blur(12px) saturate(1.5) !important;
+    backdrop-filter: blur(12px) saturate(1.5) !important;
+  }
+  #luliy-ctrl-panel,
+  .luliy-tag-list-card,
+  #luliy-home-gallery-overlay {
+    -webkit-backdrop-filter: blur(10px) saturate(1.4) !important;
+    backdrop-filter: blur(10px) saturate(1.4) !important;
+  }
+  /* 抽屉打开时常驻于前台，模糊半径同样下调 */
+  #luliy-nav-drawer {
+    -webkit-backdrop-filter: blur(16px) saturate(1.6) !important;
+    backdrop-filter: blur(16px) saturate(1.6) !important;
+  }
+
+  /* (3) 文章容器：移动端去掉常驻的 will-change，避免长页面把整篇文章
+     永久提升为合成层、白白占用大量显存。 */
+  #luliy-hero-banner { will-change: auto !important; }
 }
