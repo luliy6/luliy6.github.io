@@ -993,8 +993,9 @@
     }
     root._luliyRelocatePill = relocatePill;
 
-    /* Scroll-fade: hero card fades to fully transparent on scroll so
-       it never covers page content. Restores on hover or scroll-to-top. */
+    /* Scroll-fade: hero card fades to transparent on scroll so it never
+       covers page content; reappears (fully opaque) when the mouse moves
+       to the top region of the viewport. */
     function initHeroScrollFade() {
       var shell = document.getElementById('luliy-nav-rebuilt');
       var header = document.getElementById('header');
@@ -1003,38 +1004,41 @@
          the glass background, and it fades out completely on scroll. */
       if (header) header.style.background = 'transparent';
 
-      var scrolledFade = false;   /* 滚动是否已把卡片淡出 */
-      var hovering = false;       /* 鼠标是否悬停在卡片上 */
+      var nearTop = false;        /* 鼠标是否在视口顶部热区 */
+      var zoneBottom = 110;       /* 顶部热区下边界(px)，按卡片高度动态测量 */
 
-      /* allowClickThrough 仅在「滚动淡出且未悬停」时放行点击穿透。
-         悬停 peek 时必须保留 pointer-events——否则元素一旦透明就变成
-         click-through，会立刻触发 mouseleave、之后再也收不到 mouseenter，
-         卡片会卡死在透明状态（这是个很隐蔽的坑）。 */
-      function applyOpacity(op, allowClickThrough) {
-        shell.style.opacity = String(op);
-        shell.style.pointerEvents = (allowClickThrough && op <= 0.02) ? 'none' : '';
+      /* opacity 不影响布局，卡片几何与滚动无关，故只在构建/缩放时测一次。
+         热区 = 卡片底边 + 16px 缓冲，最少 90px，确保整张卡片都在热区内。 */
+      function measureZone() {
+        var r = shell.getBoundingClientRect();
+        zoneBottom = Math.max(90, r.bottom + 16);
       }
-      function onScroll() {
+      measureZone();
+      window.addEventListener('resize', measureZone, { passive: true });
+
+      function scrollOpacity() {
         var sy = window.scrollY || window.pageYOffset || 0;
-        var t  = Math.min(1, sy / 140);   /* fully transparent past 140px */
-        scrolledFade = t > 0.02;
-        if (!hovering) applyOpacity(1 - t, true);
+        return 1 - Math.min(1, sy / 140);   /* 下拉越多越透明，>140px 全透明 */
       }
-      /* ★ 需求：鼠标移到顶部导航卡片上时透明度 → 0%，可透视看到下方内容。
-         - 顶部（未被滚动淡出）：悬停 = peek，淡到 0；移开自动还原。
-         - 已滚动淡出时：悬停 = 还原到不透明，方便点击导航；移开再淡出。
-           （若去掉这条，桌面端滚动后将无法点击导航链接。） */
-      shell.addEventListener('mouseenter', function () {
-        hovering = true;
-        if (scrolledFade) applyOpacity(1, false);   /* 已淡出 → 还原以便操作 */
-        else applyOpacity(0, false);                 /* 在顶部 → 透视下方 */
-      });
-      shell.addEventListener('mouseleave', function () {
-        hovering = false;
-        onScroll();   /* 还原到与滚动位置匹配的透明度 */
-      });
-      onScrollRAF(onScroll);
-      onScroll();
+      function render() {
+        /* 鼠标在顶部热区 → 完全不透明；否则按滚动位置淡出 */
+        var op = nearTop ? 1 : scrollOpacity();
+        shell.style.opacity = String(op);
+        /* 透明时放行点击穿透（不挡下方内容）；不透明时恢复可点 */
+        shell.style.pointerEvents = (op <= 0.02) ? 'none' : '';
+      }
+
+      /* ★ 需求：下拉后导航栏变透明；鼠标移到网页顶部区域 → 透明度变回、
+         完全不透明。用文档级 mousemove + 廉价的 clientY 比较（不触发布局），
+         且仅在状态变化时写样式，开销极小。关键：即便卡片已 pointer-events
+         :none（收不到自身悬停事件），靠顶部热区检测也能可靠唤回。 */
+      document.addEventListener('mousemove', function (e) {
+        var inZone = e.clientY <= zoneBottom;
+        if (inZone !== nearTop) { nearTop = inZone; render(); }
+      }, { passive: true });
+
+      onScrollRAF(render);
+      render();
     }
 
     if (!tryBuild()) {
