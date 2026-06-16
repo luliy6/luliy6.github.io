@@ -1002,19 +1002,37 @@
       /* Header is always fully transparent — only the hero card carries
          the glass background, and it fades out completely on scroll. */
       if (header) header.style.background = 'transparent';
-      var fading = false;
-      function applyOpacity(op) {
+
+      var scrolledFade = false;   /* 滚动是否已把卡片淡出 */
+      var hovering = false;       /* 鼠标是否悬停在卡片上 */
+
+      /* allowClickThrough 仅在「滚动淡出且未悬停」时放行点击穿透。
+         悬停 peek 时必须保留 pointer-events——否则元素一旦透明就变成
+         click-through，会立刻触发 mouseleave、之后再也收不到 mouseenter，
+         卡片会卡死在透明状态（这是个很隐蔽的坑）。 */
+      function applyOpacity(op, allowClickThrough) {
         shell.style.opacity = String(op);
-        shell.style.pointerEvents = op <= 0.02 ? 'none' : '';
+        shell.style.pointerEvents = (allowClickThrough && op <= 0.02) ? 'none' : '';
       }
       function onScroll() {
         var sy = window.scrollY || window.pageYOffset || 0;
         var t  = Math.min(1, sy / 140);   /* fully transparent past 140px */
-        applyOpacity(1 - t);
-        fading = t > 0;
+        scrolledFade = t > 0.02;
+        if (!hovering) applyOpacity(1 - t, true);
       }
-      shell.addEventListener('mouseenter', function () { applyOpacity(1); });
-      shell.addEventListener('mouseleave', function () { if (fading) onScroll(); });
+      /* ★ 需求：鼠标移到顶部导航卡片上时透明度 → 0%，可透视看到下方内容。
+         - 顶部（未被滚动淡出）：悬停 = peek，淡到 0；移开自动还原。
+         - 已滚动淡出时：悬停 = 还原到不透明，方便点击导航；移开再淡出。
+           （若去掉这条，桌面端滚动后将无法点击导航链接。） */
+      shell.addEventListener('mouseenter', function () {
+        hovering = true;
+        if (scrolledFade) applyOpacity(1, false);   /* 已淡出 → 还原以便操作 */
+        else applyOpacity(0, false);                 /* 在顶部 → 透视下方 */
+      });
+      shell.addEventListener('mouseleave', function () {
+        hovering = false;
+        onScroll();   /* 还原到与滚动位置匹配的透明度 */
+      });
       onScrollRAF(onScroll);
       onScroll();
     }
@@ -2436,6 +2454,133 @@
     onScroll();
     root._luliyTOC = panel;
   }
+
+  /* ---- 18b  移动端快捷导航栏（singlePage + exlink）  ★新增 ----
+     需求：移动端把导航里的 singlePage（内部页）和 exlink（外部链接）
+     做成一行清晰可见、可横向滚动的快捷胶囊。
+     可靠性：直接从 .title-right 的 <a> 读取——这是 Gmeek 渲染导航的
+     真实来源，桌面胶囊栏也用它（已验证可靠），而非依赖可能尚未生成的
+     _luliyNavLinks 缓存；并用 MutationObserver + 轮询兜底，应对 Gmeek
+     或插件「晚于本脚本渲染导航」的情况。 */
+  function collectNavAnchors() {
+    /* 优先 .title-right，其次整个 header，确保拿到全部导航 <a> */
+    var scope = document.querySelector('.title-right, [class*="title-right"]') ||
+                document.getElementById('header');
+    if (!scope) return [];
+    var out = [], seen = {};
+    Array.prototype.forEach.call(scope.querySelectorAll('a[href]'), function (a) {
+      var id = a.id || '';
+      if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return;
+      /* 跳过胶囊克隆、抽屉、以及本栏自身，避免重复读取 */
+      if (a.closest('#luliy-hero-capsule, #luliy-nav-drawer, #luliy-mobile-quicklinks')) return;
+      if (a.classList && a.classList.contains('luliy-hero-cap-link')) return;
+      var href = a.getAttribute('href') || '';
+      if (!href || href.charAt(0) === '#') return;
+      if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/i.test(href)) return;   /* 跳过 RSS/feed */
+      if (a.classList && a.classList.contains('circle')) return;       /* 跳过主题圆钮 */
+      var key = (a.href || href).toLowerCase();
+      if (seen[key]) return;
+      seen[key] = 1;
+
+      /* 判定外链：target=_blank 或绝对地址且主机不同 */
+      var external = a.target === '_blank';
+      try {
+        var u = new URL(a.href, location.href);
+        if (u.origin !== location.origin) external = true;
+      } catch (e) {}
+
+      /* 标签兜底：title → aria-label → 文本 → 主机名/路径名，
+         保证纯图标链接也有可读文字 */
+      var label = (a.getAttribute('title') || a.getAttribute('aria-label') ||
+                   (a.textContent || '').trim());
+      if (!label) {
+        try {
+          var uu = new URL(a.href, location.href);
+          label = external ? uu.hostname.replace(/^www\./, '')
+            : (uu.pathname.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '') || '\u94fe\u63a5');
+        } catch (e) { label = '\u94fe\u63a5'; }
+      }
+
+      var svg = a.querySelector('svg');
+      out.push({
+        href: a.href || href,
+        target: a.getAttribute('target') || (external ? '_blank' : ''),
+        label: label,
+        icon: svg ? svg.outerHTML : '',
+        external: external
+      });
+    });
+    return out;
+  }
+
+  function buildMobileQuickLinks() {
+    var content = document.getElementById('content') || document.querySelector('.main');
+    if (!content) return false;
+
+    var anchors = collectNavAnchors();
+    /* 兜底：.title-right 尚未渲染时，用 _luliyNavLinks 缓存救场 */
+    if (!anchors.length && root._luliyNavLinks && root._luliyNavLinks.length) {
+      anchors = root._luliyNavLinks.map(function (m) {
+        var external = m.target === '_blank';
+        try { if (new URL(m.absHref || m.href, location.href).origin !== location.origin) external = true; } catch (e) {}
+        return {
+          href: m.absHref || m.href,
+          target: m.target || (external ? '_blank' : ''),
+          label: m.label || '\u94fe\u63a5',
+          icon: (m.html && /<svg/i.test(m.html)) ? m.html : '',
+          external: external
+        };
+      });
+    }
+    if (!anchors.length) return false;
+
+    var old = document.getElementById('luliy-mobile-quicklinks');
+    var bar = old || document.createElement('nav');
+    bar.id = 'luliy-mobile-quicklinks';
+    bar.setAttribute('aria-label', '\u5feb\u6377\u5bfc\u822a');
+    bar.innerHTML = '';
+
+    anchors.forEach(function (it) {
+      var a = document.createElement('a');
+      a.className = 'luliy-mql-pill' + (it.external ? ' is-ext' : '');
+      a.href = it.href;
+      if (it.target) a.target = it.target;
+      if (it.external) a.rel = 'noopener';
+      a.setAttribute('aria-label', it.label);
+      var ico = it.icon
+        ? '<span class="luliy-mql-ico">' + it.icon + '</span>'
+        : '<span class="luliy-mql-ico luliy-mql-dot"></span>';
+      a.innerHTML = ico + '<span class="luliy-mql-txt">' + esc(it.label) + '</span>';
+      bar.appendChild(a);
+    });
+
+    if (!old) content.insertBefore(bar, content.firstChild);   /* 内容区最前，移动端一眼可见 */
+    /* 成功后打标记：CSS 据此隐藏 hero 内重复的左右链接列（仅在确有快捷栏时） */
+    document.body.classList.add('luliy-has-mql');
+    return true;
+  }
+
+  function initMobileQuickLinks() {
+    if (!buildMobileQuickLinks()) {
+      var n = 0;
+      var iv = setInterval(function () {
+        if (buildMobileQuickLinks() || ++n > 25) clearInterval(iv);
+      }, 200);
+    }
+    /* 导航若被 Gmeek/插件延迟插入或改动，监听后（防抖）重建 */
+    var header = document.getElementById('header');
+    if (header && !header._luliyMqlObs) {
+      header._luliyMqlObs = true;
+      try {
+        var dt = null;
+        new MutationObserver(function () {
+          clearTimeout(dt);
+          dt = setTimeout(buildMobileQuickLinks, 150);
+        }).observe(header, { childList: true, subtree: true });
+      } catch (e) {}
+    }
+  }
+  root._luliyBuildMobileQuickLinks = buildMobileQuickLinks;
 
   /* ---- 18  Mobile nav — right-side drawer ────────────────────── */
   function initMobileNav() {
@@ -4015,6 +4160,7 @@
     safe(initToolbar,         'toolbar');
     safe(initNavTransparency, 'navTransparency');
     safe(initMobileNav,       'mobileNav');
+    safe(initMobileQuickLinks, 'mobileQuickLinks');   /* ★ 移动端 singlePage+exlink 快捷栏 */
     safe(initThemeParticles,  'themeParticles');
     safe(initFavoritesLock,   'favLock');   /* safety net — also called in post init */
 
