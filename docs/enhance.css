@@ -69,7 +69,10 @@
   --luliy-pb-extra: 0px;
 }
 
-html { scroll-behavior: smooth; zoom: 1.1; }
+/* ★ 手机端=桌面端双保险（CSS侧）：即便 viewport meta 未被 JS 成功修改，
+   min-width:1024px 也能让布局以桌面宽度渲染，所有移动端断点不再命中。
+   与 JS 的 forceDesktopViewport() 配合使用。 */
+html { scroll-behavior: smooth; zoom: 1.1; min-width: 1024px; }
 *, *::before, *::after { box-sizing: border-box; }
 
 /* Force page containers transparent so bg shows through */
@@ -1477,8 +1480,11 @@ pre.code-fullscreen {
    rounded corners are applied to the corner cells instead.
 ══════════════════════════════════════════════════════════ */
 #postBody table {
-  /* 需求：阅读宽度拉大后表格要跟着填满 → width 加 !important 覆盖 Gmeek 默认 */
-  width: 100% !important; border-collapse: separate; border-spacing: 0;
+  /* 需求①：阅读宽度拉大后表格填满——覆盖 Primer 的 display:block; width:max-content */
+  /* 需求⑦：窄屏（<600px）下宽表自动变成卡片（每行一张卡，th 文字注入 data-label） */
+  width: 100% !important;
+  display: table !important;   /* 覆盖 Primer 的 display:block */
+  border-collapse: separate; border-spacing: 0;
   border-radius: 12px; overflow: visible; margin: 1.5em 0;
   box-shadow: 0 2px 14px rgba(0,0,0,0.08), 0 0 0 1px rgba(130,80,223,0.14);
   /* 需求：表格背景不再固定白色，叠加一层主题强调色(--th-accent-soft)使其随主题继承 */
@@ -3457,4 +3463,127 @@ body.luliy-reduce-motion * {
         若快捷栏因故未生成，hero 内链接仍作为兜底保留。 */
   body.luliy-has-mql #luliy-hero-mobrow .luliy-mobrow-col { display: none !important; }
   body.luliy-has-mql #luliy-hero-mobrow { justify-content: center !important; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   31  响应式表格——窄屏卡片化  ★新增
+   宽度 < 600px 时，每行变一张卡片，th 文字通过 data-label 注入 td 前
+   配合 display:table !important / width:100% !important 完整修复表格
+══════════════════════════════════════════════════════════ */
+@media (max-width: 599px) {
+  /* 整张表变块，不再横向溢出 */
+  #postBody table,
+  #postBody thead,
+  #postBody tbody,
+  #postBody tfoot,
+  #postBody tr {
+    display: block !important;
+    width: 100% !important;
+  }
+  /* 表头行整体隐藏（内容以 data-label 形式显示在每个 td 前） */
+  #postBody thead { display: none !important; }
+
+  /* 每个 td 变成卡片内的一行 label:value */
+  #postBody td {
+    display: flex !important;
+    align-items: flex-start;
+    padding: 8px 14px !important;
+    border-bottom: 1px solid rgba(130,80,223,0.10) !important;
+    gap: 10px;
+  }
+  #postBody td:last-child { border-bottom: none !important; }
+
+  /* data-label 注入的标题前缀 */
+  #postBody td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    min-width: 5em;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--th-accent, #8250df);
+    opacity: 0.85;
+    padding-top: 1px;
+    white-space: nowrap;
+  }
+  /* 每行 tr 作为一张卡 */
+  #postBody tr {
+    border-radius: 10px !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+    overflow: hidden !important;
+    background: rgba(255,255,255,0.72) !important;
+  }
+  [data-color-mode="dark"] #postBody tr {
+    background: rgba(18,14,32,0.72) !important;
+  }
+  /* 圆角相关（原来由 corner-cell 实现，现在 tr 自己带圆角即可） */
+  #postBody thead tr:first-child th:first-child,
+  #postBody thead tr:first-child th:last-child,
+  #postBody tr:last-child td:first-child,
+  #postBody tr:last-child td:last-child { border-radius: 0 !important; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   32  导航栏透明度开关按钮样式  ★新增
+══════════════════════════════════════════════════════════ */
+.luliy-fade-toggle-row {
+  width: 100%; display: flex; align-items: center;
+  padding: 9px 14px; gap: 8px; border: none;
+  background: none; cursor: pointer; border-radius: 8px;
+  font-family: inherit; font-size: 13px;
+  color: var(--th-accent, #8250df);
+  transition: background 0.15s;
+  text-align: left;
+}
+.luliy-fade-toggle-row:hover { background: var(--th-accent-soft, rgba(130,80,223,0.10)); }
+.luliy-fade-toggle-row.is-active .luliy-fade-badge { color: #22c55e; }
+.luliy-fade-toggle-row:not(.is-active) .luliy-fade-badge { color: #f87171; }
+.luliy-fade-badge {
+  margin-left: auto; font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px;
+  background: rgba(130,80,223,0.08);
+}
+
+/* ══════════════════════════════════════════════════════════
+   33  键盘快捷键提示 Toast  ★新增
+══════════════════════════════════════════════════════════ */
+#luliy-kb-toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(12px);
+  background: rgba(18,14,32,0.92); color: #e8e2f5;
+  padding: 10px 18px; border-radius: 12px; font-size: 13px;
+  pointer-events: none; z-index: 99998;
+  opacity: 0; transition: opacity 0.3s, transform 0.3s;
+  white-space: nowrap; backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  border: 1px solid rgba(130,80,223,0.25);
+}
+#luliy-kb-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+#luliy-kb-toast kbd {
+  display: inline-block; padding: 1px 6px; border-radius: 5px;
+  background: rgba(130,80,223,0.25); color: #cba6f7;
+  font-size: 12px; font-family: monospace; margin: 0 2px;
+  border: 1px solid rgba(130,80,223,0.35);
+}
+[data-color-mode="dark"] #luliy-kb-toast { background: rgba(10,6,22,0.94); }
+
+/* ══════════════════════════════════════════════════════════
+   34  文末字数 + 阅读时长信息条  ★新增
+══════════════════════════════════════════════════════════ */
+#luliy-post-footer-bar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin: 2.5rem 0 1rem;
+  padding: 12px 18px; border-radius: 12px;
+  background: var(--th-accent-soft, rgba(130,80,223,0.08));
+  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.18));
+  font-size: 13px; color: var(--th-accent, #8250df);
+  font-family: 'Noto Sans SC', sans-serif;
+}
+#luliy-post-footer-bar svg { vertical-align: middle; opacity: 0.75; flex-shrink: 0; }
+.lpfb-item { display: inline-flex; align-items: center; gap: 5px; }
+.lpfb-item b { font-weight: 700; }
+.lpfb-sep { opacity: 0.4; font-size: 16px; }
+[data-color-mode="dark"] #luliy-post-footer-bar {
+  background: rgba(130,80,223,0.12);
+  border-color: rgba(130,80,223,0.22);
+  color: var(--th-accent, #cba6f7);
 }
