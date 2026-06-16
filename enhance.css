@@ -620,9 +620,17 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 }
 
 
+/* ── SubTitle row (mobRow): links | subtitle | links ─────── */
+#luliy-hero-mobrow {
+  grid-area: subtitle;
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px;
+}
+/* Desktop: link columns hidden (capsule handles links); only subtitle shows */
+.luliy-mobrow-col { display: none; }
+
 /* ── SubTitle (between circle and settings) ──────────────── */
 #luliy-hero-subtitle {
-  grid-area: subtitle;
   align-self: center; justify-self: center;
   font-size: 13px; font-weight: 600; letter-spacing: 0.5px;
   color: var(--th-accent, #8250df);
@@ -645,42 +653,7 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 }
 
 /* ── Mobile quick-link bar (singlePage/exlink shortcuts) ──── */
-#luliy-quickbar {
-  display: none;   /* shown only on mobile via media query */
-  position: fixed;
-  top: 110px; left: 8px; right: 8px;
-  z-index: 9998;
-  align-items: center; gap: 6px;
-  padding: 8px 10px;
-  border-radius: 16px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  background: var(--th-hero-bg, rgba(245,245,250,0.78));
-  -webkit-backdrop-filter: blur(20px) saturate(1.6);
-  backdrop-filter: blur(20px) saturate(1.6);
-  border: 1px solid var(--th-hero-border, rgba(255,255,255,0.5));
-  box-shadow: 0 6px 22px rgba(0,0,0,0.14);
-}
-#luliy-quickbar::-webkit-scrollbar { display: none; }
-[data-color-mode="dark"] #luliy-quickbar {
-  background: rgba(18,16,26,0.82);
-  border-color: rgba(255,255,255,0.10);
-}
-.luliy-quick-link {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  height: 36px; padding: 0 14px; flex-shrink: 0;
-  border-radius: 18px;
-  color: var(--th-hero-fg, #2a2440) !important;
-  background: var(--th-accent-soft, rgba(130,80,223,0.12));
-  text-decoration: none !important;
-  font-size: 13px; font-weight: 600; white-space: nowrap;
-  font-family: 'Noto Sans SC', sans-serif;
-  transition: background 0.15s, transform 0.15s;
-}
-[data-color-mode="dark"] .luliy-quick-link { color: rgba(245,242,255,0.92) !important; }
-.luliy-quick-link:active { transform: scale(0.94); background: var(--th-accent, #8250df); }
-.luliy-quick-link svg { width: 17px; height: 17px; fill: currentColor; flex-shrink: 0; }
-.luliy-quick-txt { text-transform: capitalize; }
+
 
 
 /* ── Hamburger — mobile ─────────────────────────────────── */
@@ -771,23 +744,30 @@ body.luliy-drawer-open { overflow: hidden; }
 }
 
 /* Nav links */
+/* Drawer nav links: 2-column grid (two-row arrangement) */
+.luliy-drawer-link-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
 .luliy-drawer-link {
-  display: flex; align-items: center; gap: 11px;
-  padding: 10px 14px; border-radius: 10px;
-  font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.82) !important;
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 12px; border-radius: 10px;
+  font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.82) !important;
   text-decoration: none !important;
-  transition: background 0.15s, color 0.15s;
-  margin-bottom: 2px;
+  background: rgba(255,255,255,0.05);
+  transition: background 0.15s, color 0.15s, transform 0.15s;
 }
 .luliy-drawer-link:hover {
-  background: rgba(255,255,255,0.08); color: #fff !important;
+  background: rgba(255,255,255,0.10); color: #fff !important;
 }
+.luliy-drawer-link:active { transform: scale(0.96); }
 .luliy-drawer-link-ico {
   display: inline-flex; align-items: center; justify-content: center;
   width: 20px; height: 20px; flex-shrink: 0;
 }
 .luliy-drawer-link-ico svg { width: 16px; height: 16px; fill: currentColor; }
-.luliy-drawer-link-txt { text-transform: capitalize; }
+.luliy-drawer-link-txt { text-transform: capitalize; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Theme grid: 2 columns */
 .luliy-drawer-theme-grid {
@@ -2474,7 +2454,10 @@ body[data-luliy-theme="mono"] {
   position: absolute; top: 50%; right: 2px; transform: translateY(-50%);
   background: var(--th-accent, #8250df);
 }
-@media (max-width: 768px) { #luliy-aplayer { top: 66px !important; } }
+@media (max-width: 768px) {
+  /* APlayer keeps its JS-controlled drag position; only size adjusts */
+  #luliy-aplayer .aplayer-pic { width: 44px !important; height: 44px !important; }
+}
 
 
 /* ══════════════════════════════════════════════════════════
@@ -3027,7 +3010,6 @@ body.luliy-focus-mode #luliy-sakura-canvas,
 body.luliy-focus-mode #luliy-firefly-canvas,
 body.luliy-focus-mode #luliy-meteor-canvas,
 body.luliy-focus-mode #luliy-aplayer,
-body.luliy-focus-mode #luliy-quickbar,
 body.luliy-focus-mode #luliy-search-fab,
 body.luliy-focus-mode #luliy-progress-bar,
 body.luliy-focus-mode .luliy-prevnext {
@@ -3198,13 +3180,13 @@ body.luliy-reduce-motion * {
     margin: 0 !important;
     z-index: 3;
   }
-  /* Single-row top: avatar + name + time | (ham floats top-right) */
+  /* Two-row hero: [avatar+name+time] then [links | subtitle | links] */
   #luliy-nav-rebuilt {
     grid-template-columns: 1fr !important;
     grid-template-areas:
       "left"
       "subtitle" !important;
-    gap: 8px 0 !important;
+    gap: 10px 0 !important;
     padding: 12px 48px 12px 14px !important;
     border-radius: 18px !important;
     max-width: 100% !important;
@@ -3216,26 +3198,47 @@ body.luliy-reduce-motion * {
   #luliy-hero-time { font-size: 15px !important; }
   #luliy-hero-date { font-size: 9px !important; }
   #luliy-nav-circle, .luliy-hero-circle { width: 28px !important; height: 28px !important; }
-  /* subtitle: own row, centred, tappable for the black-hole effect */
-  #luliy-hero-subtitle {
+  /* mobRow: links flank the centred subtitle */
+  #luliy-hero-mobrow {
     grid-area: subtitle !important;
-    justify-self: center !important;
-    font-size: 12px !important; padding: 4px 14px !important;
+    display: flex !important; align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important; width: 100% !important;
   }
-  /* Desktop-only zones hidden on mobile (links live in quick bar + drawer) */
+  .luliy-mobrow-col {
+    display: flex !important; flex-direction: column !important;
+    gap: 5px !important; flex: 1 !important;
+  }
+  .luliy-mobrow-left  { align-items: flex-start !important; }
+  .luliy-mobrow-right { align-items: flex-end !important; }
+  .luliy-mobrow-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 11px; border-radius: 14px;
+    background: var(--th-accent-soft, rgba(130,80,223,0.12));
+    color: var(--th-hero-fg, #2a2440) !important;
+    text-decoration: none !important;
+    font-size: 12px; font-weight: 600; white-space: nowrap;
+    max-width: 100%;
+    transition: background 0.15s, transform 0.15s;
+  }
+  [data-color-mode="dark"] .luliy-mobrow-link { color: rgba(245,242,255,0.92) !important; }
+  .luliy-mobrow-link:active { transform: scale(0.94); background: var(--th-accent, #8250df); color: #fff !important; }
+  .luliy-mobrow-link svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
+  .luliy-mobrow-txt { overflow: hidden; text-overflow: ellipsis; text-transform: capitalize; }
+  #luliy-hero-subtitle {
+    flex-shrink: 0; font-size: 12px !important; padding: 5px 14px !important;
+  }
+  /* Desktop-only zones hidden on mobile */
   #luliy-hero-capsule { display: none !important; }
   #luliy-hero-right { display: none !important; }
   .title-right { display: none !important; }
   #luliy-toolbar { display: none !important; }
 
-  /* Quick-link bar — horizontal scrollable icon+label row */
-  #luliy-quickbar { display: flex !important; }
-
   #content, .main { padding: 0 12px !important; }
-  body.luliy-post-page #content { margin-top: 168px !important; }
+  body.luliy-post-page #content { margin-top: 150px !important; }
   body:not(.luliy-post-page) #content,
-  body:not(.luliy-post-page) .main { margin-top: 158px !important; }
-  #luliy-hero-banner { margin-top: 150px; font-size: 12px; padding: 12px 16px; }
+  body:not(.luliy-post-page) .main { margin-top: 140px !important; }
+  #luliy-hero-banner { margin-top: 130px; font-size: 12px; padding: 12px 16px; }
 
   .luliy-card-grid { grid-template-columns: 1fr; }
   .luliy-prevnext { flex-direction: column; }
