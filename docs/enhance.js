@@ -3180,6 +3180,30 @@
       ? force
       : !document.body.classList.contains('luliy-focus-mode');
     document.body.classList.toggle('luliy-focus-mode', on);
+
+    /* Focus mode = distraction-free: kill all ambient motion (particles,
+       meteors, sakura, fireflies, mouse trail) and hide the music ball.
+       Only the TOC stays. Effects restart when focus mode is exited. */
+    if (on) {
+      try { if (root._luliyStopThemeParticles) root._luliyStopThemeParticles(); } catch (e) {}
+      try { if (root._luliyStopSakura) root._luliyStopSakura(); } catch (e) {}
+      try { if (typeof stopFireflies === 'function') stopFireflies(); } catch (e) {}
+      try { if (typeof stopMouseTrail === 'function') stopMouseTrail(); } catch (e) {}
+    } else {
+      /* Restart ambient effects according to current settings */
+      try { if (root._luliyInitThemeParticles) root._luliyInitThemeParticles(); } catch (e) {}
+      try {
+        if (localStorage.getItem('luliy-sakura') !== '0' && typeof initSakura === 'function') initSakura();
+      } catch (e) {}
+      try {
+        var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark';
+        if (isDark && localStorage.getItem('luliy-firefly') !== '0' && typeof initFireflies === 'function') initFireflies();
+      } catch (e) {}
+      try {
+        if (localStorage.getItem('luliy-trail') !== '0' && typeof initMouseTrail === 'function') initMouseTrail();
+      } catch (e) {}
+    }
+
     /* Sync the settings-panel badge if present */
     if (root._luliyFocusRow && root._luliyFocusRow._badge) {
       root._luliyFocusRow._badge.textContent = on ? '\u5f00\u542f' : '\u5173\u95ed';
