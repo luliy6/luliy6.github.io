@@ -207,8 +207,10 @@
     var wrap = document.createElement('div');
     wrap.id = 'luliy-aplayer';
     var pos = loadPos();
-    wrap.style.left = (pos ? pos.x : 16) + 'px';
-    wrap.style.top  = (pos ? pos.y : 76) + 'px';
+    /* Default park position: just below the hero card, left side */
+    var defX = 16, defY = (window.innerWidth <= 768) ? 150 : 92;
+    wrap.style.left = (pos ? pos.x : defX) + 'px';
+    wrap.style.top  = (pos ? pos.y : defY) + 'px';
     document.body.appendChild(wrap);
 
     /* ── Drag logic (mouse + touch) ──────────────────────── */
@@ -463,6 +465,7 @@
     var defs = {
       'luliy-sfx':       (('ontouchstart' in window) || window.innerWidth < 768) ? '0' : '1',
       'luliy-sakura':    '1',
+      'luliy-particles': '1',
       'luliy-sink':      'default',
       'luliy-bg':        '',
       'luliy-fontsize':  '18',
@@ -912,8 +915,39 @@
         triggerBlackHole(e.clientX, e.clientY);
       });
 
+      /* ── Mobile subtitle row: links | subTitle | links ───
+         On mobile the capsule is hidden; instead links flank the
+         subtitle as two columns (left half + right half). */
+      var mobRow = document.createElement('div');
+      mobRow.id = 'luliy-hero-mobrow';
+      var mobLeft = document.createElement('div');
+      mobLeft.className = 'luliy-mobrow-col luliy-mobrow-left';
+      var mobRight = document.createElement('div');
+      mobRight.className = 'luliy-mobrow-col luliy-mobrow-right';
+      function fillMobRow() {
+        var metas = (root._luliyNavLinks || []).filter(function(m){ return m.href || m.absHref; });
+        if (!metas.length) return false;
+        mobLeft.innerHTML = ''; mobRight.innerHTML = '';
+        var halfM = Math.ceil(metas.length / 2);
+        metas.forEach(function(m, i) {
+          var a = document.createElement('a');
+          a.className = 'luliy-mobrow-link';
+          a.href = m.absHref || m.href;
+          if (m.target) a.target = m.target;
+          a.setAttribute('aria-label', m.label || '');
+          a.innerHTML = (m.html || '') + '<span class="luliy-mobrow-txt">' + (m.label || '') + '</span>';
+          (i < halfM ? mobLeft : mobRight).appendChild(a);
+        });
+        return true;
+      }
+      fillMobRow();
+      root._luliyFillMobRow = fillMobRow;
+      mobRow.appendChild(mobLeft);
+      mobRow.appendChild(subTitleEl);
+      mobRow.appendChild(mobRight);
+
       shell.appendChild(leftZone);
-      shell.appendChild(subTitleEl);
+      shell.appendChild(mobRow);
       shell.appendChild(capsule);
       shell.appendChild(rightZone);
       header.insertBefore(shell, header.firstChild);
@@ -944,9 +978,6 @@
 
       /* Relocate the toolbar pill into the hero right slot, if ready */
       relocatePill();
-
-      /* Build the mobile quick-link bar (always-visible icon row) */
-      buildMobileQuickBar();
 
       return true;
     }
@@ -987,32 +1018,6 @@
       onScroll();
     }
 
-    /* Mobile quick-link bar: a compact icon row under the navbar so
-       singlePage/exlink are reachable without opening the drawer. */
-    function buildMobileQuickBar() {
-      var metas = (root._luliyNavLinks || []).filter(function (m) { return m.href || m.absHref; });
-      if (!metas.length) return false;
-      var bar = document.getElementById('luliy-quickbar');
-      if (!bar) {
-        bar = document.createElement('div');
-        bar.id = 'luliy-quickbar';
-        document.body.appendChild(bar);
-      }
-      bar.innerHTML = '';
-      metas.forEach(function (m) {
-        var a = document.createElement('a');
-        a.className = 'luliy-quick-link';
-        a.href = m.absHref || m.href;
-        if (m.target) a.target = m.target;
-        a.title = m.label || '';
-        a.setAttribute('aria-label', m.label || '');
-        a.innerHTML = (m.html || '') + '<span class="luliy-quick-txt">' + (m.label || '') + '</span>';
-        bar.appendChild(a);
-      });
-      return true;
-    }
-    root._luliyBuildQuickBar = buildMobileQuickBar;
-
     if (!tryBuild()) {
       var tries = 0;
       var iv = setInterval(function () {
@@ -1028,13 +1033,13 @@
     var pn = 0;
     var piv = setInterval(function () {
       if (root._luliyRelocatePill) root._luliyRelocatePill();
-      if (root._luliyBuildQuickBar) root._luliyBuildQuickBar();
+      if (root._luliyFillMobRow) root._luliyFillMobRow();
       var pillDone = document.getElementById('luliy-toolbar') &&
           document.getElementById('luliy-toolbar').parentElement &&
           document.getElementById('luliy-toolbar').parentElement.id === 'luliy-hero-right';
-      var qbDone = document.getElementById('luliy-quickbar') &&
-          document.getElementById('luliy-quickbar').children.length > 0;
-      if (pillDone && qbDone) clearInterval(piv);
+      var mobDone = document.querySelector('.luliy-mobrow-left') &&
+          document.querySelector('.luliy-mobrow-left').children.length > 0;
+      if (pillDone && mobDone) clearInterval(piv);
       if (++pn > 40) clearInterval(piv);
     }, 200);
   }
@@ -1505,6 +1510,19 @@
       playSfx('click');
     });
     panel.appendChild(sakuraRow);
+
+    /* Floating particles toggle */
+    var particlesOn  = localStorage.getItem('luliy-particles') !== '0';
+    var particlesRow = mkRow('\u2728', '\u6f02\u6d6e\u7c92\u5b50', particlesOn ? '\u5f00\u542f' : '\u5173\u95ed');  /* ✨ 漂浮粒子 */
+    particlesRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var on = localStorage.getItem('luliy-particles') !== '0';
+      localStorage.setItem('luliy-particles', on ? '0' : '1');
+      particlesRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
+      if (root._luliyInitThemeParticles) root._luliyInitThemeParticles();
+      playSfx('click');
+    });
+    panel.appendChild(particlesRow);
 
     /* BG */
     panel.appendChild(mkSep());
@@ -2158,15 +2176,21 @@
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
-    /* Particles */
+    /* Particles — gated by the toggle; right-heavy distribution.
+       Meteors stay on regardless (they're the global "流星" effect). */
+    var particlesEnabled = (localStorage.getItem('luliy-particles') !== '0');
     var particles = [];
-    var pCount = cfg.pCount;
+    var pCount = particlesEnabled ? cfg.pCount : 0;
     for (var i = 0; i < pCount; i++) {
+      /* Bias x toward the right: sqrt skews random() toward 1 (right side) */
+      var biasX = Math.sqrt(Math.random());   /* 0..1, weighted to 1 */
       particles.push({
-        x: Math.random() * 1500, y: Math.random() * 900,
+        x: biasX * (W || 1500),
+        y: Math.random() * (H || 900),
         r: 2 + Math.random() * 3,
         vx: (Math.random() - 0.5) * 0.3,
         vy: -0.1 - Math.random() * 0.4,
+        homeBias: biasX,   /* remember its column bias for respawn */
         life: Math.random()
       });
     }
@@ -2206,8 +2230,8 @@
       particles.forEach(function (p) {
         p.x += p.vx; p.y += p.vy; p.life += 0.004;
         if (p.life > 1) p.life = 0;
-        if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
-        if (p.x < -10 || p.x > W + 10) { p.x = Math.random() * W; p.y = Math.random() * H; }
+        if (p.y < -10) { p.y = H + 10; p.x = Math.sqrt(Math.random()) * W; }
+        if (p.x < -10 || p.x > W + 10) { p.x = Math.sqrt(Math.random()) * W; p.y = Math.random() * H; }
         var alpha = Math.sin(p.life * Math.PI) * 0.85;
         if (alpha <= 0) return;
         ctx.fillStyle = cfg.pColor.replace('VAL', alpha.toFixed(2));
@@ -2470,13 +2494,15 @@
     sec1Title.className = 'luliy-drawer-sec-title';
     sec1Title.textContent = '\u5bfc\u822a';  /* 导航 */
     sec1.appendChild(sec1Title);
+    var sec1Grid = document.createElement('div');
+    sec1Grid.className = 'luliy-drawer-link-grid';   /* 2-column rows */
+    sec1.appendChild(sec1Grid);
     dBody.insertBefore(sec1, dBody.firstChild);
 
     function populateDrawerLinks() {
       var metas = (root._luliyNavLinks || []).filter(function(m){ return m.href || m.absHref; });
       if (!metas.length) return false;
-      /* Remove old links if any */
-      sec1.querySelectorAll('.luliy-drawer-link').forEach(function(el){ el.remove(); });
+      sec1Grid.innerHTML = '';
       metas.forEach(function(m) {
         var a = document.createElement('a');
         a.className = 'luliy-drawer-link';
@@ -2487,12 +2513,11 @@
           a.innerHTML = '<span class="luliy-drawer-link-ico">' + m.html + '</span>' +
                         '<span class="luliy-drawer-link-txt">' + label + '</span>';
         } else { a.textContent = label; }
-        sec1.appendChild(a);
+        sec1Grid.appendChild(a);
       });
       return true;
     }
     if (!populateDrawerLinks()) {
-      /* Hero hasn't built yet — retry until it does */
       var dlN = 0, dlIv = setInterval(function () {
         if (populateDrawerLinks() || ++dlN > 30) clearInterval(dlIv);
       }, 200);
