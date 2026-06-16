@@ -3383,3 +3383,70 @@ body.luliy-reduce-motion * {
      永久提升为合成层、白白占用大量显存。 */
   #luliy-hero-banner { will-change: auto !important; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   30  移动端快捷导航栏（singlePage + exlink）  ★新增
+   桌面端隐藏；仅 ≤768px 显示为一行可横向滚动的快捷胶囊。
+══════════════════════════════════════════════════════════ */
+#luliy-mobile-quicklinks { display: none; }
+
+@media (max-width: 768px) {
+  #luliy-mobile-quicklinks {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;   /* iOS 惯性滚动 */
+    scrollbar-width: none;               /* Firefox 隐藏滚动条 */
+    padding: 4px 12px 10px;
+    margin: 0 0 6px;
+  }
+  #luliy-mobile-quicklinks::-webkit-scrollbar { display: none; }
+
+  .luliy-mql-pill {
+    flex: 0 0 auto;                      /* 不压缩，超出则横向滚动 */
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; white-space: nowrap;
+    text-decoration: none !important;
+    color: var(--th-accent, #8250df) !important;
+    background: var(--th-accent-soft, rgba(130,80,223,0.12));
+    border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.22));
+    font-family: 'Noto Sans SC', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s, background 0.15s, color 0.15s;
+  }
+  [data-color-mode="dark"] .luliy-mql-pill {
+    color: var(--th-accent, #cba6f7) !important;
+    background: var(--th-accent-soft, rgba(130,80,223,0.20));
+    border-color: var(--th-accent-soft, rgba(130,80,223,0.30));
+  }
+  .luliy-mql-pill:active {
+    transform: scale(0.94);
+    background: var(--th-accent, #8250df);
+    color: #fff !important;
+  }
+  /* 外链加一个 ↗ 角标，与内部页区分 */
+  .luliy-mql-pill.is-ext .luliy-mql-txt::after {
+    content: ' \2197';
+    font-size: 0.85em; opacity: 0.7;
+  }
+  .luliy-mql-ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; flex-shrink: 0;
+  }
+  .luliy-mql-ico svg { width: 15px; height: 15px; fill: currentColor; }
+  /* 无图标链接的占位圆点 */
+  .luliy-mql-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor; opacity: 0.75;
+  }
+  .luliy-mql-txt { text-transform: capitalize; }
+
+  /* 去重：导航快捷已由上方快捷栏统一呈现时（body.luliy-has-mql），
+     隐藏 hero 卡片内重复的左右链接列，仅保留居中副标题。
+     —— 用 id+class 提高优先级以覆盖前面的 .luliy-mobrow-col 规则；
+     —— 仅在快捷栏确实生成（有 luliy-has-mql 标记）时才隐藏，
+        若快捷栏因故未生成，hero 内链接仍作为兜底保留。 */
+  body.luliy-has-mql #luliy-hero-mobrow .luliy-mobrow-col { display: none !important; }
+  body.luliy-has-mql #luliy-hero-mobrow { justify-content: center !important; }
+}
