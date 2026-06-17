@@ -939,7 +939,27 @@
         capsule.appendChild(c);
       });
 
-      /* ── RIGHT: settings slot (existing toolbar pill moves here) ─ */
+      /* ★ More 下拉：放不下的链接收进这里（GitHub 式自动溢出检测，见 reflowCapsule） */
+      var moreWrap = document.createElement('div');
+      moreWrap.id = 'luliy-hero-more';
+      moreWrap.style.display = 'none';
+      var moreBtn = document.createElement('button');
+      moreBtn.type = 'button';
+      moreBtn.id = 'luliy-hero-more-btn';
+      moreBtn.innerHTML = 'More <span class="lhm-arrow">\u25be</span>';
+      moreBtn.setAttribute('aria-label', '\u66f4\u591a\u5bfc\u822a');
+      var moreMenu = document.createElement('div');
+      moreMenu.id = 'luliy-hero-more-menu';
+      moreBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        moreWrap.classList.toggle('is-open');
+      });
+      document.addEventListener('click', function (e) {
+        if (!moreWrap.contains(e.target)) moreWrap.classList.remove('is-open');
+      });
+      moreWrap.appendChild(moreBtn);
+      moreWrap.appendChild(moreMenu);
+      capsule.appendChild(moreWrap);
       var rightZone = document.createElement('div');
       rightZone.id = 'luliy-hero-right';
       /* the #luliy-toolbar pill is relocated here after it's built */
@@ -972,6 +992,61 @@
       shell.appendChild(capsule);
       shell.appendChild(rightZone);
       header.insertBefore(shell, header.firstChild);
+
+      /* ★ 自动溢出检测：一行放不下的胶囊链接收进 More 下拉（参考 GitHub）。
+         做法：测每个链接的右边缘，超出 capsule 可用宽度的移进 moreMenu。
+         capsule 宽度变化(窗口缩放/字体)时重算。 */
+      function reflowCapsule() {
+        if (!capsule.isConnected) return;
+        /* 先全部移回 capsule（moreBtn 之前），复位后再测 */
+        var menuLinks = Array.prototype.slice.call(moreMenu.children);
+        menuLinks.forEach(function (el) { capsule.insertBefore(el, moreWrap); });
+        moreWrap.style.display = 'none';
+        moreWrap.classList.remove('is-open');
+
+        /* ★ 只取 capsule 的「直接子」链接（排除 moreMenu 内的，避免重复计数 bug） */
+        function directLinks() {
+          return Array.prototype.filter.call(capsule.children, function (el) {
+            return el.classList && el.classList.contains('luliy-hero-cap-link');
+          });
+        }
+        var links = directLinks();
+        var seps  = Array.prototype.filter.call(capsule.children, function (el) {
+          return el.classList && el.classList.contains('luliy-hero-cap-sep');
+        });
+        seps.forEach(function (s) { s.style.display = ''; });
+        if (!links.length) return;
+
+        var capRect = capsule.getBoundingClientRect();
+        var avail = capRect.width - 84;   /* 预留 More 按钮宽度 */
+        var last = links[links.length - 1];
+        if (last.getBoundingClientRect().right - capRect.left <= capRect.width) {
+          return;   /* 没溢出，无需 More */
+        }
+        var overflowed = [];
+        for (var i = links.length - 1; i >= 0; i--) {
+          var r = links[i].getBoundingClientRect();
+          if (r.right - capRect.left > avail) {
+            overflowed.unshift(links[i]);
+          } else break;
+        }
+        if (!overflowed.length) overflowed.unshift(links[links.length - 1]);
+        overflowed.forEach(function (el) {
+          var prev = el.previousElementSibling;
+          if (prev && prev.classList.contains('luliy-hero-cap-sep')) prev.style.display = 'none';
+          moreMenu.appendChild(el);
+        });
+        if (moreMenu.children.length) moreWrap.style.display = '';
+      }
+      root._luliyReflowCapsule = reflowCapsule;
+      /* 初次 + 字体/图片加载后重算 */
+      requestAnimationFrame(reflowCapsule);
+      setTimeout(reflowCapsule, 300);
+      setTimeout(reflowCapsule, 1000);
+      var _rfT = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(_rfT); _rfT = setTimeout(reflowCapsule, 120);
+      }, { passive: true });
 
       /* Self-heal: capsule empty but links exist → rebuild from title-right */
       if (capsule.querySelectorAll('.luliy-hero-cap-link').length === 0) {
@@ -1400,7 +1475,33 @@
       if (root._luliyToggleNavMode) root._luliyToggleNavMode();
       refreshModeBtn();
     });
-    head.appendChild(modeBtn);
+
+    /* ★ 顶部日夜切换按钮（图标随当前模式切换） */
+    var dnBtn = document.createElement('button');
+    dnBtn.type = 'button';
+    dnBtn.id = 'luliy-drawer-dnbtn';
+    dnBtn.setAttribute('aria-label', '\u5207\u6362\u65e5\u591c\u6a21\u5f0f');   /* 切换日夜模式 */
+    var SVG_MOON = '<svg viewBox="0 0 16 16" width="17" height="17" fill="currentColor"><path d="M9.598 1.591a.749.749 0 0 1 .785-.175 7.001 7.001 0 1 1-8.967 8.967.75.75 0 0 1 .961-.96 5.5 5.5 0 0 0 7.046-7.046.75.75 0 0 1 .175-.786Zm1.616 1.945a7 7 0 0 1-7.678 7.678 5.499 5.499 0 1 0 7.678-7.678Z"/></svg>';
+    var SVG_SUN  = '<svg viewBox="0 0 16 16" width="17" height="17" fill="currentColor"><path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-1.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm5.657-8.157a.75.75 0 0 1 0 1.061l-1.061 1.06a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734l1.06-1.061a.75.75 0 0 1 1.06 0Zm-9.193 9.193a.75.75 0 0 1 0 1.06l-1.06 1.061a.75.75 0 1 1-1.061-1.06l1.06-1.061a.75.75 0 0 1 1.061 0ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0ZM3 8a.75.75 0 0 1-.75.75H.75a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 3 8Zm13 0a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 16 8ZM8 13a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13Zm3.536-2.464a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061Zm-7.193-7.193a.75.75 0 0 1 1.06 0l1.061 1.06A.751.751 0 0 1 5.404 5.46L4.343 4.4a.75.75 0 0 1 0-1.057Z"/></svg>';
+    function refreshDnBtn() {
+      var dark = (root._luliyResolveMode ? root._luliyResolveMode() : 'light') === 'dark';
+      dnBtn.innerHTML = dark ? SVG_SUN : SVG_MOON;   /* 暗色显示太阳(切回亮)，亮色显示月亮 */
+      dnBtn.title = dark ? '\u5207\u5230\u767d\u5929' : '\u5207\u5230\u591c\u95f4';
+    }
+    refreshDnBtn();
+    dnBtn.addEventListener('click', function () {
+      var cur = root._luliyResolveMode ? root._luliyResolveMode() : 'light';
+      if (root._luliySetMode) root._luliySetMode(cur === 'dark' ? 'light' : 'dark');
+      refreshDnBtn();
+      if (playSfx) playSfx('theme');
+    });
+
+    /* 切换按钮 + 日夜按钮 并排一行 */
+    var btnRow = document.createElement('div');
+    btnRow.className = 'ldh-btn-row';
+    btnRow.appendChild(modeBtn);
+    btnRow.appendChild(dnBtn);
+    head.appendChild(btnRow);
 
     /* —— 可折叠分区工厂 —— */
     function mkSection(title, defaultOpen) {
@@ -1420,25 +1521,73 @@
       return sec;
     }
 
-    /* —— 分区①：快捷访问（singlePage + exlink）—— */
-    var secQuick = mkSection('\u5feb\u6377\u8bbf\u95ee', true);   /* 快捷访问 */
-    drawer.appendChild(secQuick);
+    /* —— 快捷链接：直接平铺（无折叠），从 .title-right 实时读取 ——
+       ★ 修复：不再依赖 _luliyNavLinks 缓存（抽屉模式下 hero 不构建，缓存为空）。
+       直接扫 .title-right 的 <a>，排除 about(走头像)/RSS/主题圆钮。
+       显示：gallery book favorites archive stock link music 等。 */
+    var quickWrap = document.createElement('nav');
+    quickWrap.id = 'luliy-drawer-quick';
+    quickWrap.setAttribute('aria-label', '\u5feb\u6377\u8bbf\u95ee');
+    drawer.appendChild(quickWrap);
+
+    function readNavAnchors() {
+      var scope = document.querySelector('.title-right, [class*="title-right"]') ||
+                  document.getElementById('header');
+      if (!scope) return [];
+      var out = [], seen = {};
+      Array.prototype.forEach.call(scope.querySelectorAll('a[href]'), function (a) {
+        var id = a.id || '';
+        if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return;
+        if (a.closest('#luliy-hero-capsule, #luliy-drawer, #luliy-hero-more-menu')) return;
+        if (a.classList && (a.classList.contains('luliy-hero-cap-link') || a.classList.contains('circle'))) return;
+        var href = a.getAttribute('href') || '';
+        if (!href || href.charAt(0) === '#') return;
+        if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/i.test(href)) return;        /* 排除 RSS */
+        if (/\/about(\.html)?$|^about(\.html)?$/i.test(href)) return;        /* about 只走头像 */
+        var key = (a.href || href).toLowerCase();
+        if (seen[key]) return; seen[key] = 1;
+        var external = a.target === '_blank';
+        try { if (new URL(a.href, location.href).origin !== location.origin) external = true; } catch (e) {}
+        var label = (a.getAttribute('title') || a.getAttribute('aria-label') || (a.textContent || '').trim());
+        if (!label) {
+          try {
+            var u = new URL(a.href, location.href);
+            label = external ? u.hostname.replace(/^www\./, '')
+              : (u.pathname.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '') || '\u94fe\u63a5');
+          } catch (e) { label = '\u94fe\u63a5'; }
+        }
+        var svg = a.querySelector('svg');
+        out.push({ href: a.href || href, target: a.getAttribute('target') || (external ? '_blank' : ''),
+                   label: label, icon: svg ? svg.outerHTML : '', external: external });
+      });
+      return out;
+    }
+
     function fillQuick() {
-      var metas = (root._luliyNavLinks || []).filter(function (m) { return m.href || m.absHref; });
-      if (!metas.length) return false;
-      secQuick._body.innerHTML = '';
-      metas.forEach(function (m) {
+      var items = readNavAnchors();
+      /* 兜底：.title-right 还没渲染时用缓存救场 */
+      if (!items.length && root._luliyNavLinks && root._luliyNavLinks.length) {
+        items = root._luliyNavLinks.filter(function (m) {
+          var h = (m.href || m.absHref || '');
+          return h && !/\/about(\.html)?$|^about(\.html)?$/i.test(h) && !/rss|feed|atom/i.test(h);
+        }).map(function (m) {
+          return { href: m.absHref || m.href, target: m.target || '', label: m.label || '\u94fe\u63a5',
+                   icon: (m.html && /<svg/i.test(m.html)) ? m.html : '', external: m.target === '_blank' };
+        });
+      }
+      if (!items.length) return false;
+      quickWrap.innerHTML = '';
+      items.forEach(function (it) {
         var a = document.createElement('a');
-        a.className = 'lds-link';
-        a.href = m.absHref || m.href;
-        if (m.target) a.target = m.target;
-        var label = m.label || (m.href || '').replace(/^\//, '').replace(/\.html?$/, '') || '\u94fe\u63a5';
-        a.setAttribute('aria-label', label);
-        var ico = (m.html && /<svg/i.test(m.html)) ? m.html : '';
+        a.className = 'lds-link' + (it.external ? ' is-ext' : '');
+        a.href = it.href;
+        if (it.target) a.target = it.target;
+        if (it.external) a.rel = 'noopener';
+        a.setAttribute('aria-label', it.label);
         a.innerHTML =
-          '<span class="lds-link-ico">' + (ico || '<span class="lds-link-dot"></span>') + '</span>' +
-          '<span class="lds-link-txt">' + esc(label) + '</span>';
-        secQuick._body.appendChild(a);
+          '<span class="lds-link-ico">' + (it.icon || '<span class="lds-link-dot"></span>') + '</span>' +
+          '<span class="lds-link-txt">' + esc(it.label) + '</span>';
+        quickWrap.appendChild(a);
       });
       return true;
     }
@@ -1663,13 +1812,16 @@
     });
     panel.appendChild(sfxRow);
     panel.appendChild(mkSep());
-    panel.appendChild(mkSec('\u98ce\u683c\u4e3b\u9898'));
+    var themeSecTitle = mkSec('\u98ce\u683c\u4e3b\u9898');
+    themeSecTitle.classList.add('luliy-panel-theme-block');   /* 抽屉里隐藏(抽屉已有主题分区) */
+    panel.appendChild(themeSecTitle);
 
     /* Theme rows */
     SINKS.forEach(function (s) {
       var row = mkRow('', s.label, '\u2713');
       row.setAttribute('data-sink', s.id);
       row.classList.add('luliy-sink-opt');
+      row.classList.add('luliy-panel-theme-block');   /* 抽屉里隐藏 */
       /* Replace emoji span with color dot */
       var dot = document.createElement('span');
       dot.className = 'luliy-sink-dot'; dot.style.background = s.dot;
