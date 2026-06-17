@@ -178,6 +178,23 @@
     return tryNext(tryUrls).then(norm);
   }
 
+  /* ---- config.json 读取（导航硬编码兜底的数据源） --------- */
+  var _luliySiteConfigCache = null;
+  function fetchSiteConfig() {
+    if (_luliySiteConfigCache) return Promise.resolve(_luliySiteConfigCache);
+    var tryUrls = [location.origin + '/config.json', '/config.json'];
+    function tryNext(urls) {
+      if (!urls.length) return Promise.resolve({});
+      return fetch(urls[0], { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+        .catch(function () { return tryNext(urls.slice(1)); });
+    }
+    return tryNext(tryUrls).then(function (cfg) {
+      _luliySiteConfigCache = cfg || {};
+      return _luliySiteConfigCache;
+    });
+  }
+
   /* Relative time: 今天 / 3天前 / 2个月前 / 1年前 */
   function relativeTime(dateStr) {
     if (!dateStr) return '';
@@ -798,6 +815,104 @@
     });
   }
 
+  /* ════════════════════════════════════════════════════════
+     导航锚点多级探测 —— 修复：不同 Gmeek 主题/魔改版头部结构
+     差异很大（标准版用 .title-right；不少基于 Primer Header 组件
+     的主题改用 .Header-item；还有的链接直接散落在 <nav> 里，
+     甚至完全脱离固定容器）。initHeroCluster() 和 initDrawerNav()
+     之前都硬编码死认 .title-right，结构一旦不匹配就双双扫描失败。
+     现在统一改为按「精确 → 宽松」多级回退：
+       .title-right → .Header-item → <nav> → #header → <body>
+     任意一级扫到非零结果就停止，避免过度宽泛误抓正文里的链接。
+  ════════════════════════════════════════════════════════ */
+  function luliyNavScanScopes() {
+    var scopes = [];
+    function push(el) { if (el && scopes.indexOf(el) === -1) scopes.push(el); }
+
+    /* Lv1 —— 标准 Gmeek：.title-right */
+    push(document.querySelector('.title-right, [class*="title-right"]'));
+
+    /* Lv2 —— Primer Header 组件：.Header-item（部分主题/魔改版） */
+    var hi = document.querySelector('.Header-item, [class*="Header-item"]');
+    if (hi) push(hi.closest('.Header') || hi.closest('header') || hi.closest('#header') || hi.parentElement);
+
+    /* Lv3 —— 任意 <nav> 元素 */
+    push(document.querySelector('nav'));
+
+    /* Lv4 —— #header 整体（兜底范围放宽到整块头部） */
+    push(document.getElementById('header'));
+
+    /* Lv5 —— body（最终 DOM 回退，下面调用方会按需再收窄/过滤） */
+    push(document.body);
+
+    return scopes;
+  }
+
+  /* 在多级 scope 中按顺序探测，第一个扫到非零结果的 scope 即采用。
+     selector 默认取 a/button/.circle（导航胶囊用，需要拿到日夜圆钮）；
+     传 'a[href]' 则只取真正可跳转的链接（抽屉快捷链接用）。
+     排除 luliy 自建的 UI，避免抓到自己生成的导航/抽屉/工具条造成自我循环。 */
+  function luliyProbeNavEls(selector) {
+    selector = selector || 'a, button, .circle';
+    var scopes = luliyNavScanScopes();
+    for (var i = 0; i < scopes.length; i++) {
+      var scope = scopes[i];
+      if (!scope) continue;
+      var found = Array.prototype.filter.call(scope.querySelectorAll(selector), function (el) {
+        return !el.closest('#luliy-nav-rebuilt, #luliy-drawer, #luliy-toolbar, #luliy-hero-more-menu, #luliy-ham-btn');
+      });
+      if (found.length) return found;
+    }
+    return [];
+  }
+
+  /* 首页自链判断：排除 / 与 /index.html（及 homeUrl 本身），
+     避免抽屉/胶囊里出现和「博客名」链接重复的首页入口。 */
+  function luliyIsHomeSelfLink(href) {
+    if (!href) return false;
+    var path;
+    try { path = new URL(href, location.href).pathname; } catch (e) { path = href; }
+    path = path.replace(/\/index\.html?$/i, '/');
+    if (path === '' || path === '/') return true;
+    try {
+      var homeP = new URL(LULIY_OPTS.homeUrl || '/', location.href).pathname.replace(/\/index\.html?$/i, '/') || '/';
+      if (path === homeP) return true;
+    } catch (e) {}
+    return false;
+  }
+
+  /* ════════════════════════════════════════════════════════
+     硬编码兜底：DOM 自动探测（含上面的多级回退）全部失败时，
+     直接从 config.json 读取 singlePage + exlink 注入，确保
+     抽屉绝不空白。这里不写死任何具体链接 —— 而是实时拉取站点
+     自己的 config.json 并按 Gmeek 的字段约定解析，这样无论
+     博客的 singlePage/exlink 怎么改，兜底数据永远和站点配置同步。 */
+  function luliyBuildConfigFallbackItems(cfg) {
+    if (!cfg) return [];
+    var out = [];
+    var base = String(cfg.homeUrl || LULIY_OPTS.homeUrl || '').replace(/\/$/, '');
+    (cfg.singlePage || []).forEach(function (key) {
+      if (!key) return;
+      var href = base + '/' + key + '.html';
+      if (luliyIsHomeSelfLink(href)) return;   /* 排除首页自链 */
+      out.push({ href: href, target: '', label: key, icon: '', external: false });
+    });
+    Object.keys(cfg.exlink || {}).forEach(function (key) {
+      var href = cfg.exlink[key];
+      if (!href || luliyIsHomeSelfLink(href)) return;
+      out.push({ href: href, target: '_blank', label: key, icon: '', external: true });
+    });
+    return out;
+  }
+  var _luliyConfigFallbackItems = null;
+  function luliyEnsureConfigFallback(onReady) {
+    if (_luliyConfigFallbackItems) { onReady(_luliyConfigFallbackItems); return; }
+    fetchSiteConfig().then(function (cfg) {
+      _luliyConfigFallbackItems = luliyBuildConfigFallbackItems(cfg);
+      onReady(_luliyConfigFallbackItems);
+    });
+  }
+
   /* ---- 09  Navbar — rebuilt: avatar+name centred, time top-left, icons spread */
   /* 黑洞特效已删除（副标题改为导航切换按钮）。_bhActive 保留为常量，
      供 View Transitions 判断使用（永远 false，不再拦截）。 */
@@ -808,11 +923,11 @@
       var header = document.getElementById('header'); if (!header) return false;
       if (document.getElementById('luliy-nav-rebuilt')) return true;
 
-      /* Wait briefly for Gmeek to render nav links */
-      var trProbe = header.querySelector('.title-right, [class*="title-right"]');
-      var probeCount = trProbe ? trProbe.querySelectorAll('a, button, .circle').length
-                               : header.querySelectorAll('a, button, .circle').length;
-      if (probeCount === 0 && (tryBuild._waits || 0) < 8) {
+      /* Wait briefly for Gmeek to render nav links.
+         ★ 修复：不再硬编码 .title-right —— 按 .title-right → .Header-item →
+         nav → #header → body 多级探测，兼容不同主题/魔改版头部结构。 */
+      var probeLinks = luliyProbeNavEls('a, button, .circle');
+      if (probeLinks.length === 0 && (tryBuild._waits || 0) < 8) {
         tryBuild._waits = (tryBuild._waits || 0) + 1;
         return false;
       }
@@ -820,12 +935,7 @@
       header.setAttribute('data-luliy-nav', '1');
 
       /* ── Collect nav links BEFORE hiding anything ───────── */
-      var tr = header.querySelector('.title-right, [class*="title-right"]');
-      var rawLinks = [];
-      if (tr) rawLinks = Array.from(tr.querySelectorAll('a, button, .circle'));
-      if (rawLinks.length === 0) {
-        rawLinks = Array.from(header.querySelectorAll('a, button, .circle'));
-      }
+      var rawLinks = probeLinks;
 
       /* Hide every existing child (links captured above) */
       Array.from(header.children).forEach(function (el) {
@@ -834,19 +944,30 @@
         el.style.display = 'none';
       });
 
-      /* Filter: drop RSS + about (about lives behind avatar) + circle */
+      /* 基础过滤：去掉 RSS / 日夜圆钮 / 首页自链（两套消费者通用）。
+         ★ 不在这里过滤 about —— about 是否展示，由下面两个不同用途
+         的列表分别决定（胶囊栏 vs 缓存给抽屉用的完整列表）。 */
       var circleBtn = null;
-      var links = rawLinks.filter(function (a) {
+      var baseLinks = rawLinks.filter(function (a) {
         var id = a.id || '';
         if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return false;
+        if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
         var href = a.getAttribute('href') || '';
         if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
-        if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
-        if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
+        if (href && luliyIsHomeSelfLink(a.href || href)) return false;
         return true;
       });
-      /* Stash metadata for the mobile drawer + quick bar */
-      root._luliyNavLinks = links.map(function (a) {
+
+      /* hero 胶囊栏：about 已经挂在头像上了，胶囊里不重复展示一次 */
+      var links = baseLinks.filter(function (a) {
+        var href = a.getAttribute('href') || '';
+        return !/\/about(\.html)?$|^about(\.html)?$/.test(href);
+      });
+
+      /* ★ 缓存给抽屉等其它消费者用的完整列表 —— 不过滤 about，
+         确保「抽屉应完整展示所有单页入口」，即使切到抽屉模式
+         hero 胶囊不构建时，抽屉的兜底缓存里也仍有 about。 */
+      root._luliyNavLinks = baseLinks.map(function (a) {
         return {
           href: a.getAttribute('href') || '',
           absHref: a.href || '',
@@ -1048,14 +1169,16 @@
         clearTimeout(_rfT); _rfT = setTimeout(reflowCapsule, 120);
       }, { passive: true });
 
-      /* Self-heal: capsule empty but links exist → rebuild from title-right */
+      /* Self-heal: capsule empty but links exist → rebuild via the same
+         multi-level probe (.title-right / .Header-item / nav / #header / body) */
       if (capsule.querySelectorAll('.luliy-hero-cap-link').length === 0) {
-        var late = header.querySelector('.title-right, [class*="title-right"]');
-        if (late) {
-          Array.from(late.querySelectorAll('a')).filter(function (a) {
+        var lateLinks = luliyProbeNavEls('a[href]');
+        if (lateLinks.length) {
+          lateLinks.filter(function (a) {
             var href = a.getAttribute('href') || '';
             if (/rss\.xml$|\/rss$|\/feed/.test(href)) return false;
             if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
+            if (luliyIsHomeSelfLink(a.href || href)) return false;
             return true;
           }).forEach(function (a, i) {
             if (i > 0) {
@@ -1531,19 +1654,18 @@
     drawer.appendChild(quickWrap);
 
     function readNavAnchors() {
-      var scope = document.querySelector('.title-right, [class*="title-right"]') ||
-                  document.getElementById('header');
-      if (!scope) return [];
+      var anchors = luliyProbeNavEls('a[href]');
       var out = [], seen = {};
-      Array.prototype.forEach.call(scope.querySelectorAll('a[href]'), function (a) {
+      Array.prototype.forEach.call(anchors, function (a) {
         var id = a.id || '';
         if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return;
         if (a.closest('#luliy-hero-capsule, #luliy-drawer, #luliy-hero-more-menu')) return;
         if (a.classList && (a.classList.contains('luliy-hero-cap-link') || a.classList.contains('circle'))) return;
         var href = a.getAttribute('href') || '';
         if (!href || href.charAt(0) === '#') return;
-        if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/i.test(href)) return;        /* 排除 RSS */
-        if (/\/about(\.html)?$|^about(\.html)?$/i.test(href)) return;        /* about 只走头像 */
+        if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/i.test(href)) return;        /* 排除 RSS（独立功能入口，不算单页/外链） */
+        if (luliyIsHomeSelfLink(a.href || href)) return;                    /* ★ 排除首页自链，避免与博客名重复 */
+        /* ★ 不再过滤 about —— 抽屉要完整展示所有单页入口，about 不应被隐藏 */
         var key = (a.href || href).toLowerCase();
         if (seen[key]) return; seen[key] = 1;
         var external = a.target === '_blank';
@@ -1565,15 +1687,21 @@
 
     function fillQuick() {
       var items = readNavAnchors();
-      /* 兜底：.title-right 还没渲染时用缓存救场 */
+      /* 兜底①：.title-right 等还没渲染时，用 hero 缓存救场
+         （★ 不再过滤 about —— 抽屉要完整展示所有单页入口）。 */
       if (!items.length && root._luliyNavLinks && root._luliyNavLinks.length) {
         items = root._luliyNavLinks.filter(function (m) {
           var h = (m.href || m.absHref || '');
-          return h && !/\/about(\.html)?$|^about(\.html)?$/i.test(h) && !/rss|feed|atom/i.test(h);
+          return h && !/rss|feed|atom/i.test(h) && !luliyIsHomeSelfLink(h);
         }).map(function (m) {
           return { href: m.absHref || m.href, target: m.target || '', label: m.label || '\u94fe\u63a5',
                    icon: (m.html && /<svg/i.test(m.html)) ? m.html : '', external: m.target === '_blank' };
         });
+      }
+      /* 兜底②：上面两级自动探测全部失败 —— 直接注入 config.json 里
+         定义的 singlePage + exlink，确保抽屉绝不空白。 */
+      if (!items.length && _luliyConfigFallbackItems && _luliyConfigFallbackItems.length) {
+        items = _luliyConfigFallbackItems;
       }
       if (!items.length) return false;
       quickWrap.innerHTML = '';
@@ -1591,6 +1719,10 @@
       });
       return true;
     }
+    /* 提前异步拉取 config.json 作为终极兜底数据源；拉取完成后
+       若此时抽屉仍是空的，立即重新尝试填充一次。 */
+    luliyEnsureConfigFallback(function () { fillQuick(); });
+
     if (!fillQuick()) {
       var qn = 0, qiv = setInterval(function () {
         if (fillQuick() || ++qn > 30) clearInterval(qiv);
