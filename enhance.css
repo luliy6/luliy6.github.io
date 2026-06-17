@@ -3423,3 +3423,76 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
   #luliy-hero-subtitle { font-size: 12px; padding: 4px 10px; }
   .luliy-hero-cap-link { padding: 5px 10px; font-size: 13px; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   37  抽屉快捷链接平铺 + 顶部日夜按钮 + 隐藏重复主题 + hero More 下拉  ★
+══════════════════════════════════════════════════════════ */
+
+/* ── 抽屉顶部：切换按钮 + 日夜按钮 并排 ── */
+.ldh-btn-row { display: flex; gap: 8px; margin-top: 14px; align-items: stretch; }
+#luliy-drawer-modebtn { margin-top: 0 !important; flex: 1; }   /* 覆盖原 margin-top */
+#luliy-drawer-dnbtn {
+  flex: 0 0 auto; width: 42px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; cursor: pointer;
+  background: var(--th-accent-soft, rgba(130,80,223,0.18));
+  border: 1px solid var(--th-accent, #8250df);
+  color: var(--th-accent, #cba6f7);
+  transition: background 0.18s, transform 0.15s;
+}
+#luliy-drawer-dnbtn:hover { background: var(--th-accent, #8250df); color: #fff; }
+#luliy-drawer-dnbtn:active { transform: scale(0.94); }
+
+/* ── 快捷链接：直接平铺在抽屉顶部下方（无折叠）── */
+#luliy-drawer-quick {
+  display: flex; flex-direction: column;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+[data-color-mode="light"] #luliy-drawer-quick { border-bottom-color: rgba(0,0,0,0.05); }
+/* .lds-link 样式已在 section 35 定义，这里复用；外链加 ↗ */
+#luliy-drawer-quick .lds-link.is-ext .lds-link-txt::after {
+  content: ' \2197'; font-size: 0.82em; opacity: 0.6;
+}
+
+/* ── 设置分区：隐藏搬进抽屉后的「风格主题」标题+6行（抽屉已有独立主题分区）── */
+#luliy-ctrl-panel.in-drawer .luliy-panel-theme-block { display: none !important; }
+/* 风格主题区前的分隔线也一并隐藏（紧邻的 hr） */
+#luliy-ctrl-panel.in-drawer .luliy-ctrl-theme-preview { display: none !important; }
+
+/* ══ hero More 下拉（桌面端链接溢出时）══ */
+#luliy-hero-more { position: relative; display: inline-flex; align-items: center; flex-shrink: 0; }
+#luliy-hero-more-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 5px 12px; border-radius: 16px; cursor: pointer;
+  background: var(--th-accent-soft, rgba(130,80,223,0.14));
+  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.22));
+  color: var(--th-hero-fg, #2a2440);
+  font-size: 13px; font-weight: 600; font-family: 'Noto Sans SC', sans-serif;
+  white-space: nowrap; transition: background 0.15s, transform 0.12s;
+}
+[data-color-mode="dark"] #luliy-hero-more-btn { color: rgba(245,242,255,0.92); }
+#luliy-hero-more-btn:hover { background: var(--th-accent, #8250df); color: #fff; }
+.lhm-arrow { font-size: 10px; transition: transform 0.22s; }
+#luliy-hero-more.is-open .lhm-arrow { transform: rotate(180deg); }
+#luliy-hero-more-menu {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
+  min-width: 160px; padding: 6px;
+  display: none; flex-direction: column; gap: 2px;
+  background: rgba(18,14,32,0.96);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+  box-shadow: 0 10px 34px rgba(0,0,0,0.4);
+}
+[data-color-mode="light"] #luliy-hero-more-menu { background: rgba(250,248,254,0.97); border-color: rgba(0,0,0,0.08); }
+#luliy-hero-more.is-open #luliy-hero-more-menu { display: flex; }
+/* More 菜单里的链接（原胶囊链接移入后竖排） */
+#luliy-hero-more-menu .luliy-hero-cap-link {
+  display: flex !important; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 8px; white-space: nowrap;
+  color: rgba(255,255,255,0.85) !important; text-decoration: none;
+  transition: background 0.15s;
+}
+[data-color-mode="light"] #luliy-hero-more-menu .luliy-hero-cap-link { color: rgba(40,30,60,0.85) !important; }
+#luliy-hero-more-menu .luliy-hero-cap-link:hover { background: var(--th-accent-soft, rgba(130,80,223,0.18)); }
+#luliy-hero-more-menu .luliy-hero-cap-link svg { width: 16px; height: 16px; }
