@@ -931,6 +931,10 @@
         var lbl = a.getAttribute('title') || (a.textContent || '').trim();
         if (lbl) {
           c.setAttribute('aria-label', lbl);
+          /* ★ 补 title：纯图标模式（窄屏文字隐藏）下，鼠标悬停仍能看到
+             原生 tooltip 提示文字是什么，不靠 aria-label（那个只对屏
+             幕阅读器生效，鼠标悬停不会显示）。 */
+          c.setAttribute('title', lbl);
           var span = document.createElement('span');
           span.className = 'luliy-hero-cap-txt';
           span.textContent = lbl;
@@ -939,27 +943,9 @@
         capsule.appendChild(c);
       });
 
-      /* ★ More 下拉：放不下的链接收进这里（GitHub 式自动溢出检测，见 reflowCapsule） */
-      var moreWrap = document.createElement('div');
-      moreWrap.id = 'luliy-hero-more';
-      moreWrap.style.display = 'none';
-      var moreBtn = document.createElement('button');
-      moreBtn.type = 'button';
-      moreBtn.id = 'luliy-hero-more-btn';
-      moreBtn.innerHTML = 'More <span class="lhm-arrow">\u25be</span>';
-      moreBtn.setAttribute('aria-label', '\u66f4\u591a\u5bfc\u822a');
-      var moreMenu = document.createElement('div');
-      moreMenu.id = 'luliy-hero-more-menu';
-      moreBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        moreWrap.classList.toggle('is-open');
-      });
-      document.addEventListener('click', function (e) {
-        if (!moreWrap.contains(e.target)) moreWrap.classList.remove('is-open');
-      });
-      moreWrap.appendChild(moreBtn);
-      moreWrap.appendChild(moreMenu);
-      capsule.appendChild(moreWrap);
+      /* 链接溢出处理改为纯 CSS 响应式降级（窄屏只显示图标，见 CSS
+         section 38），不再用 JS 检测溢出/挪到下拉菜单，没有"测量
+         时机不对"这类问题。 */
       var rightZone = document.createElement('div');
       rightZone.id = 'luliy-hero-right';
       /* the #luliy-toolbar pill is relocated here after it's built */
@@ -993,75 +979,6 @@
       shell.appendChild(rightZone);
       header.insertBefore(shell, header.firstChild);
 
-      /* ★ 自动溢出检测：一行放不下的胶囊链接收进 More 下拉（参考 GitHub）。
-         做法：测每个链接的右边缘，超出 capsule 可用宽度的移进 moreMenu。
-         capsule 宽度变化(窗口缩放/字体)时重算。 */
-      function reflowCapsule() {
-        if (!capsule.isConnected) return;
-        /* 先全部移回 capsule（moreBtn 之前），复位后再测 */
-        var menuLinks = Array.prototype.slice.call(moreMenu.children);
-        menuLinks.forEach(function (el) { capsule.insertBefore(el, moreWrap); });
-        moreWrap.style.display = 'none';
-        moreWrap.classList.remove('is-open');
-
-        /* ★ 只取 capsule 的「直接子」链接（排除 moreMenu 内的，避免重复计数 bug） */
-        function directLinks() {
-          return Array.prototype.filter.call(capsule.children, function (el) {
-            return el.classList && el.classList.contains('luliy-hero-cap-link');
-          });
-        }
-        var links = directLinks();
-        var seps  = Array.prototype.filter.call(capsule.children, function (el) {
-          return el.classList && el.classList.contains('luliy-hero-cap-sep');
-        });
-        seps.forEach(function (s) { s.style.display = ''; });
-        if (!links.length) return;
-
-        var capRect = capsule.getBoundingClientRect();
-        var avail = capRect.width - 84;   /* 预留 More 按钮宽度 */
-        var last = links[links.length - 1];
-        if (last.getBoundingClientRect().right - capRect.left <= capRect.width) {
-          return;   /* 没溢出，无需 More */
-        }
-        var overflowed = [];
-        for (var i = links.length - 1; i >= 0; i--) {
-          var r = links[i].getBoundingClientRect();
-          if (r.right - capRect.left > avail) {
-            overflowed.unshift(links[i]);
-          } else break;
-        }
-        if (!overflowed.length) overflowed.unshift(links[links.length - 1]);
-        overflowed.forEach(function (el) {
-          var prev = el.previousElementSibling;
-          if (prev && prev.classList.contains('luliy-hero-cap-sep')) prev.style.display = 'none';
-          moreMenu.appendChild(el);
-        });
-        if (moreMenu.children.length) moreWrap.style.display = '';
-      }
-      root._luliyReflowCapsule = reflowCapsule;
-      /* 初次 + 字体/图片加载后重算 */
-      requestAnimationFrame(reflowCapsule);
-      setTimeout(reflowCapsule, 300);
-      setTimeout(reflowCapsule, 1000);
-      var _rfT = null;
-      window.addEventListener('resize', function () {
-        clearTimeout(_rfT); _rfT = setTimeout(reflowCapsule, 120);
-      }, { passive: true });
-
-      /* ★ bug修复：手机端默认是 drawer 模式，hero 此时 display:none，
-         上面那几次初始 reflow 测得的全是 0 宽度 —— reflowCapsule 会把
-         "0 <= 0" 误判为"没有溢出"，从此再也不会主动重算，直到窗口
-         真正 resize。但用户点击切换按钮把 hero 切到显示状态时只是切
-         body class，并不触发 resize 事件，导致 capsule 用未经裁剪的
-         原始宽度直接溢出（即此前出现的左右文字裁切问题）。
-         用 ResizeObserver 监听 capsule 自身尺寸变化，无论是因为窗口
-         缩放还是 display:none→block，都会重新触发测量，一并解决。 */
-      if (window.ResizeObserver) {
-        var _ro = new ResizeObserver(function () {
-          clearTimeout(_rfT); _rfT = setTimeout(reflowCapsule, 60);
-        });
-        _ro.observe(capsule);
-      }
       /* Self-heal: capsule empty but links exist → rebuild from title-right */
       if (capsule.querySelectorAll('.luliy-hero-cap-link').length === 0) {
         var late = header.querySelector('.title-right, [class*="title-right"]');
@@ -1080,7 +997,10 @@
             c.classList.add('luliy-hero-cap-link'); c.removeAttribute('id');
             c.style.display = ''; c.style.visibility = '';
             var lbl = a.getAttribute('title') || (a.textContent || '').trim();
-            if (lbl) { var s = document.createElement('span'); s.className = 'luliy-hero-cap-txt'; s.textContent = lbl; c.appendChild(s); }
+            if (lbl) {
+              c.setAttribute('title', lbl);   /* 纯图标模式下悬停可见提示 */
+              var s = document.createElement('span'); s.className = 'luliy-hero-cap-txt'; s.textContent = lbl; c.appendChild(s);
+            }
             capsule.appendChild(c);
           });
         }
@@ -1557,7 +1477,7 @@
       Array.prototype.forEach.call(scope.querySelectorAll('a[href]'), function (a) {
         var id = a.id || '';
         if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return;
-        if (a.closest('#luliy-hero-capsule, #luliy-drawer, #luliy-hero-more-menu')) return;
+        if (a.closest('#luliy-hero-capsule, #luliy-drawer')) return;
         if (a.classList && (a.classList.contains('luliy-hero-cap-link') || a.classList.contains('circle'))) return;
         var href = a.getAttribute('href') || '';
         if (!href || href.charAt(0) === '#') return;
@@ -1599,7 +1519,7 @@
          本身始终在 DOM 里，且其内容已被证明渲染正确（截图里桌面 hero
          能正常显示这些链接），是最可靠的最后一层数据源。 */
       if (!items.length) {
-        var capLinks = document.querySelectorAll('#luliy-hero-capsule .luliy-hero-cap-link, #luliy-hero-more-menu .luliy-hero-cap-link');
+        var capLinks = document.querySelectorAll('#luliy-hero-capsule .luliy-hero-cap-link');
         if (capLinks.length) {
           items = Array.prototype.map.call(capLinks, function (a) {
             var svg = a.querySelector('svg');
@@ -1745,9 +1665,6 @@
         closeDrawer();
         /* 切回 hero：把设置面板还给右下角浮动工具条 */
         if (root._luliyRestorePanelToFloat) root._luliyRestorePanelToFloat();
-        /* ★ 双保险：切到 hero 时显式重算胶囊溢出（ResizeObserver 之外的
-           兼容兜底；display:none→block 后尺寸才是真实的，必须重测） */
-        if (root._luliyReflowCapsule) setTimeout(root._luliyReflowCapsule, 30);
       }
       if (playSfx) playSfx('click');
     };
