@@ -576,8 +576,15 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
   width: 100%;
   min-width: 0;
-  overflow: hidden;
+  /* ★ 修复 More 下拉被裁剪：改用 overflow-x:clip（不产生滚动容器）
+     + overflow-y:visible，水平方向溢出链接由 JS reflowCapsule 移入 More，
+     竖直方向允许下拉菜单超出容器显示。 */
+  overflow-x: clip;
+  overflow-y: visible;
 }
+/* 旧浏览器（不支持 overflow-x:clip）降级为 hidden；dropdown 仍会被裁剪但不影响基本功能 */
+@supports not (overflow-x: clip) {
+  #luliy-hero-capsule { overflow: hidden; }
 [data-color-mode="dark"] #luliy-hero-capsule {
   background: rgba(255,255,255,0.06);
   border-color: rgba(255,255,255,0.10);
@@ -590,7 +597,10 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
   background: transparent !important;
   font-size: 13px; font-weight: 600;
   font-family: 'Noto Sans SC', sans-serif;
-  white-space: nowrap; flex: 1; justify-content: center;
+  /* ★ 修复 reflowCapsule 永不触发：flex:1 让链接平均分配空间（只收缩不溢出），
+     overflow 永远为 0，More 永远不出现。改为 flex:0 0 auto 使链接保持自然宽度，
+     多了才会真正溢出，reflowCapsule 才能正确检测。 */
+  white-space: nowrap; flex: 0 0 auto; justify-content: flex-start;
   transition: background 0.15s, color 0.15s, transform 0.15s;
 }
 [data-color-mode="dark"] .luliy-hero-cap-link { color: var(--th-hero-fg, rgba(245,242,255,0.92)) !important; }
@@ -602,6 +612,12 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 [data-color-mode="dark"] .luliy-hero-cap-link:hover { color: #fff !important; }
 .luliy-hero-cap-link svg { width: 17px; height: 17px; }
 .luliy-hero-cap-txt { text-transform: capitalize; }
+
+/* ── 图标优先模式（空间紧张时先隐藏文字标签来腾位，最后才进 More）── */
+#luliy-hero-capsule.luliy-capsule-icon-only .luliy-hero-cap-txt { display: none !important; }
+#luliy-hero-capsule.luliy-capsule-icon-only .luliy-hero-cap-link { padding: 7px 9px !important; gap: 0 !important; }
+/* More 菜单里的链接始终显示完整文字，不受图标优先影响 */
+#luliy-hero-more-menu .luliy-hero-cap-txt { display: inline !important; }
 .luliy-hero-cap-sep {
   width: 1px; height: 18px; flex-shrink: 0;
   background: var(--th-hero-divider, rgba(0,0,0,0.1));
@@ -3482,7 +3498,7 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
 .lhm-arrow { font-size: 10px; transition: transform 0.22s; }
 #luliy-hero-more.is-open .lhm-arrow { transform: rotate(180deg); }
 #luliy-hero-more-menu {
-  position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 9600;
   min-width: 160px; padding: 6px;
   display: none; flex-direction: column; gap: 2px;
   background: rgba(18,14,32,0.96);
@@ -3502,3 +3518,87 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
 [data-color-mode="light"] #luliy-hero-more-menu .luliy-hero-cap-link { color: rgba(40,30,60,0.85) !important; }
 #luliy-hero-more-menu .luliy-hero-cap-link:hover { background: var(--th-accent-soft, rgba(130,80,223,0.18)); }
 #luliy-hero-more-menu .luliy-hero-cap-link svg { width: 16px; height: 16px; }
+
+/* ══════════════════════════════════════════════════════════
+   38  手机端 hero 导航：横滑链接条  ★新增
+   当手机用户切到 hero 模式时，胶囊改为可横滑的链接条；
+   不使用 More 按钮，所有链接始终可见（滑动访问）。
+   ≤768px 生效；桌面端（>768px）不受影响。
+══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* 胶囊改成横滑条：允许 x 轴滚动，隐藏滚动条 */
+  body.luliy-nav-hero #luliy-hero-capsule {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    scroll-behavior: smooth;
+    scrollbar-width: none;         /* Firefox */
+    -ms-overflow-style: none;      /* IE/Edge */
+    flex-wrap: nowrap !important;
+    padding: 5px 6px !important;
+  }
+  body.luliy-nav-hero #luliy-hero-capsule::-webkit-scrollbar { display: none; }
+
+  /* 链接不收缩，保持自然宽度，放到滑动条里 */
+  body.luliy-nav-hero .luliy-hero-cap-link {
+    flex-shrink: 0 !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+  }
+
+  /* 手机端不需要 More 按钮 */
+  body.luliy-nav-hero #luliy-hero-more { display: none !important; }
+
+  /* 不触发图标优先模式（手机端用滑动代替） */
+  body.luliy-nav-hero #luliy-hero-capsule.luliy-capsule-icon-only .luliy-hero-cap-txt {
+    display: inline !important;
+  }
+  body.luliy-nav-hero #luliy-hero-capsule.luliy-capsule-icon-only .luliy-hero-cap-link {
+    padding: 6px 10px !important;
+    gap: 7px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   39  手机端 hero 导航栏布局优化（防止元素重叠）★新增
+   ≤768px 且 body.luliy-nav-hero 时，重新排布 nav 网格：
+   将三列布局压缩为两行，左区收缩，副标题隐藏，胶囊全宽横滑。
+══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  body.luliy-nav-hero #luliy-nav-rebuilt {
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+      "left  right"
+      "capsule capsule" !important;
+    gap: 8px 10px !important;
+    padding: 10px 14px 8px !important;
+    border-radius: 16px !important;
+  }
+
+  /* 副标题（切换按钮）在手机 hero 模式下隐藏，避免挤压左右区 */
+  body.luliy-nav-hero #luliy-hero-subtitle {
+    display: none !important;
+  }
+
+  /* 时间块在手机上缩小字号，避免左区溢出 */
+  body.luliy-nav-hero #luliy-hero-time { font-size: 13px !important; }
+  body.luliy-nav-hero #luliy-hero-date { font-size: 11px !important; }
+  body.luliy-nav-hero #luliy-hero-timeblock { gap: 1px !important; }
+
+  /* 左区：压缩间距 */
+  body.luliy-nav-hero #luliy-hero-left { gap: 8px !important; }
+
+  /* 博客名：限制最大宽度，长名字省略 */
+  body.luliy-nav-hero #luliy-nav-blogname {
+    max-width: 28vw !important;
+    font-size: 16px !important;
+  }
+
+  /* 头像稍缩小 */
+  body.luliy-nav-hero #luliy-nav-avatar {
+    width: 30px !important; height: 30px !important;
+  }
+
+  /* 右区（toolbar pill）不溢出 */
+  body.luliy-nav-hero #luliy-hero-right { min-width: 36px !important; }
+}

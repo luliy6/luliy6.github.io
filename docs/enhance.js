@@ -993,16 +993,18 @@
       shell.appendChild(rightZone);
       header.insertBefore(shell, header.firstChild);
 
-      /* ★ 自动溢出检测：一行放不下的胶囊链接收进 More 下拉（参考 GitHub）。
-         做法：测每个链接的右边缘，超出 capsule 可用宽度的移进 moreMenu。
-         capsule 宽度变化(窗口缩放/字体)时重算。 */
+      /* ★ 自动溢出检测（三阶段）：
+         Phase 1 全文字模式 → Phase 2 图标优先（隐藏文字标签）→ Phase 3 图标+More
+         手机端（≤768px）：恢复全部链接后直接返回，由 CSS 横滑处理。 */
       function reflowCapsule() {
         if (!capsule.isConnected) return;
-        /* 先全部移回 capsule（moreBtn 之前），复位后再测 */
+
+        /* ── 先全部移回 capsule（moreBtn 之前），清除图标优先，复位后再测 ── */
         var menuLinks = Array.prototype.slice.call(moreMenu.children);
         menuLinks.forEach(function (el) { capsule.insertBefore(el, moreWrap); });
         moreWrap.style.display = 'none';
         moreWrap.classList.remove('is-open');
+        capsule.classList.remove('luliy-capsule-icon-only');
 
         /* ★ 只取 capsule 的「直接子」链接（排除 moreMenu 内的，避免重复计数 bug） */
         function directLinks() {
@@ -1018,25 +1020,49 @@
         if (!links.length) return;
 
         var capRect = capsule.getBoundingClientRect();
-        var avail = capRect.width - 84;   /* 预留 More 按钮宽度 */
-        var last = links[links.length - 1];
-        if (last.getBoundingClientRect().right - capRect.left <= capRect.width) {
-          return;   /* 没溢出，无需 More */
+        if (!capRect.width) return;   /* 尚未渲染（display:none 状态） */
+
+        /* ── 手机端（≤768px）：CSS 横滑条接管，无需 More ── */
+        if (window.innerWidth <= 768) return;
+
+        /* ══ Phase 1：全文字模式，检查是否放得下 ══ */
+        var lastLink = links[links.length - 1];
+        var lastRight = lastLink.getBoundingClientRect().right;
+        if (lastRight <= capRect.right + 1) return;   /* 全部放得下，完成 */
+
+        /* ══ Phase 2：图标优先（隐藏文字标签），看图标能否放下所有链接 ══ */
+        capsule.classList.add('luliy-capsule-icon-only');
+        void capsule.offsetWidth;   /* 强制重排，取到真实的图标宽度 */
+        var links2 = directLinks();
+        if (links2.length) {
+          var lastRight2 = links2[links2.length - 1].getBoundingClientRect().right;
+          if (lastRight2 <= capRect.right + 1) return;   /* 图标模式放得下，完成 */
         }
-        var overflowed = [];
-        for (var i = links.length - 1; i >= 0; i--) {
-          var r = links[i].getBoundingClientRect();
-          if (r.right - capRect.left > avail) {
-            overflowed.unshift(links[i]);
-          } else break;
+
+        /* ══ Phase 3：图标模式仍然放不下 → 显示 More，移入溢出链接 ══ */
+        moreWrap.style.display = '';
+        void capsule.offsetWidth;   /* 重排，让 moreWrap 的位置稳定 */
+
+        var moreLeft = moreWrap.getBoundingClientRect().left;
+        var overflow = [];
+        var linksNow = directLinks();
+        for (var i = linksNow.length - 1; i >= 0; i--) {
+          var r = linksNow[i].getBoundingClientRect();
+          if (r.right > moreLeft - 2) {
+            overflow.unshift(linksNow[i]);
+          } else {
+            break;
+          }
         }
-        if (!overflowed.length) overflowed.unshift(links[links.length - 1]);
-        overflowed.forEach(function (el) {
+        /* 若测量没有溢出但 More 已显示，至少保证移一个进去（避免 More 空菜单） */
+        if (!overflow.length && linksNow.length) {
+          overflow.unshift(linksNow[linksNow.length - 1]);
+        }
+        overflow.forEach(function (el) {
           var prev = el.previousElementSibling;
           if (prev && prev.classList.contains('luliy-hero-cap-sep')) prev.style.display = 'none';
           moreMenu.appendChild(el);
         });
-        if (moreMenu.children.length) moreWrap.style.display = '';
       }
       root._luliyReflowCapsule = reflowCapsule;
       /* 初次 + 字体/图片加载后重算 */
