@@ -560,7 +560,14 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
 #luliy-hero-capsule {
   grid-area: capsule;
   display: flex; align-items: center;
-  justify-content: center;
+  /* ★ bug修复：原 justify-content:center + overflow-x:auto 组合是经典
+     CSS 陷阱——内容溢出时居中会让左侧溢出量变成「负向 scrollLeft」，
+     浏览器无法滚到那里，造成左侧文字永久裁切不可见（如"Favorites"
+     显示成"rites"），右侧也只能看到居中窗口内的一段。
+     现在改用 flex-start + overflow:hidden：溢出的链接交给 JS 的
+     reflowCapsule() 移进 More 菜单，capsule 本身不再需要、也不再
+     允许滚动，避免这个陷阱重现。 */
+  justify-content: flex-start;
   gap: 0;
   padding: 6px 8px;
   border-radius: 14px;
@@ -568,10 +575,9 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
   border: 1px solid var(--th-hero-border, rgba(255,255,255,0.5));
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
   width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
+  min-width: 0;
+  overflow: hidden;
 }
-#luliy-hero-capsule::-webkit-scrollbar { display: none; }
 [data-color-mode="dark"] #luliy-hero-capsule {
   background: rgba(255,255,255,0.06);
   border-color: rgba(255,255,255,0.10);
@@ -3409,8 +3415,8 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
 /* 中间副标题(切换按钮)允许收缩，不挤压两侧 */
 #luliy-hero-subtitle { min-width: 0; }
 
-/* 链接胶囊：本就整行、可横向滚动，确保不被裁掉、滚动条隐藏 */
-#luliy-hero-capsule { min-width: 0; max-width: 100%; overflow-x: auto; }
+/* 链接胶囊：min-width:0 + overflow:hidden 已在基础规则定义，
+   溢出由 JS reflowCapsule() 移进 More 菜单处理，这里不再重复/冲突设置 overflow-x:auto */
 
 /* 右区(设置pill)不收缩、始终可见 */
 #luliy-hero-right { flex-shrink: 0; }
