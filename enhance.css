@@ -564,9 +564,9 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
      CSS 陷阱——内容溢出时居中会让左侧溢出量变成「负向 scrollLeft」，
      浏览器无法滚到那里，造成左侧文字永久裁切不可见（如"Favorites"
      显示成"rites"），右侧也只能看到居中窗口内的一段。
-     现在改用 flex-start + overflow:hidden：溢出的链接交给 JS 的
-     reflowCapsule() 移进 More 菜单，capsule 本身不再需要、也不再
-     允许滚动，避免这个陷阱重现。 */
+     现在改用 flex-start + overflow:hidden + 纯CSS响应式降级（窄屏只显
+     示图标，见 section 38），不再用 JS 测量溢出，没有滚动、没有
+     "测量时机不对"的问题，这个陷阱不会再出现。 */
   justify-content: flex-start;
   gap: 0;
   padding: 6px 8px;
@@ -3416,7 +3416,7 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
 #luliy-hero-subtitle { min-width: 0; }
 
 /* 链接胶囊：min-width:0 + overflow:hidden 已在基础规则定义，
-   溢出由 JS reflowCapsule() 移进 More 菜单处理，这里不再重复/冲突设置 overflow-x:auto */
+   窄屏降级为纯图标见 section 38，不再有 JS 测量/滚动相关的设置 */
 
 /* 右区(设置pill)不收缩、始终可见 */
 #luliy-hero-right { flex-shrink: 0; }
@@ -3431,7 +3431,7 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   37  抽屉快捷链接平铺 + 顶部日夜按钮 + 隐藏重复主题 + hero More 下拉  ★
+   37  抽屉快捷链接平铺 + 顶部日夜按钮 + 隐藏重复主题  ★
 ══════════════════════════════════════════════════════════ */
 
 /* ── 抽屉顶部：切换按钮 + 日夜按钮 并排 ── */
@@ -3466,39 +3466,22 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
 /* 风格主题区前的分隔线也一并隐藏（紧邻的 hr） */
 #luliy-ctrl-panel.in-drawer .luliy-ctrl-theme-preview { display: none !important; }
 
-/* ══ hero More 下拉（桌面端链接溢出时）══ */
-#luliy-hero-more { position: relative; display: inline-flex; align-items: center; flex-shrink: 0; }
-#luliy-hero-more-btn {
-  display: inline-flex; align-items: center; gap: 3px;
-  padding: 5px 12px; border-radius: 16px; cursor: pointer;
-  background: var(--th-accent-soft, rgba(130,80,223,0.14));
-  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.22));
-  color: var(--th-hero-fg, #2a2440);
-  font-size: 13px; font-weight: 600; font-family: 'Noto Sans SC', sans-serif;
-  white-space: nowrap; transition: background 0.15s, transform 0.12s;
+/* ══════════════════════════════════════════════════════════
+   38  hero 链接胶囊响应式降级（替代已删除的 More 下拉）  ★
+   逻辑：More 机制依赖 JS 测量元素宽度来决定收纳，但测量时机很容易
+   出错（隐藏态测量为 0、resize 不覆盖所有触发场景等），上一版就因
+   此出现过显示异常。改用纯 CSS 方案后没有这些问题：
+   - 空间还够时，图标+文字都显示
+   - 视口变窄、capsule 撑不下全部链接文字时，文字自动隐藏，只留图标
+   - 纯 CSS 渐进降级，没有"测量时机"这个概念，不存在出错的时间窗口
+   断点选择：每个链接图标+间距约 36px，文字额外占 50~70px，
+   1024px 临界是经验值——可按实际链接数量调整。 ══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .luliy-hero-cap-link .luliy-hero-cap-txt { display: none; }
+  .luliy-hero-cap-link { padding: 7px 9px; }   /* 纯图标时缩小左右留白，更紧凑 */
 }
-[data-color-mode="dark"] #luliy-hero-more-btn { color: rgba(245,242,255,0.92); }
-#luliy-hero-more-btn:hover { background: var(--th-accent, #8250df); color: #fff; }
-.lhm-arrow { font-size: 10px; transition: transform 0.22s; }
-#luliy-hero-more.is-open .lhm-arrow { transform: rotate(180deg); }
-#luliy-hero-more-menu {
-  position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
-  min-width: 160px; padding: 6px;
-  display: none; flex-direction: column; gap: 2px;
-  background: rgba(18,14,32,0.96);
-  -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
-  border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
-  box-shadow: 0 10px 34px rgba(0,0,0,0.4);
+/* 更窄时（逼近抽屉切换的临界区）进一步收紧分隔符间距，挤出更多空间 */
+@media (max-width: 860px) {
+  .luliy-hero-cap-sep { margin: 0 2px; }
+  #luliy-hero-capsule { gap: 0; padding: 6px 6px; }
 }
-[data-color-mode="light"] #luliy-hero-more-menu { background: rgba(250,248,254,0.97); border-color: rgba(0,0,0,0.08); }
-#luliy-hero-more.is-open #luliy-hero-more-menu { display: flex; }
-/* More 菜单里的链接（原胶囊链接移入后竖排） */
-#luliy-hero-more-menu .luliy-hero-cap-link {
-  display: flex !important; align-items: center; gap: 8px;
-  padding: 8px 12px; border-radius: 8px; white-space: nowrap;
-  color: rgba(255,255,255,0.85) !important; text-decoration: none;
-  transition: background 0.15s;
-}
-[data-color-mode="light"] #luliy-hero-more-menu .luliy-hero-cap-link { color: rgba(40,30,60,0.85) !important; }
-#luliy-hero-more-menu .luliy-hero-cap-link:hover { background: var(--th-accent-soft, rgba(130,80,223,0.18)); }
-#luliy-hero-more-menu .luliy-hero-cap-link svg { width: 16px; height: 16px; }
