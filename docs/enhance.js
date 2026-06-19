@@ -47,6 +47,30 @@
     heroTitle: 'Luliy',
     heroSubtitle: '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65',
     heroHint: '\u4e0b\u6ed1\u8fdb\u5165 \u2193',
+    /* Small corner badge on the Hero, like a game site's "Pre-order on ..." tag. Set to '' to hide. */
+    heroBadge: '\u6b22\u8fce\u6765\u5230 Luliy \u7684\u535a\u5ba2',
+
+    /* Spotlight cards — shown right under the Hero, side by side.
+       Modelled after Rockstar's "Only in Leonida" / "Media & Artwork" cards.
+       Add/remove items freely; 2 items = side-by-side, 1 item = full width. */
+    spotlightCards: [
+      {
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/Luliy.jpg',
+        tag: '\u5173\u4e8e',
+        title: '\u5173\u4e8e\u6211',
+        desc: '\u4e86\u89e3\u535a\u4e3b\u7684\u6545\u4e8b\u4e0e\u6298\u817e\u8bb0\u5f55\u3002',
+        linkText: '\u67e5\u770b\u8be6\u60c5',
+        href: 'about.html'
+      },
+      {
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg',
+        tag: '\u5f71\u50cf',
+        title: '\u76f8\u518c / Gallery',
+        desc: '\u8bb0\u5f55\u751f\u6d3b\u4e0e\u8bbe\u8ba1\u7075\u611f\u7684\u753b\u9762\u3002',
+        linkText: '\u67e5\u770b\u5168\u90e8',
+        href: 'gallery.html'
+      }
+    ],
 
     /* APlayer mini player (top-left, all pages, autoplay, default folded) */
     aplayer: {
@@ -473,6 +497,14 @@
     hero.appendChild(inner);
     hero.appendChild(hint);
 
+    /* Corner badge — e.g. "Pre-order on June 25" style tag, top-left of the Hero */
+    if (LULIY_OPTS.heroBadge) {
+      var badge = document.createElement('div');
+      badge.id = 'luliy-hero-badge';
+      badge.textContent = LULIY_OPTS.heroBadge;
+      hero.appendChild(badge);
+    }
+
     /* Insert hero as the very first thing in the page flow */
     if (document.body.firstChild) document.body.insertBefore(hero, document.body.firstChild);
     else document.body.appendChild(hero);
@@ -517,6 +549,60 @@
       inner.style.opacity = String(1 - p * 1.4);
       hint.style.opacity = String(1 - p * 2);
     });
+  }
+
+  /* ---- 00b  Hero spotlight cards (Rockstar-style dual cards) ---- */
+  function initHeroSpotlight() {
+    /* Only on the homepage, only once, only if there's something to show */
+    if (!isIndexPage()) return;
+    if (document.getElementById('luliy-spotlight')) return;
+    var items = LULIY_OPTS.spotlightCards;
+    if (!items || !items.length) return;
+
+    var wrap = document.createElement('section');
+    wrap.id = 'luliy-spotlight';
+
+    items.forEach(function (it) {
+      var card = document.createElement('a');
+      card.className = 'luliy-spot-card';
+      card.href = it.href || '#';
+      card.style.backgroundImage =
+        'linear-gradient(to top, rgba(8,6,16,0.82) 10%, rgba(8,6,16,0.15) 55%, rgba(8,6,16,0.05)), url("' +
+        it.image + '")';
+
+      var tag = document.createElement('span');
+      tag.className = 'luliy-spot-tag';
+      tag.textContent = it.tag || '';
+
+      var title = document.createElement('h3');
+      title.className = 'luliy-spot-title';
+      title.textContent = it.title || '';
+
+      var desc = document.createElement('p');
+      desc.className = 'luliy-spot-desc';
+      desc.textContent = it.desc || '';
+
+      var link = document.createElement('span');
+      link.className = 'luliy-spot-link';
+      link.textContent = (it.linkText || '\u67e5\u770b\u66f4\u591a') + '  \u2192';
+
+      card.appendChild(tag);
+      card.appendChild(title);
+      card.appendChild(desc);
+      card.appendChild(link);
+      wrap.appendChild(card);
+    });
+
+    /* Insert right after the Hero (if present) or right before #content */
+    var hero = document.getElementById('luliy-hero');
+    var content = document.getElementById('content');
+    if (hero && hero.parentNode) {
+      hero.parentNode.insertBefore(wrap, hero.nextSibling);
+    } else if (content && content.parentNode) {
+      content.parentNode.insertBefore(wrap, content);
+    } else {
+      document.body.appendChild(wrap);
+    }
   }
 
   /* ---- 01  localStorage init ------------------------------ */
@@ -4414,6 +4500,7 @@
       document.body.classList.toggle('luliy-nav-drawer', _m === 'drawer');
     } catch (e) {}
     safe(initHomeHero,        'homeHero');
+    safe(initHeroSpotlight,   'heroSpotlight');
     safe(initAPlayer,         'aplayer');
     safe(initProgressBar,     'progressBar');
     safe(initDynamicTitle,    'dynamicTitle');
