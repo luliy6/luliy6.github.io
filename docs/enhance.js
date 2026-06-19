@@ -42,35 +42,52 @@
     ],
     galleryText: '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65',
 
-    /* Homepage full-screen Hero (scroll down to enter). */
-    heroImage: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/SunFragment17_8k.webp',
-    heroTitle: 'Luliy',
-    heroSubtitle: '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65',
-    heroHint: '\u4e0b\u6ed1\u8fdb\u5165 \u2193',
-    /* Small corner badge on the Hero, like a game site's "Pre-order on ..." tag. Set to '' to hide. */
-    heroBadge: '\u6b22\u8fce\u6765\u5230 Luliy \u7684\u535a\u5ba2',
+    /* ★ Site identity */
+    siteName: '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2',   /* ΔιάΝους — shown top-left, in drawer, etc. */
 
-    /* Spotlight cards — shown right under the Hero, side by side.
-       Modelled after Rockstar's "Only in Leonida" / "Media & Artwork" cards.
-       Add/remove items freely; 2 items = side-by-side, 1 item = full width. */
-    spotlightCards: [
+    /* ★ Global background image (whole site) */
+    siteBackground: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9999.png',
+
+    /* ★ Loading splash image (shown briefly while the site loads) */
+    splashImage: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/l.png',
+    splashMaxMs: 1500,   /* auto-dismiss after this many ms no matter what */
+
+    /* Homepage full-screen Hero (scroll down to enter). No text now —
+       just the welcome image + a scroll-down hint. */
+    heroImage: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/wel.png',
+    heroTitle: '',
+    heroSubtitle: '',
+    heroHint: '\u2193',
+    heroBadge: '',
+
+    /* ★ Homepage category cards (Rockstar "Only in Leonida" style, 3 across).
+       Each links to tag.html#<label> which shows only that category's posts.
+       label MUST match the GitHub issue label name exactly. */
+    categoryCards: [
       {
-        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/Luliy.jpg',
-        tag: '\u5173\u4e8e',
-        title: '\u5173\u4e8e\u6211',
-        desc: '\u4e86\u89e3\u535a\u4e3b\u7684\u6545\u4e8b\u4e0e\u6298\u817e\u8bb0\u5f55\u3002',
-        linkText: '\u67e5\u770b\u8be6\u60c5',
-        href: 'about.html'
+        label: 'Study',
+        title: 'STUDY',
+        kicker: '\u5b66\u4e60',          /* 学习 */
+        desc: '\u77e5\u8bc6\u3001\u7b14\u8bb0\u4e0e\u6280\u672f\u63a2\u7d22\u3002',  /* 知识、笔记与技术探索。 */
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/study.png'
       },
       {
-        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9.jpg',
-        tag: '\u5f71\u50cf',
-        title: '\u76f8\u518c / Gallery',
-        desc: '\u8bb0\u5f55\u751f\u6d3b\u4e0e\u8bbe\u8ba1\u7075\u611f\u7684\u753b\u9762\u3002',
-        linkText: '\u67e5\u770b\u5168\u90e8',
-        href: 'gallery.html'
+        label: 'Journal',
+        title: 'JOURNAL',
+        kicker: '\u65e5\u5fd7',          /* 日志 */
+        desc: '\u751f\u6d3b\u3001\u8bb0\u5f55\u4e0e\u70b9\u6ef4\u3002',          /* 生活、记录与点滴。 */
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/Journal.png'
+      },
+      {
+        label: 'Musings',
+        title: 'MUSINGS',
+        kicker: '\u968f\u7b14',          /* 随笔 */
+        desc: '\u601d\u8003\u3001\u611f\u609f\u4e0e\u5076\u5f97\u3002',            /* 思考、感悟与偶得。 */
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/Musings.png'
       }
     ],
+    /* "more" button under the cards → archive page */
+    categoryMoreHref: 'archive.html',
 
     /* APlayer mini player (top-left, all pages, autoplay, default folded) */
     aplayer: {
@@ -551,57 +568,76 @@
     });
   }
 
-  /* ---- 00b  Hero spotlight cards (Rockstar-style dual cards) ---- */
-  function initHeroSpotlight() {
+  /* ---- 00b  Homepage category cards (Rockstar-style, 3 across) ----
+     Three big cards (Study / Journal / Musings). Each links to
+     tag.html#<label>, which we restyle into a 3-column grid showing only
+     that category's posts. A "more →" button under them goes to archive. */
+  function initCategoryCards() {
     /* Only on the homepage, only once, only if there's something to show */
     if (!isIndexPage()) return;
-    if (document.getElementById('luliy-spotlight')) return;
-    var items = LULIY_OPTS.spotlightCards;
+    if (document.getElementById('luliy-cats')) return;
+    var items = LULIY_OPTS.categoryCards;
     if (!items || !items.length) return;
 
-    var wrap = document.createElement('section');
-    wrap.id = 'luliy-spotlight';
+    var section = document.createElement('section');
+    section.id = 'luliy-cats-wrap';
+
+    var grid = document.createElement('div');
+    grid.id = 'luliy-cats';
 
     items.forEach(function (it) {
       var card = document.createElement('a');
-      card.className = 'luliy-spot-card';
-      card.href = it.href || '#';
+      card.className = 'luliy-cat-card';
+      /* tag.html uses #<label> to filter; encode in case of spaces */
+      card.href = 'tag.html#' + encodeURIComponent(it.label || '');
       card.style.backgroundImage =
-        'linear-gradient(to top, rgba(8,6,16,0.82) 10%, rgba(8,6,16,0.15) 55%, rgba(8,6,16,0.05)), url("' +
+        'linear-gradient(to top, rgba(6,5,16,0.88) 8%, rgba(6,5,16,0.30) 50%, rgba(6,5,16,0.10) 100%), url("' +
         it.image + '")';
 
-      var tag = document.createElement('span');
-      tag.className = 'luliy-spot-tag';
-      tag.textContent = it.tag || '';
+      var kicker = document.createElement('span');
+      kicker.className = 'luliy-cat-kicker';
+      kicker.textContent = it.kicker || '';
 
       var title = document.createElement('h3');
-      title.className = 'luliy-spot-title';
-      title.textContent = it.title || '';
+      title.className = 'luliy-cat-title';
+      title.textContent = it.title || it.label || '';
 
       var desc = document.createElement('p');
-      desc.className = 'luliy-spot-desc';
+      desc.className = 'luliy-cat-desc';
       desc.textContent = it.desc || '';
 
       var link = document.createElement('span');
-      link.className = 'luliy-spot-link';
-      link.textContent = (it.linkText || '\u67e5\u770b\u66f4\u591a') + '  \u2192';
+      link.className = 'luliy-cat-link';
+      link.textContent = '\u8fdb\u5165 \u2192';   /* 进入 → */
 
-      card.appendChild(tag);
+      card.appendChild(kicker);
       card.appendChild(title);
       card.appendChild(desc);
       card.appendChild(link);
-      wrap.appendChild(card);
+      grid.appendChild(card);
     });
+
+    section.appendChild(grid);
+
+    /* "more →" button, bottom-right, → archive */
+    var moreRow = document.createElement('div');
+    moreRow.id = 'luliy-cats-more-row';
+    var more = document.createElement('a');
+    more.id = 'luliy-cats-more';
+    more.href = LULIY_OPTS.categoryMoreHref || 'archive.html';
+    more.innerHTML = 'more <span aria-hidden="true">\u2192</span>';
+    moreRow.appendChild(more);
+    section.appendChild(moreRow);
 
     /* Insert right after the Hero (if present) or right before #content */
     var hero = document.getElementById('luliy-hero');
     var content = document.getElementById('content');
     if (hero && hero.parentNode) {
-      hero.parentNode.insertBefore(wrap, hero.nextSibling);
+      hero.parentNode.insertBefore(section, hero.nextSibling);
     } else if (content && content.parentNode) {
-      content.parentNode.insertBefore(wrap, content);
+      content.parentNode.insertBefore(section, content);
     } else {
-      document.body.appendChild(wrap);
+      document.body.appendChild(section);
     }
   }
 
@@ -1391,6 +1427,10 @@
   ];
 
   function applySink(id) {
+    /* ★ 大改后：全站锁定「太空 space」主题，忽略传入 id。
+       （主题选择器入口已隐藏，此处兜底确保任何调用都回到 space。
+       日后恢复多主题：删掉下面这行即可。） */
+    id = 'space';
     var s = null;
     SINKS.forEach(function (x) { if (x.id === id) s = x; });
     if (!s) s = SINKS[0];
@@ -1424,11 +1464,16 @@
   ════════════════════════════════════════════════════════ */
   var NAV_MODE_KEY = 'luliy-nav-mode';   /* 'hero' | 'drawer' */
 
-  /* 当前生效的导航模式：用户存过则用存的；否则按宽度给默认值 */
+  /* 当前生效的导航模式。
+     ★ 大改后：全站锁定「抽屉导航」，不再提供顶部 hero 导航。
+     （切换逻辑代码保留，但 getNavMode 恒定返回 'drawer'，
+     这样顶部导航那一套永远不会显示，又不破坏原有结构。
+     若日后想恢复双模式，把下面这行删掉、解开注释即可。） */
   function getNavMode() {
-    var saved = localStorage.getItem(NAV_MODE_KEY);
+    return 'drawer';
+    /* var saved = localStorage.getItem(NAV_MODE_KEY);
     if (saved === 'hero' || saved === 'drawer') return saved;
-    return (window.innerWidth <= 768) ? 'drawer' : 'hero';
+    return (window.innerWidth <= 768) ? 'drawer' : 'hero'; */
   }
 
   /* 应用导航模式：切换 body class，由 CSS 控制 hero / ☰ 的显隐 */
@@ -1460,9 +1505,10 @@
     var head = document.createElement('div');
     head.id = 'luliy-drawer-head';
     var avatarSrc = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/Luliy.jpg';
+    var _brandName = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
     head.innerHTML =
       '<a class="ldh-avatar" href="/about" aria-label="\u5173\u4e8e"><img src="' + avatarSrc + '" alt="avatar"></a>' +
-      '<a class="ldh-name" href="/">Luliy</a>' +
+      '<a class="ldh-name" href="/">' + esc(_brandName) + '</a>' +
       '<div class="ldh-accent"></div>' +
       '<div class="ldh-time"><span class="ldh-clock">' +
         '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.4"/><path d="M8 4.4V8l2.6 1.6" stroke-linecap="round"/></svg>' +
@@ -1643,8 +1689,12 @@
     }
     root._luliyFillDrawerQuick = fillQuick;
 
-    /* —— 分区②：主题（6 个）—— */
+    /* —— 分区②：主题（6 个）——
+       ★ 大改后：全站锁定太空主题，主题选择入口已无意义，整段隐藏。
+       代码保留（只加一个隐藏 class），日后想恢复多主题：
+       删掉下面这行 secTheme.classList.add('luliy-hidden-feature') 即可。 */
     var secTheme = mkSection('\u4e3b\u9898', false);   /* 主题 */
+    secTheme.classList.add('luliy-hidden-feature');
     drawer.appendChild(secTheme);
     var sinks = root._luliySINKS || [];
     var grid = document.createElement('div');
@@ -1740,6 +1790,17 @@
     document.body.appendChild(backdrop);
     document.body.appendChild(drawer);
     document.body.appendChild(ham);
+
+    /* ★ 左上角博客名 ΔιάΝους（纯文字，点击回主页），固定在汉堡按钮右侧。
+       全站可见，是「化繁为简」后的主要品牌标识。 */
+    if (!document.getElementById('luliy-brand')) {
+      var brand = document.createElement('a');
+      brand.id = 'luliy-brand';
+      brand.href = '/';
+      brand.textContent = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
+      brand.setAttribute('aria-label', brand.textContent + ' \u2014 \u8fd4\u56de\u4e3b\u9875');
+      document.body.appendChild(brand);
+    }
 
     /* ── 双导航模式切换实现 ── */
     root._luliyToggleNavMode = function () {
@@ -3565,13 +3626,26 @@
       var custom = localStorage.getItem('luliy-bg');
       if (custom) return custom;
     } catch (e) {}
-    return 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png';
+    /* ★ 默认用全站背景图（9999.png），与全站统一 */
+    return (LULIY_OPTS && LULIY_OPTS.siteBackground) ||
+           'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9999.png';
   }
+  var FOCUS_OPT_OUT_KEY = 'luliy-focus-optout';
   function toggleFocusMode(force) {
     var on = (typeof force === 'boolean')
       ? force
       : !document.body.classList.contains('luliy-focus-mode');
     document.body.classList.toggle('luliy-focus-mode', on);
+
+    /* ★ 记录用户的手动选择（仅本次浏览有效）：
+       手动退出 → 记 opt-out，本次不再自动进专注；
+       手动开启 → 清 opt-out。
+       注意：文章页首次自动开启时调用的是 toggleFocusMode(true)，
+       这会清除标记，属正常（用户没主动退出，理应保持自动行为）。 */
+    try {
+      if (on) sessionStorage.removeItem(FOCUS_OPT_OUT_KEY);
+      else sessionStorage.setItem(FOCUS_OPT_OUT_KEY, '1');
+    } catch (e) {}
 
     /* Immersive backdrop: a blurred, darkened version of the current
        background photo sits behind the text — like a movie-poster tagline,
@@ -3660,6 +3734,18 @@
       if (sel && sel.toString().length > 0) return;
       toggleFocusMode();
     });
+
+    /* ★ 大改后：打开任意文章页时，默认自动进入专注模式
+       （= 太空主题 + 沉浸背景 + 加宽阅读区）。
+       但若用户在「本次访问」里手动点过「退出专注」，
+       则记一个 sessionStorage 标记（FOCUS_OPT_OUT_KEY，见 toggleFocusMode），
+       这次就不再自动开，避免出现「退出后一刷新又被强制拉回专注」的烦人循环。
+       关闭浏览器标签后标记自动清空，下次打开文章又会默认专注。 */
+    var optedOut = false;
+    try { optedOut = sessionStorage.getItem(FOCUS_OPT_OUT_KEY) === '1'; } catch (e) {}
+    if (!optedOut && !document.body.classList.contains('luliy-focus-mode')) {
+      toggleFocusMode(true);
+    }
   }
   root._luliyToggleFocus = toggleFocusMode;
 
@@ -4464,7 +4550,12 @@
 
   /* Restore theme immediately to prevent FOUC */
   (function () {
-    var savedId = localStorage.getItem('luliy-sink') || 'default';
+    /* ★ 大改后：全站锁定「太空 space」主题。
+       不再读取 localStorage 的已存主题，强制 space。
+       （其他 5 套主题的 CSS 代码都保留，只是入口隐藏、不再被选中；
+       日后想恢复多主题：把下一行改回
+       var savedId = localStorage.getItem('luliy-sink') || 'default';） */
+    var savedId = 'space';
     var themePalettes = {
       'default':   { theme: 'default',   c: ['#8250df', '#0969da', '#ff6b9d', '#f0b429'] },
       'sakura':    { theme: 'sakura',     c: ['#e05c8a', '#f9a8c9', '#c94070', '#ffb7c5'] },
@@ -4486,20 +4577,66 @@
     else document.addEventListener('DOMContentLoaded', applyFouc);
   })();
 
-  /* Restore saved background image immediately (prevent flash) */
+  /* Restore saved background image immediately (prevent flash).
+     ★ 大改后：默认全站背景 = 9999.png（用户没自定义时用它）。 */
   (function () {
     var savedBg = localStorage.getItem('luliy-bg');
-    if (!savedBg) return;
+    var bg = savedBg ||
+      (LULIY_OPTS && LULIY_OPTS.siteBackground) ||
+      'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9999.png';
     function applyBg() {
       if (!document.body) return;
-      document.body.style.setProperty('background-image', 'url("' + savedBg + '")', 'important');
+      document.body.style.setProperty('background-image', 'url("' + bg + '")', 'important');
     }
     if (document.body) applyBg();
     else document.addEventListener('DOMContentLoaded', applyBg);
   })();
 
   /* Welcome splash (before DOM ready, append after body exists) */
-  /* Homepage Hero is initialised inside ready() (needs DOM + helpers) */
+  /* ★ 大改后：网站打开时的加载动画。
+     全屏深色遮罩 + 居中 l.png（带轻微脉动），最多显示 splashMaxMs(默认1.5s)
+     后自动淡出移除；若图片提前加载完也会尽快淡出。
+     只在「首页」显示一次太重，这里做成每次进站都显示但很短，
+     体验类似游戏启动画面。 */
+  (function initSplash() {
+    /* 避免重复、避免在 iframe / 打印时出现 */
+    if (window.top !== window.self) return;
+    var IMG = (LULIY_OPTS && LULIY_OPTS.splashImage) || '';
+    if (!IMG) return;
+    var MAXMS = (LULIY_OPTS && LULIY_OPTS.splashMaxMs) || 1500;
+
+    function build() {
+      if (!document.body) { return setTimeout(build, 10); }
+      if (document.getElementById('luliy-splash')) return;
+
+      var splash = document.createElement('div');
+      splash.id = 'luliy-splash';
+      var img = document.createElement('img');
+      img.id = 'luliy-splash-img';
+      img.src = IMG;
+      img.alt = '';
+      splash.appendChild(img);
+      document.body.appendChild(splash);
+      /* 锁滚动，避免加载时页面在动画底下乱跳 */
+      document.documentElement.style.overflow = 'hidden';
+
+      var done = false;
+      function dismiss() {
+        if (done) return; done = true;
+        splash.classList.add('is-leaving');
+        document.documentElement.style.overflow = '';
+        setTimeout(function () {
+          if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
+        }, 600);   /* 与 CSS 淡出时长一致 */
+      }
+      /* 最长 MAXMS 后无条件消失（核心保险，防止图片慢导致卡住） */
+      setTimeout(dismiss, MAXMS);
+      /* 若图片很快加载完，至少显示 ~500ms 再走，避免一闪而过 */
+      img.addEventListener('load', function () { setTimeout(dismiss, 500); });
+      img.addEventListener('error', dismiss);   /* 图片挂了也别卡住 */
+    }
+    build();
+  })();
 
   /* Sakura petals */
   if (localStorage.getItem('luliy-sakura') !== '0') {
@@ -4516,16 +4653,33 @@
   }
 
   ready(function () {
-    /* ★ 尽早应用导航模式（hero/drawer），避免首屏两套导航同时短暂出现 */
+    /* ★ 大改后：全站锁定「抽屉导航」，首屏直接应用，避免两套导航闪现 */
     try {
-      var _m = (localStorage.getItem('luliy-nav-mode') === 'hero' || localStorage.getItem('luliy-nav-mode') === 'drawer')
-        ? localStorage.getItem('luliy-nav-mode')
-        : (window.innerWidth <= 768 ? 'drawer' : 'hero');
-      document.body.classList.toggle('luliy-nav-hero',   _m === 'hero');
-      document.body.classList.toggle('luliy-nav-drawer', _m === 'drawer');
+      document.body.classList.remove('luliy-nav-hero');
+      document.body.classList.add('luliy-nav-drawer');
     } catch (e) {}
+
+    /* ★ 把 Gmeek 原生 header 里的博客名也改成 ΔιάΝους（保持一致；
+       原生 header 在抽屉模式下被压扁隐藏，但改掉更稳妥） */
+    try {
+      var _bn = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
+      document.querySelectorAll('.blogTitle, .blogTitle a, a.blogTitle').forEach(function (el) {
+        /* 只改纯文字节点，避免动到里头的头像 <img> */
+        if (el.children.length === 0) el.textContent = _bn;
+      });
+    } catch (e) {}
+
+    /* ★ 标记分类页（tag.html）：它有独特的 .tagTitle 元素而首页没有。
+       打了 luliy-tag-page 这个 body 类后，CSS 会把它的文章列表
+       改造成三列网格视图。 */
+    try {
+      if (document.querySelector('.tagTitle') && document.querySelector('nav.SideNav')) {
+        document.body.classList.add('luliy-tag-page');
+      }
+    } catch (e) {}
+
     safe(initHomeHero,        'homeHero');
-    safe(initHeroSpotlight,   'heroSpotlight');
+    safe(initCategoryCards,   'categoryCards');
     safe(initAPlayer,         'aplayer');
     safe(initProgressBar,     'progressBar');
     safe(initDynamicTitle,    'dynamicTitle');
