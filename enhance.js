@@ -45,9 +45,6 @@
     /* ★ Site identity */
     siteName: '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2',   /* ΔιάΝους — shown top-left, in drawer, etc. */
 
-    /* ★ Global background image (whole site) */
-    siteBackground: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9999.png',
-
     /* ★ Loading splash image (shown briefly while the site loads) */
     splashImage: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/l.png',
     splashMaxMs: 1500,   /* auto-dismiss after this many ms no matter what */
@@ -480,38 +477,42 @@
     /* Only on the homepage / index, not on article or single pages */
     if (!isIndexPage()) return;
     if (document.getElementById('luliy-hero')) return;
-
-    /* First visit of this session only — afterwards homepage shows directly */
-    try {
-      if (sessionStorage.getItem('luliy-hero-shown') === '1') return;
-      sessionStorage.setItem('luliy-hero-shown', '1');
-    } catch (e) {}
+    /* ★ 大改后：「常驻」——欢迎页每次进主页都显示，
+       不再只显示一次（删掉了原本的 sessionStorage 限制）。 */
 
     var hero = document.createElement('section');
     hero.id = 'luliy-hero';
-    hero.style.backgroundImage = "linear-gradient(to bottom, rgba(10,6,22,0.10), rgba(10,6,22,0.45)), url('" + LULIY_OPTS.heroImage + "')";
+    /* ★ 去掉深色渐变蒙版，图片纯净显示（不再叠加 linear-gradient 暗角） */
+    hero.style.backgroundImage = "url('" + LULIY_OPTS.heroImage + "')";
+    hero.setAttribute('role', 'button');
+    hero.setAttribute('tabindex', '0');
+    hero.setAttribute('aria-label', '\u8fdb\u5165\u4e3b\u9875');   /* 进入主页 */
 
-    var inner = document.createElement('div');
-    inner.id = 'luliy-hero-inner';
+    /* ★ 不要文章/文字：只有标题/副标题非空时才创建对应元素 */
+    var inner = null;
+    if (LULIY_OPTS.heroTitle || LULIY_OPTS.heroSubtitle) {
+      inner = document.createElement('div');
+      inner.id = 'luliy-hero-inner';
+      if (LULIY_OPTS.heroTitle) {
+        var title = document.createElement('h1');
+        title.id = 'luliy-hero-title';
+        title.textContent = LULIY_OPTS.heroTitle;
+        inner.appendChild(title);
+      }
+      if (LULIY_OPTS.heroSubtitle) {
+        var sub = document.createElement('p');
+        sub.id = 'luliy-hero-intro-sub';
+        sub.textContent = LULIY_OPTS.heroSubtitle;
+        inner.appendChild(sub);
+      }
+      hero.appendChild(inner);
+    }
 
-    var title = document.createElement('h1');
-    title.id = 'luliy-hero-title';
-    title.textContent = LULIY_OPTS.heroTitle || 'Luliy';
-
-    var sub = document.createElement('p');
-    sub.id = 'luliy-hero-intro-sub';
-    sub.textContent = LULIY_OPTS.heroSubtitle || '';
-
-    inner.appendChild(title);
-    inner.appendChild(sub);
-
+    /* 持续呼吸的小提示（不依赖滚动，点哪都能进） */
     var hint = document.createElement('div');
     hint.id = 'luliy-hero-hint';
     hint.textContent = LULIY_OPTS.heroHint || '\u2193';
-    hint.setAttribute('role', 'button');
-    hint.setAttribute('tabindex', '0');
 
-    hero.appendChild(inner);
     hero.appendChild(hint);
 
     /* Corner badge — e.g. "Pre-order on June 25" style tag, top-left of the Hero */
@@ -526,45 +527,21 @@
     if (document.body.firstChild) document.body.insertBefore(hero, document.body.firstChild);
     else document.body.appendChild(hero);
 
-    /* Smooth-scroll to content when hint clicked / Enter pressed */
+    /* ★ 大改后：不再是「滚动渐隐」，而是「点一下（整张图任意位置都可点）
+       直接进入主页」——淡出后从文档流移除，下面的内容自然顶上来填满视口，
+       不做滚动动画，也不监听 scroll 事件。 */
+    var entered = false;
     function enterSite() {
-      var target = document.getElementById('content') ||
-                   document.querySelector('.SideNav') ||
-                   document.getElementById('header');
-      var y = target ? (target.getBoundingClientRect().top + window.scrollY - 60) : window.innerHeight;
-      window.scrollTo({ top: Math.max(y, window.innerHeight * 0.92), behavior: 'smooth' });
+      if (entered) return;
+      entered = true;
+      hero.classList.add('is-leaving');
+      setTimeout(function () {
+        if (hero && hero.parentNode) hero.parentNode.removeChild(hero);
+      }, 550);   /* 与 CSS 淡出时长一致 */
     }
-    hint.addEventListener('click', enterSite);
-    hint.addEventListener('keydown', function (e) {
+    hero.addEventListener('click', enterSite);
+    hero.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSite(); }
-    });
-
-    /* Parallax + fade as user scrolls + hide/show navbar */
-    var _heroHeader = null, _heroHdrInit = false, _heroWasIn = null;
-    onScrollRAF(function () {
-      var st = window.scrollY || 0;
-      var vh = window.innerHeight;
-
-      /* ── Navbar: fully hidden while Hero fills the viewport ── */
-      if (!_heroHeader) _heroHeader = document.getElementById('header');
-      if (_heroHeader) {
-        if (!_heroHdrInit) {            /* set transition exactly once */
-          _heroHeader.style.transition = 'opacity 0.5s ease';
-          _heroHdrInit = true;
-        }
-        var inHero = st < vh * 0.85;
-        if (inHero !== _heroWasIn) {    /* write styles only on state change */
-          _heroHeader.style.opacity = inHero ? '0' : '';
-          _heroHeader.style.pointerEvents = inHero ? 'none' : '';
-          _heroWasIn = inHero;
-        }
-      }
-
-      if (st > vh) return;
-      var p = Math.min(1, st / vh);
-      inner.style.transform = 'translateY(' + (p * 60) + 'px)';
-      inner.style.opacity = String(1 - p * 1.4);
-      hint.style.opacity = String(1 - p * 2);
     });
   }
 
@@ -646,18 +623,11 @@
     var defs = {
       'luliy-sfx':       (('ontouchstart' in window) || window.innerWidth < 768) ? '0' : '1',
       'luliy-sakura':    '1',
-      'luliy-particles': '1',
-      'luliy-sink':      'default',
-      'luliy-bg':        '',
       'luliy-fontsize':  '18',
       'luliy-sans':      '0',
       'luliy-cardview':  'grid',   /* grid | list */
-      'luliy-trail':     '0',      /* mouse trail off by default */
-      'luliy-firefly':   '0',      /* fireflies off by default */
-      'luliy-focus':     '0',      /* focus reading mode */
       'luliy-reduce':    '0',      /* reduce motion override */
-      'luliy-bgblur':    '0',      /* background blur px */
-      'luliy-pbwidth':   '0'       /* postBody width delta px (0 = default) */
+      'luliy-pbwidth':   '400'     /* postBody width delta px (default = 最大) */
     };
     Object.keys(defs).forEach(function (k) {
       if (localStorage.getItem(k) === null) localStorage.setItem(k, defs[k]);
@@ -784,7 +754,8 @@
 
   /* ---- 06  Static background (particles removed) ---------- */
   /* 清理：原 initParticles() 是个从未被任何地方调用的空函数，已删除。
-     静态背景完全由 CSS 负责，动态粒子由 initThemeParticles() 处理。 */
+     动态主题粒子/流星模块（initThemeParticles）也已整体删除，
+     全站背景统一为纯色 #00020c，仅保留樱花花瓣与点击火花两个特效。 */
 
   /* ---- 07  Web Audio SFX ---------------------------------- */
   var _actx = null;
@@ -1313,29 +1284,8 @@
   }
 
 
-  /* ---- Background picker helper -------------------------------- */
-  function showBgPicker() {
-    var cur = localStorage.getItem('luliy-bg') || '';
-    var url = window.prompt(
-      '\u8bf7\u7c98\u8d34\u80cc\u666f\u56fe\u7247\u94fe\u63a5\uff08\u7559\u7a7a\u5219\u6062\u590d\u9ed8\u8ba4\u80cc\u666f\uff09\uff1a',
-      cur
-    );
-    if (url === null) return; // cancelled
-    url = url.trim();
-    if (url === '') {
-      localStorage.removeItem('luliy-bg');
-      document.body.style.setProperty(
-        'background-image',
-        'url("https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png")',
-        'important'
-      );
-    } else {
-      localStorage.setItem('luliy-bg', url);
-      document.body.style.setProperty('background-image', 'url("' + url + '")', 'important');
-    }
-    if (root._luliyApplyBgBlur) root._luliyApplyBgBlur();
-    playSfx('click');
-  }
+  /* ---- Background picker — 已移除（全站改用纯色 #00020c，无背景图功能） */
+  function showBgPicker() { /* no-op: background-image feature removed */ }
 
   /* ---- Reading preferences (font size + font style) -------- */
   function applyReadingPrefs() {
@@ -1351,21 +1301,13 @@
   }
   root._luliyApplyReadingPrefs = applyReadingPrefs;
 
-  /* ---- Background blur + reading-panel width (CSS variables) -- */
-  function _currentBgUrl() {
-    var custom = localStorage.getItem('luliy-bg');
-    if (custom) return custom;
-    return 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png';
-  }
-  function applyBgBlur() {
-    var px = parseInt(localStorage.getItem('luliy-bgblur') || '0', 10) || 0;
-    px = Math.min(20, Math.max(0, px));
-    document.documentElement.style.setProperty('--luliy-bg-blur', px + 'px');
-    document.documentElement.style.setProperty('--luliy-bg-url', 'url("' + _currentBgUrl() + '")');
-    document.body.classList.toggle('luliy-bg-blurred', px > 0);
-  }
+  /* ---- Reading-panel width (CSS variable) --------------------
+     背景图/模糊功能已删除。仅保留阅读宽度控制，默认拉到最大(400)。 */
+  function applyBgBlur() { /* no-op: background blur feature removed */ }
   function applyPbWidth() {
-    var d = parseInt(localStorage.getItem('luliy-pbwidth') || '0', 10) || 0;
+    /* 默认最大宽度 400；用户若手动调过则用其值 */
+    var raw = localStorage.getItem('luliy-pbwidth');
+    var d = (raw === null) ? 400 : (parseInt(raw, 10) || 0);
     d = Math.min(400, Math.max(0, d));   /* 0..400px extra width, each side */
     document.documentElement.style.setProperty('--luliy-pb-extra', d + 'px');
   }
@@ -1375,31 +1317,10 @@
   /* ---- 13  Floating toolbar + unified sink (6 themes) ----- */
 
   /* ── 6 Sinks / Themes ───────────────────────────────────── */
+  /* ★ 大改后：6 套主题精简为只保留「太空旅行」一套。
+     其余 5 套（默认/樱花少女/你的名字/日落黄昏/极简黑白）的配置、
+     CSS 都已删除（不是隐藏，是真删），不再维护多主题系统。 */
   var SINKS = [
-    {
-      id: 'default',
-      label: '\u9ed8\u8ba4',
-      dot:   '#8250df',
-      theme: 'default',
-      cardPalette: ['#8250df', '#0969da', '#ff6b9d', '#f0b429'],
-      desc:  '\u7ecf\u5178\u7d2b\u8c03\uff0c\u5c40\u6f14\u6e05\u6b63'
-    },
-    {
-      id: 'sakura',
-      label: '\u6a31\u82b1\u5c11\u5973',
-      dot:   '#f9a8c9',
-      theme: 'sakura',
-      cardPalette: ['#e05c8a', '#f9a8c9', '#c94070', '#ffb7c5'],
-      desc:  '\u7c89\u5ae9\u6a31\u82b1\uff0c\u5c11\u5973\u5fc3\u601d'
-    },
-    {
-      id: 'your-name',
-      label: '\u4f60\u7684\u540d\u5b57',
-      dot:   '#4a9de0',
-      theme: 'your-name',
-      cardPalette: ['#1a59a4', '#4a9de0', '#f4a738', '#60b8ff'],
-      desc:  '\u5929\u7a7a\u84dd\u8c03\uff0c\u9ec4\u91d1\u5f67\u661f'
-    },
     {
       id: 'space',
       label: '\u592a\u7a7a\u65c5\u884c',
@@ -1407,48 +1328,17 @@
       theme: 'space',
       cardPalette: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'],
       desc:  '\u6df1\u591c\u661f\u6d77\uff0c\u5b87\u5b99\u65c5\u8005'
-    },
-    {
-      id: 'sunset',
-      label: '\u65e5\u843d\u9ec4\u660f',                 /* 日落黄昏 */
-      dot:   '#e8a838',
-      theme: 'sunset',
-      cardPalette: ['#f0b429', '#ffd98a', '#e8821e', '#d9930d'],
-      desc:  '\u91d1\u8272\u4f59\u6656\uff0c\u6696\u9ec4\u9ec4\u660f'  /* 金色余晖，暖黄黄昏 */
-    },
-    {
-      id: 'mono',
-      label: '\u6781\u7b80\u9ed1\u767d',                 /* 极简黑白 */
-      dot:   '#222222',
-      theme: 'mono',
-      cardPalette: ['#222222', '#555555', '#888888', '#bbbbbb'],
-      desc:  '\u53bb\u8272\u7559\u767d\uff0c\u4e13\u6ce8\u9605\u8bfb'  /* 去色留白，专注阅读 */
     }
   ];
 
-  function applySink(id) {
-    /* ★ 大改后：全站锁定「太空 space」主题，忽略传入 id。
-       （主题选择器入口已隐藏，此处兜底确保任何调用都回到 space。
-       日后恢复多主题：删掉下面这行即可。） */
-    id = 'space';
-    var s = null;
-    SINKS.forEach(function (x) { if (x.id === id) s = x; });
-    if (!s) s = SINKS[0];
+  function applySink() {
+    var s = SINKS[0];
     localStorage.setItem('luliy-sink', s.id);
-    document.body.setAttribute('data-luliy-theme', s.theme || 'default');
+    document.body.setAttribute('data-luliy-theme', s.theme);
     document.documentElement.style.setProperty('--card-c1', s.cardPalette[0]);
     document.documentElement.style.setProperty('--card-c2', s.cardPalette[1]);
     document.documentElement.style.setProperty('--card-c3', s.cardPalette[2]);
     document.documentElement.style.setProperty('--card-c4', s.cardPalette[3]);
-    document.querySelectorAll('.luliy-sink-opt').forEach(function (b) {
-      b.classList.toggle('is-active', b.getAttribute('data-sink') === s.id);
-    });
-    /* 同步抽屉里的主题高亮 */
-    document.querySelectorAll('.luliy-drawer-theme-cell').forEach(function (b) {
-      b.classList.toggle('is-active', b.getAttribute('data-sink') === s.id);
-    });
-    /* Restart themed particles with new theme colours */
-    if (root._luliyInitThemeParticles) root._luliyInitThemeParticles();
   }
   /* 暴露给抽屉系统复用 */
   root._luliyApplySink = applySink;
@@ -2116,43 +2006,6 @@
     });
     panel.appendChild(sakuraRow);
 
-    /* Floating particles toggle */
-    var particlesOn  = localStorage.getItem('luliy-particles') !== '0';
-    var particlesRow = mkRow('\u2728', '\u6f02\u6d6e\u7c92\u5b50', particlesOn ? '\u5f00\u542f' : '\u5173\u95ed');  /* ✨ 漂浮粒子 */
-    particlesRow.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var on = localStorage.getItem('luliy-particles') !== '0';
-      localStorage.setItem('luliy-particles', on ? '0' : '1');
-      particlesRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
-      if (root._luliyInitThemeParticles) root._luliyInitThemeParticles();
-      playSfx('click');
-    });
-    panel.appendChild(particlesRow);
-
-    /* BG */
-    panel.appendChild(mkSep());
-    var bgRow = mkRow('\uD83D\uDDBC', '\u80cc\u666f\u56fe\u7247', '\u66F4\u6362');
-    bgRow.addEventListener('click', function (e) {
-      e.stopPropagation();
-      panel.classList.remove('is-open');
-      ctrlBtn.classList.remove('is-open');
-      setTimeout(showBgPicker, 80);
-    });
-    panel.appendChild(bgRow);
-
-    /* Background blur — slider 0..20px */
-    var blurSlider = mkSlider({
-      emoji: '\uD83C\uDF2B\uFE0F', label: '\u80cc\u666f\u6a21\u7cca',   /* 🌫️ 背景模糊 */
-      min: 0, max: 20, step: 1,
-      value: parseInt(localStorage.getItem('luliy-bgblur') || '0', 10) || 0,
-      format: function (v) { return v + 'px'; },
-      onInput: function (v) {
-        localStorage.setItem('luliy-bgblur', String(v));
-        if (root._luliyApplyBgBlur) root._luliyApplyBgBlur();
-      }
-    });
-    panel.appendChild(blurSlider);
-
     /* ── Reading settings (article pages only) ───────────── */
     if (document.getElementById('postBody')) {
       panel.appendChild(mkSep());
@@ -2241,32 +2094,6 @@
     });
     panel.appendChild(cardViewRow);
 
-    /* Mouse trail toggle */
-    var trailRow = mkRow('\u2728', '\u9f20\u6807\u62d6\u5c3e',
-      localStorage.getItem('luliy-trail') === '1' ? '\u5f00\u542f' : '\u5173\u95ed');
-    trailRow.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var on = localStorage.getItem('luliy-trail') === '1';
-      localStorage.setItem('luliy-trail', on ? '0' : '1');
-      trailRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
-      if (!on) initMouseTrail(); else stopMouseTrail();
-      playSfx('click');
-    });
-    panel.appendChild(trailRow);
-
-    /* Fireflies toggle (dark mode) */
-    var fireflyRow = mkRow('\uD83E\uDD9F', '\u8424\u706b\u866b',
-      localStorage.getItem('luliy-firefly') === '1' ? '\u5f00\u542f' : '\u5173\u95ed');
-    fireflyRow.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var on = localStorage.getItem('luliy-firefly') === '1';
-      localStorage.setItem('luliy-firefly', on ? '0' : '1');
-      fireflyRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
-      if (!on) initFireflies(); else stopFireflies();
-      playSfx('click');
-    });
-    panel.appendChild(fireflyRow);
-
     /* Reduce-motion override */
     var reduceRow = mkRow('\uD83C\uDF00', '\u51cf\u5f31\u52a8\u6548',
       localStorage.getItem('luliy-reduce') === '1' ? '\u5f00\u542f' : '\u5173\u95ed');
@@ -2279,20 +2106,6 @@
       playSfx('click');
     });
     panel.appendChild(reduceRow);
-
-    /* Focus reading mode (article pages only) */
-    if (document.getElementById('postBody')) {
-      var focusRow = mkRow('\uD83D\uDCD6', '\u4e13\u6ce8\u9605\u8bfb',
-        document.body.classList.contains('luliy-focus-mode') ? '\u5f00\u542f' : '\u5173\u95ed');
-      focusRow.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var on = toggleFocusMode();
-        focusRow._bdg.textContent = on ? '\u5f00\u542f' : '\u5173\u95ed';
-      });
-      focusRow._badge = focusRow._bdg;
-      root._luliyFocusRow = focusRow;
-      panel.appendChild(focusRow);
-    }
 
     /* Toggle open / close */
     ctrlBtn.addEventListener('click', function (e) {
@@ -2743,160 +2556,10 @@
   }
   root._luliyStopSakura = stopSakura;
 
-  /* ---- 16b  Theme particles + meteors (all themes) -------- */
-  var _particleRAF = null;
-  var _meteorCanvas = null;
+  /* ---- 16b 流星/主题粒子模块已删除 -------------------------
+     只保留樱花花瓣（initSakura）与点击火花（Click burst）两个
+     装饰特效，其余主题的粒子/流星画布全部移除。 */
 
-  /* Per-theme config: { pColor, mColor, pShape, pCount } */
-  var THEME_PARTICLE_CFG = {
-    'default':   { pColor: 'rgba(130,80,223,VAL)',  mColor: '#c3a6ff', pShape: 'star',    pCount: 22 },
-    'sakura':    { pColor: 'rgba(255,160,180,VAL)',  mColor: '#ffb3c6', pShape: 'circle',  pCount: 0 },  /* sakuraPlus handles petals */
-    'your-name': { pColor: 'rgba(255,169,77,VAL)',   mColor: '#ffe066', pShape: 'comet',   pCount: 14 },
-    'space':     { pColor: 'rgba(200,230,255,VAL)',  mColor: '#e0f4ff', pShape: 'circle',  pCount: 30 },
-    'sunset':    { pColor: 'rgba(232,168,56,VAL)',   mColor: '#ffd98a', pShape: 'circle',  pCount: 20 },
-    'mono':      { pColor: 'rgba(180,180,180,VAL)',  mColor: '#e8e8e8', pShape: 'square',  pCount: 16 }
-  };
-
-  /* Hoist hexToRgba outside the animation loop — called once per meteor */
-  function hexToRgba(hex, alpha) {
-    var r = parseInt(hex.slice(1,3),16);
-    var g = parseInt(hex.slice(3,5),16);
-    var b = parseInt(hex.slice(5,7),16);
-    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
-  }
-
-  function initThemeParticles() {
-    stopThemeParticles();
-    if (prefersReduce && prefersReduce()) return;
-    var theme = (document.body && document.body.getAttribute('data-luliy-theme')) || 'default';
-    var cfg = THEME_PARTICLE_CFG[theme] || THEME_PARTICLE_CFG['default'];
-    var canvas = document.createElement('canvas');
-    canvas.id = 'luliy-meteor-canvas';
-    canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:1;';
-    document.body.appendChild(canvas);
-    _meteorCanvas = canvas;
-    var ctx = canvas.getContext('2d');
-    var W, H;
-    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-    resize();
-    window.addEventListener('resize', resize, { passive: true });
-
-    /* Particles — gated by the toggle; right-heavy distribution.
-       Meteors stay on regardless (they're the global "流星" effect). */
-    var particlesEnabled = (localStorage.getItem('luliy-particles') !== '0');
-    var particles = [];
-    var pCount = particlesEnabled ? cfg.pCount : 0;
-    for (var i = 0; i < pCount; i++) {
-      /* Bias x toward the right: sqrt skews random() toward 1 (right side) */
-      var biasX = Math.sqrt(Math.random());   /* 0..1, weighted to 1 */
-      particles.push({
-        x: biasX * (W || 1500),
-        y: Math.random() * (H || 900),
-        r: 2 + Math.random() * 3,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: -0.1 - Math.random() * 0.4,
-        homeBias: biasX,   /* remember its column bias for respawn */
-        life: Math.random()
-      });
-    }
-
-    /* Meteors */
-    var meteors = [];
-    var nextMeteor = Date.now() + 2000 + Math.random() * 3000;
-
-    function spawnMeteor() {
-      meteors.push({
-        x: Math.random() * W + W * 0.2,
-        y: -30,
-        vx: -4 - Math.random() * 5,
-        vy: 3 + Math.random() * 4,
-        len: 80 + Math.random() * 120,
-        life: 1, decay: 0.022 + Math.random() * 0.015
-      });
-    }
-
-    function drawStar(ctx, x, y, r) {
-      var sp = 5, outer = r, inner = r * 0.45;
-      ctx.beginPath();
-      for (var i = 0; i < sp * 2; i++) {
-        var a = (i * Math.PI) / sp - Math.PI / 2;
-        var rr = i % 2 === 0 ? outer : inner;
-        if (i === 0) ctx.moveTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
-        else ctx.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
-      }
-      ctx.closePath(); ctx.fill();
-    }
-
-    function tick() {
-      if (!document.getElementById('luliy-meteor-canvas')) { _particleRAF = null; return; }
-      ctx.clearRect(0, 0, W, H);
-
-      /* Draw particles */
-      particles.forEach(function (p) {
-        p.x += p.vx; p.y += p.vy; p.life += 0.004;
-        if (p.life > 1) p.life = 0;
-        if (p.y < -10) { p.y = H + 10; p.x = Math.sqrt(Math.random()) * W; }
-        if (p.x < -10 || p.x > W + 10) { p.x = Math.sqrt(Math.random()) * W; p.y = Math.random() * H; }
-        var alpha = Math.sin(p.life * Math.PI) * 0.85;
-        if (alpha <= 0) return;
-        ctx.fillStyle = cfg.pColor.replace('VAL', alpha.toFixed(2));
-        if (cfg.pShape === 'star') drawStar(ctx, p.x, p.y, p.r);
-        else if (cfg.pShape === 'square') {
-          ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
-        } else {
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-        }
-      });
-
-      /* Spawn meteors */
-      var now = Date.now();
-      if (now >= nextMeteor) {
-        spawnMeteor();
-        nextMeteor = now + 3000 + Math.random() * 6000;
-      }
-
-      /* Draw meteors */
-      for (var mi = meteors.length - 1; mi >= 0; mi--) {
-        var m = meteors[mi];
-        m.x += m.vx; m.y += m.vy; m.life -= m.decay;
-        if (m.life <= 0 || m.y > H + 40 || m.x < -200) {
-          meteors.splice(mi, 1); continue;
-        }
-        var angle = Math.atan2(m.vy, m.vx);
-        /* 性能优化：尾点坐标只计算一次（原代码重复算了 3 次 cos/sin），
-           并删除了原先「创建后从未使用」的 grad 渐变对象——它在每帧、
-           每颗流星上都会被白白分配一次，是纯粹的死代码。 */
-        var tailX = m.x - Math.cos(angle) * m.len;
-        var tailY = m.y - Math.sin(angle) * m.len;
-        var mHead = hexToRgba(cfg.mColor, m.life);
-        var grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
-        grad.addColorStop(0, mHead);
-        grad.addColorStop(1, hexToRgba(cfg.mColor, 0));
-        ctx.beginPath();
-        ctx.moveTo(m.x, m.y);
-        ctx.lineTo(tailX, tailY);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2.5 * m.life;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, 3 * m.life, 0, Math.PI * 2);
-        ctx.fillStyle = mHead;
-        ctx.fill();
-      }
-      _particleRAF = requestAnimationFrame(tick);
-    }
-    _particleRAF = requestAnimationFrame(tick);
-  }
-
-  function stopThemeParticles() {
-    if (_particleRAF) { cancelAnimationFrame(_particleRAF); _particleRAF = null; }
-    var c = document.getElementById('luliy-meteor-canvas');
-    if (c && c.parentNode) c.parentNode.removeChild(c);
-    _meteorCanvas = null;
-  }
-  root._luliyInitThemeParticles = initThemeParticles;
-  root._luliyStopThemeParticles = stopThemeParticles;
 
 /* ---- 17  ArticleTOC scroll-spy + back-to-top ------------ */
   function initArticleTocSpy() {
@@ -3296,19 +2959,6 @@
     /* Mark body for post-page margin CSS */
     document.body.classList.add('luliy-post-page');
 
-    /* ★ 需求⑤：文章页默认背景模糊 11px
-       仅在用户本次会话没有主动设置过背景模糊时才应用默认值，
-       避免覆盖用户自己调整的偏好（通过控制面板背景按钮调整后存入 localStorage）。 */
-    (function () {
-      var stored = localStorage.getItem('luliy-bg-blur');
-      /* stored 为 null 表示用户从未设置过，应用默认 11px */
-      if (stored === null) {
-        var px = 11;
-        document.documentElement.style.setProperty('--luliy-bg-blur', px + 'px');
-        document.body.classList.toggle('luliy-bg-blurred', px > 0);
-      }
-    })();
-
     var pbody = document.getElementById('postBody');
 
     /* External links → new tab */
@@ -3505,9 +3155,16 @@
 
   /* ---- 22  Index page init -------------------------------- */
   root._luliyInitIndex = function () {
-    initCards();
-    initHeroBanner();
-    initHomeGallery();
+    /* ★ 大改后：主页（首页）只要「Hero + 三张分类卡片」，
+       不再需要旧的文章网格 / "Remember, this is your world." 横幅 /
+       底部画廊横幅 —— 这三个是改版前遗留的旧主页内容。
+       归档页（archive.html）仍然保留它们原本的行为不受影响。 */
+    var onHome = isIndexPage() && !isArchivePage();
+    if (!onHome) {
+      initCards();
+      initHeroBanner();
+      initHomeGallery();
+    }
     setTimeout(initCardViewToggle, 900);
 
     if (isArchivePage()) {
@@ -3620,134 +3277,11 @@
      NEW MODULES (v10)
   ════════════════════════════════════════════════════════ */
 
-  /* ---- Focus reading mode (F key / double-click / exit btn) */
-  function _focusVeilUrl() {
-    try {
-      var custom = localStorage.getItem('luliy-bg');
-      if (custom) return custom;
-    } catch (e) {}
-    /* ★ 默认用全站背景图（9999.png），与全站统一 */
-    return (LULIY_OPTS && LULIY_OPTS.siteBackground) ||
-           'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9999.png';
-  }
-  var FOCUS_OPT_OUT_KEY = 'luliy-focus-optout';
-  function toggleFocusMode(force) {
-    var on = (typeof force === 'boolean')
-      ? force
-      : !document.body.classList.contains('luliy-focus-mode');
-    document.body.classList.toggle('luliy-focus-mode', on);
+  /* ---- 专注阅读模式已删除 ----------------------------------
+     原专注模式的好处（沉浸、宽阅读区、清晰排版）已经变成
+     文章页的默认样式（见 enhance.css），不再需要开关/快捷键/
+     退出按钮这套切换机制，故整段移除。 */
 
-    /* ★ 记录用户的手动选择（仅本次浏览有效）：
-       手动退出 → 记 opt-out，本次不再自动进专注；
-       手动开启 → 清 opt-out。
-       注意：文章页首次自动开启时调用的是 toggleFocusMode(true)，
-       这会清除标记，属正常（用户没主动退出，理应保持自动行为）。 */
-    try {
-      if (on) sessionStorage.removeItem(FOCUS_OPT_OUT_KEY);
-      else sessionStorage.setItem(FOCUS_OPT_OUT_KEY, '1');
-    } catch (e) {}
-
-    /* Immersive backdrop: a blurred, darkened version of the current
-       background photo sits behind the text — like a movie-poster tagline,
-       no white/card panel behind the article. Created fresh each time so
-       it always reflects whichever background image is currently set. */
-    var veil = document.getElementById('luliy-focus-veil');
-    if (on) {
-      if (!veil) {
-        veil = document.createElement('div');
-        veil.id = 'luliy-focus-veil';
-        document.body.appendChild(veil);
-      }
-      veil.style.backgroundImage =
-        'linear-gradient(180deg, rgba(8,6,16,0.55) 0%, rgba(8,6,16,0.78) 60%, rgba(8,6,16,0.92) 100%), url("' +
-        _focusVeilUrl() + '")';
-    } else if (veil) {
-      veil.remove();
-    }
-
-    /* Focus mode = distraction-free: kill all ambient motion (particles,
-       meteors, sakura, fireflies, mouse trail) and hide the music ball.
-       Only the TOC stays. Effects restart when focus mode is exited. */
-    if (on) {
-      try { if (root._luliyStopThemeParticles) root._luliyStopThemeParticles(); } catch (e) {}
-      try { if (root._luliyStopSakura) root._luliyStopSakura(); } catch (e) {}
-      try { if (typeof stopFireflies === 'function') stopFireflies(); } catch (e) {}
-      try { if (typeof stopMouseTrail === 'function') stopMouseTrail(); } catch (e) {}
-    } else {
-      /* Restart ambient effects according to current settings */
-      try { if (root._luliyInitThemeParticles) root._luliyInitThemeParticles(); } catch (e) {}
-      try {
-        if (localStorage.getItem('luliy-sakura') !== '0' && typeof initSakura === 'function') initSakura();
-      } catch (e) {}
-      try {
-        var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark';
-        if (isDark && localStorage.getItem('luliy-firefly') !== '0' && typeof initFireflies === 'function') initFireflies();
-      } catch (e) {}
-      try {
-        if (localStorage.getItem('luliy-trail') !== '0' && typeof initMouseTrail === 'function') initMouseTrail();
-      } catch (e) {}
-    }
-
-    /* Sync the settings-panel badge if present */
-    if (root._luliyFocusRow && root._luliyFocusRow._badge) {
-      root._luliyFocusRow._badge.textContent = on ? '\u5f00\u542f' : '\u5173\u95ed';
-    }
-    /* Show / hide the floating exit button */
-    var exit = document.getElementById('luliy-focus-exit');
-    if (on && !exit) {
-      exit = document.createElement('button');
-      exit.id = 'luliy-focus-exit';
-      exit.type = 'button';
-      exit.innerHTML = '\u2715 \u9000\u51fa\u4e13\u6ce8';   /* ✕ 退出专注 */
-      exit.title = '\u9000\u51fa\u4e13\u6ce8\u6a21\u5f0f (F)';
-      exit.addEventListener('click', function () { toggleFocusMode(false); });
-      document.body.appendChild(exit);
-    } else if (!on && exit) {
-      exit.remove();
-    }
-    try { playSfx('click'); } catch (e) {}
-    return on;
-  }
-
-  function initFocusMode() {
-    if (!document.getElementById('postBody')) return;
-
-    /* F key toggles focus mode (ignore when typing in a field) */
-    document.addEventListener('keydown', function (e) {
-      if (e.key !== 'f' && e.key !== 'F') return;
-      if (e.ctrlKey || e.metaKey || e.altKey) return;   /* Ctrl+F = search */
-      var t = e.target;
-      var tag = t && t.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || (t && t.isContentEditable)) return;
-      e.preventDefault();
-      toggleFocusMode();
-    });
-
-    /* Double-click the article body toggles focus mode
-       (ignore double-clicks on links / code / images / selections) */
-    var pbody = document.getElementById('postBody');
-    pbody.addEventListener('dblclick', function (e) {
-      var t = e.target;
-      if (t.closest('a, code, pre, img, button, table, .luliy-series, mark')) return;
-      /* Don't toggle if the user is selecting text */
-      var sel = window.getSelection && window.getSelection();
-      if (sel && sel.toString().length > 0) return;
-      toggleFocusMode();
-    });
-
-    /* ★ 大改后：打开任意文章页时，默认自动进入专注模式
-       （= 太空主题 + 沉浸背景 + 加宽阅读区）。
-       但若用户在「本次访问」里手动点过「退出专注」，
-       则记一个 sessionStorage 标记（FOCUS_OPT_OUT_KEY，见 toggleFocusMode），
-       这次就不再自动开，避免出现「退出后一刷新又被强制拉回专注」的烦人循环。
-       关闭浏览器标签后标记自动清空，下次打开文章又会默认专注。 */
-    var optedOut = false;
-    try { optedOut = sessionStorage.getItem(FOCUS_OPT_OUT_KEY) === '1'; } catch (e) {}
-    if (!optedOut && !document.body.classList.contains('luliy-focus-mode')) {
-      toggleFocusMode(true);
-    }
-  }
-  root._luliyToggleFocus = toggleFocusMode;
 
   /* ---- Card view (grid / list) ---------------------------- */
   var CARD_VIEWS = ['grid', 'list', 'timeline'];
@@ -3809,7 +3343,6 @@
   }
   function applyReduceMotion() {
     document.body.classList.toggle('luliy-reduce-motion', prefersReduce());
-    if (prefersReduce()) { stopMouseTrail(); stopFireflies(); }
   }
 
   /* ---- 17b  Reading progress ring (merged into back-top) -- */
@@ -4213,122 +3746,9 @@
     }).catch(function () {});
   }
 
-  /* ---- 25a  Mouse trail (theme cursor) -------------------- */
-  var _trailHandler = null, _trailNodes = [];
-  function initMouseTrail() {
-    if (_trailHandler) return;
-    if ('ontouchstart' in window) return;     /* skip touch devices */
-    if (prefersReduce()) return;
-    var theme = document.body.getAttribute('data-luliy-theme') || 'default';
-    var glyph = theme === 'sakura' ? '\uD83C\uDF38'
-      : theme === 'space' ? '\u2727'
-      : theme === 'sunset' ? '\u2600'
-      : theme === 'your-name' ? '\u2601'
-      : '\u2728';
-    var lastT = 0;
-    _trailHandler = function (e) {
-      var now = Date.now();
-      if (now - lastT < 60) return;
-      lastT = now;
-      var s = document.createElement('span');
-      s.className = 'luliy-trail-dot';
-      s.textContent = glyph;
-      /* ★ zoom 校正：fixed 定位需除以 html zoom 才能精确跟手 */
-      var p = zoomPos(e.clientX, e.clientY);
-      s.style.left = p.x + 'px';
-      s.style.top  = p.y + 'px';
-      s.style.setProperty('--rot', (Math.random() * 360) + 'deg');
-      document.body.appendChild(s);
-      _trailNodes.push(s);
-      setTimeout(function () { s.remove(); _trailNodes.shift(); }, 1100);
-    };
-    document.addEventListener('mousemove', _trailHandler, { passive: true });
-  }
-  function stopMouseTrail() {
-    if (_trailHandler) document.removeEventListener('mousemove', _trailHandler);
-    _trailHandler = null;
-    _trailNodes.forEach(function (n) { n.remove(); }); _trailNodes = [];
-  }
+  /* ---- 25a/25b 鼠标拖尾、萤火虫特效已删除 --------------------
+     只保留樱花花瓣与点击火花两个装饰特效。 */
 
-  /* ---- 25b  Fireflies (dark mode, mouse-attracted) -------- */
-  var _ffRAF = null, _ffCanvas = null;
-  function initFireflies() {
-    if (_ffCanvas) return;
-    if (prefersReduce()) return;
-    var canvas = document.createElement('canvas');
-    canvas.id = 'luliy-firefly-canvas';
-    canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2;';
-    document.body.appendChild(canvas);
-    _ffCanvas = canvas;
-    var ctx = canvas.getContext('2d');
-    var W, H;
-    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-    resize();
-    window.addEventListener('resize', resize);
-
-    var mouse = { x: -999, y: -999 };
-    var mm = function (e) { mouse.x = e.clientX; mouse.y = e.clientY; };
-    document.addEventListener('mousemove', mm, { passive: true });
-    canvas._mm = mm;
-
-    var N = Math.min(26, Math.round(window.innerWidth / 50));
-    var flies = [];
-    for (var i = 0; i < N; i++) {
-      flies.push({
-        x: Math.random() * W, y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
-        r: 1.4 + Math.random() * 1.8,
-        ph: Math.random() * Math.PI * 2,
-        ps: 0.02 + Math.random() * 0.03
-      });
-    }
-    function tick() {
-      if (!document.getElementById('luliy-firefly-canvas')) { _ffRAF = null; return; }
-      ctx.clearRect(0, 0, W, H);
-      flies.forEach(function (f) {
-        /* Gentle attraction toward mouse */
-        var dx = mouse.x - f.x, dy = mouse.y - f.y;
-        var dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 220 && dist > 1) {
-          f.vx += (dx / dist) * 0.04;
-          f.vy += (dy / dist) * 0.04;
-        }
-        f.vx += (Math.random() - 0.5) * 0.05;
-        f.vy += (Math.random() - 0.5) * 0.05;
-        f.vx *= 0.94; f.vy *= 0.94;
-        f.x += f.vx; f.y += f.vy;
-        if (f.x < 0) f.x = W; if (f.x > W) f.x = 0;
-        if (f.y < 0) f.y = H; if (f.y > H) f.y = 0;
-        f.ph += f.ps;
-        var glow = 0.45 + Math.sin(f.ph) * 0.4;
-        var grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * 5);
-        grad.addColorStop(0, 'rgba(190,255,150,' + glow + ')');
-        grad.addColorStop(0.4, 'rgba(150,230,120,' + (glow * 0.4) + ')');
-        grad.addColorStop(1, 'rgba(150,230,120,0)');
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(f.x, f.y, f.r * 5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = 'rgba(220,255,180,' + glow + ')';
-        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2); ctx.fill();
-      });
-      _ffRAF = requestAnimationFrame(tick);
-    }
-    tick();
-  }
-  function stopFireflies() {
-    if (_ffCanvas) {
-      if (_ffCanvas._mm) document.removeEventListener('mousemove', _ffCanvas._mm);
-      _ffCanvas.remove(); _ffCanvas = null;
-    }
-    if (_ffRAF) { cancelAnimationFrame(_ffRAF); _ffRAF = null; }
-  }
-  /* Fireflies only make sense at night; re-evaluate on theme/mode change */
-  function maybeFireflies() {
-    var wantFf = localStorage.getItem('luliy-firefly') === '1';
-    var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark' ||
-      document.body.getAttribute('data-luliy-theme') === 'space';
-    if (wantFf && isDark && !prefersReduce()) initFireflies();
-    else stopFireflies();
-  }
 
   /* ---- 25b  键盘快捷键 ------------------------------------- */
   function initKeyboardShortcuts() {
@@ -4577,20 +3997,9 @@
     else document.addEventListener('DOMContentLoaded', applyFouc);
   })();
 
-  /* Restore saved background image immediately (prevent flash).
-     ★ 大改后：默认全站背景 = 9999.png（用户没自定义时用它）。 */
-  (function () {
-    var savedBg = localStorage.getItem('luliy-bg');
-    var bg = savedBg ||
-      (LULIY_OPTS && LULIY_OPTS.siteBackground) ||
-      'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/9999.png';
-    function applyBg() {
-      if (!document.body) return;
-      document.body.style.setProperty('background-image', 'url("' + bg + '")', 'important');
-    }
-    if (document.body) applyBg();
-    else document.addEventListener('DOMContentLoaded', applyBg);
-  })();
+  /* ★ 背景图功能已全部移除 —— 全站背景统一改为纯色 #00020c，
+     直接写在 enhance.css 的 html,body 规则里，深浅模式自适配，
+     不再需要任何 JS 早期注入/恢复逻辑。 */
 
   /* Welcome splash (before DOM ready, append after body exists) */
   /* ★ 大改后：网站打开时的加载动画。
@@ -4694,28 +4103,13 @@
     safe(initNavTransparency, 'navTransparency');
     safe(initDrawerNav,       'drawerNav');           /* ★ 左滑抽屉导航（全端） */
     safe(initKeyboardShortcuts, 'keyboardShortcuts'); /* ★ 键盘快捷键 / j k g t ←→ */
-    safe(initThemeParticles,  'themeParticles');
     safe(initFavoritesLock,   'favLock');   /* safety net — also called in post init */
 
     /* v10 global features */
     safe(applyReduceMotion,   'reduceMotion');
-    safe(applyBgBlur,         'bgBlur');
     safe(applyPbWidth,        'pbWidth');
-    safe(initFocusMode,       'focusMode');
     safe(initViewTransitions, 'viewTransitions');
     safe(initTagCloud,        'tagCloud');
-    if (localStorage.getItem('luliy-trail') === '1') safe(initMouseTrail, 'mouseTrail');
-    safe(maybeFireflies,      'fireflies');
-
-    /* Re-evaluate fireflies when color mode flips (Gmeek toggles data-color-mode) */
-    (function () {
-      var mo = new MutationObserver(maybeFireflies);
-      try { mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-color-mode'] }); } catch (e) {}
-      if (document.body) {
-        var mo2 = new MutationObserver(maybeFireflies);
-        try { mo2.observe(document.body, { attributes: true, attributeFilter: ['data-luliy-theme'] }); } catch (e) {}
-      }
-    })();
 
     var isPost    = !!document.getElementById('postBody');
     var hasList   = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
