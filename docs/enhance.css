@@ -2991,7 +2991,42 @@ body.luliy-focus-mode.luliy-focus-mode .markdown-body {
   -webkit-backdrop-filter: none !important;
 }
 
-/* Headings — bold, oversized, single accent colour like a movie tagline.
+/* The backdrop in focus mode is always a dark blurred photo, no matter
+   whether the site's light/dark toggle is set to "day". So headings need
+   their bright/light colour palette at all times — this re-uses each
+   theme's own "dark mode" colours (already designed to be readable on a
+   dark background) and forces them on, overriding whatever the current
+   day/night toggle would normally pick. This is what makes headings
+   automatically match the active theme (purple / pink / blue / cyan /
+   orange / mono) instead of always being the same fixed colour. */
+body.luliy-focus-mode[data-luliy-theme="default"],
+body.luliy-focus-mode:not([data-luliy-theme]) {
+  --th-h1: #cba6f7; --th-h2: #b4befe; --th-h3: #cdd6f4; --th-h4: #bac2de;
+  --th-strong: #cba6f7; --th-accent: #cba6f7;
+}
+body.luliy-focus-mode[data-luliy-theme="sakura"] {
+  --th-h1: #f9a8c9; --th-h2: #ffb7c5; --th-h3: #ffc5d0; --th-h4: #ffd5e0;
+  --th-strong: #f9a8c9; --th-accent: #f9a8c9;
+}
+body.luliy-focus-mode[data-luliy-theme="your-name"] {
+  --th-h1: #74c0fc; --th-h2: #a5d8ff; --th-h3: #c0e4ff; --th-h4: #d0ecff;
+  --th-strong: #ffd43b; --th-accent: #74c0fc;
+}
+body.luliy-focus-mode[data-luliy-theme="space"] {
+  --th-h1: #40d8ff; --th-h2: #60e0ff; --th-h3: #80eaff; --th-h4: #80eaff;
+  --th-strong: #00e5ff; --th-accent: #40d8ff;
+}
+body.luliy-focus-mode[data-luliy-theme="sunset"] {
+  --th-h1: #ffce6b; --th-h2: #ffd98a; --th-h3: #ffe2a8; --th-h4: #ffecc4;
+  --th-strong: #ffb347; --th-accent: #ffc14d;
+}
+body.luliy-focus-mode[data-luliy-theme="mono"] {
+  --th-h1: #f0f0f0; --th-h2: #e0e0e0; --th-h3: #cccccc; --th-h4: #bbbbbb;
+  --th-strong: #ffffff; --th-accent: #e8e8e8;
+}
+
+/* Headings — bold, oversized, coloured per the active theme (see block
+   above), like a movie tagline.
    Must also reset background-image / -webkit-text-fill-color: the site's
    gradient-heading effect (28.1, earlier in this file) paints headings
    with transparent fill clipped to a background-image, so without this
@@ -3008,7 +3043,7 @@ body.luliy-focus-mode.luliy-focus-mode #postBody h6 {
   -webkit-text-fill-color: initial !important;
 }
 body.luliy-focus-mode.luliy-focus-mode #postBody h1 {
-  color: #ff6fa3 !important;
+  color: var(--th-h1, #ff6fa3) !important;
   font-weight: 800 !important;
   font-size: clamp(34px, 5vw, 56px) !important;
   letter-spacing: 0.5px;
@@ -3018,7 +3053,7 @@ body.luliy-focus-mode.luliy-focus-mode #postBody h1 {
   text-shadow: 0 2px 24px rgba(0,0,0,0.5);
 }
 body.luliy-focus-mode.luliy-focus-mode #postBody h2 {
-  color: #ffa8c6 !important;
+  color: var(--th-h2, #ffa8c6) !important;
   font-weight: 700 !important;
   border-left: none !important;
   background: none !important;
@@ -3029,12 +3064,12 @@ body.luliy-focus-mode.luliy-focus-mode #postBody h3,
 body.luliy-focus-mode.luliy-focus-mode #postBody h4,
 body.luliy-focus-mode.luliy-focus-mode #postBody h5,
 body.luliy-focus-mode.luliy-focus-mode #postBody h6 {
-  color: #ffc89a !important;
+  color: var(--th-h3, #ffc89a) !important;
   text-shadow: 0 2px 14px rgba(0,0,0,0.5);
 }
 
-/* Body copy — warm, light, gradient-tinted text that reads clearly
-   over the dark blurred photo, no matter the active theme. */
+/* Body copy — warm, light text that reads clearly over the dark blurred
+   photo. Kept neutral on purpose (not theme-tinted) for readability. */
 body.luliy-focus-mode.luliy-focus-mode #postBody,
 body.luliy-focus-mode.luliy-focus-mode #postBody p,
 body.luliy-focus-mode.luliy-focus-mode #postBody li,
@@ -3045,45 +3080,52 @@ body.luliy-focus-mode.luliy-focus-mode #postBody figcaption {
   color: #ffd9c2 !important;
   text-shadow: 0 2px 16px rgba(0,0,0,0.55);
 }
-body.luliy-focus-mode.luliy-focus-mode #postBody strong { color: #ffb37a !important; }
-body.luliy-focus-mode.luliy-focus-mode #postBody a { color: #ffe1b3 !important; text-decoration: underline; text-decoration-color: rgba(255,225,179,0.5); }
+body.luliy-focus-mode.luliy-focus-mode #postBody strong { color: var(--th-strong, #ffb37a) !important; }
+body.luliy-focus-mode.luliy-focus-mode #postBody a { color: var(--th-accent, #ffe1b3) !important; text-decoration: underline; text-decoration-color: rgba(255,225,179,0.5); }
 body.luliy-focus-mode.luliy-focus-mode #postBody a:hover { color: #fff !important; }
 body.luliy-focus-mode.luliy-focus-mode #postBody code {
   color: #ffd9c2 !important;
   background: rgba(0,0,0,0.4) !important;
 }
 body.luliy-focus-mode.luliy-focus-mode #postBody blockquote {
-  border-left: 4px solid rgba(255,180,200,0.6);
+  border-left: 4px solid var(--th-accent, rgba(255,180,200,0.6));
   background: rgba(0,0,0,0.32) !important;
   color: #ffe7d6 !important;
 }
 body.luliy-focus-mode.luliy-focus-mode #postBody hr { background: rgba(255,255,255,0.18); }
 
 /* Tables — always rendered in the dark glass style in focus mode,
-   regardless of the site's current light/dark toggle or colour theme. */
+   regardless of the site's current light/dark toggle or colour theme.
+   Every cell level (table / tr / td / th) gets its own explicit
+   background so nothing can "show through" from the normal light-mode
+   table styling underneath — that was the cause of the alternating
+   white/dark rows bug. */
 body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody table {
-  background:
-    linear-gradient(rgba(255,180,200,0.07), rgba(255,180,200,0.07)),
-    rgba(14,10,22,0.78) !important;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,180,200,0.16) !important;
+  background: rgba(14,10,22,0.86) !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.10) !important;
 }
 body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody thead tr {
-  background: linear-gradient(90deg, rgba(255,180,200,0.20), rgba(255,180,200,0.04)) !important;
+  background: linear-gradient(90deg, var(--th-accent-hover, rgba(255,180,200,0.22)), rgba(20,14,28,0.92)) !important;
 }
 body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody th {
-  color: #ffc4dc !important;
-  background: rgba(24,14,24,0.92) !important;
-  border-bottom-color: rgba(255,180,200,0.28) !important;
+  color: var(--th-accent, #ffc4dc) !important;
+  background: rgba(20,14,28,0.92) !important;
+  border-bottom-color: rgba(255,255,255,0.20) !important;
 }
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody td {
-  color: #ffe7d6 !important;
-  border-bottom-color: rgba(255,180,200,0.12) !important;
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody tr {
+  background: rgba(14,10,22,0.86) !important;
 }
 body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody tr:nth-child(even) {
-  background: rgba(255,180,200,0.05) !important;
+  background: rgba(255,255,255,0.045) !important;
 }
 body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody tr:hover {
-  background: rgba(255,180,200,0.12) !important;
+  background: var(--th-accent-soft, rgba(255,180,200,0.14)) !important;
+}
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody td,
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody th {
+  color: #ffe7d6 !important;
+  background: transparent !important;
+  border-bottom-color: rgba(255,255,255,0.10) !important;
 }
 
 body.luliy-reduce-motion #luliy-focus-veil { animation: none !important; }
