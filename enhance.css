@@ -254,6 +254,104 @@ body.luliy-reduce-motion #luliy-hero-hint { transform: translateX(-50%) !importa
 body.luliy-reduce-motion #luliy-hero-hint { animation: none; }
 /* On article / single pages there is no hero, so this never applies. */
 
+/* ── Hero corner badge (Rockstar "Pre-order on ..." style tag) ── */
+#luliy-hero-badge {
+  position: absolute;
+  top: 28px; left: 28px;
+  z-index: 3;
+  padding: 7px 16px;
+  font-size: 13px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0,0,0,0.38);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+  animation: luliyHeroIn 1.2s cubic-bezier(.2,.7,.3,1) 0.15s both;
+}
+@media (max-width: 600px) {
+  #luliy-hero-badge { top: 16px; left: 16px; font-size: 12px; padding: 6px 12px; }
+}
+body.luliy-reduce-motion #luliy-hero-badge { animation: none !important; opacity: 1 !important; }
+
+/* ══════════════════════════════════════════════════════════
+   02b  Hero spotlight cards (Rockstar "Only in Leonida" style)
+══════════════════════════════════════════════════════════ */
+#luliy-spotlight {
+  width: 100vw;
+  max-width: none !important;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  background: #0b0712;
+  margin-bottom: 24px;
+}
+.luliy-spot-card {
+  position: relative;
+  flex: 1 1 320px;
+  min-width: 280px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px;
+  background-size: cover;
+  background-position: center;
+  text-decoration: none !important;
+  overflow: hidden;
+  isolation: isolate;
+  transition: filter 0.35s ease;
+}
+.luliy-spot-card:hover { filter: brightness(1.12); }
+.luliy-spot-card:hover .luliy-spot-title { transform: translateY(-2px); }
+.luliy-spot-tag {
+  align-self: flex-start;
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
+.luliy-spot-title {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+  transition: transform 0.3s ease;
+}
+.luliy-spot-desc {
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.82);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.55);
+  max-width: 36em;
+}
+.luliy-spot-link {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.6);
+  padding-bottom: 2px;
+  width: fit-content;
+}
+@media (max-width: 600px) {
+  .luliy-spot-card { height: 280px; padding: 20px; }
+  .luliy-spot-title { font-size: 21px; }
+  .luliy-spot-desc { font-size: 13px; }
+}
+body.luliy-reduce-motion .luliy-spot-card { transition: none; }
+
 /* ══════════════════════════════════════════════════════════
    03  Background image — fixed, full viewport
 ══════════════════════════════════════════════════════════ */
