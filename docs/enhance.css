@@ -65,7 +65,6 @@
   --th-strong:     #8250df;
 
   /* 合并自原第二个 :root 块（消除重复声明） */
-  --luliy-bg-blur: 0px;
   --luliy-pb-extra: 0px;
 }
 
@@ -175,7 +174,12 @@ body.luliy-post-page #postBody {
   overflow: hidden;
   z-index: 1;
   margin-bottom: 8px;
+  /* ★ 大改后：整张图都可点击进入主页，不再依赖滚动 */
+  cursor: pointer;
+  transition: opacity 0.55s ease;
 }
+/* 点击后的淡出（JS 加 is-leaving，淡出完再从 DOM 移除） */
+#luliy-hero.is-leaving { opacity: 0; pointer-events: none; }
 #luliy-hero-inner {
   position: relative;
   z-index: 2;
@@ -555,35 +559,15 @@ body.luliy-tag-page .listLabels {
 body.luliy-reduce-motion body.luliy-tag-page .SideNav-item { transition: none; }
 
 /* ══════════════════════════════════════════════════════════
-   03  Background image — fixed, full viewport
+   03  Background — 纯色 #00020c（深浅模式通用，无背景图功能）
 ══════════════════════════════════════════════════════════ */
-/* 注：--luliy-bg-blur / --luliy-pb-extra 已合并到顶部主 :root 块 */
-body {
-  background-image: url('https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-attachment: fixed !important;
-  background-repeat: no-repeat !important;
-  background-color: transparent !important;
+html, body {
+  background: #00020c !important;
+  background-image: none !important;
 }
-/* Blur overlay: a fixed pseudo-layer that blurs the page background
-   without blurring the content (content sits above it). */
-body.luliy-bg-blurred::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image: var(--luliy-bg-url, none);
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  filter: blur(var(--luliy-bg-blur, 0px));
-  transform: scale(1.08);   /* hide blurred edges */
-  pointer-events: none;
-}
-body.luliy-bg-blurred {
-  background-image: none !important;   /* hand off to the ::before layer */
+[data-color-mode="light"] html,
+[data-color-mode="light"] body {
+  background: #00020c !important;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2792,36 +2776,8 @@ body.luliy-tl-infinite a[href*="?page="] {
   }
 }
 
-/* ── Focus-mode floating exit button ──────────────────────── */
-#luliy-focus-exit {
-  position: fixed; top: 20px; right: 20px;
-  z-index: 100001;
-  padding: 9px 18px; border-radius: 30px;
-  background: var(--th-accent, #8250df); color: #fff;
-  border: none; cursor: pointer;
-  font-size: 13px; font-weight: 700; letter-spacing: 1px;
-  font-family: 'Noto Sans SC', sans-serif;
-  box-shadow: 0 6px 22px rgba(0,0,0,0.30);
-  opacity: 0; transform: translateY(-12px);
-  animation: luliyFocusExitIn 0.4s cubic-bezier(.2,.7,.3,1) 0.1s forwards;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-#luliy-focus-exit:hover { transform: translateY(-2px); box-shadow: 0 9px 28px rgba(0,0,0,0.4); }
-@keyframes luliyFocusExitIn {
-  to { opacity: 1; transform: translateY(0); }
-}
-/* Subtle hint that double-click / F exits, shown briefly on entering focus mode */
-body.luliy-focus-mode::after {
-  content: 'F 或双击退出专注模式';
-  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-  background: rgba(0,0,0,0.66); color: #fff;
-  padding: 8px 18px; border-radius: 24px; font-size: 12px; letter-spacing: 1px;
-  z-index: 100001; pointer-events: none;
-  animation: luliyFocusHint 3.2s ease forwards;
-}
-@keyframes luliyFocusHint {
-  0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; }
-}
+/* focus-exit 按钮、退出提示已删除（专注模式整体移除） */
+
 
 /* ── 28.4 Card skeleton ───────────────────────────────────── */
 .luliy-card-skeleton {
@@ -3118,219 +3074,8 @@ mark.luliy-search-hit.is-current {
   100% { opacity: 0; transform: translate(-50%, 20px) rotate(var(--rot, 0deg)) scale(0.4); }
 }
 
-/* ── 28.12 Focus reading mode ─────────────────────────────── */
-body.luliy-focus-mode #header,
-body.luliy-focus-mode #luliy-toolbar,
-body.luliy-focus-mode #luliy-sakura-canvas,
-body.luliy-focus-mode #luliy-firefly-canvas,
-body.luliy-focus-mode #luliy-meteor-canvas,
-body.luliy-focus-mode #luliy-aplayer,
-body.luliy-focus-mode #luliy-search-fab,
-body.luliy-focus-mode #luliy-progress-bar,
-body.luliy-focus-mode .luliy-prevnext {
-  opacity: 0 !important; pointer-events: none !important;
-}
-/* Hard-hide canvases + music ball so no residual motion/sound UI shows */
-body.luliy-focus-mode #luliy-meteor-canvas,
-body.luliy-focus-mode #luliy-sakura-canvas,
-body.luliy-focus-mode #luliy-firefly-canvas,
-body.luliy-focus-mode #luliy-aplayer,
-body.luliy-focus-mode .luliy-trail-dot {
-  display: none !important;
-}
-/* Focus mode KEEPS the TOC (fab + panel) and back-to-top */
-body.luliy-focus-mode #luliy-toc-fab.is-visible,
-body.luliy-focus-mode #luliy-back-top.is-visible {
-  opacity: 1 !important; pointer-events: all !important;
-}
-body.luliy-focus-mode #luliy-toc-panel.is-open {
-  opacity: 1 !important; pointer-events: auto !important;
-}
-body.luliy-focus-mode #postBody {
-  /* Escape the narrow parent using viewport units. +300px wider than
-     whatever the normal reading-width setting currently is. */
-  width: min(calc(720px + var(--luliy-pb-extra, 0px) * 2 + 300px), calc(100vw - 48px)) !important;
-  max-width: none !important;
-  margin: 0 auto !important;
-  /* Use margin:auto + explicit negative margins to centre without transform
-     (avoids compositing conflict with backdrop-filter parents in some browsers) */
-  position: relative !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  transform-origin: top center !important;  /* Safari fix */
-  will-change: transform !important;
-}
+/* 专注模式整段样式已删除（好处已并入文章默认样式，见上方 04/21 区块） */
 
-/* ── 28.12b Focus mode — cinematic backdrop (Rockstar "Vice City, USA." look) ──
-   A fixed, blurred, darkened photo sits behind the article instead of any
-   card/panel background — text floats directly over it.
-   NOTE: every selector below repeats .luliy-focus-mode 2-3× on purpose.
-   This is a CSS-specificity trick (each repeat counts again toward
-   specificity) needed to beat the theme system's own
-   `[data-color-mode="dark"] body[data-luliy-theme="..."] #postBody …`
-   rules, which are otherwise more specific than a single class. */
-#luliy-focus-veil {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(18px);
-  transform: scale(1.1);   /* hide blurred edges */
-  pointer-events: none;
-  animation: luliyHeroBgIn 0.6s ease both;
-}
-
-/* No card / panel behind the text — the veil shows straight through,
-   regardless of which colour theme / light-dark mode is active. */
-body.luliy-focus-mode.luliy-focus-mode #postBody,
-body.luliy-focus-mode.luliy-focus-mode .markdown-body {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* The backdrop in focus mode is always a dark blurred photo, no matter
-   whether the site's light/dark toggle is set to "day". So headings need
-   their bright/light colour palette at all times — this re-uses each
-   theme's own "dark mode" colours (already designed to be readable on a
-   dark background) and forces them on, overriding whatever the current
-   day/night toggle would normally pick. This is what makes headings
-   automatically match the active theme (purple / pink / blue / cyan /
-   orange / mono) instead of always being the same fixed colour. */
-body.luliy-focus-mode[data-luliy-theme="default"],
-body.luliy-focus-mode:not([data-luliy-theme]) {
-  --th-h1: #cba6f7; --th-h2: #b4befe; --th-h3: #cdd6f4; --th-h4: #bac2de;
-  --th-strong: #cba6f7; --th-accent: #cba6f7;
-}
-body.luliy-focus-mode[data-luliy-theme="sakura"] {
-  --th-h1: #f9a8c9; --th-h2: #ffb7c5; --th-h3: #ffc5d0; --th-h4: #ffd5e0;
-  --th-strong: #f9a8c9; --th-accent: #f9a8c9;
-}
-body.luliy-focus-mode[data-luliy-theme="your-name"] {
-  --th-h1: #74c0fc; --th-h2: #a5d8ff; --th-h3: #c0e4ff; --th-h4: #d0ecff;
-  --th-strong: #ffd43b; --th-accent: #74c0fc;
-}
-body.luliy-focus-mode[data-luliy-theme="space"] {
-  --th-h1: #40d8ff; --th-h2: #60e0ff; --th-h3: #80eaff; --th-h4: #80eaff;
-  --th-strong: #00e5ff; --th-accent: #40d8ff;
-}
-body.luliy-focus-mode[data-luliy-theme="sunset"] {
-  --th-h1: #ffce6b; --th-h2: #ffd98a; --th-h3: #ffe2a8; --th-h4: #ffecc4;
-  --th-strong: #ffb347; --th-accent: #ffc14d;
-}
-body.luliy-focus-mode[data-luliy-theme="mono"] {
-  --th-h1: #f0f0f0; --th-h2: #e0e0e0; --th-h3: #cccccc; --th-h4: #bbbbbb;
-  --th-strong: #ffffff; --th-accent: #e8e8e8;
-}
-
-/* Headings — bold, oversized, coloured per the active theme (see block
-   above), like a movie tagline.
-   Must also reset background-image / -webkit-text-fill-color: the site's
-   gradient-heading effect (28.1, earlier in this file) paints headings
-   with transparent fill clipped to a background-image, so without this
-   reset the heading text is literally invisible in focus mode. */
-body.luliy-focus-mode.luliy-focus-mode #postBody h1,
-body.luliy-focus-mode.luliy-focus-mode #postBody h2,
-body.luliy-focus-mode.luliy-focus-mode #postBody h3,
-body.luliy-focus-mode.luliy-focus-mode #postBody h4,
-body.luliy-focus-mode.luliy-focus-mode #postBody h5,
-body.luliy-focus-mode.luliy-focus-mode #postBody h6 {
-  background-image: none !important;
-  -webkit-background-clip: initial !important;
-  background-clip: initial !important;
-  -webkit-text-fill-color: initial !important;
-}
-body.luliy-focus-mode.luliy-focus-mode #postBody h1 {
-  color: var(--th-h1, #ff6fa3) !important;
-  font-weight: 800 !important;
-  font-size: clamp(34px, 5vw, 56px) !important;
-  letter-spacing: 0.5px;
-  border-bottom: none !important;
-  background: none !important;
-  padding-bottom: 0 !important;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.5);
-}
-body.luliy-focus-mode.luliy-focus-mode #postBody h2 {
-  color: var(--th-h2, #ffa8c6) !important;
-  font-weight: 700 !important;
-  border-left: none !important;
-  background: none !important;
-  padding: 0 !important;
-  text-shadow: 0 2px 18px rgba(0,0,0,0.5);
-}
-body.luliy-focus-mode.luliy-focus-mode #postBody h3,
-body.luliy-focus-mode.luliy-focus-mode #postBody h4,
-body.luliy-focus-mode.luliy-focus-mode #postBody h5,
-body.luliy-focus-mode.luliy-focus-mode #postBody h6 {
-  color: var(--th-h3, #ffc89a) !important;
-  text-shadow: 0 2px 14px rgba(0,0,0,0.5);
-}
-
-/* Body copy — warm, light text that reads clearly over the dark blurred
-   photo. Kept neutral on purpose (not theme-tinted) for readability. */
-body.luliy-focus-mode.luliy-focus-mode #postBody,
-body.luliy-focus-mode.luliy-focus-mode #postBody p,
-body.luliy-focus-mode.luliy-focus-mode #postBody li,
-body.luliy-focus-mode.luliy-focus-mode #postBody td,
-body.luliy-focus-mode.luliy-focus-mode #postBody th,
-body.luliy-focus-mode.luliy-focus-mode #postBody span,
-body.luliy-focus-mode.luliy-focus-mode #postBody figcaption {
-  color: #ffd9c2 !important;
-  text-shadow: 0 2px 16px rgba(0,0,0,0.55);
-}
-body.luliy-focus-mode.luliy-focus-mode #postBody strong { color: var(--th-strong, #ffb37a) !important; }
-body.luliy-focus-mode.luliy-focus-mode #postBody a { color: var(--th-accent, #ffe1b3) !important; text-decoration: underline; text-decoration-color: rgba(255,225,179,0.5); }
-body.luliy-focus-mode.luliy-focus-mode #postBody a:hover { color: #fff !important; }
-body.luliy-focus-mode.luliy-focus-mode #postBody code {
-  color: #ffd9c2 !important;
-  background: rgba(0,0,0,0.4) !important;
-}
-body.luliy-focus-mode.luliy-focus-mode #postBody blockquote {
-  border-left: 4px solid var(--th-accent, rgba(255,180,200,0.6));
-  background: rgba(0,0,0,0.32) !important;
-  color: #ffe7d6 !important;
-}
-body.luliy-focus-mode.luliy-focus-mode #postBody hr { background: rgba(255,255,255,0.18); }
-
-/* Tables — always rendered in the dark glass style in focus mode,
-   regardless of the site's current light/dark toggle or colour theme.
-   Every cell level (table / tr / td / th) gets its own explicit
-   background so nothing can "show through" from the normal light-mode
-   table styling underneath — that was the cause of the alternating
-   white/dark rows bug. */
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody table {
-  background: rgba(14,10,22,0.86) !important;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.10) !important;
-}
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody thead tr {
-  background: linear-gradient(90deg, var(--th-accent-hover, rgba(255,180,200,0.22)), rgba(20,14,28,0.92)) !important;
-}
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody th {
-  color: var(--th-accent, #ffc4dc) !important;
-  background: rgba(20,14,28,0.92) !important;
-  border-bottom-color: rgba(255,255,255,0.20) !important;
-}
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody tr {
-  background: rgba(14,10,22,0.86) !important;
-}
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody tr:nth-child(even) {
-  background: rgba(255,255,255,0.045) !important;
-}
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody tr:hover {
-  background: var(--th-accent-soft, rgba(255,180,200,0.14)) !important;
-}
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody td,
-body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody th {
-  color: #ffe7d6 !important;
-  background: transparent !important;
-  border-bottom-color: rgba(255,255,255,0.10) !important;
-}
-
-body.luliy-reduce-motion #luliy-focus-veil { animation: none !important; }
 
 /* ── 28.13 Reduce motion ──────────────────────────────────── */
 body.luliy-reduce-motion #luliy-sakura-canvas,
@@ -3532,7 +3277,6 @@ body.luliy-reduce-motion * {
      大面积重绘 / 滚动卡顿）。显式设为 scroll 既修复 iOS 表现，也消除
      移动端滚动时的重绘开销。 */
   body { background-attachment: scroll !important; }
-  body.luliy-bg-blurred::before { background-attachment: scroll !important; }
 
   /* (2) 降低毛玻璃模糊半径。
      手机 GPU/合成器对 backdrop-filter 极敏感，首页一屏多张 blur(24px)
