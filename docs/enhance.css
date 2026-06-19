@@ -2945,8 +2945,9 @@ body.luliy-focus-mode #luliy-toc-panel.is-open {
   opacity: 1 !important; pointer-events: auto !important;
 }
 body.luliy-focus-mode #postBody {
-  /* Escape the narrow parent using viewport units */
-  width: min(calc(720px + var(--luliy-pb-extra, 0px) * 2), calc(100vw - 48px)) !important;
+  /* Escape the narrow parent using viewport units. +300px wider than
+     whatever the normal reading-width setting currently is. */
+  width: min(calc(720px + var(--luliy-pb-extra, 0px) * 2 + 300px), calc(100vw - 48px)) !important;
   max-width: none !important;
   margin: 0 auto !important;
   /* Use margin:auto + explicit negative margins to centre without transform
@@ -2960,7 +2961,12 @@ body.luliy-focus-mode #postBody {
 
 /* ── 28.12b Focus mode — cinematic backdrop (Rockstar "Vice City, USA." look) ──
    A fixed, blurred, darkened photo sits behind the article instead of any
-   card/panel background — text floats directly over it. */
+   card/panel background — text floats directly over it.
+   NOTE: every selector below repeats .luliy-focus-mode 2-3× on purpose.
+   This is a CSS-specificity trick (each repeat counts again toward
+   specificity) needed to beat the theme system's own
+   `[data-color-mode="dark"] body[data-luliy-theme="..."] #postBody …`
+   rules, which are otherwise more specific than a single class. */
 #luliy-focus-veil {
   position: fixed;
   inset: 0;
@@ -2974,16 +2980,34 @@ body.luliy-focus-mode #postBody {
   animation: luliyHeroBgIn 0.6s ease both;
 }
 
-/* No card / panel behind the text — the veil shows straight through */
-body.luliy-focus-mode #postBody,
-body.luliy-focus-mode .markdown-body {
+/* No card / panel behind the text — the veil shows straight through,
+   regardless of which colour theme / light-dark mode is active. */
+body.luliy-focus-mode.luliy-focus-mode #postBody,
+body.luliy-focus-mode.luliy-focus-mode .markdown-body {
   background: transparent !important;
   box-shadow: none !important;
   border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-/* Headings — bold, oversized, single accent colour like a movie tagline */
-body.luliy-focus-mode #postBody h1 {
+/* Headings — bold, oversized, single accent colour like a movie tagline.
+   Must also reset background-image / -webkit-text-fill-color: the site's
+   gradient-heading effect (28.1, earlier in this file) paints headings
+   with transparent fill clipped to a background-image, so without this
+   reset the heading text is literally invisible in focus mode. */
+body.luliy-focus-mode.luliy-focus-mode #postBody h1,
+body.luliy-focus-mode.luliy-focus-mode #postBody h2,
+body.luliy-focus-mode.luliy-focus-mode #postBody h3,
+body.luliy-focus-mode.luliy-focus-mode #postBody h4,
+body.luliy-focus-mode.luliy-focus-mode #postBody h5,
+body.luliy-focus-mode.luliy-focus-mode #postBody h6 {
+  background-image: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+}
+body.luliy-focus-mode.luliy-focus-mode #postBody h1 {
   color: #ff6fa3 !important;
   font-weight: 800 !important;
   font-size: clamp(34px, 5vw, 56px) !important;
@@ -2993,7 +3017,7 @@ body.luliy-focus-mode #postBody h1 {
   padding-bottom: 0 !important;
   text-shadow: 0 2px 24px rgba(0,0,0,0.5);
 }
-body.luliy-focus-mode #postBody h2 {
+body.luliy-focus-mode.luliy-focus-mode #postBody h2 {
   color: #ffa8c6 !important;
   font-weight: 700 !important;
   border-left: none !important;
@@ -3001,38 +3025,67 @@ body.luliy-focus-mode #postBody h2 {
   padding: 0 !important;
   text-shadow: 0 2px 18px rgba(0,0,0,0.5);
 }
-body.luliy-focus-mode #postBody h3,
-body.luliy-focus-mode #postBody h4,
-body.luliy-focus-mode #postBody h5 {
+body.luliy-focus-mode.luliy-focus-mode #postBody h3,
+body.luliy-focus-mode.luliy-focus-mode #postBody h4,
+body.luliy-focus-mode.luliy-focus-mode #postBody h5,
+body.luliy-focus-mode.luliy-focus-mode #postBody h6 {
   color: #ffc89a !important;
   text-shadow: 0 2px 14px rgba(0,0,0,0.5);
 }
 
 /* Body copy — warm, light, gradient-tinted text that reads clearly
-   over the dark blurred photo */
-body.luliy-focus-mode #postBody,
-body.luliy-focus-mode #postBody p,
-body.luliy-focus-mode #postBody li,
-body.luliy-focus-mode #postBody td,
-body.luliy-focus-mode #postBody th,
-body.luliy-focus-mode #postBody span,
-body.luliy-focus-mode #postBody figcaption {
+   over the dark blurred photo, no matter the active theme. */
+body.luliy-focus-mode.luliy-focus-mode #postBody,
+body.luliy-focus-mode.luliy-focus-mode #postBody p,
+body.luliy-focus-mode.luliy-focus-mode #postBody li,
+body.luliy-focus-mode.luliy-focus-mode #postBody td,
+body.luliy-focus-mode.luliy-focus-mode #postBody th,
+body.luliy-focus-mode.luliy-focus-mode #postBody span,
+body.luliy-focus-mode.luliy-focus-mode #postBody figcaption {
   color: #ffd9c2 !important;
   text-shadow: 0 2px 16px rgba(0,0,0,0.55);
 }
-body.luliy-focus-mode #postBody strong { color: #ffb37a !important; }
-body.luliy-focus-mode #postBody a { color: #ffe1b3 !important; text-decoration: underline; text-decoration-color: rgba(255,225,179,0.5); }
-body.luliy-focus-mode #postBody a:hover { color: #fff !important; }
-body.luliy-focus-mode #postBody code {
+body.luliy-focus-mode.luliy-focus-mode #postBody strong { color: #ffb37a !important; }
+body.luliy-focus-mode.luliy-focus-mode #postBody a { color: #ffe1b3 !important; text-decoration: underline; text-decoration-color: rgba(255,225,179,0.5); }
+body.luliy-focus-mode.luliy-focus-mode #postBody a:hover { color: #fff !important; }
+body.luliy-focus-mode.luliy-focus-mode #postBody code {
   color: #ffd9c2 !important;
   background: rgba(0,0,0,0.4) !important;
 }
-body.luliy-focus-mode #postBody blockquote {
+body.luliy-focus-mode.luliy-focus-mode #postBody blockquote {
   border-left: 4px solid rgba(255,180,200,0.6);
   background: rgba(0,0,0,0.32) !important;
   color: #ffe7d6 !important;
 }
-body.luliy-focus-mode #postBody hr { background: rgba(255,255,255,0.18); }
+body.luliy-focus-mode.luliy-focus-mode #postBody hr { background: rgba(255,255,255,0.18); }
+
+/* Tables — always rendered in the dark glass style in focus mode,
+   regardless of the site's current light/dark toggle or colour theme. */
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody table {
+  background:
+    linear-gradient(rgba(255,180,200,0.07), rgba(255,180,200,0.07)),
+    rgba(14,10,22,0.78) !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,180,200,0.16) !important;
+}
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody thead tr {
+  background: linear-gradient(90deg, rgba(255,180,200,0.20), rgba(255,180,200,0.04)) !important;
+}
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody th {
+  color: #ffc4dc !important;
+  background: rgba(24,14,24,0.92) !important;
+  border-bottom-color: rgba(255,180,200,0.28) !important;
+}
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody td {
+  color: #ffe7d6 !important;
+  border-bottom-color: rgba(255,180,200,0.12) !important;
+}
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody tr:nth-child(even) {
+  background: rgba(255,180,200,0.05) !important;
+}
+body.luliy-focus-mode.luliy-focus-mode.luliy-focus-mode #postBody tbody tr:hover {
+  background: rgba(255,180,200,0.12) !important;
+}
+
 body.luliy-reduce-motion #luliy-focus-veil { animation: none !important; }
 
 /* ── 28.13 Reduce motion ──────────────────────────────────── */
