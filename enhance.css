@@ -2958,6 +2958,83 @@ body.luliy-focus-mode #postBody {
   will-change: transform !important;
 }
 
+/* ── 28.12b Focus mode — cinematic backdrop (Rockstar "Vice City, USA." look) ──
+   A fixed, blurred, darkened photo sits behind the article instead of any
+   card/panel background — text floats directly over it. */
+#luliy-focus-veil {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(18px);
+  transform: scale(1.1);   /* hide blurred edges */
+  pointer-events: none;
+  animation: luliyHeroBgIn 0.6s ease both;
+}
+
+/* No card / panel behind the text — the veil shows straight through */
+body.luliy-focus-mode #postBody,
+body.luliy-focus-mode .markdown-body {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Headings — bold, oversized, single accent colour like a movie tagline */
+body.luliy-focus-mode #postBody h1 {
+  color: #ff6fa3 !important;
+  font-weight: 800 !important;
+  font-size: clamp(34px, 5vw, 56px) !important;
+  letter-spacing: 0.5px;
+  border-bottom: none !important;
+  background: none !important;
+  padding-bottom: 0 !important;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.5);
+}
+body.luliy-focus-mode #postBody h2 {
+  color: #ffa8c6 !important;
+  font-weight: 700 !important;
+  border-left: none !important;
+  background: none !important;
+  padding: 0 !important;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.5);
+}
+body.luliy-focus-mode #postBody h3,
+body.luliy-focus-mode #postBody h4,
+body.luliy-focus-mode #postBody h5 {
+  color: #ffc89a !important;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.5);
+}
+
+/* Body copy — warm, light, gradient-tinted text that reads clearly
+   over the dark blurred photo */
+body.luliy-focus-mode #postBody,
+body.luliy-focus-mode #postBody p,
+body.luliy-focus-mode #postBody li,
+body.luliy-focus-mode #postBody td,
+body.luliy-focus-mode #postBody th,
+body.luliy-focus-mode #postBody span,
+body.luliy-focus-mode #postBody figcaption {
+  color: #ffd9c2 !important;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.55);
+}
+body.luliy-focus-mode #postBody strong { color: #ffb37a !important; }
+body.luliy-focus-mode #postBody a { color: #ffe1b3 !important; text-decoration: underline; text-decoration-color: rgba(255,225,179,0.5); }
+body.luliy-focus-mode #postBody a:hover { color: #fff !important; }
+body.luliy-focus-mode #postBody code {
+  color: #ffd9c2 !important;
+  background: rgba(0,0,0,0.4) !important;
+}
+body.luliy-focus-mode #postBody blockquote {
+  border-left: 4px solid rgba(255,180,200,0.6);
+  background: rgba(0,0,0,0.32) !important;
+  color: #ffe7d6 !important;
+}
+body.luliy-focus-mode #postBody hr { background: rgba(255,255,255,0.18); }
+body.luliy-reduce-motion #luliy-focus-veil { animation: none !important; }
+
 /* ── 28.13 Reduce motion ──────────────────────────────────── */
 body.luliy-reduce-motion #luliy-sakura-canvas,
 body.luliy-reduce-motion #luliy-firefly-canvas { display: none !important; }
