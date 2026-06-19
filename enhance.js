@@ -3560,11 +3560,36 @@
   ════════════════════════════════════════════════════════ */
 
   /* ---- Focus reading mode (F key / double-click / exit btn) */
+  function _focusVeilUrl() {
+    try {
+      var custom = localStorage.getItem('luliy-bg');
+      if (custom) return custom;
+    } catch (e) {}
+    return 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png';
+  }
   function toggleFocusMode(force) {
     var on = (typeof force === 'boolean')
       ? force
       : !document.body.classList.contains('luliy-focus-mode');
     document.body.classList.toggle('luliy-focus-mode', on);
+
+    /* Immersive backdrop: a blurred, darkened version of the current
+       background photo sits behind the text — like a movie-poster tagline,
+       no white/card panel behind the article. Created fresh each time so
+       it always reflects whichever background image is currently set. */
+    var veil = document.getElementById('luliy-focus-veil');
+    if (on) {
+      if (!veil) {
+        veil = document.createElement('div');
+        veil.id = 'luliy-focus-veil';
+        document.body.appendChild(veil);
+      }
+      veil.style.backgroundImage =
+        'linear-gradient(180deg, rgba(8,6,16,0.55) 0%, rgba(8,6,16,0.78) 60%, rgba(8,6,16,0.92) 100%), url("' +
+        _focusVeilUrl() + '")';
+    } else if (veil) {
+      veil.remove();
+    }
 
     /* Focus mode = distraction-free: kill all ambient motion (particles,
        meteors, sakura, fireflies, mouse trail) and hide the music ball.
