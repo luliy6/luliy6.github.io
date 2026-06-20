@@ -46,8 +46,8 @@
     siteName: '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2',   /* ΔιάΝους — shown top-left, in drawer, etc. */
 
     /* ★ Loading splash image (shown briefly while the site loads) */
-    splashImage: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/l.png',
-    splashMaxMs: 1500,   /* auto-dismiss after this many ms no matter what */
+    /* ★ Loading splash：不再用图片，文字内容取自 siteName */
+    splashMaxMs: 1500,   /* 显示这么久后自动淡出 */
 
     /* Homepage full-screen Hero (scroll down to enter). No text now —
        just the welcome image + a scroll-down hint. */
@@ -57,7 +57,7 @@
     heroHint: '\u2193',
     heroBadge: '',
 
-    /* ★ Homepage category cards (Rockstar "Only in Leonida" style, 3 across).
+    /* ★ Homepage category cards — 6 张，2 行 3 列。
        Each links to tag.html#<label> which shows only that category's posts.
        label MUST match the GitHub issue label name exactly. */
     categoryCards: [
@@ -81,6 +81,27 @@
         kicker: '\u968f\u7b14',          /* 随笔 */
         desc: '\u601d\u8003\u3001\u611f\u609f\u4e0e\u5076\u5f97\u3002',            /* 思考、感悟与偶得。 */
         image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/Musings.png'
+      },
+      {
+        label: 'Guidebook',
+        title: 'GUIDEBOOK',
+        kicker: '\u6307\u5357',          /* 指南 */
+        desc: '\u672c\u7ad9\u4f7f\u7528\u4e0e\u914d\u7f6e\u6307\u5357\u3002',      /* 本站使用与配置指南。 */
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/docs/img/Guidebook.png'
+      },
+      {
+        label: 'Library',
+        title: 'LIBRARY',
+        kicker: '\u85cf\u4e66',          /* 藏书 */
+        desc: '\u4e66\u7c4d\u4e0e\u8d44\u6599\u6536\u85cf\u3002',                /* 书籍与资料收藏。 */
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/docs/img/Library.png'
+      },
+      {
+        label: 'AI',
+        title: 'AI',
+        kicker: '\u4eba\u5de5\u667a\u80fd',  /* 人工智能 */
+        desc: '\u6a21\u578b\u3001\u5de5\u5177\u4e0e\u5b9e\u8df5\u8bb0\u5f55\u3002',  /* 模型、工具与实践记录。 */
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/docs/img/AI.png'
       }
     ],
     /* "more" button under the cards → archive page */
@@ -478,7 +499,10 @@
     if (!isIndexPage()) return;
     if (document.getElementById('luliy-hero')) return;
     /* ★ 大改后：「常驻」——欢迎页每次进主页都显示，
-       不再只显示一次（删掉了原本的 sessionStorage 限制）。 */
+       不再只显示一次（删掉了原本的 sessionStorage 限制）。
+       但若网址带 #cats（左上角 ΔιάΝους 点击回主页时用这个），
+       则直接跳过欢迎页，落到六张卡片区。 */
+    if (location.hash === '#cats') { root._luliyHeroSkipped = true; return; }
 
     var hero = document.createElement('section');
     hero.id = 'luliy-hero';
@@ -543,6 +567,7 @@
     hero.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSite(); }
     });
+    root._luliyHeroEnter = enterSite;   /* 供"点击 ΔιάΝους 跳过欢迎页"复用 */
   }
 
   /* ---- 00b  Homepage category cards (Rockstar-style, 3 across) ----
@@ -583,14 +608,9 @@
       desc.className = 'luliy-cat-desc';
       desc.textContent = it.desc || '';
 
-      var link = document.createElement('span');
-      link.className = 'luliy-cat-link';
-      link.textContent = '\u8fdb\u5165 \u2192';   /* 进入 → */
-
       card.appendChild(kicker);
       card.appendChild(title);
       card.appendChild(desc);
-      card.appendChild(link);
       grid.appendChild(card);
     });
 
@@ -1317,13 +1337,24 @@
   /* ---- 13  Floating toolbar + unified sink (6 themes) ----- */
 
   /* ── 6 Sinks / Themes ───────────────────────────────────── */
-  /* ★ 大改后：6 套主题精简为只保留「太空旅行」一套。
-     其余 5 套（默认/樱花少女/你的名字/日落黄昏/极简黑白）的配置、
-     CSS 都已删除（不是隐藏，是真删），不再维护多主题系统。 */
+  /* ★ 大改后：不再是"用户手选一套主题锁死"，而是跟随深浅模式自动切换——
+     白天 = 你的名字（your-name），夜间 = 太空旅行（space）。
+     SINKS 仅保留这两项供抽屉里的"当前主题"展示用，applySink() 本身
+     已不再处理"选择"，而是委托给 applyThemeForColorMode()（见文件末尾）
+     根据当前 data-color-mode 自动决定。其余 4 套主题的 CSS 代码仍保留
+     未删，只是不会再被这套逻辑选中。 */
   var SINKS = [
     {
+      id: 'your-name',
+      label: '\u4f60\u7684\u540d\u5b57\uff08\u767d\u5929\uff09',
+      dot:   '#4a9de0',
+      theme: 'your-name',
+      cardPalette: ['#1a59a4', '#4a9de0', '#f4a738', '#60b8ff'],
+      desc:  '\u5929\u7a7a\u84dd\u8c03\uff0c\u9ec4\u91d1\u5f67\u661f'
+    },
+    {
       id: 'space',
-      label: '\u592a\u7a7a\u65c5\u884c',
+      label: '\u592a\u7a7a\u65c5\u884c\uff08\u9ed1\u591c\uff09',
       dot:   '#00e5ff',
       theme: 'space',
       cardPalette: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'],
@@ -1332,13 +1363,8 @@
   ];
 
   function applySink() {
-    var s = SINKS[0];
-    localStorage.setItem('luliy-sink', s.id);
-    document.body.setAttribute('data-luliy-theme', s.theme);
-    document.documentElement.style.setProperty('--card-c1', s.cardPalette[0]);
-    document.documentElement.style.setProperty('--card-c2', s.cardPalette[1]);
-    document.documentElement.style.setProperty('--card-c3', s.cardPalette[2]);
-    document.documentElement.style.setProperty('--card-c4', s.cardPalette[3]);
+    /* 不再接受手选 id —— 始终交给"按深浅模式自动选主题"决定 */
+    if (root._luliyApplyThemeForColorMode) root._luliyApplyThemeForColorMode();
   }
   /* 暴露给抽屉系统复用 */
   root._luliyApplySink = applySink;
@@ -1394,7 +1420,7 @@
     /* —— 顶部信息区 —— */
     var head = document.createElement('div');
     head.id = 'luliy-drawer-head';
-    var avatarSrc = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/Luliy.jpg';
+    var avatarSrc = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/docs/img/tx.webp';
     var _brandName = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
     head.innerHTML =
       '<a class="ldh-avatar" href="/about" aria-label="\u5173\u4e8e"><img src="' + avatarSrc + '" alt="avatar"></a>' +
@@ -1682,13 +1708,26 @@
     document.body.appendChild(ham);
 
     /* ★ 左上角博客名 ΔιάΝους（纯文字，点击回主页），固定在汉堡按钮右侧。
-       全站可见，是「化繁为简」后的主要品牌标识。 */
+       全站可见，是「化繁为简」后的主要品牌标识。
+       点击它返回主页时跳过开屏欢迎页，直接落到六张卡片区
+       （用 #cats 这个 hash 当信号，initHomeHero 见到它就不显示自己）。 */
     if (!document.getElementById('luliy-brand')) {
       var brand = document.createElement('a');
       brand.id = 'luliy-brand';
-      brand.href = '/';
+      brand.href = '/#cats';
       brand.textContent = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
       brand.setAttribute('aria-label', brand.textContent + ' \u2014 \u8fd4\u56de\u4e3b\u9875');
+      brand.addEventListener('click', function (e) {
+        /* 已经在主页：不整页刷新，直接让欢迎页（若还在）淡出消失 */
+        if (isIndexPage()) {
+          e.preventDefault();
+          if (root._luliyHeroEnter) root._luliyHeroEnter();
+          try { history.replaceState(null, '', '/#cats'); } catch (err) {}
+          var catsEl = document.getElementById('luliy-cats-wrap');
+          if (catsEl) catsEl.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
+        /* 不在主页：走正常链接跳转，新页面加载时 initHomeHero 会读取 #cats 自动跳过欢迎页 */
+      });
       document.body.appendChild(brand);
     }
 
@@ -2142,8 +2181,28 @@
   }
 
   function initCards() {
-    if (/tag\.html?$|\/tag\/?$/i.test(location.pathname)) return;
+    var isTagPage = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
+    var isArchive = isArchivePage();
+
+    /* ★ 大改后：真正的首页（既不是分类页也不是归档页）只要
+       「Hero + 六张分类卡片」，绝不在这里渲染文章列表——
+       哪怕 Gmeek 原生还在首页 DOM 里塞了一份 nav.SideNav。 */
+    if (isIndexPage() && !isTagPage && !isArchive) return;
+
     var nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
+    if (!nav && isArchive) {
+      /* archive.html 是单页类型，原生没有 SideNav 列表容器——
+         在 #postBody 里现造一个，交给下面统一的卡片渲染逻辑接管。
+         这样归档页就能直接复用"漂亮卡片 + 时间轴视图"，
+         不用再维护一套单独的 renderArchive() 简陋列表了。 */
+      var pbArchive = document.getElementById('postBody');
+      if (pbArchive) {
+        pbArchive.innerHTML = '';
+        nav = document.createElement('ul');
+        nav.className = 'SideNav';
+        pbArchive.appendChild(nav);
+      }
+    }
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
 
@@ -2202,8 +2261,45 @@
     fetchPosts().then(function (posts) {
       if (!posts || !posts.length) { fallbackDomCards(nav); return; }
 
-      var pinnedPosts  = posts.filter(function (p) { return p.pinned; });
-      var regularPosts = posts.filter(function (p) { return !p.pinned; });
+      /* ★ 分类页（tag.html#标签名）：只保留带该标签的文章 */
+      if (isTagPage) {
+        var rawTag = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+        if (rawTag) {
+          posts = posts.filter(function (p) {
+            var labels = Array.isArray(p.labels) ? p.labels : [];
+            return labels.some(function (lbl) {
+              var name = (typeof lbl === 'object') ? lbl.name : lbl;
+              return name === rawTag;
+            });
+          });
+        }
+        var tagHead = document.getElementById('luliy-tag-head');
+        if (!tagHead) {
+          tagHead = document.createElement('h1');
+          tagHead.id = 'luliy-tag-head';
+          nav.parentNode.insertBefore(tagHead, nav);
+        }
+        tagHead.textContent = rawTag ? ('\uD83C\uDFF7\uFE0F ' + rawTag) : '\u5168\u90e8\u6587\u7ae0';
+        if (!posts.length) {
+          nav.innerHTML = '';
+          var empty = document.createElement('p');
+          empty.style.cssText = 'color:#888;padding:24px 0;';
+          empty.textContent = '\u8fd9\u4e2a\u5206\u7c7b\u4e0b\u8fd8\u6ca1\u6709\u6587\u7ae0\u3002';
+          nav.appendChild(empty);
+          return;
+        }
+      }
+
+      var pinnedPosts, regularPosts;
+      if (isIndexPage()) {
+        pinnedPosts  = posts.filter(function (p) { return p.pinned; });
+        regularPosts = posts.filter(function (p) { return !p.pinned; });
+      } else {
+        /* 归档页 / 分类页：不单独抽出"置顶区"，置顶文章混在普通列表里
+           正常按时间排序显示，避免被两边都漏掉。 */
+        pinnedPosts  = [];
+        regularPosts = posts;
+      }
 
       /* Multi-level pin sort: higher pinLevel first, then newest first */
       pinnedPosts.sort(function (a, b) {
@@ -2318,13 +2414,27 @@
 
       /* ── Route by current view + expose re-render for view switch ─ */
       function renderRegular() {
-        if (getCardView() === 'timeline') renderTimeline();
+        /* ★ 分类页：焊死网格视图（不留切换入口）。
+           归档页：焊死时间轴视图，呈现"卡片沿时间线排列"的效果。
+           其余页面（理论上只剩首页，但首页已不调用本函数）按用户偏好。 */
+        var view = isTagPage ? 'grid' : (isArchive ? 'timeline' : getCardView());
+        if (view === 'timeline') renderTimeline();
         else renderPaged();
-        applyCardView();
+        applyCardView(view);
       }
       root._luliyRerenderCards = renderRegular;
       root._luliyTeardownTimeline = teardownTimeline;
       renderRegular();
+
+      /* ★ 分类页内切换标签（点了另一个标签 pill，#hash 变了但页面没刷新）：
+         去掉"已渲染"标记，重新拉取+过滤+渲染一遍。 */
+      if (isTagPage && !nav.getAttribute('data-luliy-hash-bound')) {
+        nav.setAttribute('data-luliy-hash-bound', '1');
+        window.addEventListener('hashchange', function () {
+          nav.removeAttribute('data-luliy-cards');
+          initCards();
+        });
+      }
 
     }).catch(function () { fallbackDomCards(nav); });
 
@@ -2556,10 +2666,160 @@
   }
   root._luliyStopSakura = stopSakura;
 
-  /* ---- 16b 流星/主题粒子模块已删除 -------------------------
-     只保留樱花花瓣（initSakura）与点击火花（Click burst）两个
-     装饰特效，其余主题的粒子/流星画布全部移除。 */
+  /* ---- 16b  Theme particles + meteors (all themes) -------- */
+  var _particleRAF = null;
+  var _meteorCanvas = null;
 
+  /* Per-theme config: { pColor, mColor, pShape, pCount } */
+  var THEME_PARTICLE_CFG = {
+    'default':   { pColor: 'rgba(130,80,223,VAL)',  mColor: '#c3a6ff', pShape: 'star',    pCount: 22 },
+    'sakura':    { pColor: 'rgba(255,160,180,VAL)',  mColor: '#ffb3c6', pShape: 'circle',  pCount: 0 },  /* sakuraPlus handles petals */
+    'your-name': { pColor: 'rgba(255,169,77,VAL)',   mColor: '#ffe066', pShape: 'comet',   pCount: 14 },
+    'space':     { pColor: 'rgba(200,230,255,VAL)',  mColor: '#e0f4ff', pShape: 'circle',  pCount: 30 },
+    'sunset':    { pColor: 'rgba(232,168,56,VAL)',   mColor: '#ffd98a', pShape: 'circle',  pCount: 20 },
+    'mono':      { pColor: 'rgba(180,180,180,VAL)',  mColor: '#e8e8e8', pShape: 'square',  pCount: 16 }
+  };
+
+  /* Hoist hexToRgba outside the animation loop — called once per meteor */
+  function hexToRgba(hex, alpha) {
+    var r = parseInt(hex.slice(1,3),16);
+    var g = parseInt(hex.slice(3,5),16);
+    var b = parseInt(hex.slice(5,7),16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
+  function initThemeParticles() {
+    stopThemeParticles();
+    if (prefersReduce && prefersReduce()) return;
+    var theme = (document.body && document.body.getAttribute('data-luliy-theme')) || 'default';
+    var cfg = THEME_PARTICLE_CFG[theme] || THEME_PARTICLE_CFG['default'];
+    var canvas = document.createElement('canvas');
+    canvas.id = 'luliy-meteor-canvas';
+    canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:1;';
+    document.body.appendChild(canvas);
+    _meteorCanvas = canvas;
+    var ctx = canvas.getContext('2d');
+    var W, H;
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    /* Particles — gated by the toggle; right-heavy distribution.
+       Meteors stay on regardless (they're the global "流星" effect). */
+    var particlesEnabled = (localStorage.getItem('luliy-particles') !== '0');
+    var particles = [];
+    var pCount = particlesEnabled ? cfg.pCount : 0;
+    for (var i = 0; i < pCount; i++) {
+      /* Bias x toward the right: sqrt skews random() toward 1 (right side) */
+      var biasX = Math.sqrt(Math.random());   /* 0..1, weighted to 1 */
+      particles.push({
+        x: biasX * (W || 1500),
+        y: Math.random() * (H || 900),
+        r: 2 + Math.random() * 3,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -0.1 - Math.random() * 0.4,
+        homeBias: biasX,   /* remember its column bias for respawn */
+        life: Math.random()
+      });
+    }
+
+    /* Meteors */
+    var meteors = [];
+    var nextMeteor = Date.now() + 2000 + Math.random() * 3000;
+
+    function spawnMeteor() {
+      meteors.push({
+        x: Math.random() * W + W * 0.2,
+        y: -30,
+        vx: -4 - Math.random() * 5,
+        vy: 3 + Math.random() * 4,
+        len: 80 + Math.random() * 120,
+        life: 1, decay: 0.022 + Math.random() * 0.015
+      });
+    }
+
+    function drawStar(ctx, x, y, r) {
+      var sp = 5, outer = r, inner = r * 0.45;
+      ctx.beginPath();
+      for (var i = 0; i < sp * 2; i++) {
+        var a = (i * Math.PI) / sp - Math.PI / 2;
+        var rr = i % 2 === 0 ? outer : inner;
+        if (i === 0) ctx.moveTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
+        else ctx.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
+      }
+      ctx.closePath(); ctx.fill();
+    }
+
+    function tick() {
+      if (!document.getElementById('luliy-meteor-canvas')) { _particleRAF = null; return; }
+      ctx.clearRect(0, 0, W, H);
+
+      /* Draw particles */
+      particles.forEach(function (p) {
+        p.x += p.vx; p.y += p.vy; p.life += 0.004;
+        if (p.life > 1) p.life = 0;
+        if (p.y < -10) { p.y = H + 10; p.x = Math.sqrt(Math.random()) * W; }
+        if (p.x < -10 || p.x > W + 10) { p.x = Math.sqrt(Math.random()) * W; p.y = Math.random() * H; }
+        var alpha = Math.sin(p.life * Math.PI) * 0.85;
+        if (alpha <= 0) return;
+        ctx.fillStyle = cfg.pColor.replace('VAL', alpha.toFixed(2));
+        if (cfg.pShape === 'star') drawStar(ctx, p.x, p.y, p.r);
+        else if (cfg.pShape === 'square') {
+          ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+        } else {
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        }
+      });
+
+      /* Spawn meteors */
+      var now = Date.now();
+      if (now >= nextMeteor) {
+        spawnMeteor();
+        nextMeteor = now + 3000 + Math.random() * 6000;
+      }
+
+      /* Draw meteors */
+      for (var mi = meteors.length - 1; mi >= 0; mi--) {
+        var m = meteors[mi];
+        m.x += m.vx; m.y += m.vy; m.life -= m.decay;
+        if (m.life <= 0 || m.y > H + 40 || m.x < -200) {
+          meteors.splice(mi, 1); continue;
+        }
+        var angle = Math.atan2(m.vy, m.vx);
+        /* 性能优化：尾点坐标只计算一次（原代码重复算了 3 次 cos/sin），
+           并删除了原先「创建后从未使用」的 grad 渐变对象——它在每帧、
+           每颗流星上都会被白白分配一次，是纯粹的死代码。 */
+        var tailX = m.x - Math.cos(angle) * m.len;
+        var tailY = m.y - Math.sin(angle) * m.len;
+        var mHead = hexToRgba(cfg.mColor, m.life);
+        var grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+        grad.addColorStop(0, mHead);
+        grad.addColorStop(1, hexToRgba(cfg.mColor, 0));
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(tailX, tailY);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2.5 * m.life;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, 3 * m.life, 0, Math.PI * 2);
+        ctx.fillStyle = mHead;
+        ctx.fill();
+      }
+      _particleRAF = requestAnimationFrame(tick);
+    }
+    _particleRAF = requestAnimationFrame(tick);
+  }
+
+  function stopThemeParticles() {
+    if (_particleRAF) { cancelAnimationFrame(_particleRAF); _particleRAF = null; }
+    var c = document.getElementById('luliy-meteor-canvas');
+    if (c && c.parentNode) c.parentNode.removeChild(c);
+    _meteorCanvas = null;
+  }
+  root._luliyInitThemeParticles = initThemeParticles;
+  root._luliyStopThemeParticles = stopThemeParticles;
 
 /* ---- 17  ArticleTOC scroll-spy + back-to-top ------------ */
   function initArticleTocSpy() {
@@ -3155,29 +3415,14 @@
 
   /* ---- 22  Index page init -------------------------------- */
   root._luliyInitIndex = function () {
-    /* ★ 大改后：主页（首页）只要「Hero + 三张分类卡片」，
-       不再需要旧的文章网格 / "Remember, this is your world." 横幅 /
-       底部画廊横幅 —— 这三个是改版前遗留的旧主页内容。
-       归档页（archive.html）仍然保留它们原本的行为不受影响。 */
-    var onHome = isIndexPage() && !isArchivePage();
-    if (!onHome) {
-      initCards();
-      initHeroBanner();
-      initHomeGallery();
-    }
-    setTimeout(initCardViewToggle, 900);
-
-    if (isArchivePage()) {
-      var pb = document.getElementById('postBody');
-      if (pb) {
-        pb.innerHTML = '<p style="color:#888;font-size:14px">\u6b63\u5728\u52a0\u8f7d\u5f52\u6863...</p>';
-        fetchPosts().then(function (posts) {
-          renderArchive(pb, posts);
-        }).catch(function () {
-          pb.innerHTML = '<p style="color:#e74c3c">\u5f52\u6863\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u5237\u65b0\u91cd\u8bd5\u3002</p>';
-        });
-      }
-    }
+    /* ★ 大改后：
+       - 首页（homepage）只要「Hero + 六张分类卡片」，不调用本函数渲染文章。
+       - 分类页（tag.html#标签）→ initCards() 内部按标签过滤，焊死网格视图。
+       - 归档页（archive.html）→ initCards() 内部在 #postBody 里现造容器，
+         焊死时间轴视图，与分类页共用同一套"漂亮卡片"渲染逻辑。
+       - 旧的 "Remember, this is your world." 横幅、底部画廊横幅、
+         以及单独的 renderArchive() 简易列表，均已废弃不再调用。 */
+    initCards();
   };
 
   /* ---- 22b  Archive: timeline + calendar views ------------ */
@@ -3289,8 +3534,9 @@
     var v = localStorage.getItem('luliy-cardview');
     return CARD_VIEWS.indexOf(v) >= 0 ? v : 'grid';
   }
-  function applyCardView() {
-    var view = getCardView();
+  function applyCardView(forcedView) {
+    var isTagPg = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
+    var view = forcedView || (isTagPg ? 'grid' : (isArchivePage() ? 'timeline' : getCardView()));
     document.querySelectorAll('.luliy-card-grid').forEach(function (g) {
       /* Pinned strip always stays a grid — alt layouts make no sense there */
       if (g.classList.contains('luliy-pinned-grid')) {
@@ -3968,33 +4214,47 @@
   /* ---- 27  Main entry ------------------------------------- */
   initLocalStorage();
 
-  /* Restore theme immediately to prevent FOUC */
+  /* Restore theme immediately to prevent FOUC.
+     ★ 大改后：白天模式锁定「你的名字」主题，夜间模式锁定「太空旅行」主题。
+     不再是单一锁死的主题——而是跟随 Gmeek 自带的深浅模式开关自动切换。
+     （其他 4 套主题 sunset/mono/default/sakura 的 CSS 代码仍保留未删，
+     只是不会再被选中；日后想恢复某一套，只需在下面的映射里加回去。） */
+  var THEME_PALETTES = {
+    'your-name': { theme: 'your-name', c: ['#1a59a4', '#4a9de0', '#f4a738', '#60b8ff'] },
+    'space':     { theme: 'space',     c: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'] }
+  };
+  function themeForColorMode() {
+    var cm = document.documentElement.getAttribute('data-color-mode') || 'light';
+    return (cm === 'dark') ? THEME_PALETTES.space : THEME_PALETTES['your-name'];
+  }
+  function applyThemeForColorMode() {
+    if (!document.body) return;
+    var def = themeForColorMode();
+    document.body.setAttribute('data-luliy-theme', def.theme);
+    document.documentElement.style.setProperty('--card-c1', def.c[0]);
+    document.documentElement.style.setProperty('--card-c2', def.c[1]);
+    document.documentElement.style.setProperty('--card-c3', def.c[2]);
+    document.documentElement.style.setProperty('--card-c4', def.c[3]);
+  }
+  root._luliyApplyThemeForColorMode = applyThemeForColorMode;
   (function () {
-    /* ★ 大改后：全站锁定「太空 space」主题。
-       不再读取 localStorage 的已存主题，强制 space。
-       （其他 5 套主题的 CSS 代码都保留，只是入口隐藏、不再被选中；
-       日后想恢复多主题：把下一行改回
-       var savedId = localStorage.getItem('luliy-sink') || 'default';） */
-    var savedId = 'space';
-    var themePalettes = {
-      'default':   { theme: 'default',   c: ['#8250df', '#0969da', '#ff6b9d', '#f0b429'] },
-      'sakura':    { theme: 'sakura',     c: ['#e05c8a', '#f9a8c9', '#c94070', '#ffb7c5'] },
-      'your-name': { theme: 'your-name',  c: ['#1a59a4', '#4a9de0', '#f4a738', '#60b8ff'] },
-      'space':     { theme: 'space',      c: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'] },
-      'sunset':    { theme: 'sunset',     c: ['#f0b429', '#ffd98a', '#e8821e', '#d9930d'] },
-      'mono':      { theme: 'mono',       c: ['#222222', '#555555', '#888888', '#bbbbbb'] }
-    };
-    var def = themePalettes[savedId] || themePalettes['default'];
-    function applyFouc() {
-      if (!document.body) return;
-      document.body.setAttribute('data-luliy-theme', def.theme);
-      document.documentElement.style.setProperty('--card-c1', def.c[0]);
-      document.documentElement.style.setProperty('--card-c2', def.c[1]);
-      document.documentElement.style.setProperty('--card-c3', def.c[2]);
-      document.documentElement.style.setProperty('--card-c4', def.c[3]);
+    if (document.body) applyThemeForColorMode();
+    else document.addEventListener('DOMContentLoaded', applyThemeForColorMode);
+  })();
+  /* 监听深浅模式实时切换（用户点白天/黑夜按钮），同步换主题 + 重启粒子特效 */
+  (function () {
+    function onColorModeChange() {
+      applyThemeForColorMode();
+      if (root._luliyInitThemeParticles) root._luliyInitThemeParticles();
     }
-    if (document.body) applyFouc();
-    else document.addEventListener('DOMContentLoaded', applyFouc);
+    function start() {
+      try {
+        var mo = new MutationObserver(onColorModeChange);
+        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-color-mode'] });
+      } catch (e) {}
+    }
+    if (document.body) start();
+    else document.addEventListener('DOMContentLoaded', start);
   })();
 
   /* ★ 背景图功能已全部移除 —— 全站背景统一改为纯色 #00020c，
@@ -4003,15 +4263,13 @@
 
   /* Welcome splash (before DOM ready, append after body exists) */
   /* ★ 大改后：网站打开时的加载动画。
-     全屏深色遮罩 + 居中 l.png（带轻微脉动），最多显示 splashMaxMs(默认1.5s)
-     后自动淡出移除；若图片提前加载完也会尽快淡出。
-     只在「首页」显示一次太重，这里做成每次进站都显示但很短，
-     体验类似游戏启动画面。 */
+     不再用图片，改成居中的"ΔιάΝους"文字 + 赛博朋克荧光循环缠绕效果
+     （动画细节见 enhance.css 的 #luliy-splash-text）。
+     显示 splashMaxMs(默认1.5s) 后自动淡出移除。 */
   (function initSplash() {
     /* 避免重复、避免在 iframe / 打印时出现 */
     if (window.top !== window.self) return;
-    var IMG = (LULIY_OPTS && LULIY_OPTS.splashImage) || '';
-    if (!IMG) return;
+    var TEXT = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
     var MAXMS = (LULIY_OPTS && LULIY_OPTS.splashMaxMs) || 1500;
 
     function build() {
@@ -4020,11 +4278,11 @@
 
       var splash = document.createElement('div');
       splash.id = 'luliy-splash';
-      var img = document.createElement('img');
-      img.id = 'luliy-splash-img';
-      img.src = IMG;
-      img.alt = '';
-      splash.appendChild(img);
+      var txt = document.createElement('div');
+      txt.id = 'luliy-splash-text';
+      txt.textContent = TEXT;
+      txt.setAttribute('data-text', TEXT);   /* 用于 CSS 荧光叠层 */
+      splash.appendChild(txt);
       document.body.appendChild(splash);
       /* 锁滚动，避免加载时页面在动画底下乱跳 */
       document.documentElement.style.overflow = 'hidden';
@@ -4038,11 +4296,7 @@
           if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
         }, 600);   /* 与 CSS 淡出时长一致 */
       }
-      /* 最长 MAXMS 后无条件消失（核心保险，防止图片慢导致卡住） */
       setTimeout(dismiss, MAXMS);
-      /* 若图片很快加载完，至少显示 ~500ms 再走，避免一闪而过 */
-      img.addEventListener('load', function () { setTimeout(dismiss, 500); });
-      img.addEventListener('error', dismiss);   /* 图片挂了也别卡住 */
     }
     build();
   })();
@@ -4103,6 +4357,7 @@
     safe(initNavTransparency, 'navTransparency');
     safe(initDrawerNav,       'drawerNav');           /* ★ 左滑抽屉导航（全端） */
     safe(initKeyboardShortcuts, 'keyboardShortcuts'); /* ★ 键盘快捷键 / j k g t ←→ */
+    safe(initThemeParticles,  'themeParticles');
     safe(initFavoritesLock,   'favLock');   /* safety net — also called in post init */
 
     /* v10 global features */
