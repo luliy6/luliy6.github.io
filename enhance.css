@@ -367,7 +367,7 @@ body.luliy-reduce-motion #luliy-splash-text::before { animation: none; }
   font-weight: 800;
   letter-spacing: 1px;
   line-height: 1;
-  color: #eaf6ff;
+  color: #fff;
   text-decoration: none !important;
   text-shadow: 0 2px 14px rgba(0,0,0,0.55);
   transition: color 0.25s, text-shadow 0.25s, transform 0.2s;
@@ -378,11 +378,12 @@ body.luliy-reduce-motion #luliy-splash-text::before { animation: none; }
   text-shadow: 0 0 18px rgba(0,229,255,0.55);
   transform: translateY(-1px);
 }
+/* ★ 始终白色 #fff（白天/黑夜都一样），加阴影保证在任何背景下都看得清 */
 [data-color-mode="light"] #luliy-brand {
-  color: #14233a;
-  text-shadow: 0 1px 8px rgba(255,255,255,0.6);
+  color: #fff;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.65);
 }
-[data-color-mode="light"] #luliy-brand:hover { color: #0a86b0; }
+[data-color-mode="light"] #luliy-brand:hover { color: #00e5ff; }
 @media (max-width: 600px) {
   #luliy-brand { font-size: 18px; left: 64px; }
 }
@@ -390,14 +391,29 @@ body.luliy-reduce-motion #luliy-splash-text::before { animation: none; }
 /* ══════════════════════════════════════════════════════════
    02c  Homepage category cards — 6 张，2 行 3 列，整体垂直居中
 ══════════════════════════════════════════════════════════ */
+/* ★ 首页：隐藏 Gmeek 原生的副标题 div 与文章列表 nav.SideNav，
+   只保留六张分类卡片。#content 去掉自身限宽/内边距，让卡片区能撑满。 */
+body.luliy-home #content > div[style*="margin-bottom"],
+body.luliy-home #content > nav.SideNav,
+body.luliy-home #content > .pagination,
+body.luliy-home #luliy-pinned-section {
+  display: none !important;
+}
+body.luliy-home #content {
+  max-width: none !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
 #luliy-cats-wrap {
   width: min(1200px, calc(100vw - 48px));
   min-height: 100vh;
   margin: 0 auto;
-  padding: 32px 0;
+  padding: 80px 0 48px;   /* 顶部留出 logo / 播放器的空间 */
   display: flex;
   flex-direction: column;
   justify-content: center;   /* 整体（6 张卡片 + more 按钮）垂直居中 */
+  box-sizing: border-box;
 }
 #luliy-cats {
   display: grid;
@@ -2790,7 +2806,13 @@ body.luliy-tl-infinite .paginate,
 body.luliy-tl-infinite #pagination,
 body.luliy-tl-infinite .Paginate,
 body.luliy-tl-infinite .pagenav,
-body.luliy-tl-infinite a[href*="?page="] {
+body.luliy-tl-infinite a[href*="?page="],
+/* ★ 分类页 / 归档页：始终隐藏 Gmeek 原生「上一页/下一页」翻页器 */
+body.luliy-hide-pagination .pagination,
+body.luliy-hide-pagination .paginate,
+body.luliy-hide-pagination #pagination,
+body.luliy-hide-pagination .Paginate,
+body.luliy-hide-pagination .pagenav {
   display: none !important;
 }
 
