@@ -1218,26 +1218,6 @@
   }
 
   /* ---- 10  Hero banner (homepage, scroll-fold) ------------ */
-  function initHeroBanner() {
-    if (document.getElementById('luliy-hero-banner')) return;
-    var content = document.getElementById('content') || document.querySelector('.main');
-    if (!content) return;
-    var banner = document.createElement('div');
-    banner.id = 'luliy-hero-banner';
-    banner.textContent = 'Remember, this is your world.';
-    content.parentNode.insertBefore(banner, content);
-
-    var bannerH = 0;
-    function getBannerH() { bannerH = banner.offsetHeight || 56; }
-    getBannerH();
-    window.addEventListener('resize', getBannerH, { passive: true });
-    onScrollRAF(function () {
-      var st = window.scrollY || window.pageYOffset || 0;
-      var progress = Math.min(1, st / (bannerH + 32));
-      banner.style.transform = 'translateY(-' + (progress * (bannerH + 32)) + 'px)';
-      banner.style.opacity = String(1 - progress);
-    }, { passive: true });
-  }
 
   /* ---- 11  Tag page search toolbar ----------------------- */
   function initTagEnhance() {
@@ -2188,29 +2168,52 @@
     var isTagPage = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
     var isArchive = isArchivePage();
 
-    /* ★ 大改后：真正的首页（既不是分类页也不是归档页）只要
-       「Hero + 六张分类卡片」，绝不在这里渲染文章列表——
-       哪怕 Gmeek 原生还在首页 DOM 里塞了一份 nav.SideNav。 */
+    /* ★ 真正的首页（既不是分类页也不是归档页）只要「Hero + 六张分类卡片」，
+       绝不在这里渲染文章列表——哪怕 Gmeek 原生还在首页 DOM 里塞了一份 SideNav。 */
     if (isIndexPage() && !isTagPage && !isArchive) return;
 
-    var nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
-    if (!nav && isArchive) {
-      /* archive.html 是单页类型，原生没有 SideNav 列表容器——
-         在 #postBody 里现造一个，交给下面统一的卡片渲染逻辑接管。
-         这样归档页就能直接复用"漂亮卡片 + 时间轴视图"，
-         不用再维护一套单独的 renderArchive() 简陋列表了。 */
-      var pbArchive = document.getElementById('postBody');
-      if (pbArchive) {
-        pbArchive.innerHTML = '';
+    var nav;
+
+    if (isTagPage) {
+      /* ★ 分类页（tag.html）：它自带一套原生 JS——会自己拉 postList.json、
+         生成 .lists 列表项、用 style.display 做标签筛选。那套和我们这套
+         卡片系统会互相打架（原生筛选只认 .lists，对我们的卡片无效；两份
+         列表还会叠加）。所以这里彻底"另起炉灶"：
+           1) 给 body 打标记，CSS 隐藏页面里所有原生 .SideNav 与原生标签条
+              （用 body 标记而非逐个打标记，可覆盖原生脚本"异步生成"的列表，
+              否则它生成晚于我们时会漏网）；
+           2) 新建一个我们自己的容器来渲染卡片；
+           3) 标签筛选完全由我们按 location.hash 控制。 */
+      document.body.classList.add('luliy-tag-takeover');
+
+      var host = document.getElementById('content') ||
+                 document.querySelector('.main') || document.body;
+      nav = document.getElementById('luliy-tag-grid');
+      if (!nav) {
         nav = document.createElement('ul');
+        nav.id = 'luliy-tag-grid';
         nav.className = 'SideNav';
-        pbArchive.appendChild(nav);
+        host.appendChild(nav);
+      }
+    } else {
+      nav = document.querySelector('nav.SideNav, ul.SideNav, .SideNav');
+      if (!nav && isArchive) {
+        /* archive.html 是单页类型，原生没有 SideNav 列表容器——
+           在 #postBody 里现造一个，交给统一的卡片渲染逻辑接管，
+           直接复用"漂亮卡片 + 时间轴视图"。 */
+        var pbArchive = document.getElementById('postBody');
+        if (pbArchive) {
+          pbArchive.innerHTML = '';
+          nav = document.createElement('ul');
+          nav.className = 'SideNav';
+          pbArchive.appendChild(nav);
+        }
       }
     }
+
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
-    /* ★ 分类页/归档页：标记 body，隐藏 Gmeek 原生的「上一页/下一页」翻页器
-       （我们用时间轴无限滚动或单标签全量展示，不需要原生分页） */
+    /* ★ 分类页/归档页：标记 body，隐藏 Gmeek 原生的「上一页/下一页」翻页器 */
     if (isTagPage || isArchive) document.body.classList.add('luliy-hide-pagination');
 
     /* Show skeleton placeholders while postList.json loads */
@@ -2433,12 +2436,13 @@
       root._luliyTeardownTimeline = teardownTimeline;
       renderRegular();
 
-      /* ★ 分类页内切换标签（点了另一个标签 pill，#hash 变了但页面没刷新）：
-         去掉"已渲染"标记，重新拉取+过滤+渲染一遍。 */
+      /* ★ 分类页内切换标签（点了另一个标签 pill 或浏览器前进后退，#hash 变了
+         但页面没刷新）：清掉"已渲染"标记，让容器可被重新填充，再渲染一遍。 */
       if (isTagPage && !nav.getAttribute('data-luliy-hash-bound')) {
         nav.setAttribute('data-luliy-hash-bound', '1');
         window.addEventListener('hashchange', function () {
           nav.removeAttribute('data-luliy-cards');
+          nav.innerHTML = '';
           initCards();
         });
       }
@@ -3000,77 +3004,6 @@
     return imgs.filter(Boolean);
   }
 
-  function initHomeGallery() {
-    if (!isIndexPage()) return;
-    /* Wait until card grid has been built */
-    setTimeout(buildGallery, 800);
-  }
-
-  function buildGallery() {
-    var old = document.getElementById('luliy-home-gallery');
-    if (old) old.remove();
-    var content = document.getElementById('content') || document.querySelector('.main');
-    if (!content) return;
-
-    var imgs = getGalleryImages();
-    if (!imgs.length) return;
-
-    var wrap = document.createElement('div');
-    wrap.id = 'luliy-home-gallery';
-    if (imgs.length > 1) wrap.classList.add('is-grid');
-
-    imgs.forEach(function (src, i) {
-      var cell = document.createElement('div');
-      cell.className = 'luliy-gallery-cell';
-      var img = document.createElement('img');
-      img.src = src;
-      img.alt = 'Gallery ' + (i + 1);
-      img.loading = 'lazy';
-      img.addEventListener('error', function () { cell.style.display = 'none'; });
-      cell.appendChild(img);
-      cell.style.cursor = 'zoom-in';
-      cell.addEventListener('click', function () {
-        if (root._luliyLightboxOpen) root._luliyLightboxOpen(src, '\u753b\u5eca');
-      });
-      wrap.appendChild(cell);
-    });
-
-    /* Overlay caption (single-image banner only) */
-    if (imgs.length === 1) {
-      var ov = document.createElement('div');
-      ov.id = 'luliy-home-gallery-overlay';
-      var txt = document.createElement('div');
-      txt.id = 'luliy-home-gallery-text';
-      txt.textContent = LULIY_OPTS.galleryText || '';
-      ov.appendChild(txt);
-      wrap.appendChild(ov);
-    }
-
-    /* ✎ Edit button: add / reset custom images */
-    var edit = document.createElement('button');
-    edit.id = 'luliy-gallery-edit';
-    edit.type = 'button';
-    edit.title = '\u6dfb\u52a0\u81ea\u5b9a\u4e49\u56fe\u7247';   /* 添加自定义图片 */
-    edit.textContent = '\u270e';
-    edit.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var url = window.prompt(
-        '\u7c98\u8d34\u56fe\u7247\u94fe\u63a5\u6dfb\u52a0\u5230\u753b\u5eca\uff08\u8f93\u5165 reset \u6e05\u7a7a\u81ea\u5b9a\u4e49\u56fe\u7247\uff09\uff1a', '');
-      if (url === null) return;
-      url = url.trim();
-      var custom = [];
-      try { custom = JSON.parse(localStorage.getItem('luliy-gallery') || '[]'); } catch (_) {}
-      if (!Array.isArray(custom)) custom = [];
-      if (url.toLowerCase() === 'reset') custom = [];
-      else if (url) custom.push(url);
-      localStorage.setItem('luliy-gallery', JSON.stringify(custom));
-      buildGallery();
-      playSfx('click');
-    });
-    wrap.appendChild(edit);
-
-    content.appendChild(wrap);
-  }
 
   /* ---- 19  Favorites page front-end lock --------------------
      Hides the favorites page behind a password prompt.
@@ -3433,97 +3366,6 @@
   };
 
   /* ---- 22b  Archive: timeline + calendar views ------------ */
-  function renderArchive(pb, posts) {
-    var view = localStorage.getItem('luliy-archive-view') || 'timeline';
-
-    function renderTimeline() {
-      var byY = {};
-      posts.forEach(function (p) {
-        var y = (p.created || '\u672a\u77e5').slice(0, 4);
-        if (!byY[y]) byY[y] = [];
-        byY[y].push(p);
-      });
-      var years = Object.keys(byY).sort(function (a, b) { return b - a; });
-      var html = '';
-      years.forEach(function (y) {
-        html += '<div class="tl-year">' + esc(y) + ' \u5e74 <span class="tl-count">' + byY[y].length + ' \u7bc7</span></div><ul class="tl-list">';
-        byY[y].sort(function (a, b) { return String(b.created).localeCompare(String(a.created)); });
-        byY[y].forEach(function (p) {
-          var md = (p.created || '').slice(5, 10).replace('-', '/');
-          html +=
-            '<li class="tl-item">' +
-            '<span class="tl-dot"></span>' +
-            '<a href="' + esc(buildPostLink(p.link)) + '">' + esc(p.title) + '</a>' +
-            '<span class="tl-date">' + md + '</span>' +
-            '</li>';
-        });
-        html += '</ul>';
-      });
-      return html;
-    }
-
-    function renderCalendar() {
-      /* Map yyyy-mm-dd -> [posts] */
-      var byDay = {};
-      posts.forEach(function (p) {
-        var d = (p.created || '').slice(0, 10);
-        if (!d) return;
-        (byDay[d] = byDay[d] || []).push(p);
-      });
-      /* Group available months */
-      var months = {};
-      Object.keys(byDay).forEach(function (d) { months[d.slice(0, 7)] = true; });
-      var mList = Object.keys(months).sort(function (a, b) { return b.localeCompare(a); });
-
-      var html = '';
-      mList.forEach(function (ym) {
-        var parts = ym.split('-'), Y = +parts[0], M = +parts[1];
-        var first = new Date(Y, M - 1, 1);
-        var startDow = first.getDay();   /* 0=Sun */
-        var days = new Date(Y, M, 0).getDate();
-        html += '<div class="cal-month"><div class="cal-mhead">' + Y + ' \u5e74 ' + M + ' \u6708</div>';
-        html += '<div class="cal-grid"><span class="cal-dow">\u65e5</span><span class="cal-dow">\u4e00</span>' +
-          '<span class="cal-dow">\u4e8c</span><span class="cal-dow">\u4e09</span><span class="cal-dow">\u56db</span>' +
-          '<span class="cal-dow">\u4e94</span><span class="cal-dow">\u516d</span>';
-        for (var b = 0; b < startDow; b++) html += '<span class="cal-cell cal-empty"></span>';
-        for (var dd = 1; dd <= days; dd++) {
-          var key = ym + '-' + (dd < 10 ? '0' + dd : dd);
-          var dayPosts = byDay[key];
-          if (dayPosts && dayPosts.length) {
-            var link = buildPostLink(dayPosts[0].link);
-            var titles = dayPosts.map(function (p) { return p.title; }).join(' / ');
-            html += '<a class="cal-cell cal-has" href="' + esc(link) + '" title="' + esc(titles) + '">' +
-              dd + '<span class="cal-badge">' + dayPosts.length + '</span></a>';
-          } else {
-            html += '<span class="cal-cell">' + dd + '</span>';
-          }
-        }
-        html += '</div></div>';
-      });
-      return html || '<p style="color:#888">\u6682\u65e0\u65e5\u671f\u6570\u636e</p>';
-    }
-
-    function paint() {
-      var html =
-        '<div class="luliy-archive-head">' +
-        '<h1>\uD83D\uDCC5 \u6587\u7ae0\u5f52\u6863</h1>' +
-        '<div class="luliy-archive-tabs">' +
-        '<button type="button" data-av="timeline" class="' + (view === 'timeline' ? 'is-active' : '') + '">\u65f6\u95f4\u8f74</button>' +
-        '<button type="button" data-av="calendar" class="' + (view === 'calendar' ? 'is-active' : '') + '">\u65e5\u5386</button>' +
-        '</div></div>' +
-        '<div class="luliy-archive-body">' + (view === 'calendar' ? renderCalendar() : renderTimeline()) + '</div>';
-      pb.innerHTML = html;
-      pb.querySelectorAll('.luliy-archive-tabs button').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          view = btn.getAttribute('data-av');
-          localStorage.setItem('luliy-archive-view', view);
-          paint();
-          playSfx('click');
-        });
-      });
-    }
-    paint();
-  }
 
   /* ════════════════════════════════════════════════════════
      NEW MODULES (v10)
@@ -3557,35 +3399,6 @@
     if (tb) tb.setAttribute('data-view', view);
   }
 
-  function initCardViewToggle() {
-    if (!isIndexPage()) return;
-    if (document.getElementById('luliy-cardview-toggle')) return;
-    var content = document.getElementById('content') || document.querySelector('.main');
-    if (!content) return;
-    var nav = document.querySelector('.luliy-card-grid');
-    if (!nav) return;
-
-    var bar = document.createElement('div');
-    bar.id = 'luliy-cardview-bar';
-    var toggle = document.createElement('div');
-    toggle.id = 'luliy-cardview-toggle';
-    toggle.setAttribute('data-view', getCardView());
-    toggle.innerHTML =
-      '<button type="button" class="cv-grid" data-v="grid" title="\u7f51\u683c\u89c6\u56fe">\u2317</button>' +
-      '<button type="button" class="cv-list" data-v="list" title="\u5217\u8868\u89c6\u56fe">\u2630</button>' +
-      '<button type="button" class="cv-timeline" data-v="timeline" title="\u65f6\u95f4\u8f74\u89c6\u56fe">\u2261\u20D7</button>';
-    toggle.querySelectorAll('button').forEach(function (b) {
-      b.addEventListener('click', function () {
-        localStorage.setItem('luliy-cardview', b.getAttribute('data-v'));
-        if (root._luliyRerenderCards) root._luliyRerenderCards();
-        else applyCardView();
-        playSfx('click');
-      });
-    });
-    bar.appendChild(toggle);
-    nav.parentNode.insertBefore(bar, nav);
-    applyCardView();
-  }
 
   /* ---- Reduce motion ------------------------------------- */
   function prefersReduce() {
@@ -4337,15 +4150,6 @@
         /* 只改纯文字节点，避免动到里头的头像 <img> */
         if (el.children.length === 0) el.textContent = _bn;
       });
-    } catch (e) {}
-
-    /* ★ 标记分类页（tag.html）：它有独特的 .tagTitle 元素而首页没有。
-       打了 luliy-tag-page 这个 body 类后，CSS 会把它的文章列表
-       改造成三列网格视图。 */
-    try {
-      if (document.querySelector('.tagTitle') && document.querySelector('nav.SideNav')) {
-        document.body.classList.add('luliy-tag-page');
-      }
     } catch (e) {}
 
     safe(initHomeHero,        'homeHero');
