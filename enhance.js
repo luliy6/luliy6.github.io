@@ -596,6 +596,9 @@
       'luliy-cyber':       '1',      /* 赛博朋克粒子系统总开关 */
       'luliy-cyber-speed': '1',      /* 0.2 ~ 3 */
       'luliy-cyber-dir':   'converge', /* converge | diverge | free */
+      'luliy-glass-blur':    '22',     /* px，0~50 */
+      'luliy-glass-opacity': '0.5',    /* 0~1 */
+      'luliy-glass-hue':     '250',    /* 0~360 */
       'luliy-fontsize':  '18',
       'luliy-sans':      '0',
       'luliy-cardview':  'grid',   /* grid | list */
@@ -1088,8 +1091,14 @@
       if (!document.getElementById('luliy-cyber-canvas')) { _cyberRAF = null; return; }
       var speedMul = getCyberSpeed(), dir = getCyberDir();
 
-      ctx.fillStyle = 'rgba(15,12,35,0.22)';
-      ctx.fillRect(0, 0, W, H);
+      /* ★ 修复"屏幕中间变黑"的根因：原来这里是每帧叠一层
+         rgba(15,12,35,0.22) 的半透明深色（想做拖尾效果），但极光/
+         城市剪影只覆盖屏幕边角，中间没人"重新点亮"的区域会在
+         不到 0.2 秒内被反复叠加到几乎纯黑。改成真正的 clearRect，
+         画布永远透明，背后统一露出页面本身的深蓝紫纯色背景，
+         不会再有局部发黑。粒子/拖尾/爆炸各自已经有独立的淡出
+         （life -= ...），效果不受影响。 */
+      ctx.clearRect(0, 0, W, H);
 
       drawAurora(speedMul);
       drawCityGhost(speedMul);
@@ -1548,6 +1557,29 @@
   }
   root._luliyApplyBgBlur = applyBgBlur;
   root._luliyApplyPbWidth = applyPbWidth;
+
+  /* ---- 液态玻璃三个可调参数：模糊 / 透明度 / 色调 -------------
+     写入 CSS 变量 --luliy-glass-blur / -opacity / -hue，
+     .luliy-card、文章面板、标签云容器都读这三个变量。 */
+  function applyGlassVars() {
+    var blur = parseFloat(localStorage.getItem('luliy-glass-blur'));
+    if (isNaN(blur)) blur = 22;
+    blur = Math.min(50, Math.max(0, blur));
+
+    var op = parseFloat(localStorage.getItem('luliy-glass-opacity'));
+    if (isNaN(op)) op = 0.5;
+    op = Math.min(0.95, Math.max(0.1, op));
+
+    var hue = parseFloat(localStorage.getItem('luliy-glass-hue'));
+    if (isNaN(hue)) hue = 250;
+    hue = ((hue % 360) + 360) % 360;
+
+    var root2 = document.documentElement.style;
+    root2.setProperty('--luliy-glass-blur', blur + 'px');
+    root2.setProperty('--luliy-glass-opacity', String(op));
+    root2.setProperty('--luliy-glass-hue', String(hue));
+  }
+  root._luliyApplyGlassVars = applyGlassVars;
 
   /* ---- 13  Floating toolbar + unified sink (6 themes) ----- */
 
@@ -2295,6 +2327,46 @@
       playSfx('click');
     });
     panel.appendChild(cyberDirRow);
+
+    /* ── 液态玻璃三个可调参数 ───────────────────────────── */
+    panel.appendChild(mkSep());
+    panel.appendChild(mkSec('\uD83E\uDE9E \u6db2\u6001\u73bb\u7483'));   /* 🪞 液态玻璃 */
+
+    var glassBlurSlider = mkSlider({
+      emoji: '\uD83C\uDF2B\uFE0F', label: '\u6a21\u7cca\u7a0b\u5ea6',   /* 🌫️ 模糊程度 */
+      min: 0, max: 50, step: 2,
+      value: parseFloat(localStorage.getItem('luliy-glass-blur')) || 22,
+      format: function (v) { return v + 'px'; },
+      onInput: function (v) {
+        localStorage.setItem('luliy-glass-blur', String(v));
+        applyGlassVars();
+      }
+    });
+    panel.appendChild(glassBlurSlider);
+
+    var glassOpacitySlider = mkSlider({
+      emoji: '\uD83D\uDD73\uFE0F', label: '\u900f\u660e\u5ea6',   /* 🕳️ 透明度（这里指不透明度，数值越大越实） */
+      min: 0.1, max: 0.95, step: 0.05,
+      value: parseFloat(localStorage.getItem('luliy-glass-opacity')) || 0.5,
+      format: function (v) { return Math.round(v * 100) + '%'; },
+      onInput: function (v) {
+        localStorage.setItem('luliy-glass-opacity', String(v));
+        applyGlassVars();
+      }
+    });
+    panel.appendChild(glassOpacitySlider);
+
+    var glassHueSlider = mkSlider({
+      emoji: '\uD83C\uDFA8', label: '\u8272\u8c03',   /* 🎨 色调 */
+      min: 0, max: 360, step: 10,
+      value: parseFloat(localStorage.getItem('luliy-glass-hue')) || 250,
+      format: function (v) { return v + '\u00b0'; },
+      onInput: function (v) {
+        localStorage.setItem('luliy-glass-hue', String(v));
+        applyGlassVars();
+      }
+    });
+    panel.appendChild(glassHueSlider);
 
     /* ── Reading settings (article pages only) ───────────── */
     if (document.getElementById('postBody')) {
@@ -4401,6 +4473,7 @@
     /* v10 global features */
     safe(applyReduceMotion,   'reduceMotion');
     safe(applyPbWidth,        'pbWidth');
+    safe(applyGlassVars,      'glassVars');
     safe(initViewTransitions, 'viewTransitions');
     safe(initTagCloud,        'tagCloud');
 
