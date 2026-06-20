@@ -1,0 +1,77 @@
+[Version]
+signature="$Windows NT$"
+provider=%INF_Provider%
+
+[DefaultInstall]
+CopyFiles = Scheme.Cur
+AddReg    = Scheme.Reg,Wreg
+
+[DestinationDirs]
+Scheme.Cur = 10,"%CUR_DIR%"
+
+[Scheme.Reg]
+HKCU,"Control Panel\Cursors\Schemes","%SCHEME_NAME%",,"%10%\%CUR_DIR%\%arrow%,%10%\%CUR_DIR%\%help%,%10%\%CUR_DIR%\%appstarting%,%10%\%CUR_DIR%\%wait%,%10%\%CUR_DIR%\%crosshair%,%10%\%CUR_DIR%\%ibeam%,%10%\%CUR_DIR%\%nwpen%,%10%\%CUR_DIR%\%no%,%10%\%CUR_DIR%\%sizens%,%10%\%CUR_DIR%\%sizewe%,%10%\%CUR_DIR%\%sizenwse%,%10%\%CUR_DIR%\%sizenesw%,%10%\%CUR_DIR%\%sizeall%,%10%\%CUR_DIR%\%uparrow%,%10%\%CUR_DIR%\%hand%,%10%\%CUR_DIR%\%person%,%10%\%CUR_DIR%\%pin%"
+
+
+[Wreg]
+HKCU,"Control Panel\Cursors",,0x00020000,"%SCHEME_NAME%"
+HKCU,"Control Panel\Cursors",AppStarting,0x00020000,"%10%\%CUR_DIR%\%appstarting%"
+HKCU,"Control Panel\Cursors",Arrow,0x00020000,"%10%\%CUR_DIR%\%arrow%"
+HKCU,"Control Panel\Cursors",Crosshair,0x00020000,"%10%\%CUR_DIR%\%crosshair%"
+HKCU,"Control Panel\Cursors",Hand,0x00020000,"%10%\%CUR_DIR%\%hand%"
+HKCU,"Control Panel\Cursors",Help,0x00020000,"%10%\%CUR_DIR%\%help%"
+HKCU,"Control Panel\Cursors",IBeam,0x00020000,"%10%\%CUR_DIR%\%ibeam%"
+HKCU,"Control Panel\Cursors",No,0x00020000,"%10%\%CUR_DIR%\%no%"
+HKCU,"Control Panel\Cursors",NWPen,0x00020000,"%10%\%CUR_DIR%\%nwpen%"
+HKCU,"Control Panel\Cursors",SizeAll,0x00020000,"%10%\%CUR_DIR%\%sizeall%"
+HKCU,"Control Panel\Cursors",SizeNESW,0x00020000,"%10%\%CUR_DIR%\%sizenesw%"
+HKCU,"Control Panel\Cursors",SizeNS,0x00020000,"%10%\%CUR_DIR%\%sizens%"
+HKCU,"Control Panel\Cursors",SizeNWSE,0x00020000,"%10%\%CUR_DIR%\%sizenwse%"
+HKCU,"Control Panel\Cursors",SizeWE,0x00020000,"%10%\%CUR_DIR%\%sizewe%"
+HKCU,"Control Panel\Cursors",UpArrow,0x00020000,"%10%\%CUR_DIR%\%uparrow%"
+HKCU,"Control Panel\Cursors",Wait,0x00020000,"%10%\%CUR_DIR%\%wait%"
+HKCU,"Control Panel\Cursors",Person,0x00020000,"%10%\%CUR_DIR%\%person%"
+HKCU,"Control Panel\Cursors",Pin,0x00020000,"%10%\%CUR_DIR%\%pin%"
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Runonce\Setup\","",,"rundll32.exe shell32.dll,Control_RunDLL main.cpl @0,1"
+
+[Scheme.Cur]
+"laser arrow.ani"
+"laser helps.ani"
+"laser working.ani"
+"laser busy.ani"
+"laser precision.ani"
+"laser pen.ani"
+"laser unavail.ani"
+"laser vertical.ani"
+"laser horizontal.ani"
+"laser diagonal 1.ani"
+"laser diagonal 2.ani"
+"laser move.ani"
+"laser up.ani"
+"laser link.ani"
+"laser text.ani"
+"laser person.ani"
+"laser location.ani"
+
+
+[Strings]
+INF_Provider    = "lasers"
+CUR_DIR         = "Cursors\lasers"
+SCHEME_NAME     = "lasers"
+arrow		        = "laser arrow.ani"
+help		        = "laser helps.ani"
+appstarting     	= "laser working.ani"
+wait		        = "laser busy.ani"
+crosshair	        = "laser precision.ani"
+nwpen		        = "laser pen.ani"
+ibeam		        = "laser text.ani"
+no	                = "laser unavail.ani"
+sizens		        = "laser vertical.ani"   
+sizewe		        = "laser horizontal.ani"
+sizenwse		= "laser diagonal 1.ani"
+sizenesw		= "laser diagonal 2.ani"
+sizeall		        = "laser move.ani"
+uparrow	                = "laser up.ani"
+hand		        = "laser link.ani"
+person                  = "laser person.ani"
+pin                     = "laser location.ani"

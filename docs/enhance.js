@@ -426,7 +426,7 @@
           });
         } else { try { ap.pause(); } catch(e){} }
 
-        /* ── Mini control strip: add-music + hide-to-side ──── */
+        /* ── Mini control strip: add-music only ──────────────── */
         if (!wrap.querySelector('.luliy-ap-tools')) {
           var tools = document.createElement('div');
           tools.className = 'luliy-ap-tools';
@@ -454,34 +454,50 @@
             } catch(err) { try { console.warn('[luliy] add track failed', err); } catch(e2){} }
           });
 
-          /* Hide-to-side button — collapses the player to a thin edge tab */
-          var hideBtn = document.createElement('button');
-          hideBtn.type = 'button'; hideBtn.className = 'luliy-ap-tool luliy-ap-hide';
-          hideBtn.textContent = '‹';
-          hideBtn.title = '收起到侧边';
-          var AHIDE = 'luliy-aplayer-hidden';
-          function applyHidden(hidden) {
-            wrap.classList.toggle('is-tucked', hidden);
-            hideBtn.textContent = hidden ? '›' : '‹';
-            hideBtn.title = hidden ? '展开播放器' : '收起到侧边';
-            try { localStorage.setItem(AHIDE, hidden ? '1' : '0'); } catch(e){}
-          }
-          hideBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            applyHidden(!wrap.classList.contains('is-tucked'));
-          });
-          /* Restore saved hidden state */
-          try { if (localStorage.getItem(AHIDE) === '1') applyHidden(true); } catch(e){}
-          /* Tapping a tucked player re-expands it */
-          wrap.addEventListener('click', function(e) {
-            if (wrap.classList.contains('is-tucked') && !e.target.closest('.luliy-ap-tool')) {
-              applyHidden(false);
-            }
-          });
-
           tools.appendChild(addBtn);
-          tools.appendChild(hideBtn);
           wrap.appendChild(tools);
+        }
+
+        /* ── ★ 圆形折叠按钮（参照目录 #luliy-toc-fab 的交互方式）：
+           默认收起成一个圆形按钮，点击展开成完整播放器（拖拽/歌词全都还在），
+           再点一次按钮、点击外部空白处或按 Esc 都能收起回圆形。
+           音频本身不受展开/收起影响，收起时依旧在后台播放。 */
+        if (!document.getElementById('luliy-ap-fab')) {
+          var apFab = document.createElement('button');
+          apFab.id = 'luliy-ap-fab';
+          apFab.type = 'button';
+          apFab.setAttribute('aria-label', '\u97f3\u4e50\u64ad\u653e\u5668');
+          apFab.textContent = '\u266A';   /* ♪ */
+          apFab.classList.add('is-visible');
+
+          var APOPEN = 'luliy-aplayer-open';
+          var apOpen = false;
+          function setApOpen(v) {
+            apOpen = v;
+            wrap.classList.toggle('is-open', apOpen);
+            apFab.classList.toggle('is-active', apOpen);
+            try { localStorage.setItem(APOPEN, apOpen ? '1' : '0'); } catch (e) {}
+          }
+          apFab.addEventListener('click', function (e) {
+            e.stopPropagation();
+            setApOpen(!apOpen);
+            playSfx('click');
+          });
+          document.addEventListener('click', function (e) {
+            if (!apOpen) return;
+            if (e.target === apFab || apFab.contains(e.target)) return;
+            if (wrap.contains(e.target)) return;
+            setApOpen(false);
+          });
+          document.addEventListener('keydown', function (e) {
+            if (apOpen && (e.key === 'Escape' || e.keyCode === 27)) { setApOpen(false); playSfx('click'); }
+          });
+          document.body.appendChild(apFab);
+
+          /* 默认收起；只有用户上次主动展开过才恢复展开状态 */
+          var wasOpen = false;
+          try { wasOpen = localStorage.getItem(APOPEN) === '1'; } catch (e) {}
+          setApOpen(wasOpen);
         }
 
       } catch(e) { console.warn('[luliy] APlayer failed', e); }
@@ -494,81 +510,12 @@
     document.head.appendChild(sc);
   }
 
-  function initHomeHero() {
-    /* Only on the homepage / index, not on article or single pages */
-    if (!isIndexPage()) return;
-    if (document.getElementById('luliy-hero')) return;
-    /* ★ 大改后：「常驻」——欢迎页每次进主页都显示，
-       不再只显示一次（删掉了原本的 sessionStorage 限制）。
-       但若网址带 #cats（左上角 ΔιάΝους 点击回主页时用这个），
-       则直接跳过欢迎页，落到六张卡片区。 */
-    if (location.hash === '#cats') { root._luliyHeroSkipped = true; return; }
+  /* ---- 00 欢迎页（Hero）已删除 --------------------------
+     原因：会反复出现"第一次显示、之后又不出现"的不一致问题，
+     用户决定彻底去掉。主页现在打开即直接显示六张分类卡片。
+     加载动画（#luliy-splash，居中荧光 ΔιάΝους 文字）是另一个独立
+     功能，与欢迎页无关，予以保留。 */
 
-    var hero = document.createElement('section');
-    hero.id = 'luliy-hero';
-    /* ★ 去掉深色渐变蒙版，图片纯净显示（不再叠加 linear-gradient 暗角） */
-    hero.style.backgroundImage = "url('" + LULIY_OPTS.heroImage + "')";
-    hero.setAttribute('role', 'button');
-    hero.setAttribute('tabindex', '0');
-    hero.setAttribute('aria-label', '\u8fdb\u5165\u4e3b\u9875');   /* 进入主页 */
-
-    /* ★ 不要文章/文字：只有标题/副标题非空时才创建对应元素 */
-    var inner = null;
-    if (LULIY_OPTS.heroTitle || LULIY_OPTS.heroSubtitle) {
-      inner = document.createElement('div');
-      inner.id = 'luliy-hero-inner';
-      if (LULIY_OPTS.heroTitle) {
-        var title = document.createElement('h1');
-        title.id = 'luliy-hero-title';
-        title.textContent = LULIY_OPTS.heroTitle;
-        inner.appendChild(title);
-      }
-      if (LULIY_OPTS.heroSubtitle) {
-        var sub = document.createElement('p');
-        sub.id = 'luliy-hero-intro-sub';
-        sub.textContent = LULIY_OPTS.heroSubtitle;
-        inner.appendChild(sub);
-      }
-      hero.appendChild(inner);
-    }
-
-    /* 持续呼吸的小提示（不依赖滚动，点哪都能进） */
-    var hint = document.createElement('div');
-    hint.id = 'luliy-hero-hint';
-    hint.textContent = LULIY_OPTS.heroHint || '\u2193';
-
-    hero.appendChild(hint);
-
-    /* Corner badge — e.g. "Pre-order on June 25" style tag, top-left of the Hero */
-    if (LULIY_OPTS.heroBadge) {
-      var badge = document.createElement('div');
-      badge.id = 'luliy-hero-badge';
-      badge.textContent = LULIY_OPTS.heroBadge;
-      hero.appendChild(badge);
-    }
-
-    /* Insert hero as the very first thing in the page flow */
-    if (document.body.firstChild) document.body.insertBefore(hero, document.body.firstChild);
-    else document.body.appendChild(hero);
-
-    /* ★ 大改后：不再是「滚动渐隐」，而是「点一下（整张图任意位置都可点）
-       直接进入主页」——淡出后从文档流移除，下面的内容自然顶上来填满视口，
-       不做滚动动画，也不监听 scroll 事件。 */
-    var entered = false;
-    function enterSite() {
-      if (entered) return;
-      entered = true;
-      hero.classList.add('is-leaving');
-      setTimeout(function () {
-        if (hero && hero.parentNode) hero.parentNode.removeChild(hero);
-      }, 550);   /* 与 CSS 淡出时长一致 */
-    }
-    hero.addEventListener('click', enterSite);
-    hero.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSite(); }
-    });
-    root._luliyHeroEnter = enterSite;   /* 供"点击 ΔιάΝους 跳过欢迎页"复用 */
-  }
 
   /* ---- 00b  Homepage category cards (Rockstar-style, 3 across) ----
      Three big cards (Study / Journal / Musings). Each links to
@@ -630,12 +577,9 @@
     moreRow.appendChild(more);
     section.appendChild(moreRow);
 
-    /* Insert right after the Hero (if present) or right before #content */
-    var hero = document.getElementById('luliy-hero');
+    /* Insert right before #content (hero 已删除，不需要再判断它) */
     var content = document.getElementById('content');
-    if (hero && hero.parentNode) {
-      hero.parentNode.insertBefore(section, hero.nextSibling);
-    } else if (content && content.parentNode) {
+    if (content && content.parentNode) {
       content.parentNode.insertBefore(section, content);
     } else {
       document.body.appendChild(section);
@@ -1692,26 +1636,13 @@
     document.body.appendChild(ham);
 
     /* ★ 左上角博客名 ΔιάΝους（纯文字，点击回主页），固定在汉堡按钮右侧。
-       全站可见，是「化繁为简」后的主要品牌标识。
-       点击它返回主页时跳过开屏欢迎页，直接落到六张卡片区
-       （用 #cats 这个 hash 当信号，initHomeHero 见到它就不显示自己）。 */
+       全站可见，是「化繁为简」后的主要品牌标识。 */
     if (!document.getElementById('luliy-brand')) {
       var brand = document.createElement('a');
       brand.id = 'luliy-brand';
-      brand.href = '/#cats';
+      brand.href = '/';
       brand.textContent = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
       brand.setAttribute('aria-label', brand.textContent + ' \u2014 \u8fd4\u56de\u4e3b\u9875');
-      brand.addEventListener('click', function (e) {
-        /* 已经在主页：不整页刷新，直接让欢迎页（若还在）淡出消失 */
-        if (isIndexPage()) {
-          e.preventDefault();
-          if (root._luliyHeroEnter) root._luliyHeroEnter();
-          try { history.replaceState(null, '', '/#cats'); } catch (err) {}
-          var catsEl = document.getElementById('luliy-cats-wrap');
-          if (catsEl) catsEl.scrollIntoView({ behavior: 'auto', block: 'start' });
-        }
-        /* 不在主页：走正常链接跳转，新页面加载时 initHomeHero 会读取 #cats 自动跳过欢迎页 */
-      });
       document.body.appendChild(brand);
     }
 
@@ -2424,10 +2355,11 @@
 
       /* ── Route by current view + expose re-render for view switch ─ */
       function renderRegular() {
-        /* ★ 分类页：焊死网格视图（不留切换入口）。
-           归档页：焊死时间轴视图，呈现"卡片沿时间线排列"的效果。
-           其余页面（理论上只剩首页，但首页已不调用本函数）按用户偏好。 */
-        var view = isTagPage ? 'grid' : (isArchive ? 'timeline' : getCardView());
+        /* ★ 分类页：跟随设置面板里的「卡片视图」（网格/列表/时间轴），
+           和首页以前的切换方式一样，由 getCardView() 统一控制。
+           归档页：固定时间轴视图，呈现"卡片沿时间线排列"的效果——
+           这是「more」按钮的专属入口，不需要切换。 */
+        var view = isArchive ? 'timeline' : getCardView();
         if (view === 'timeline') renderTimeline();
         else renderPaged();
         applyCardView(view);
@@ -3384,8 +3316,7 @@
     return CARD_VIEWS.indexOf(v) >= 0 ? v : 'grid';
   }
   function applyCardView(forcedView) {
-    var isTagPg = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
-    var view = forcedView || (isTagPg ? 'grid' : (isArchivePage() ? 'timeline' : getCardView()));
+    var view = forcedView || (isArchivePage() ? 'timeline' : getCardView());
     document.querySelectorAll('.luliy-card-grid').forEach(function (g) {
       /* Pinned strip always stays a grid — alt layouts make no sense there */
       if (g.classList.contains('luliy-pinned-grid')) {
@@ -3707,14 +3638,11 @@
   function initTagCloud() {
     var onTagPage = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
     if (!onTagPage) return;
-    /* Keep Gmeek's native article/tag list intact — do NOT hide it. */
-    var pbody = document.getElementById('postBody') ||
-      document.querySelector('.SideNav, .markdown-body, #content');
-    var mount = document.getElementById('content') || document.body;
+    if (document.getElementById('luliy-tagcloud')) return;   /* 防重复执行 */
 
     fetchPosts().then(function (posts) {
       if (!posts || !posts.length) return;
-      /* Count tag frequencies + collect year colors */
+      /* Count tag frequencies + collect label colors */
       var freq = {}, colors = {};
       posts.forEach(function (p) {
         (p.labels || []).forEach(function (l) {
@@ -3738,77 +3666,41 @@
 
       var cloud = document.createElement('div');
       cloud.className = 'luliy-tagcloud-body';
-      /* Sort by frequency desc for nicer layout */
       tags.sort(function (a, b) { return freq[b] - freq[a]; });
+
+      function syncActive() {
+        var cur = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+        cloud.querySelectorAll('.luliy-tag-bubble').forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-tag') === cur);
+        });
+      }
+
       tags.forEach(function (t) {
         var ratio = max === min ? 0.5 : (freq[t] - min) / (max - min);
         var size = 13 + ratio * 22;  /* 13px → 35px */
         var bubble = document.createElement('a');
         bubble.className = 'luliy-tag-bubble';
+        bubble.setAttribute('data-tag', t);
+        /* ★ 点击气泡只是普通的 hash 跳转链接，不再自己渲染列表。
+           tag.html#标签名 这个 hash 变化会被 initCards() 里已经接好的
+           hashchange 监听器捕获，自动重新筛选并刷新下面那套统一的
+           卡片网格——两套 UI 由此"合二为一"，不再各管各的。 */
         bubble.href = '/tag.html#' + encodeURIComponent(t);
         bubble.style.fontSize = size.toFixed(1) + 'px';
         bubble.style.setProperty('--tag-c', colors[t]);
         bubble.innerHTML = esc(t) + '<sup>' + freq[t] + '</sup>';
-        bubble.addEventListener('click', function (e) {
-          e.preventDefault();
-          playSfx('click');
-          /* Filter the article list below by this tag */
-          if (root._luliyRenderTagList) root._luliyRenderTagList(t);
-          cloud.querySelectorAll('.luliy-tag-bubble').forEach(function(b){ b.classList.remove('is-active'); });
-          bubble.classList.add('is-active');
-        });
+        bubble.addEventListener('click', function () { playSfx('click'); });
         cloud.appendChild(bubble);
       });
       wrap.appendChild(cloud);
+      syncActive();
+      window.addEventListener('hashchange', syncActive);
 
-      /* Insert above the existing tag list */
-      var sidenav = document.querySelector('.SideNav');
-      if (sidenav && sidenav.parentNode) {
-        sidenav.parentNode.insertBefore(wrap, sidenav);
-      } else if (mount) {
-        mount.insertBefore(wrap, mount.firstChild);
-      }
-
-      /* ── Article list in list-view card style ─────────────── */
-      function renderTagArticleList(filterTag) {
-        var ex = document.getElementById('luliy-tag-articles');
-        if (ex) ex.remove();
-        var filtered = filterTag
-          ? posts.filter(function(p){ return (p.labels||[]).some(function(l){ return (l.name||l)===filterTag; }) && !(p.labels||[]).some(function(l){ return /^pinned/.test(l.name||l); }); })
-          : posts.filter(function(p){ return !(p.labels||[]).some(function(l){ return /^pinned/.test(l.name||l); }); });
-        filtered.sort(function(a,b){ return String(b.created).localeCompare(String(a.created)); });
-        var listWrap = document.createElement('div');
-        listWrap.id = 'luliy-tag-articles';
-        filtered.forEach(function(p) {
-          var card = document.createElement('a');
-          card.className = 'luliy-tag-list-card';
-          card.href = buildPostLink(p.link);
-          var meta = document.createElement('div');
-          meta.className = 'luliy-tag-card-meta';
-          var d = p.created ? new Date(p.created) : null;
-          meta.textContent = d ? (d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0')) : '';
-          var titleEl = document.createElement('div');
-          titleEl.className = 'luliy-tag-card-title';
-          titleEl.textContent = p.title || p.postTitle || p.name || '';
-          var labelsEl = document.createElement('div');
-          labelsEl.className = 'luliy-tag-card-labels';
-          (p.labels||[]).filter(function(l){ return !/^pinned/.test(l.name||l); }).forEach(function(l) {
-            var tb = document.createElement('span');
-            tb.className = 'luliy-card-label';
-            tb.textContent = l.name || l;
-            tb.style.setProperty('--lc', '#'+((l.color||'0969da')+'').replace(/^#/,''));
-            labelsEl.appendChild(tb);
-          });
-          card.appendChild(meta); card.appendChild(titleEl);
-          if (labelsEl.children.length) card.appendChild(labelsEl);
-          listWrap.appendChild(card);
-        });
-        var target = sidenav ? sidenav.parentNode : mount;
-        if (sidenav) { sidenav.parentNode.insertBefore(listWrap, sidenav.nextSibling); }
-        else { mount.appendChild(listWrap); }
-      }
-      renderTagArticleList(null);
-      root._luliyRenderTagList = renderTagArticleList;
+      /* Insert above the card grid（#luliy-tag-grid 由 initCards() 创建；
+         若它还没创建好就先插到 #content 顶部，等 initCards 跑完再调整也没关系，
+         因为 #luliy-tag-grid 本身在 #content 末尾追加，先后顺序不影响视觉） */
+      var mount = document.getElementById('content') || document.body;
+      mount.insertBefore(wrap, mount.firstChild);
     }).catch(function () {});
   }
 
@@ -4152,7 +4044,6 @@
       });
     } catch (e) {}
 
-    safe(initHomeHero,        'homeHero');
     safe(initCategoryCards,   'categoryCards');
     safe(initAPlayer,         'aplayer');
     safe(initProgressBar,     'progressBar');

@@ -99,43 +99,7 @@ body.luliy-post-page #postBody {
 }
 
 
-/* ── Tag page article list cards ──────────────────────────── */
-#luliy-tag-articles {
-  margin-top: 20px;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.luliy-tag-list-card {
-  display: flex; flex-direction: column; gap: 6px;
-  padding: 16px 20px; border-radius: 14px;
-  text-decoration: none !important;
-  background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(130,80,223,0.10);
-  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
-}
-[data-color-mode="dark"] .luliy-tag-list-card {
-  background: rgba(22,16,36,0.72);
-  border-color: rgba(130,80,223,0.18);
-}
-.luliy-tag-list-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 28px rgba(130,80,223,0.18);
-  background: rgba(255,255,255,0.88);
-}
-[data-color-mode="dark"] .luliy-tag-list-card:hover { background: rgba(28,20,44,0.88); }
-.luliy-tag-card-meta {
-  font-size: 12px; opacity: 0.60;
-  font-family: 'LXGW WenKai Mono', monospace;
-  color: var(--th-accent, #8250df);
-}
-.luliy-tag-card-title {
-  font-size: 16px; font-weight: 700;
-  color: #1a1430;
-  line-height: 1.4;
-}
-[data-color-mode="dark"] .luliy-tag-card-title { color: rgba(245,240,255,0.95); }
-.luliy-tag-card-labels { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+/* ── 旧的重复文章列表样式已删除（duplicateList，见 initTagCloud 改造说明） ── */
 .luliy-tag-bubble.is-active {
   background: var(--tag-c, #8250df) !important;
   color: #fff !important;
@@ -407,20 +371,20 @@ body.luliy-home #pagination {
   display: none !important;
 }
 
-/* 卡片区：fixed 满屏 + flex 居中，彻底不受页面其它元素高度/位置影响，
-   在任意窗口尺寸下都能"整体垂直 + 水平居中"。 */
+/* 卡片区：正常文档流 + min-height:100vh + flex 居中。
+   能这样写是因为上面已经把 #content 整个 display:none 了（高度归零），
+   所以卡片区不再被"它后面还有别的高内容"顶歪，可以放心居中；
+   同时它是 #footer（Gmeek 原生页脚）的前一个兄弟节点，
+   página 自然顺序就是「卡片区 → footer」，footer 会乖乖待在卡片下方，
+   不用再像之前那样用 fixed 叠加层去"硬居中"。 */
 #luliy-cats-wrap {
-  position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;   /* inset:0 回退 */
-  inset: 0;
-  z-index: 5;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 96px 24px 32px;   /* 顶部留出 logo / 播放器空间 */
   box-sizing: border-box;
-  overflow-y: auto;          /* 内容超高时（极小屏）可滚动，不被裁切 */
 }
 /* 卡片网格本身限制最大宽度并居中 */
 #luliy-cats {
@@ -573,20 +537,32 @@ body.luliy-tag-takeover .notFind {
   color: var(--th-h1, #00e5ff);
 }
 
-/* 我们自建的卡片容器：标准三列网格（≥860px），样式与首页卡片一致。
+/* 我们自建的卡片容器：标准三列网格（≥860px，仅网格模式下生效）。
+   用 :not() 排除列表/时间轴模式，避免 ID 选择器的高优先级
+   抢了 .luliy-card-grid.luliy-card-list / .luliy-card-timeline 的样式
+   （那两个是纯 class 选择器，优先级比 ID 低，不加 :not() 会被盖掉）。
    .luliy-card / .luliy-card-grid 等具体卡片样式由后面统一区块提供。 */
-#luliy-tag-grid.luliy-card-grid {
+#luliy-tag-grid.luliy-card-grid:not(.luliy-card-list):not(.luliy-card-timeline) {
   grid-template-columns: repeat(3, 1fr);
 }
 @media (max-width: 860px) {
-  #luliy-tag-grid.luliy-card-grid { grid-template-columns: repeat(2, 1fr); }
+  #luliy-tag-grid.luliy-card-grid:not(.luliy-card-list):not(.luliy-card-timeline) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 @media (max-width: 560px) {
-  #luliy-tag-grid.luliy-card-grid { grid-template-columns: 1fr; }
+  #luliy-tag-grid.luliy-card-grid:not(.luliy-card-list):not(.luliy-card-timeline) {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
-   03  Background — 纯色 #00020c（深浅模式通用，无背景图功能）
+   03  Background — 赛博朋克 2077 风格（纯色基底 + CSS 装饰层）
+   设计原则：低调，不抢文字风头。
+     · 基底依旧是 #00020c 深色纯色，深浅模式通用；
+     · 叠加层全部用极低透明度（3%~10%），且用 mask 往边缘淡出，
+       中心阅读区域几乎感觉不到，只在留白处隐约可见；
+     · 不用任何图片、不做动画，性能开销几乎为零。
 ══════════════════════════════════════════════════════════ */
 html, body {
   background: #00020c !important;
@@ -595,6 +571,42 @@ html, body {
 [data-color-mode="light"] html,
 [data-color-mode="light"] body {
   background: #00020c !important;
+}
+
+/* 装饰层①：极淡电路网格，用径向遮罩往四周淡出，避免盖住正文 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.05) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 28%, #000 35%, transparent 88%);
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 28%, #000 35%, transparent 88%);
+}
+/* 装饰层②：四角霓虹光晕（青 / 品红 / 紫），呼应加载动画与卡片的配色 */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 46vw 38vh at 6% -4%,  rgba(255,43,214,0.10), transparent 70%),
+    radial-gradient(ellipse 46vw 38vh at 96% 4%,  rgba(0,229,255,0.10), transparent 70%),
+    radial-gradient(ellipse 55vw 42vh at 50% 104%, rgba(123,47,190,0.08), transparent 72%);
+}
+/* 手机上网格更密会显花，调粗一点、再淡一点 */
+@media (max-width: 600px) {
+  body::before {
+    background-size: 34px 34px;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.035) 1px, transparent 1px);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2550,7 +2562,7 @@ body[data-luliy-theme="mono"] {
   border-radius: 10px !important;
   box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
 }
-/* ── Mini control strip: add-music + hide-to-side ───────── */
+/* ── Mini control strip: add-music ──────────────────────── */
 .luliy-ap-tools {
   display: flex; gap: 4px;
   position: absolute; top: 2px; right: 2px;
@@ -2568,21 +2580,50 @@ body[data-luliy-theme="mono"] {
 }
 .luliy-ap-tool:hover { transform: scale(1.15); background: var(--th-accent, #8250df); }
 .luliy-ap-add { font-size: 15px; font-weight: 700; }
-.luliy-ap-hide { font-size: 15px; font-weight: 700; }
 [data-color-mode="dark"] #luliy-aplayer .luliy-ap-tool { background: rgba(255,255,255,0.18); }
-/* ── Hide-to-side: collapse the player to a thin edge tab ── */
+
+/* ══════════════════════════════════════════════════════════
+   音乐播放器：圆形按钮默认收起，点击展开（交互方式与目录按钮一致）
+══════════════════════════════════════════════════════════ */
+/* 圆形折叠按钮，样式参照 #luliy-toc-fab，在它正上方紧接着排列 */
+#luliy-ap-fab {
+  position: fixed; bottom: 268px; right: 22px;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--th-accent-soft, rgba(130,80,223,0.22));
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.35));
+  color: var(--th-accent, #8250df); font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; z-index: 9994;
+  transition: opacity 0.28s, transform 0.28s, background 0.25s, color 0.25s;
+}
+#luliy-ap-fab.is-visible { opacity: 1; pointer-events: all; }
+#luliy-ap-fab.is-active {
+  background: var(--th-accent, #8250df) !important;
+  color: #fff !important;
+  border-color: var(--th-accent, #8250df) !important;
+}
+#luliy-ap-fab:hover { transform: translateY(-3px); background: var(--th-accent-hover, rgba(130,80,223,0.35)); }
+[data-color-mode="dark"] #luliy-ap-fab { color: var(--th-accent, #cba6f7); }
+
+/* 完整播放器：默认收起（不占地方、不拦截点击），点圆形按钮后展开 */
 #luliy-aplayer {
-  transition: box-shadow 0.2s, transform 0.32s cubic-bezier(.4,0,.2,1);
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.2,.8,.3,1), visibility 0.22s;
+  transform-origin: top right;
 }
-#luliy-aplayer.is-tucked {
-  transform: translateX(calc(-100% + 16px));   /* only a 16px sliver shows */
-  cursor: pointer;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.45) !important;
+#luliy-aplayer.is-open {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  visibility: visible;
 }
-#luliy-aplayer.is-tucked:hover { transform: translateX(calc(-100% + 24px)); }
-#luliy-aplayer.is-tucked .luliy-ap-hide {
-  position: absolute; top: 50%; right: 2px; transform: translateY(-50%);
-  background: var(--th-accent, #8250df);
+@media (max-width: 768px) {
+  /* 手机上圆形按钮和其它竖排按钮一起，间距收紧一点 */
+  #luliy-ap-fab { bottom: 252px; }
 }
 
 
@@ -3735,4 +3776,43 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
 @media (max-width: 860px) {
   .luliy-hero-cap-sep { margin: 0 2px; }
   #luliy-hero-capsule { gap: 0; padding: 6px 6px; }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   32  自定义鼠标样式 —— 赛博朋克激光箭头
+   素材来源：用户提供的 Windows .ani 动态光标包（lasers 文件夹）。
+   说明：浏览器不支持 .ani 这种 Windows 专用格式，所以这里取了其中
+   一帧裁成静态 PNG，转 Base64 直接内嵌（不用另外上传图片文件，
+   替换这一份 enhance.css 就能用）。
+     · 默认光标：珊瑚粉箭头（来自 laser arrow.ani 第一帧）
+     · 链接/按钮悬停：亮品红箭头（来自 laser link.ani 第一帧）
+   热点坐标（光标图片里"指尖"对应的像素点）已经按原文件保留，
+   保证点击定位准确。放在文件最后 + !important，
+   确保能覆盖前面散落的 34 处 cursor:pointer 声明。
+══════════════════════════════════════════════════════════ */
+html, body {
+  cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAABy1BMVEX/////UWv/UWv/UWv/UWv/UWv/UWv/UWv/UWv/UWv/UWv/UWv/////hZP/UWv/UWv/UWv/UWv/m6X/UWv/UWv/UWv/UWv/UWv/3+L/lqD/UWv/UWv/UWv/UWv/UWv/c4T/3uD/kZz/UWv/UWv/UWv/UWv/eYn/4OL/i5f/UWv/UWv/UWv/fo3/4uT/hpP/UWv/gpD/5Ob/gY//UWv/h5T/5uj/fYz/6Or/eon/j5v/UWv/UWv/6uz/eIj/k57/UWv/U2z/7O7/dYX/lqH/UWv/UWv/Vm//7/D/coP/mqT/UWv/UWv/W3L/8PH/cYL/nqf/UWv/UWv/X3X/8vP/oar/UWv/UWv/UWv/Y3j/9PX/pK3/UWv/UWv/an3/9vb+/v7/qLD/cIL/9/j/dob/q7P/UWv/d4f/+Pn/rrX/UWv/+vr/sbj/hJL/+vv/tLv/i5j/+/v/UWv/t73/kp7/usD/e4r/vcL/fIv/wMX/qLH/wsf/r7f/f47/xcr/tr3/9/f/gI7/yMz/vsP/9fX/y8//xsv/8/T/zdH/g5H/z9P/09f/7u//0tb/VG3/2dz9/f3/1Nj/WHD/trz/pa3/n6j/19r/297/6er/qrJknfD5AAAAmXRSTlMABQoUHigjMktfWjf/r6qWc4L/8MOHRqX////SfWm+////uXgtbv////q0Qf////X///+v////////5uH////c/////82g/////5Fk/////4xV////UBnr////1w///////////zz///+b/////////8j///////////////////////////////////////////////////+YHlefAAAACXBIWXMAAA9hAAAPYQGoP6dpAAADPklEQVRYhe3X+3vSVhgHcMIlB9JXCCMF/UJRCekFVFTmZVDFKWiFuZVNqApbvFVXr61uc/PuNu/azd3/3J1Tn+rKSgjhNx+/PyY5nyfJec/JG5frHYkkuSVpgOFuj9cnez1up4Dby/wBxT8kOxU8TKE1wZDqdyp4/WGiDyLacNShIAditJbWIZ6Ieh0JvpEkrd9AG5HSnQlpQ6NRjNH4REbPOhGYqtEmYDNtyWVUJwIzUrQVwDbaHnEkMCNPH3IAO2inI4EZQRoXAHbRbieCAD5CrlAsYJL2OBDEI+xFKRUMlvZ9TPv7FwRwAOVKwqgUDx6iqb7ngql5OoxytZatVYqfHKFP+xWYmqHPUJ6uy0O1WOHzL2hqItVXRQngKOLVhqc5NBKbOXac1vcnCOAEWtVGW+JCMPLlV+Z+9CMwNUUn0Qo12i4uGPnIqdPmGSTtCwI4i1Ko3ubbW3PWyE+cO2+eQ9L26mZ6kr5GcU4ALndzVs1g5wVzDzS7ggAuovAa4DtkVk3h0mVz1LYggCsoVJQlQAh6Elfnzd1YsCcwXaNrmIkpHteykNBwfUkI2xEE8A0ibwAuRMMLODxvfmtPYAmNvkMuGFgGXG45Gi7j6Lx5A2UbAkss0PcrAC74h+P44YK5yY4ggJuYyNfeAkKYbuHWefO2EHp8L1iiTHeAfK35n4NtuVEt4e498z7ivQQBPAAyKwBX29eoFvHjT+Z2xHt8swTwMwdGVgBcqIcKePjI3NpLYOE4PQZSHQAXlLkZPD5iPoGmzza7NxACeAokOwGpnVYqkX3PnpuXchXF1/0WBPCCA0YHIIRALPdycfKXJymDtS2AFv0KaIa388ySMPPqt9//SKpDntXGvgH+5ID6P8AleVhgrhzJtSo1ZgEMl2gRWFgFEEI9EapUVb/P4hE48FcXgAu+2YZSj6abFi+RAxuAsr4asNTDyaKHs5jG4SKNAXFd7nKBJNJ1+GtgsxXQK2y6SNuAVmIQYMcgQJrXwd/iJToFfHxPnBSLadVZsBG5FqR/UJpTOteC3Xgb4UypFdSz3WvNOrxa9eq04U877dZ5ux+tN7Jpiy3DOlJ7wB8OUe/ugf553ud9Bs2/C+GRdDvhxBUAAAAASUVORK5CYII=") 6 6, auto !important;
+}
+a, button, [role="button"], [onclick],
+input[type="button"], input[type="submit"], input[type="reset"],
+select, summary, label[for],
+.luliy-cat-card, .luliy-card, .luliy-tag-bubble,
+#luliy-ham-btn, #luliy-brand, #luliy-cats-more,
+.luliy-ctrl-panel button, .luliy-ctrl-row,
+#luliy-ap-fab, #luliy-toc-fab, #luliy-search-fab, #luliy-back-top {
+  cursor: url("data:image/png;base64,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") 23 7, pointer !important;
+}
+/* 触屏设备没有鼠标，自定义光标没有意义，干脆不设，用系统默认即可 */
+@media (hover: none) and (pointer: coarse) {
+  html, body,
+  a, button, [role="button"], [onclick],
+  input[type="button"], input[type="submit"], input[type="reset"],
+  select, summary, label[for],
+  .luliy-cat-card, .luliy-card, .luliy-tag-bubble,
+  #luliy-ham-btn, #luliy-brand, #luliy-cats-more,
+  .luliy-ctrl-panel button, .luliy-ctrl-row,
+  #luliy-ap-fab, #luliy-toc-fab, #luliy-search-fab, #luliy-back-top {
+    cursor: auto !important;
+  }
 }
