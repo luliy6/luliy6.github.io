@@ -426,19 +426,19 @@ body.luliy-home #pagination {
    平板/手机/矮屏的响应式收缩规则不受影响。 */
 #luliy-cats {
   width: 100%;
-  max-width: 1440px;        /* 1200 × 1.2 */
+  max-width: 1200px;        /* ★ 宽度恢复 1 倍原始值 */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;                /* 16 × 1.2 */
+  gap: 16px;                /* 1 倍 */
 }
 .luliy-cat-card {
   position: relative;
-  height: 360px;            /* 300 × 1.2 */
+  height: 375px;            /* ★ 高度在 1 倍(300px)基础上 +25% = 375px */
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 28px;            /* 24 × 1.2 */
-  border-radius: 19px;      /* 16 × 1.2 */
+  padding: 24px;            /* 1 倍 */
+  border-radius: 16px;      /* 1 倍 */
   background-size: cover;
   background-position: center;
   text-decoration: none !important;
@@ -455,49 +455,48 @@ body.luliy-home #pagination {
 .luliy-cat-card:hover .luliy-cat-title { transform: translateY(-3px); }
 .luliy-cat-kicker {
   align-self: flex-start;
-  font-size: 14px;          /* 12 × 1.2 */
-  letter-spacing: 5px;      /* 4 × 1.2 */
+  font-size: 12px;          /* 1 倍 */
+  letter-spacing: 4px;      /* 1 倍 */
   font-weight: 700;
   color: rgba(255,255,255,0.9);
   text-transform: uppercase;
-  margin-bottom: 10px;      /* 8 × 1.2 */
+  margin-bottom: 8px;       /* 1 倍 */
   text-shadow: 0 1px 8px rgba(0,0,0,0.7);
 }
 .luliy-cat-title {
-  margin: 0 0 10px;         /* 8 × 1.2 */
-  font-size: 32px;          /* 26 × 1.2 */
+  margin: 0 0 8px;          /* 1 倍 */
+  font-size: 26px;          /* 1 倍 */
   font-weight: 900;
   color: #fff;
-  letter-spacing: 2.5px;    /* 2 × 1.2 */
+  letter-spacing: 2px;      /* 1 倍 */
   text-shadow: 0 2px 18px rgba(0,0,0,0.7);
   transition: transform 0.3s ease;
 }
 .luliy-cat-desc {
   margin: 0;
-  font-size: 16px;          /* 13 × 1.2 */
+  font-size: 13px;          /* 1 倍 */
   line-height: 1.5;
   color: rgba(255,255,255,0.86);
   text-shadow: 0 1px 10px rgba(0,0,0,0.6);
 }
-/* "more →" row, bottom-right, → archive
-   ★ 同样缩回 1.2 倍 */
+/* "more →" row, bottom-right, → archive ★ 恢复 1 倍 */
 #luliy-cats-more-row {
   width: 100%;
-  max-width: 1440px;        /* 1200 × 1.2 */
+  max-width: 1200px;        /* 1 倍 */
   display: flex;
   justify-content: flex-end;
-  margin: 22px auto 0;      /* 18 × 1.2 */
+  margin: 18px auto 0;      /* 1 倍 */
 }
 #luliy-cats-more {
   display: inline-flex;
   align-items: center;
-  gap: 10px;                /* 8 × 1.2 */
-  font-size: 17px;          /* 14 × 1.2 */
+  gap: 8px;                 /* 1 倍 */
+  font-size: 14px;          /* 1 倍 */
   font-weight: 700;
-  letter-spacing: 1.2px;    /* 1 × 1.2 */
+  letter-spacing: 1px;      /* 1 倍 */
   color: #c8e8ff;
   text-decoration: none !important;
-  padding: 11px 24px;       /* 9px 20px × 1.2 */
+  padding: 9px 20px;        /* 1 倍 */
   border: 1px solid rgba(0,229,255,0.4);
   border-radius: 999px;
   background: rgba(0,200,255,0.06);
@@ -506,7 +505,7 @@ body.luliy-home #pagination {
 #luliy-cats-more:hover {
   background: rgba(0,200,255,0.16);
   color: #fff;
-  gap: 16px;
+  gap: 14px;
   transform: translateY(-2px);
 }
 [data-color-mode="light"] #luliy-cats-more {
@@ -600,13 +599,26 @@ body.luliy-tag-takeover .notFind {
    背景装饰改由 #luliy-cyber-canvas（赛博朋克粒子系统）负责，
    这里只保留纯色兜底，避免 canvas 还没绘制完成前露出白底。
 ══════════════════════════════════════════════════════════ */
-html, body {
-  background: #00020c !important;
+/* ★ 全站底色：从死黑 #00020c 换成赛博朋克渐变（取自用户上传的粒子页面）。
+   这是"中间黑色竖条"的根治办法——之前底色是近乎纯黑，全屏粒子 canvas
+   中间区域粒子稀疏时就会露出这片死黑；换成渐变后，无论粒子怎么分布，
+   背后始终是深蓝→紫→品红的渐变，不会再有死黑块。
+   渐变挂在 html 上铺满整个视口，body 透明，让 html 渐变透上来。 */
+html {
+  background: linear-gradient(160deg, #0a0e2a 0%, #1a1140 30%, #3d1a5c 55%, #5c1a4a 75%, #1a0e2e 100%) !important;
+  background-attachment: fixed !important;
+  min-height: 100%;
+}
+body {
+  background: transparent !important;
   background-image: none !important;
 }
-[data-color-mode="light"] html,
+[data-color-mode="light"] html {
+  background: linear-gradient(160deg, #0a0e2a 0%, #1a1140 30%, #3d1a5c 55%, #5c1a4a 75%, #1a0e2e 100%) !important;
+  background-attachment: fixed !important;
+}
 [data-color-mode="light"] body {
-  background: #00020c !important;
+  background: transparent !important;
 }
 
 /* ══════════════════════════════════════════════════════════
