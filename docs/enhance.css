@@ -66,6 +66,15 @@
 
   /* 合并自原第二个 :root 块（消除重复声明） */
   --luliy-pb-extra: 0px;
+
+  /* ★ 液态玻璃可调参数（设置面板里三个滑块联动这三个变量）：
+     模糊程度 / 不透明度 / 色调。用于深色模式下的卡片、文章正文面板、
+     标签云容器——统一替换掉之前写死的 rgba(...) 数值。
+     默认不透明度刻意调低（0.5 而不是原来的 0.72/0.75），
+     避免再叠加出"看起来像纯黑"的效果。 */
+  --luliy-glass-blur: 22px;
+  --luliy-glass-opacity: 0.5;
+  --luliy-glass-hue: 250;
 }
 
 html { scroll-behavior: smooth; zoom: 1.1; }
@@ -412,24 +421,24 @@ body.luliy-home #pagination {
   box-sizing: border-box;
 }
 /* 卡片网格本身限制最大宽度并居中
-   ★ 整体放大 1.75 倍（视觉上接近"页面缩放 175%"的效果），
-   只影响桌面默认尺寸；平板/手机/矮屏的响应式收缩规则不受影响，
-   该缩多小还缩多小，避免溢出。 */
+   ★ 1.75 倍太大、太丑，缩回 1.2 倍——比最初版本稍大一点，
+   更接近卡片背景图本身的自然比例。布局仍是 3 列 × 2 行不变；
+   平板/手机/矮屏的响应式收缩规则不受影响。 */
 #luliy-cats {
   width: 100%;
-  max-width: 2100px;        /* 1200 × 1.75 */
+  max-width: 1440px;        /* 1200 × 1.2 */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 28px;                /* 16 × 1.75 */
+  gap: 20px;                /* 16 × 1.2 */
 }
 .luliy-cat-card {
   position: relative;
-  height: 525px;            /* 300 × 1.75 */
+  height: 360px;            /* 300 × 1.2 */
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 42px;            /* 24 × 1.75 */
-  border-radius: 28px;      /* 16 × 1.75 */
+  padding: 28px;            /* 24 × 1.2 */
+  border-radius: 19px;      /* 16 × 1.2 */
   background-size: cover;
   background-position: center;
   text-decoration: none !important;
@@ -446,49 +455,49 @@ body.luliy-home #pagination {
 .luliy-cat-card:hover .luliy-cat-title { transform: translateY(-3px); }
 .luliy-cat-kicker {
   align-self: flex-start;
-  font-size: 21px;          /* 12 × 1.75 */
-  letter-spacing: 7px;      /* 4 × 1.75 */
+  font-size: 14px;          /* 12 × 1.2 */
+  letter-spacing: 5px;      /* 4 × 1.2 */
   font-weight: 700;
   color: rgba(255,255,255,0.9);
   text-transform: uppercase;
-  margin-bottom: 14px;      /* 8 × 1.75 */
+  margin-bottom: 10px;      /* 8 × 1.2 */
   text-shadow: 0 1px 8px rgba(0,0,0,0.7);
 }
 .luliy-cat-title {
-  margin: 0 0 14px;         /* 8 × 1.75 */
-  font-size: 46px;          /* 26 × 1.75 */
+  margin: 0 0 10px;         /* 8 × 1.2 */
+  font-size: 32px;          /* 26 × 1.2 */
   font-weight: 900;
   color: #fff;
-  letter-spacing: 3.5px;    /* 2 × 1.75 */
+  letter-spacing: 2.5px;    /* 2 × 1.2 */
   text-shadow: 0 2px 18px rgba(0,0,0,0.7);
   transition: transform 0.3s ease;
 }
 .luliy-cat-desc {
   margin: 0;
-  font-size: 23px;          /* 13 × 1.75 */
+  font-size: 16px;          /* 13 × 1.2 */
   line-height: 1.5;
   color: rgba(255,255,255,0.86);
   text-shadow: 0 1px 10px rgba(0,0,0,0.6);
 }
 /* "more →" row, bottom-right, → archive
-   ★ 同样放大 1.75 倍 */
+   ★ 同样缩回 1.2 倍 */
 #luliy-cats-more-row {
   width: 100%;
-  max-width: 2100px;        /* 1200 × 1.75 */
+  max-width: 1440px;        /* 1200 × 1.2 */
   display: flex;
   justify-content: flex-end;
-  margin: 32px auto 0;      /* 18 × 1.75 ≈ 32 */
+  margin: 22px auto 0;      /* 18 × 1.2 */
 }
 #luliy-cats-more {
   display: inline-flex;
   align-items: center;
-  gap: 14px;                /* 8 × 1.75 */
-  font-size: 25px;          /* 14 × 1.75 */
+  gap: 10px;                /* 8 × 1.2 */
+  font-size: 17px;          /* 14 × 1.2 */
   font-weight: 700;
-  letter-spacing: 1.5px;    /* 1 × 1.75 */
+  letter-spacing: 1.2px;    /* 1 × 1.2 */
   color: #c8e8ff;
   text-decoration: none !important;
-  padding: 16px 35px;       /* 9px 20px × 1.75 */
+  padding: 11px 24px;       /* 9px 20px × 1.2 */
   border: 1px solid rgba(0,229,255,0.4);
   border-radius: 999px;
   background: rgba(0,200,255,0.06);
@@ -497,7 +506,7 @@ body.luliy-home #pagination {
 #luliy-cats-more:hover {
   background: rgba(0,200,255,0.16);
   color: #fff;
-  gap: 20px;
+  gap: 16px;
   transform: translateY(-2px);
 }
 [data-color-mode="light"] #luliy-cats-more {
@@ -1082,11 +1091,13 @@ body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgb
     0 0 0 1.5px var(--th-accent-soft, rgba(255,255,255,0.50)) inset !important;
 }
 [data-color-mode="dark"] .luliy-card {
-  background: rgba(18,14,34,0.72) !important;
+  background: hsla(var(--luliy-glass-hue), 45%, 14%, var(--luliy-glass-opacity)) !important;
+  backdrop-filter: blur(var(--luliy-glass-blur)) saturate(1.9) !important;
+  -webkit-backdrop-filter: blur(var(--luliy-glass-blur)) saturate(1.9) !important;
   border-color: rgba(255,255,255,0.12) !important;
 }
 [data-color-mode="dark"] .luliy-card:hover {
-  background: rgba(26,20,50,0.82) !important;
+  background: hsla(var(--luliy-glass-hue), 45%, 18%, calc(var(--luliy-glass-opacity) + 0.1)) !important;
   border-color: var(--th-accent, rgba(255,255,255,0.20)) !important;
   box-shadow: 0 18px 48px rgba(0,0,0,0.55), 0 0 0 1px var(--th-accent-soft, rgba(255,255,255,0.08)) inset !important;
 }
@@ -1408,22 +1419,17 @@ body[data-luliy-theme="your-name"] #postBody {
   border-top-color: rgba(255,212,59,0.55) !important;
 }
 
-/* ── Space: deep space dark glass ────────────────────────── */
+/* ── Space: 液态玻璃文章面板（参数由设置面板的三个滑块控制） ── */
 body[data-luliy-theme="space"] #postBody {
-  background: rgba(2,8,36,0.75) !important;
-  backdrop-filter: blur(26px) saturate(2) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(2) !important;
+  background: hsla(var(--luliy-glass-hue), 70%, 9%, var(--luliy-glass-opacity)) !important;
+  backdrop-filter: blur(var(--luliy-glass-blur)) saturate(2) !important;
+  -webkit-backdrop-filter: blur(var(--luliy-glass-blur)) saturate(2) !important;
   border: 1px solid rgba(0,200,255,0.22) !important;
   border-top: 3px solid rgba(0,200,255,0.50) !important;
   border-radius: 20px !important;
   padding: 36px 40px !important;
   margin-bottom: 48px !important;
   box-shadow: 0 6px 44px rgba(0,80,180,0.30), 0 0 80px rgba(0,200,255,0.08) !important;
-}
-/* Space: day mode is still dark (it's space) */
-[data-color-mode="dark"] body[data-luliy-theme="space"] #postBody {
-  background: rgba(1,4,22,0.85) !important;
-  border-color: rgba(0,200,255,0.28) !important;
 }
 
 /* ── Sunset: 日落大道 highway dusk gradient glass ─────────── */
@@ -3044,7 +3050,12 @@ mark.luliy-search-hit.is-current {
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,0.30);
 }
-[data-color-mode="dark"] .luliy-tagcloud-body { background: rgba(18,14,34,0.45); border-color: rgba(255,255,255,0.08); }
+[data-color-mode="dark"] .luliy-tagcloud-body {
+  background: hsla(var(--luliy-glass-hue), 45%, 14%, calc(var(--luliy-glass-opacity) * 0.9));
+  -webkit-backdrop-filter: blur(var(--luliy-glass-blur));
+  backdrop-filter: blur(var(--luliy-glass-blur));
+  border-color: rgba(255,255,255,0.08);
+}
 .luliy-tag-bubble {
   --tag-c: #8250df;
   display: inline-flex; align-items: baseline; gap: 2px;
