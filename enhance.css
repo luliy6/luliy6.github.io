@@ -286,6 +286,7 @@ body.luliy-reduce-motion #luliy-hero-badge { animation: none !important; opacity
 ══════════════════════════════════════════════════════════ */
 #luliy-splash {
   position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;   /* inset:0 的回退写法（兼容旧 Safari） */
   inset: 0;
   z-index: 100000;
   display: flex;
@@ -309,6 +310,7 @@ body.luliy-reduce-motion #luliy-hero-badge { animation: none !important; opacity
   background-size: 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;   /* Safari 上让渐变透出文字更可靠 */
   color: transparent;
   animation:
     luliyNeonFlow 3.2s linear infinite,
@@ -389,33 +391,41 @@ body.luliy-reduce-motion #luliy-splash-text::before { animation: none; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   02c  Homepage category cards — 6 张，2 行 3 列，整体垂直居中
+   02c  Homepage category cards — 6 张，2 行 3 列，满屏垂直居中
 ══════════════════════════════════════════════════════════ */
-/* ★ 首页：隐藏 Gmeek 原生的副标题 div 与文章列表 nav.SideNav，
-   只保留六张分类卡片。#content 去掉自身限宽/内边距，让卡片区能撑满。 */
-body.luliy-home #content > div[style*="margin-bottom"],
-body.luliy-home #content > nav.SideNav,
-body.luliy-home #content > .pagination,
-body.luliy-home #luliy-pinned-section {
+/* ★ 首页：把 Gmeek 原生 #content 里的所有东西全部隐藏（副标题、文章列表、
+   翻页器等），只保留我们注入的六张分类卡片。
+   用后代选择器（空格）而非直接子选择器（>），因为 Gmeek 运行时会把翻页器
+   包进 .paginate-container 等额外层级，直接子选择器会漏掉。 */
+body.luliy-home #content {
   display: none !important;
 }
-body.luliy-home #content {
-  max-width: none !important;
-  width: 100% !important;
-  padding: 0 !important;
-  margin: 0 !important;
+/* 兜底：万一翻页器被插到 #content 之外，也一并隐藏 */
+body.luliy-home .pagination,
+body.luliy-home .paginate-container,
+body.luliy-home #pagination {
+  display: none !important;
 }
+
+/* 卡片区：fixed 满屏 + flex 居中，彻底不受页面其它元素高度/位置影响，
+   在任意窗口尺寸下都能"整体垂直 + 水平居中"。 */
 #luliy-cats-wrap {
-  width: min(1200px, calc(100vw - 48px));
-  min-height: 100vh;
-  margin: 0 auto;
-  padding: 80px 0 48px;   /* 顶部留出 logo / 播放器的空间 */
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;   /* inset:0 回退 */
+  inset: 0;
+  z-index: 5;
   display: flex;
   flex-direction: column;
-  justify-content: center;   /* 整体（6 张卡片 + more 按钮）垂直居中 */
+  justify-content: center;
+  align-items: center;
+  padding: 96px 24px 32px;   /* 顶部留出 logo / 播放器空间 */
   box-sizing: border-box;
+  overflow-y: auto;          /* 内容超高时（极小屏）可滚动，不被裁切 */
 }
+/* 卡片网格本身限制最大宽度并居中 */
 #luliy-cats {
+  width: 100%;
+  max-width: 1200px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
@@ -470,9 +480,11 @@ body.luliy-home #content {
 }
 /* "more →" row, bottom-right, → archive */
 #luliy-cats-more-row {
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   justify-content: flex-end;
-  margin-top: 18px;
+  margin: 18px auto 0;
 }
 #luliy-cats-more {
   display: inline-flex;
@@ -505,16 +517,30 @@ body.luliy-home #content {
 /* Tablet: 3 列太挤，6 张卡片改 2 列（3 行）；手机进一步降到 1 列 */
 @media (max-width: 860px) {
   #luliy-cats { grid-template-columns: repeat(2, 1fr); }
-  .luliy-cat-card { height: 260px; }
+  .luliy-cat-card { height: 240px; }
 }
 @media (max-width: 560px) {
   #luliy-cats { grid-template-columns: 1fr; }
-  #luliy-cats-wrap { width: calc(100vw - 32px); }
-  .luliy-cat-card { height: 220px; padding: 20px; }
+  /* 手机单列：6 张卡片总高超过一屏，容器顶对齐 + 可滚动，能看全 */
+  #luliy-cats-wrap { justify-content: flex-start; padding: 80px 16px 32px; }
+  .luliy-cat-card { height: 200px; padding: 20px; }
   .luliy-cat-title { font-size: 24px; }
 }
 body.luliy-reduce-motion .luliy-cat-card,
 body.luliy-reduce-motion #luliy-cats-more { transition: none; }
+
+/* 矮窗口（如多数笔记本 ≤800px 高）：6 张卡片整体偏高，自动压缩卡片高度
+   与顶部留白，尽量让六张卡片 + more 在一屏内完整显示、保持居中。 */
+@media (min-width: 861px) and (max-height: 800px) {
+  #luliy-cats-wrap { padding-top: 72px; }
+  .luliy-cat-card { height: 230px; }
+}
+@media (min-width: 861px) and (max-height: 680px) {
+  #luliy-cats-wrap { padding-top: 60px; }
+  .luliy-cat-card { height: 190px; padding: 18px; }
+  .luliy-cat-title { font-size: 23px; margin-bottom: 6px; }
+  .luliy-cat-desc { font-size: 12px; }
+}
 
 /* ── 大改后：隐藏因「锁定太空主题」而不再需要的功能入口 ──
    （元素仍在 DOM 里，只是视觉隐藏；日后恢复多主题时删掉本段即可） */
@@ -525,87 +551,39 @@ body.luliy-reduce-motion #luliy-cats-more { transition: none; }
 #themeSwitch, a[onclick*="modeSwitch"] { display: none !important; }
 
 /* ══════════════════════════════════════════════════════════
-   02d  Category page (tag.html) — 3-column grid of post cards
-   只显示当前分类的文章（筛选由 tag.html 原生逻辑按 #label 完成），
-   这里把竖列表改造成三列网格卡片，与首页风格统一。
+   02d  Category page (tag.html) — 复用统一的卡片系统
+   原方案试图把 Gmeek 原生的 .lists/.SideNav-item 强行套成网格，
+   但和原生筛选逻辑冲突（见 enhance.js 注释）。现改为：
+     · 隐藏原生 SideNav 列表与原生标签筛选条；
+     · 我们自建的 #luliy-tag-grid 容器复用统一卡片系统（.luliy-card 等）。
 ══════════════════════════════════════════════════════════ */
-/* 顶部标签筛选条仍可见（用户可在分类间切换） */
-body.luliy-tag-page #taglabel { margin-bottom: 18px !important; }
+/* 隐藏原生列表与原生标签条（但放过我们自建的 #luliy-tag-grid 容器）。
+   用 body 标记覆盖原生"异步生成"的列表，避免漏网。 */
+body.luliy-tag-takeover .SideNav:not(#luliy-tag-grid),
+body.luliy-tag-takeover #taglabel,
+body.luliy-tag-takeover .notFind {
+  display: none !important;
+}
 
-/* 列表容器 → 三列网格 */
-body.luliy-tag-page nav.SideNav {
-  display: grid !important;
+/* 分类页标题（🏷️ 标签名） */
+#luliy-tag-head {
+  margin: 8px 0 20px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--th-h1, #00e5ff);
+}
+
+/* 我们自建的卡片容器：标准三列网格（≥860px），样式与首页卡片一致。
+   .luliy-card / .luliy-card-grid 等具体卡片样式由后面统一区块提供。 */
+#luliy-tag-grid.luliy-card-grid {
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
 }
-/* 每个 .lists 包裹就是一张卡片格子 */
-body.luliy-tag-page .lists { min-width: 0; }
-
-/* 文章项 → 卡片 */
-body.luliy-tag-page .SideNav-item {
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  justify-content: flex-start !important;
-  gap: 12px;
-  height: 100%;
-  min-height: 150px;
-  padding: 20px !important;
-  border-radius: 14px;
-  background: rgba(16,14,30,0.62) !important;
-  border: 1px solid rgba(0,229,255,0.16) !important;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.32);
-  transition: transform 0.3s cubic-bezier(.2,.7,.3,1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
-}
-body.luliy-tag-page .SideNav-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 14px 34px rgba(0,0,0,0.45);
-  border-color: rgba(0,229,255,0.5) !important;
-  background: rgba(22,20,40,0.78) !important;
-}
-[data-color-mode="light"] body.luliy-tag-page .SideNav-item {
-  background: rgba(255,255,255,0.72) !important;
-  border-color: rgba(10,134,176,0.18) !important;
-}
-[data-color-mode="light"] body.luliy-tag-page .SideNav-item:hover {
-  background: rgba(255,255,255,0.92) !important;
-  border-color: rgba(10,134,176,0.45) !important;
-}
-
-/* 标题：放大、允许两行 */
-body.luliy-tag-page .listTitle {
-  white-space: normal !important;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.4;
-  max-width: 100% !important;
-  color: #eaf6ff;
-}
-[data-color-mode="light"] body.luliy-tag-page .listTitle { color: #14233a; }
-
-/* 文章项里的图标行：靠左正常显示 */
-body.luliy-tag-page .SideNav-item .d-flex.flex-items-center { width: 100%; }
-body.luliy-tag-page .SideNav-icon { margin-right: 10px; }
-
-/* 标签行：移到卡片底部，自动换行 */
-body.luliy-tag-page .listLabels {
-  white-space: normal !important;
-  margin-top: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-/* 平板 / 手机降列 */
 @media (max-width: 860px) {
-  body.luliy-tag-page nav.SideNav { grid-template-columns: 1fr 1fr; }
+  #luliy-tag-grid.luliy-card-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 600px) {
-  body.luliy-tag-page nav.SideNav { grid-template-columns: 1fr; }
+@media (max-width: 560px) {
+  #luliy-tag-grid.luliy-card-grid { grid-template-columns: 1fr; }
 }
-body.luliy-reduce-motion body.luliy-tag-page .SideNav-item { transition: none; }
 
 /* ══════════════════════════════════════════════════════════
    03  Background — 纯色 #00020c（深浅模式通用，无背景图功能）
@@ -2807,8 +2785,10 @@ body.luliy-tl-infinite #pagination,
 body.luliy-tl-infinite .Paginate,
 body.luliy-tl-infinite .pagenav,
 body.luliy-tl-infinite a[href*="?page="],
-/* ★ 分类页 / 归档页：始终隐藏 Gmeek 原生「上一页/下一页」翻页器 */
+/* ★ 分类页 / 归档页：始终隐藏 Gmeek 原生「上一页/下一页」翻页器
+   （含运行时包裹的 .paginate-container 层） */
 body.luliy-hide-pagination .pagination,
+body.luliy-hide-pagination .paginate-container,
 body.luliy-hide-pagination .paginate,
 body.luliy-hide-pagination #pagination,
 body.luliy-hide-pagination .Paginate,
