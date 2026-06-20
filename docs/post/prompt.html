@@ -58,8 +58,10 @@ The user will provide learning material (a single sentence or a full article/par
 (function(){
   try{
     var d=document.documentElement;
-    /* 锁定太空主题 */
-    d.setAttribute('data-luliy-theme','space');
+    /* ★ 白天模式锁定「你的名字」主题，夜间模式锁定「太空旅行」主题 */
+    var cm=d.getAttribute('data-color-mode')||'light';
+    var th=(cm==='dark')?'space':'your-name';
+    d.setAttribute('data-luliy-theme',th);
     /* 阅读宽度默认拉到最大(400) */
     var pw=parseInt(localStorage.getItem('luliy-pbwidth')||'400',10);
     if(isNaN(pw))pw=400;
@@ -71,7 +73,7 @@ The user will provide learning material (a single sentence or a full article/par
     (d.head||d).appendChild(st);
     document.addEventListener('DOMContentLoaded',function(){
       if(document.body){
-        document.body.setAttribute('data-luliy-theme','space');
+        document.body.setAttribute('data-luliy-theme',th);
         if(sans==='1')document.body.classList.add('luliy-sans');
         if(sans==='2')document.body.classList.add('luliy-canger');
       }

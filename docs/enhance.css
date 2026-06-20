@@ -282,7 +282,7 @@ body.luliy-reduce-motion #luliy-hero-hint { animation: none; }
 body.luliy-reduce-motion #luliy-hero-badge { animation: none !important; opacity: 1 !important; }
 
 /* ══════════════════════════════════════════════════════════
-   02a  Loading splash (site entry animation, uses l.png)
+   02a  Loading splash — "ΔιάΝους" 赛博朋克荧光文字
 ══════════════════════════════════════════════════════════ */
 #luliy-splash {
   position: fixed;
@@ -291,23 +291,64 @@ body.luliy-reduce-motion #luliy-hero-badge { animation: none !important; opacity
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #07060f;
+  background: #00020c;
+  overflow: hidden;
   transition: opacity 0.55s ease, visibility 0.55s ease;
 }
 #luliy-splash.is-leaving { opacity: 0; visibility: hidden; }
-#luliy-splash-img {
-  max-width: min(60vw, 320px);
-  max-height: 50vh;
-  width: auto; height: auto;
-  object-fit: contain;
-  animation: luliySplashPulse 1.4s ease-in-out infinite;
-  filter: drop-shadow(0 6px 30px rgba(0,0,0,0.5));
+
+#luliy-splash-text {
+  position: relative;
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  font-size: clamp(30px, 7vw, 60px);
+  font-weight: 800;
+  letter-spacing: 3px;
+  padding: 10px 30px;
+  /* 流动渐变文字：青→紫→品红循环流动，制造"荧光缠绕"感 */
+  background: linear-gradient(90deg, #00e5ff, #7b2fbe, #ff2bd6, #00e5ff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    luliyNeonFlow 3.2s linear infinite,
+    luliyNeonPulse 1.8s ease-in-out infinite;
 }
-@keyframes luliySplashPulse {
-  0%, 100% { transform: scale(1);    opacity: 0.92; }
-  50%      { transform: scale(1.06); opacity: 1; }
+/* 文字背后一圈缓慢旋转的光晕环，呼应"循环缠绕" */
+#luliy-splash-text::before {
+  content: '';
+  position: absolute;
+  inset: -50px -70px;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(0,229,255,0.55) 12%,
+    transparent 25%,
+    rgba(255,43,214,0.55) 45%,
+    transparent 58%,
+    rgba(123,47,190,0.55) 78%,
+    transparent 92%
+  );
+  filter: blur(28px);
+  animation: luliyNeonSpin 4.5s linear infinite;
 }
-body.luliy-reduce-motion #luliy-splash-img { animation: none; }
+@keyframes luliyNeonFlow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+@keyframes luliyNeonPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(0,229,255,0.55)) drop-shadow(0 0 22px rgba(123,47,190,0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(0,229,255,0.85)) drop-shadow(0 0 36px rgba(255,43,214,0.55));
+  }
+}
+@keyframes luliyNeonSpin { to { transform: rotate(360deg); } }
+body.luliy-reduce-motion #luliy-splash-text,
+body.luliy-reduce-motion #luliy-splash-text::before { animation: none; }
 
 /* ══════════════════════════════════════════════════════════
    02b  Top-left brand name  ΔιάΝους  (click → home)
@@ -347,11 +388,16 @@ body.luliy-reduce-motion #luliy-splash-img { animation: none; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   02c  Homepage category cards (Rockstar style, 3 across)
+   02c  Homepage category cards — 6 张，2 行 3 列，整体垂直居中
 ══════════════════════════════════════════════════════════ */
 #luliy-cats-wrap {
-  width: min(1100px, calc(100vw - 48px));
-  margin: 8px auto 28px;
+  width: min(1200px, calc(100vw - 48px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 32px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* 整体（6 张卡片 + more 按钮）垂直居中 */
 }
 #luliy-cats {
   display: grid;
@@ -360,11 +406,11 @@ body.luliy-reduce-motion #luliy-splash-img { animation: none; }
 }
 .luliy-cat-card {
   position: relative;
-  height: 420px;
+  height: 300px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 26px;
+  padding: 24px;
   border-radius: 16px;
   background-size: cover;
   background-position: center;
@@ -380,7 +426,6 @@ body.luliy-reduce-motion #luliy-splash-img { animation: none; }
   filter: brightness(1.08);
 }
 .luliy-cat-card:hover .luliy-cat-title { transform: translateY(-3px); }
-.luliy-cat-card:hover .luliy-cat-link { gap: 12px; }
 .luliy-cat-kicker {
   align-self: flex-start;
   font-size: 12px;
@@ -392,8 +437,8 @@ body.luliy-reduce-motion #luliy-splash-img { animation: none; }
   text-shadow: 0 1px 8px rgba(0,0,0,0.7);
 }
 .luliy-cat-title {
-  margin: 0 0 10px;
-  font-size: 32px;
+  margin: 0 0 8px;
+  font-size: 26px;
   font-weight: 900;
   color: #fff;
   letter-spacing: 2px;
@@ -401,24 +446,11 @@ body.luliy-reduce-motion #luliy-splash-img { animation: none; }
   transition: transform 0.3s ease;
 }
 .luliy-cat-desc {
-  margin: 0 0 16px;
-  font-size: 14px;
-  line-height: 1.55;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
   color: rgba(255,255,255,0.86);
   text-shadow: 0 1px 10px rgba(0,0,0,0.6);
-}
-.luliy-cat-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  width: fit-content;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: #fff;
-  padding-bottom: 3px;
-  border-bottom: 2px solid rgba(255,255,255,0.7);
-  transition: gap 0.25s ease;
 }
 /* "more →" row, bottom-right, → archive */
 #luliy-cats-more-row {
@@ -454,15 +486,16 @@ body.luliy-reduce-motion #luliy-splash-img { animation: none; }
 }
 [data-color-mode="light"] #luliy-cats-more:hover { color: #06506b; background: rgba(10,134,176,0.14); }
 
-/* Tablet: 3 cards get cramped → drop to a flexible layout */
+/* Tablet: 3 列太挤，6 张卡片改 2 列（3 行）；手机进一步降到 1 列 */
 @media (max-width: 860px) {
-  #luliy-cats { grid-template-columns: 1fr; }
-  .luliy-cat-card { height: 300px; }
+  #luliy-cats { grid-template-columns: repeat(2, 1fr); }
+  .luliy-cat-card { height: 260px; }
 }
-@media (max-width: 600px) {
+@media (max-width: 560px) {
+  #luliy-cats { grid-template-columns: 1fr; }
   #luliy-cats-wrap { width: calc(100vw - 32px); }
-  .luliy-cat-card { height: 260px; padding: 20px; }
-  .luliy-cat-title { font-size: 27px; }
+  .luliy-cat-card { height: 220px; padding: 20px; }
+  .luliy-cat-title { font-size: 24px; }
 }
 body.luliy-reduce-motion .luliy-cat-card,
 body.luliy-reduce-motion #luliy-cats-more { transition: none; }
@@ -3510,8 +3543,8 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 [data-color-mode="light"] #luliy-drawer-head { border-bottom-color: rgba(0,0,0,0.06); }
-.ldh-avatar { display: inline-block; width: 72px; height: 72px; border-radius: 50%; overflow: hidden; border: 2px solid var(--th-accent, #8250df); }
-.ldh-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ldh-avatar { display: inline-block; width: 72px; height: 72px; overflow: visible; }
+.ldh-avatar img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .ldh-name {
   display: block; margin: 10px 0 0; font-size: 20px; font-weight: 700;
   color: #fff; text-decoration: none; letter-spacing: 0.5px;
