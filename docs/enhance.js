@@ -44,6 +44,8 @@
 
     /* ★ Site identity */
     siteName: '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2',   /* ΔιάΝους — shown top-left, in drawer, etc. */
+    /* 副标题，来自用户上传的赛博朋克粒子页面，只在首页 brand 下方显示 */
+    siteSubtitle: '\u0391\u03bc\u03c6\u03b9\u03c3\u03b2\u03ae\u03c4\u03b7\u03c3\u03b5. \u039a\u03b1\u03c4\u03b1\u03bd\u03cc\u03b7\u03c3\u03b5. \u0394\u03b7\u03bc\u03b9\u03bf\u03cd\u03c1\u03b3\u03b7\u03c3\u03b5.',
 
     /* ★ Loading splash image (shown briefly while the site loads) */
     /* ★ Loading splash：不再用图片，文字内容取自 siteName */
@@ -591,6 +593,9 @@
     var defs = {
       'luliy-sfx':       (('ontouchstart' in window) || window.innerWidth < 768) ? '0' : '1',
       'luliy-sakura':    '1',
+      'luliy-cyber':       '1',      /* 赛博朋克粒子系统总开关 */
+      'luliy-cyber-speed': '1',      /* 0.2 ~ 3 */
+      'luliy-cyber-dir':   'converge', /* converge | diverge | free */
       'luliy-fontsize':  '18',
       'luliy-sans':      '0',
       'luliy-cardview':  'grid',   /* grid | list */
@@ -778,86 +783,368 @@
     }, true);
   }
 
-  /* ---- 08  Click burst — 彩色圆点向外炸开 + 扩散圆环 -----------
-     替换原 click sparks。参考用户上传的两张图：
-       图1(开始)=圆点又大又聚在中心；图2(结束)=圆点变小、向四周扩散消失。
-     效果：点击空白处 → 一簇高饱和彩色圆点从点击点向外飞散，边飞边缩小淡出；
-           同时一圈圆环放大约 12 倍扩散淡出；外加几颗四角星点缀(呼应图2)。
-     参数：炸开距离 60~160px；圆环放大倍数 12。
-     实现用 WAAPI(element.animate)，transform/opacity 走合成器，流畅且省 CPU。 */
-  function initClickSparks() {
-    /* 取自参考图的配色：品红/红/绿/青/黄/珊瑚/蓝/紫 */
-    var COLORS = ['#ff1b8d', '#ff1744', '#00e676', '#1de9b6',
-                  '#ffd740', '#ffab91', '#2979ff', '#7c4dff'];
-    var DOT_COUNT  = 20;            /* 圆点数量 */
-    var DIST_MIN   = 60, DIST_MAX = 160;   /* 炸开距离范围(px) */
-    var RING_SCALE = 12;            /* 圆环放大倍数 */
-    var STAR_COUNT = 4;             /* 四角星数量 */
+  /* ---- 08 旧的点击火花效果已删除 -----------------------------
+     原 initClickSparks()（彩色圆点炸开+扩散环）被新的赛博朋克粒子
+     系统（initCyberParticles，见下方）取代——点击爆炸/扩散环/故障文字
+     这三个效果现在内建在那个 canvas 动画系统里。 */
+
+  /* ════════════════════════════════════════════════════════
+     08b  Cyberpunk particles — 全站背景粒子系统
+     改编自用户上传的独立 HTML（赛博朋克粒子页）。原版逻辑保留：
+     背景粒子向标题汇聚 + 连线 + 鼠标拖尾 + 点击爆炸/扩散环/故障文字
+     + 极光色块 + 城市剪影。这里做的改动：
+       · 汇聚目标从"屏幕顶部居中的独立标题"改成本站左上角 #luliy-brand
+         的实际位置——不再新建一个标题，避免出现两个博客名字；
+       · 加入开关 / 速度 / 方向三个设置项（存 localStorage，设置面板里调）；
+       · 尊重"减弱动态效果"，开启时直接不渲染；
+       · 与樱花花瓣（initSakura）各自独立、互不影响，z-index 更低，
+         确保樱花飘在它前面、正文飘在更前面，层次不乱。
+  ════════════════════════════════════════════════════════ */
+  var _cyberRAF = null;
+  var _cyberCanvas = null;
+
+  function getCyberSpeed() {
+    var v = parseFloat(localStorage.getItem('luliy-cyber-speed'));
+    return (isNaN(v) || v <= 0) ? 1 : Math.min(3, Math.max(0.2, v));
+  }
+  function getCyberDir() {
+    var v = localStorage.getItem('luliy-cyber-dir');
+    return (v === 'diverge' || v === 'free') ? v : 'converge';   /* converge | diverge | free */
+  }
+
+  function stopCyberParticles() {
+    if (_cyberRAF) { cancelAnimationFrame(_cyberRAF); _cyberRAF = null; }
+    if (_cyberCanvas && _cyberCanvas.parentNode) _cyberCanvas.parentNode.removeChild(_cyberCanvas);
+    _cyberCanvas = null;
+    if (initCyberParticles._cleanup) { initCyberParticles._cleanup(); initCyberParticles._cleanup = null; }
+  }
+
+  function initCyberParticles() {
+    if (localStorage.getItem('luliy-cyber') === '0') return;
+    if (prefersReduce && prefersReduce()) return;
+    if (document.getElementById('luliy-cyber-canvas')) return;
+
+    var canvas = document.createElement('canvas');
+    canvas.id = 'luliy-cyber-canvas';
+    canvas.setAttribute('style',
+      'position:fixed;left:0;top:0;pointer-events:none;z-index:-1;');
+    document.body.appendChild(canvas);
+    _cyberCanvas = canvas;
+    var ctx = canvas.getContext('2d');
+
+    var W = canvas.width  = window.innerWidth;
+    var H = canvas.height = window.innerHeight;
+
     function rand(a, b) { return a + Math.random() * (b - a); }
-    function pick()     { return COLORS[(Math.random() * COLORS.length) | 0]; }
+    function pick(arr)  { return arr[(Math.random() * arr.length) | 0]; }
+    var NEON = ['#ff6ec7', '#6ec7ff', '#b48cff', '#ff9eda', '#7fdbff', '#c77dff'];
 
-    function burst(x, y) {
-      var els = [];
-      /* 统一创建一个定位在点击点、居中对齐的元素 */
-      function make(extra) {
-        var el = document.createElement('div');
-        el.style.cssText = 'position:fixed;left:' + x + 'px;top:' + y + 'px;' +
-          'pointer-events:none;z-index:99999;border-radius:50%;will-change:transform,opacity;' + extra;
-        document.body.appendChild(el); els.push(el);
-        return el;
+    /* ── 汇聚目标点：本站左上角 ΔιάΝους（#luliy-brand），不再是独立标题 ── */
+    var target = { x: 70, y: 36 };
+    function updateTarget() {
+      var el = document.getElementById('luliy-brand');
+      if (el) {
+        var r = el.getBoundingClientRect();
+        target.x = r.left + r.width / 2;
+        target.y = r.top + r.height / 2;
       }
+    }
+    updateTarget();
 
-      /* 扩散圆环：从小圆放大 RING_SCALE 倍并淡出 */
-      var rs = 18;
-      var ring = make('width:' + rs + 'px;height:' + rs + 'px;margin:' + (-rs / 2) + 'px 0 0 ' + (-rs / 2) +
-        'px;background:transparent;border:2px solid rgba(255,27,141,0.55);');
-      ring.animate(
-        [{ transform: 'scale(1)', opacity: 0.9 }, { transform: 'scale(' + RING_SCALE + ')', opacity: 0 }],
-        { duration: 640, easing: 'cubic-bezier(.15,.6,.3,1)', fill: 'forwards' }
-      );
-
-      /* 彩色圆点：起始大而聚(scale 1)，向外飞 DIST 距离并缩小淡出 */
-      for (var i = 0; i < DOT_COUNT; i++) {
-        var sz = rand(10, 22);     /* 起始直径较大，呼应图1 */
-        var dot = make('width:' + sz + 'px;height:' + sz + 'px;margin:' + (-sz / 2) + 'px 0 0 ' + (-sz / 2) +
-          'px;background:' + pick() + ';');
-        var ang = rand(0, Math.PI * 2), dist = rand(DIST_MIN, DIST_MAX);
-        dot.animate(
-          [{ transform: 'translate(0,0) scale(1)', opacity: 1 },
-           { transform: 'translate(' + (Math.cos(ang) * dist) + 'px,' + (Math.sin(ang) * dist) + 'px) scale(0.15)', opacity: 0 }],
-          { duration: rand(620, 900), easing: 'cubic-bezier(.12,.7,.25,1)', fill: 'forwards' }
-        );
+    /* ── 背景粒子：朝目标汇聚 / 发散 / 自由漂浮，方向由设置决定 ── */
+    function BgParticle() { this.reset(); }
+    BgParticle.prototype.reset = function () {
+      var edge = Math.floor(rand(0, 4));
+      if (edge === 0) { this.x = rand(0, W); this.y = -20; }
+      else if (edge === 1) { this.x = W + 20; this.y = rand(0, H); }
+      else if (edge === 2) { this.x = rand(0, W); this.y = H + 20; }
+      else { this.x = -20; this.y = rand(0, H); }
+      this.r = rand(0.6, 2.2);
+      this.speed = rand(0.015, 0.045);
+      this.color = pick(NEON);
+      this.alpha = rand(0.2, 0.9);
+      this.pulse = rand(0, Math.PI * 2);
+      this.swirl = rand(0.015, 0.04) * (Math.random() < 0.5 ? 1 : -1);
+      /* 自由漂浮模式下给个随机恒定方向 */
+      this.fx = rand(-0.3, 0.3); this.fy = rand(-0.3, 0.3);
+    };
+    BgParticle.prototype.update = function (speedMul, dir) {
+      if (dir === 'free') {
+        this.x += this.fx * speedMul; this.y += this.fy * speedMul;
+        if (this.x < -30 || this.x > W + 30 || this.y < -30 || this.y > H + 30) this.reset();
+        this.pulse += 0.02;
+        return;
       }
+      var dx = target.x - this.x, dy = target.y - this.y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+      if (dir === 'converge' && dist < 14) { this.reset(); return; }
+      var sign = (dir === 'diverge') ? -1 : 1;
+      var pull = this.speed * speedMul * Math.min(dist, 260) * sign;
+      var vx = (dx / dist) * pull, vy = (dy / dist) * pull;
+      var perpX = -dy / dist, perpY = dx / dist;
+      var swirlStrength = this.swirl * speedMul * Math.min(dist, 200) * 0.05;
+      vx += perpX * swirlStrength; vy += perpY * swirlStrength;
+      this.x += vx; this.y += vy;
+      if (dir === 'diverge' && (this.x < -40 || this.x > W + 40 || this.y < -40 || this.y > H + 40)) this.reset();
+      this.pulse += 0.02;
+    };
+    BgParticle.prototype.draw = function () {
+      var a = this.alpha * (0.6 + 0.4 * Math.sin(this.pulse));
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = a;
+      ctx.shadowBlur = 8; ctx.shadowColor = this.color;
+      ctx.fill();
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    };
 
-      /* 四角星点缀：在中等距离闪现后旋转消失 */
-      for (var s = 0; s < STAR_COUNT; s++) {
-        var ssz = rand(9, 16), sa = rand(0, Math.PI * 2), soff = rand(24, 92);
-        var sx = Math.cos(sa) * soff, sy = Math.sin(sa) * soff;
-        var star = make('width:' + ssz + 'px;height:' + ssz + 'px;margin:' + (-ssz / 2) + 'px 0 0 ' + (-ssz / 2) +
-          'px;background:' + pick() + ';border-radius:0;' +
-          'clip-path:polygon(50% 0%,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0% 50%,39% 39%);');
-        star.animate(
-          [{ transform: 'translate(' + (sx * 0.3) + 'px,' + (sy * 0.3) + 'px) scale(0) rotate(0deg)', opacity: 0 },
-           { transform: 'translate(' + (sx * 0.7) + 'px,' + (sy * 0.7) + 'px) scale(1) rotate(45deg)', opacity: 1, offset: 0.4 },
-           { transform: 'translate(' + sx + 'px,' + sy + 'px) scale(0.2) rotate(90deg)', opacity: 0 }],
-          { duration: rand(720, 1000), easing: 'ease-out', fill: 'forwards' }
-        );
+    var bgParticles = [];
+    var BG_COUNT = Math.min(70, Math.floor((W * H) / 25000));
+    for (var i = 0; i < BG_COUNT; i++) bgParticles.push(new BgParticle());
+
+    /* ── 连接线 ── */
+    var CONNECT_DIST = 100;
+    function drawConnections() {
+      ctx.lineWidth = 0.4; ctx.strokeStyle = '#6ec7ff';
+      for (var i = 0; i < bgParticles.length; i++) {
+        var p1 = bgParticles[i];
+        for (var j = i + 1; j < Math.min(i + 8, bgParticles.length); j++) {
+          var p2 = bgParticles[j];
+          var dx = p1.x - p2.x, dy = p1.y - p2.y;
+          var distSq = dx * dx + dy * dy;
+          if (distSq < CONNECT_DIST * CONNECT_DIST) {
+            var dist = Math.sqrt(distSq);
+            ctx.globalAlpha = (1 - dist / CONNECT_DIST) * 0.15;
+            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+          }
+        }
       }
-
-      /* 动画结束后统一清理 DOM */
-      setTimeout(function () { for (var k = 0; k < els.length; k++) els[k].remove(); }, 1050);
+      ctx.globalAlpha = 1;
     }
 
-    document.addEventListener('click', function (e) {
-      if (prefersReduce && prefersReduce()) return;   /* 尊重「减少动态效果」 */
-      /* 仅在空白区域触发：跳过链接/按钮/表单等可交互元素，避免干扰操作 */
+    /* ── 鼠标拖尾 ── */
+    var mouse = { x: W / 2, y: H / 2, active: false };
+    var trailParticles = [];
+    function TrailParticle(x, y) {
+      this.x = x; this.y = y; this.r = rand(1, 3); this.color = pick(NEON);
+      this.life = 1; this.vx = rand(-0.5, 0.5); this.vy = rand(-0.5, 0.5);
+    }
+    TrailParticle.prototype.update = function () { this.x += this.vx; this.y += this.vy; this.life -= 0.02; };
+    TrailParticle.prototype.draw = function () {
+      var r = Math.max(this.r * this.life, 0); if (r <= 0) return;
+      ctx.beginPath(); ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color; ctx.globalAlpha = Math.max(this.life, 0);
+      ctx.shadowBlur = 10; ctx.shadowColor = this.color;
+      ctx.fill(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    };
+    function onMouseMove(e) {
+      mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true;
+      if (Math.random() > 0.5 && trailParticles.length < 80) trailParticles.push(new TrailParticle(mouse.x, mouse.y));
+    }
+    function onTouchMove(e) {
+      var t = e.touches[0]; if (!t) return;
+      mouse.x = t.clientX; mouse.y = t.clientY; mouse.active = true;
+      trailParticles.push(new TrailParticle(mouse.x, mouse.y));
+    }
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+
+    /* ── 点击：爆炸粒子 + 扩散环 + 故障文字 ── */
+    var explosions = [], rings = [], glitchTexts = [];
+    var GLYPHS = '0123456789ABCDEF$#%&*';
+    function ExplosionParticle(x, y, color) {
+      this.x = x; this.y = y;
+      var angle = rand(0, Math.PI * 2), speed = rand(2, 9);
+      this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
+      this.r = rand(1, 3.5); this.color = color; this.life = 1; this.decay = rand(0.012, 0.03);
+    }
+    ExplosionParticle.prototype.update = function () {
+      this.x += this.vx; this.y += this.vy; this.vx *= 0.96; this.vy *= 0.96; this.life -= this.decay;
+    };
+    ExplosionParticle.prototype.draw = function () {
+      var r = Math.max(this.r * this.life, 0); if (r <= 0) return;
+      ctx.beginPath(); ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color; ctx.globalAlpha = Math.max(this.life, 0);
+      ctx.shadowBlur = 15; ctx.shadowColor = this.color;
+      ctx.fill(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    };
+    function Ring(x, y, color) {
+      this.x = x; this.y = y; this.r = 2; this.maxR = rand(60, 120); this.color = color; this.life = 1;
+    }
+    Ring.prototype.update = function () { this.r += 3.2; this.life = 1 - this.r / this.maxR; };
+    Ring.prototype.draw = function () {
+      if (this.life <= 0) return;
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color; ctx.lineWidth = 2; ctx.globalAlpha = Math.max(this.life, 0);
+      ctx.shadowBlur = 12; ctx.shadowColor = this.color;
+      ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    };
+    function spawnGlitchText(x, y) {
+      var text = Math.random() < 0.5
+        ? ((LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2')
+        : Array.from({ length: 5 }, function () { return GLYPHS[(Math.random() * GLYPHS.length) | 0]; }).join('');
+      glitchTexts.push({ x: x, y: y - 10, text: text, life: 1, color: pick(NEON) });
+    }
+    function drawGlitchTexts() {
+      ctx.font = '12px monospace';
+      for (var i = glitchTexts.length - 1; i >= 0; i--) {
+        var g = glitchTexts[i];
+        ctx.globalAlpha = Math.max(g.life, 0); ctx.fillStyle = g.color;
+        ctx.shadowBlur = 6; ctx.shadowColor = g.color;
+        ctx.fillText(g.text, g.x + rand(-2, 2), g.y);
+        ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+        g.y -= 0.6; g.life -= 0.02;
+        if (g.life <= 0) glitchTexts.splice(i, 1);
+      }
+    }
+    function spawnClickEffect(x, y) {
+      var color = pick(NEON);
+      var spawnCount = explosions.length > 300 ? 10 : 35;
+      for (var i = 0; i < spawnCount; i++) explosions.push(new ExplosionParticle(x, y, pick(NEON)));
+      rings.push(new Ring(x, y, color));
+      rings.push(new Ring(x, y, pick(NEON)));
+      spawnGlitchText(x, y);
+    }
+    function onMouseDown(e) {
+      /* 点在链接/按钮等可交互元素上时不触发，避免干扰正常操作 */
       var t = e.target;
       if (t && t.closest && t.closest('a,button,input,textarea,select,label,summary,[role="button"],[contenteditable]')) return;
-      /* ★ zoom 坐标校正：html{zoom:1.1} 下 clientX/Y 需除以缩放因子才能精确跟手 */
       var p = zoomPos(e.clientX, e.clientY);
-      burst(p.x, p.y);
-    });
+      spawnClickEffect(p.x, p.y);
+    }
+    function onTouchStart(e) {
+      var t = e.touches[0]; if (!t) return;
+      spawnClickEffect(t.clientX, t.clientY);
+    }
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+
+    /* ── 极光色块 ── */
+    var auroraTime = 0;
+    var BLOBS = [
+      { color: 'rgba(110,199,255,0.10)', xRatio: 0.25, yRatio: 0.18, rRatio: 0.42, speed: 1.0 },
+      { color: 'rgba(255,110,199,0.09)', xRatio: 0.75, yRatio: 0.28, rRatio: 0.38, speed: 1.3 },
+      { color: 'rgba(180,140,255,0.08)', xRatio: 0.50, yRatio: 0.12, rRatio: 0.50, speed: 0.7 },
+      { color: 'rgba(124,219,255,0.07)', xRatio: 0.85, yRatio: 0.55, rRatio: 0.34, speed: 1.6 }
+    ];
+    function drawAurora(speedMul) {
+      auroraTime += 0.0035 * speedMul;
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      BLOBS.forEach(function (b, i) {
+        var ox = Math.sin(auroraTime * b.speed + i) * W * 0.06;
+        var oy = Math.cos(auroraTime * b.speed * 0.8 + i) * H * 0.04;
+        var cx = W * b.xRatio + ox, cy = H * b.yRatio + oy;
+        var r = Math.max(W, H) * b.rRatio;
+        var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        grad.addColorStop(0, b.color); grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    /* ── 城市天际线剪影 ── */
+    var cityBuildings = [];
+    function rebuildCity() {
+      var buildings = [], x = 0;
+      while (x < W + 60) {
+        var bw = rand(28, 70), bh = rand(H * 0.12, H * 0.42);
+        buildings.push({ x: x, w: bw, h: bh, win: Math.random() < 0.5 });
+        x += bw + rand(2, 10);
+      }
+      cityBuildings = buildings;
+    }
+    rebuildCity();
+    function drawCityLayer(offsetX, offsetY, color, alpha) {
+      ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = color;
+      ctx.beginPath(); ctx.moveTo(offsetX, H + offsetY);
+      cityBuildings.forEach(function (b) {
+        ctx.lineTo(b.x + offsetX, H - b.h + offsetY);
+        ctx.lineTo(b.x + b.w + offsetX, H - b.h + offsetY);
+      });
+      ctx.lineTo(W + offsetX, H + offsetY); ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+    var cityGlitchTime = 0;
+    function drawCityGhost(speedMul) {
+      cityGlitchTime += 0.02 * speedMul;
+      var jitter = Math.sin(cityGlitchTime * 3) * 1.2;
+      drawCityLayer(-4 + jitter, 0, 'rgba(110,199,255,0.22)', 1);
+      drawCityLayer(4 - jitter, 0, 'rgba(255,110,199,0.20)', 1);
+      drawCityLayer(0, 0, 'rgba(10,8,24,0.85)', 1);
+      ctx.save(); ctx.fillStyle = 'rgba(180,200,255,0.5)';
+      cityBuildings.forEach(function (b) {
+        if (!b.win) return;
+        var flicker = 0.3 + 0.7 * Math.abs(Math.sin(cityGlitchTime + b.x));
+        ctx.globalAlpha = flicker * 0.4;
+        ctx.fillRect(b.x + b.w * 0.3, H - b.h + 14, 2, 2);
+        ctx.fillRect(b.x + b.w * 0.6, H - b.h + 26, 2, 2);
+      });
+      ctx.restore();
+    }
+
+    /* ── 主循环 ── */
+    function tick() {
+      if (!document.getElementById('luliy-cyber-canvas')) { _cyberRAF = null; return; }
+      var speedMul = getCyberSpeed(), dir = getCyberDir();
+
+      ctx.fillStyle = 'rgba(15,12,35,0.22)';
+      ctx.fillRect(0, 0, W, H);
+
+      drawAurora(speedMul);
+      drawCityGhost(speedMul);
+
+      drawConnections();
+      for (var i = 0; i < bgParticles.length; i++) { bgParticles[i].update(speedMul, dir); bgParticles[i].draw(); }
+
+      if (mouse.active) {
+        var grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 90);
+        grad.addColorStop(0, 'rgba(255,110,199,0.14)'); grad.addColorStop(1, 'rgba(255,110,199,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 90, 0, Math.PI * 2); ctx.fill();
+      }
+
+      for (var i = trailParticles.length - 1; i >= 0; i--) {
+        var t = trailParticles[i]; t.update(); t.draw();
+        if (t.life <= 0) trailParticles.splice(i, 1);
+      }
+      for (var i = explosions.length - 1; i >= 0; i--) {
+        var ex = explosions[i]; ex.update(); ex.draw();
+        if (ex.life <= 0) explosions.splice(i, 1);
+      }
+      for (var i = rings.length - 1; i >= 0; i--) {
+        var r = rings[i]; r.update(); r.draw();
+        if (r.life <= 0) rings.splice(i, 1);
+      }
+      drawGlitchTexts();
+
+      _cyberRAF = requestAnimationFrame(tick);
+    }
+    _cyberRAF = requestAnimationFrame(tick);
+
+    /* ── resize ── */
+    function onResize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      updateTarget();
+      rebuildCity();
+    }
+    window.addEventListener('resize', onResize, { passive: true });
+    /* 标题位置可能因布局变化（比如展开抽屉、切换深浅模式）而移动，定时校正一下 */
+    var targetTimer = setInterval(updateTarget, 1500);
+
+    initCyberParticles._cleanup = function () {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('resize', onResize);
+      clearInterval(targetTimer);
+    };
   }
+  root._luliyInitCyberParticles = initCyberParticles;
+  root._luliyStopCyberParticles = stopCyberParticles;
+
 
   /* ---- 09  Navbar — rebuilt: avatar+name centred, time top-left, icons spread */
   /* 黑洞特效已删除（副标题改为导航切换按钮）。_bhActive 保留为常量，
@@ -1645,6 +1932,14 @@
       brand.setAttribute('aria-label', brand.textContent + ' \u2014 \u8fd4\u56de\u4e3b\u9875');
       document.body.appendChild(brand);
     }
+    /* ★ 副标题：只在首页显示（文章页等其它页面顶部已经比较拥挤，
+       不重复放）。位置紧贴在 ΔιάΝους 正下方。 */
+    if (isIndexPage() && LULIY_OPTS.siteSubtitle && !document.getElementById('luliy-subtitle')) {
+      var subEl = document.createElement('div');
+      subEl.id = 'luliy-subtitle';
+      subEl.textContent = LULIY_OPTS.siteSubtitle;
+      document.body.appendChild(subEl);
+    }
 
     /* ── 双导航模式切换实现 ── */
     root._luliyToggleNavMode = function () {
@@ -1959,6 +2254,47 @@
       playSfx('click');
     });
     panel.appendChild(sakuraRow);
+
+    /* Cyberpunk particles — 总开关 */
+    var cyberOn  = localStorage.getItem('luliy-cyber') !== '0';
+    var cyberRow = mkRow('\u2728', '\u8d5b\u535a\u7c92\u5b50', cyberOn ? '\u5f00\u542f' : '\u5173\u95ed');
+    cyberRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var on = localStorage.getItem('luliy-cyber') !== '0';
+      localStorage.setItem('luliy-cyber', on ? '0' : '1');
+      cyberRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
+      if (on) { if (root._luliyStopCyberParticles) root._luliyStopCyberParticles(); }
+      else { if (root._luliyInitCyberParticles) root._luliyInitCyberParticles(); }
+      playSfx('click');
+    });
+    panel.appendChild(cyberRow);
+
+    /* Cyberpunk particles — 速度 */
+    var cyberSpeedSlider = mkSlider({
+      emoji: '\u26a1', label: '\u7c92\u5b50\u901f\u5ea6',
+      min: 0.2, max: 3, step: 0.2,
+      value: parseFloat(localStorage.getItem('luliy-cyber-speed')) || 1,
+      format: function (v) { return v.toFixed(1) + 'x'; },
+      onInput: function (v) { localStorage.setItem('luliy-cyber-speed', String(v)); }
+    });
+    panel.appendChild(cyberSpeedSlider);
+
+    /* Cyberpunk particles — 方向（汇聚 / 发散 / 自由漂浮，循环切换） */
+    var _dirLabels = { converge: '\u6c47\u805a\u6807\u9898', diverge: '\u53d1\u6563\u6269\u6563', free: '\u81ea\u7531\u98d8\u6d6e' };
+    function curDir() {
+      var v = localStorage.getItem('luliy-cyber-dir');
+      return (v === 'diverge' || v === 'free') ? v : 'converge';
+    }
+    var cyberDirRow = mkRow('\uD83E\uDDED', '\u7c92\u5b50\u65b9\u5411', _dirLabels[curDir()]);
+    cyberDirRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var order = ['converge', 'diverge', 'free'];
+      var next = order[(order.indexOf(curDir()) + 1) % order.length];
+      localStorage.setItem('luliy-cyber-dir', next);
+      cyberDirRow._bdg.textContent = _dirLabels[next];
+      playSfx('click');
+    });
+    panel.appendChild(cyberDirRow);
 
     /* ── Reading settings (article pages only) ───────────── */
     if (document.getElementById('postBody')) {
@@ -4050,7 +4386,7 @@
     safe(initDynamicTitle,    'dynamicTitle');
     safe(initUptime,          'uptime');
     safe(initSfxEvents,       'sfx');
-    safe(initClickSparks,     'sparks');
+    safe(initCyberParticles,  'cyberParticles');
     safe(initThemeRipple,     'ripple');
     safe(initTagEnhance,      'tagEnhance');
     safe(initHeroCluster,     'navbar');
