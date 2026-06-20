@@ -87,21 +87,21 @@
         title: 'GUIDEBOOK',
         kicker: '\u6307\u5357',          /* 指南 */
         desc: '\u672c\u7ad9\u4f7f\u7528\u4e0e\u914d\u7f6e\u6307\u5357\u3002',      /* 本站使用与配置指南。 */
-        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/docs/img/Guidebook.png'
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/Guidebook.png'
       },
       {
         label: 'Library',
         title: 'LIBRARY',
         kicker: '\u85cf\u4e66',          /* 藏书 */
         desc: '\u4e66\u7c4d\u4e0e\u8d44\u6599\u6536\u85cf\u3002',                /* 书籍与资料收藏。 */
-        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/docs/img/Library.png'
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/Library.png'
       },
       {
         label: 'AI',
         title: 'AI',
         kicker: '\u4eba\u5de5\u667a\u80fd',  /* 人工智能 */
         desc: '\u6a21\u578b\u3001\u5de5\u5177\u4e0e\u5b9e\u8df5\u8bb0\u5f55\u3002',  /* 模型、工具与实践记录。 */
-        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/docs/img/AI.png'
+        image: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/AI.png'
       }
     ],
     /* "more" button under the cards → archive page */
@@ -580,6 +580,10 @@
     if (document.getElementById('luliy-cats')) return;
     var items = LULIY_OPTS.categoryCards;
     if (!items || !items.length) return;
+
+    /* ★ 标记首页 body：CSS 据此隐藏 Gmeek 原生的副标题与文章列表，
+       只留下面这六张分类卡片，并让它们在视口里垂直居中。 */
+    document.body.classList.add('luliy-home');
 
     var section = document.createElement('section');
     section.id = 'luliy-cats-wrap';
@@ -1420,7 +1424,7 @@
     /* —— 顶部信息区 —— */
     var head = document.createElement('div');
     head.id = 'luliy-drawer-head';
-    var avatarSrc = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/docs/img/tx.webp';
+    var avatarSrc = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/tx.webp';
     var _brandName = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
     head.innerHTML =
       '<a class="ldh-avatar" href="/about" aria-label="\u5173\u4e8e"><img src="' + avatarSrc + '" alt="avatar"></a>' +
@@ -2205,6 +2209,9 @@
     }
     if (!nav || nav.getAttribute('data-luliy-cards')) return;
     nav.setAttribute('data-luliy-cards', '1');
+    /* ★ 分类页/归档页：标记 body，隐藏 Gmeek 原生的「上一页/下一页」翻页器
+       （我们用时间轴无限滚动或单标签全量展示，不需要原生分页） */
+    if (isTagPage || isArchive) document.body.classList.add('luliy-hide-pagination');
 
     /* Show skeleton placeholders while postList.json loads */
     showCardSkeleton(nav);
