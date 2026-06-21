@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Sun, 21 Jun 2026 05:04:41 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>四级清单</title><link>https://luliy.me/post/si-ji-qing-dan.html</link><description># 作文
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Sun, 21 Jun 2026 08:17:23 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>四级清单</title><link>https://luliy.me/post/si-ji-qing-dan.html</link><description># 作文
 ## The controversy surrounding () has fueled public discussions for long time,As modern society advances at a staggering pace in recent decades.
 People from diverse fields are playing more heed to this topic.people hold vastly different standards. I Find myself more inclined to endorse 
 My reasoning is elaborate as follows
@@ -2135,9 +2135,10 @@ The user will provide learning material (a single sentence or a full article/par
 3. 	**Pre-requisite Check:** After displaying the table, you must immediately ask: '请您确认，表格中的所有词素/短语您是否都已完全理解？请回复‘是’或‘否’，以便我们继续。</description><guid isPermaLink="true">https://luliy.me/post/prompt.html</guid><pubDate>Sat, 30 May 2026 10:45:20 +0000</pubDate></item><item><title>Gmeek上手</title><link>https://luliy.me/post/Gmeek-shang-shou.html</link><description>&lt;!-- ##{'timestamp':1743429389}## --&gt;
 
 # 0. 简介
-&gt; [Gmeek](https://github.com/Meekdai/Gmeek) 一个博客框架，超轻量级个人博客模板，完全基于Github Pages 、 Github Issues 和 Github Actions，可以称作All in Github。</description><guid isPermaLink="true">https://luliy.me/post/Gmeek-shang-shou.html</guid><pubDate>Mon, 31 Mar 2025 13:56:29 +0000</pubDate></item><item><title>about</title><link>https://luliy.me/about.html</link><description># 关于我
-Luliy，
-23岁，银川能源学院，机械专业。</description><guid isPermaLink="true">https://luliy.me/about.html</guid><pubDate>Sat, 30 May 2026 10:29:29 +0000</pubDate></item><item><title>book</title><link>https://luliy.me/book.html</link><description>```
+&gt; [Gmeek](https://github.com/Meekdai/Gmeek) 一个博客框架，超轻量级个人博客模板，完全基于Github Pages 、 Github Issues 和 Github Actions，可以称作All in Github。</description><guid isPermaLink="true">https://luliy.me/post/Gmeek-shang-shou.html</guid><pubDate>Mon, 31 Mar 2025 13:56:29 +0000</pubDate></item><item><title>about</title><link>https://luliy.me/about.html</link><description># ΔιάΝους
+
+&gt; **Διά**,希腊语前缀，通过（through），穿越（across），贯穿（via），
+&gt; **Νους**,古希腊哲学中的重要概念，意为：理智（Intellect），心智（Mind），智慧（Wisdom），思维（Reason）。</description><guid isPermaLink="true">https://luliy.me/about.html</guid><pubDate>Sat, 30 May 2026 10:29:29 +0000</pubDate></item><item><title>book</title><link>https://luliy.me/book.html</link><description>```
 Gmeek-html&lt;link rel='preconnect' href='https://fonts.googleapis.com'&gt;
 &lt;link rel='preconnect' href='https://fonts.gstatic.com' crossorigin&gt;
 &lt;link href='https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&amp;family=Inter:wght@400;500;600&amp;display=swap' rel='stylesheet'&gt;
