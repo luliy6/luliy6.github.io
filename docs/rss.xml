@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Fri, 19 Jun 2026 15:50:57 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>四级清单</title><link>https://luliy.me/post/si-ji-qing-dan.html</link><description># 作文
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Sun, 21 Jun 2026 05:04:41 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>四级清单</title><link>https://luliy.me/post/si-ji-qing-dan.html</link><description># 作文
 ## The controversy surrounding () has fueled public discussions for long time,As modern society advances at a staggering pace in recent decades.
 People from diverse fields are playing more heed to this topic.people hold vastly different standards. I Find myself more inclined to endorse 
 My reasoning is elaborate as follows
@@ -2137,7 +2137,314 @@ The user will provide learning material (a single sentence or a full article/par
 # 0. 简介
 &gt; [Gmeek](https://github.com/Meekdai/Gmeek) 一个博客框架，超轻量级个人博客模板，完全基于Github Pages 、 Github Issues 和 Github Actions，可以称作All in Github。</description><guid isPermaLink="true">https://luliy.me/post/Gmeek-shang-shou.html</guid><pubDate>Mon, 31 Mar 2025 13:56:29 +0000</pubDate></item><item><title>about</title><link>https://luliy.me/about.html</link><description># 关于我
 Luliy，
-23岁，银川能源学院，机械专业。</description><guid isPermaLink="true">https://luliy.me/about.html</guid><pubDate>Sat, 30 May 2026 10:29:29 +0000</pubDate></item><item><title>book</title><link>https://luliy.me/book.html</link><description>哈喽。</description><guid isPermaLink="true">https://luliy.me/book.html</guid><pubDate>Sat, 30 May 2026 10:43:19 +0000</pubDate></item><item><title>gallery</title><link>https://luliy.me/gallery.html</link><description>&lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/4a6cb22c-6459-4605-9605-3daa7b7da42b' /&gt;
+23岁，银川能源学院，机械专业。</description><guid isPermaLink="true">https://luliy.me/about.html</guid><pubDate>Sat, 30 May 2026 10:29:29 +0000</pubDate></item><item><title>book</title><link>https://luliy.me/book.html</link><description>```
+Gmeek-html&lt;link rel='preconnect' href='https://fonts.googleapis.com'&gt;
+&lt;link rel='preconnect' href='https://fonts.gstatic.com' crossorigin&gt;
+&lt;link href='https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&amp;family=Inter:wght@400;500;600&amp;display=swap' rel='stylesheet'&gt;
+&lt;style&gt;
+  :root{
+    --wall:#3B4A45;
+    --wall-deep:#2E3A36;
+    --wood-dark:#5C3A21;
+    --wood-mid:#7A4B27;
+    --wood-light:#9A6A3C;
+    --brass:#C9A24B;
+    --brass-dark:#8A6B2E;
+    --parchment:#EFE6D2;
+    --cream:#F2EAD3;
+    --ink:#2A2420;
+    --muted:#C9C2AC;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: radial-gradient(circle at 50% 0%, var(--wall) 0%, var(--wall-deep) 75%);
+    font-family:'Inter',sans-serif;
+    color:var(--cream);
+    min-height:100vh;
+  }
+
+  .page{ max-width:1080px; margin:0 auto; padding:48px 24px 72px; }
+
+  /* ---------- 头部 ---------- */
+  .site-header{ text-align:center; margin-bottom:44px; }
+  .site-header h1{
+    font-family:'Noto Serif SC',serif;
+    font-weight:900;
+    font-size:clamp(28px, 5vw, 44px);
+    margin:0 0 10px;
+    color:var(--cream);
+    letter-spacing:2px;
+  }
+  .subtitle{
+    margin:0;
+    font-size:14px;
+    color:var(--muted);
+    letter-spacing:.5px;
+  }
+
+  /* ---------- 书柜外框 ---------- */
+  .bookcase{
+    background:linear-gradient(180deg, var(--wood-mid), var(--wood-dark));
+    border:14px solid var(--wood-dark);
+    border-radius:6px;
+    padding:30px 18px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:34px;
+    box-shadow:
+      0 30px 60px rgba(0,0,0,.45),
+      inset 0 0 0 3px rgba(0,0,0,.25);
+  }
+
+  /* ---------- 每层书架 ---------- */
+  .shelf{ position:relative; }
+
+  .shelf-plaque{
+    display:inline-flex;
+    align-items:baseline;
+    gap:6px;
+    background:var(--brass);
+    color:var(--ink);
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:13px;
+    padding:4px 12px 5px;
+    border-radius:3px 3px 0 0;
+    margin-left:14px;
+    box-shadow:0 -1px 0 rgba(255,255,255,.3) inset, 0 2px 3px rgba(0,0,0,.3);
+    position:relative;
+    z-index:2;
+  }
+  .shelf-plaque .count{
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    font-size:11px;
+    color:var(--brass-dark);
+  }
+
+  .shelf-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    gap:7px;
+    padding:0 16px 12px;
+    min-height:40px;
+  }
+
+  .shelf-board{
+    height:16px;
+    margin:0 6px;
+    border-radius:2px;
+    background:linear-gradient(180deg, var(--wood-light) 0%, var(--wood-mid) 45%, var(--wood-dark) 100%);
+    box-shadow:0 6px 10px rgba(0,0,0,.35), 0 -1px 0 rgba(255,255,255,.15) inset;
+    position:relative;
+  }
+  .shelf-board::before,
+  .shelf-board::after{
+    content:'';
+    position:absolute;
+    top:-10px;
+    width:6px;
+    height:18px;
+    background:var(--brass-dark);
+    border-radius:1px 1px 0 0;
+    box-shadow:0 0 0 1px rgba(0,0,0,.3);
+  }
+  .shelf-board::before{ left:2px; }
+  .shelf-board::after{ right:2px; }
+
+  /* ---------- 书脊 ---------- */
+  .spine{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    color:var(--cream);
+    border-radius:3px 3px 1px 1px;
+    box-shadow:
+      inset -3px 0 6px rgba(0,0,0,.25),
+      inset 2px 0 0 rgba(255,255,255,.12),
+      0 3px 6px rgba(0,0,0,.35);
+    cursor:pointer;
+    transform:rotate(var(--tilt,0deg));
+    transition:transform .18s ease, box-shadow .18s ease;
+    position:relative;
+    padding:10px 0;
+  }
+  .spine:hover,
+  .spine:focus-visible{
+    transform:translateY(-12px) rotate(0deg);
+    box-shadow:
+      inset -3px 0 6px rgba(0,0,0,.25),
+      inset 2px 0 0 rgba(255,255,255,.12),
+      0 14px 18px rgba(0,0,0,.45);
+  }
+  .spine:focus-visible{
+    outline:2px solid var(--brass);
+    outline-offset:3px;
+  }
+
+  .spine-title{
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:1px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-height:100%;
+    text-shadow:0 1px 1px rgba(0,0,0,.3);
+  }
+
+  /* 悬浮提示卡 */
+  .tip{
+    position:absolute;
+    bottom:100%;
+    left:50%;
+    transform:translate(-50%, 6px);
+    width:180px;
+    background:var(--parchment);
+    color:var(--ink);
+    border-radius:6px;
+    padding:10px 12px;
+    font-family:'Inter',sans-serif;
+    writing-mode:horizontal-tb;
+    text-orientation:initial;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+    box-shadow:0 8px 18px rgba(0,0,0,.4);
+    z-index:5;
+    margin-bottom:6px;
+  }
+  .spine:hover .tip,
+  .spine:focus-visible .tip{
+    opacity:1;
+    transform:translate(-50%, 0);
+  }
+  .tip strong{
+    display:block;
+    font-size:13px;
+    margin-bottom:2px;
+  }
+  .tip span.author{
+    display:block;
+    font-size:11px;
+    color:#6b6354;
+    margin-bottom:4px;
+  }
+  .tip span.note{
+    display:block;
+    font-size:11px;
+    line-height:1.5;
+    color:#4a4438;
+  }
+
+  /* ---------- “在读” 平放书堆（签名细节） ---------- */
+  .reading-zone{
+    margin-left:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    padding-bottom:4px;
+  }
+  .reading-label{
+    font-size:10px;
+    letter-spacing:1px;
+    color:var(--brass);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+  }
+  .reading-stack{
+    position:relative;
+    width:78px;
+    height:46px;
+  }
+  .flat-book{
+    position:absolute;
+    left:0;
+    width:78px;
+    height:16px;
+    border-radius:2px;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    padding-left:8px;
+    font-family:'Noto Serif SC',serif;
+    font-size:9px;
+    color:var(--cream);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    box-shadow:0 3px 5px rgba(0,0,0,.3), inset 0 0 0 1px rgba(255,255,255,.1);
+    transition:transform .15s ease;
+  }
+  .flat-book:hover,
+  .flat-book:focus-visible{ transform:translateX(3px); }
+  .flat-book::after{
+    content:'';
+    position:absolute;
+    right:0; top:0; bottom:0;
+    width:5px;
+    background:rgba(255,255,255,.35);
+  }
+  .flat-book.is-top{
+    transform:rotate(-5deg) translateY(0);
+    z-index:3;
+  }
+  .flat-book.is-top::before{
+    content:'';
+    position:absolute;
+    top:-6px; left:14px;
+    width:6px; height:10px;
+    background:#B5752A;
+  }
+
+  /* ---------- 空状态 ---------- */
+  .empty-shelf{
+    color:var(--muted);
+    font-size:13px;
+    padding:14px 16px;
+  }
+
+  /* ---------- 页脚 ---------- */
+  .site-footer{
+    text-align:center;
+    margin-top:36px;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:1px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .spine, .flat-book, .tip{ transition:none; }
+  }
+
+  @media (max-width:560px){
+    .bookcase{ padding:24px 10px 12px; gap:26px; border-width:10px; }
+    .shelf-row{ padding:0 8px 10px; gap:5px; }
+    .spine-title{ font-size:13px; }
+  }
+&lt;/style&gt;
+&lt;div class='page'&gt;
+  &lt;header class='site-header'&gt;
+    &lt;h1&gt;我的书架&lt;/h1&gt;
+    &lt;p class='subtitle' id='subtitle'&gt;点击书脊，前往对应的文章&lt;/p&gt;
+  &lt;/header&gt;
+
+  &lt;main class='bookcase' id='bookcase'&gt;&lt;/main&gt;
+
+  &lt;footer class='site-footer'&gt;书架 · 私人收藏&lt;/footer&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+/* ============================================================
+   📚 在下面的 books 数组里编辑你的书目，改完保存即可生效。</description><guid isPermaLink="true">https://luliy.me/book.html</guid><pubDate>Sat, 30 May 2026 10:43:19 +0000</pubDate></item><item><title>gallery</title><link>https://luliy.me/gallery.html</link><description>&lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/4a6cb22c-6459-4605-9605-3daa7b7da42b' /&gt;
 &lt;img width='3344' height='1882' alt='Image' src='https://github.com/user-attachments/assets/7ecae118-93d7-4c83-9a6c-2973535bf479' /&gt;
 &lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/c7f210ae-89e9-4912-82b5-40d409dbf4f4' /&gt;
 &lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/6d1940a4-e3c9-44ea-af27-a58f8a9d015c' /&gt;
