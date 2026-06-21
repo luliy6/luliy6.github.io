@@ -545,9 +545,10 @@
       card.className = 'luliy-cat-card';
       /* tag.html uses #<label> to filter; encode in case of spaces */
       card.href = 'tag.html#' + encodeURIComponent(it.label || '');
-      card.style.backgroundImage =
-        'linear-gradient(to top, rgba(6,5,16,0.88) 8%, rgba(6,5,16,0.30) 50%, rgba(6,5,16,0.10) 100%), url("' +
-        it.image + '")';
+      /* ★ 图片改用 CSS 变量传给 ::before 伪元素（见 enhance.css），
+         这样图片能在悬停时独立缩放/加滤镜，不会带着文字一起变形。
+         渐变遮罩也挪到了 ::after 里统一处理，这里不用再拼了。 */
+      card.style.setProperty('--cat-img', 'url("' + it.image + '")');
 
       var kicker = document.createElement('span');
       kicker.className = 'luliy-cat-kicker';
@@ -1170,23 +1171,32 @@
       return buildings;
     }
     function rebuildCityLayers() {
-      var CITY_SCALE = 0.2;
+      /* ★ 重新设计：原版用 yOffset 把整层建筑往下平移，数值算下来会把
+         矮楼直接推到画布外面（translate 之后 top 坐标超过 H），只是
+         恰好被原版"每帧叠加半透明黑"的拖尾 bug 顺带"补"出一点残影，
+         才勉强看到一丝痕迹——而那个拖尾 bug 正是我们之前专门修掉的
+         "屏幕变黑"问题的根源，不能再加回来。
+         这里改成：不做整层下移，建筑高度直接按屏幕高度的合理比例
+         生成、自然"长在"画布底部（H 为基准线），三层靠"建筑高度本身
+         的差异 + 描边纵深感"区分远中近，确保不管哪一层都在可见区域
+         内。整体尺度也显著放大，呈现真正成片的多层建筑群，
+         而不是原版那种几乎看不见的细线。 */
       cityLayers = [
         { buildings: makeBuildingLayer({
-            minW: 18 * CITY_SCALE, maxW: 36 * CITY_SCALE, minH: 0.06 * CITY_SCALE, maxH: 0.12 * CITY_SCALE,
-            spireChance: 0.15, neonChance: 0.25, gapMin: 1 * CITY_SCALE, gapMax: 6 * CITY_SCALE,
+            minW: 26, maxW: 52, minH: 0.10, maxH: 0.19,
+            spireChance: 0.15, neonChance: 0.25, gapMin: 3, gapMax: 14,
             neonColors: ['#3a4a8c', '#4a6a9c'] }),
-          baseColor: '20,24,48', alpha: 0.55, yOffset: H * 0.42 * CITY_SCALE, parallax: 6 },
+          baseColor: '20,24,48', alpha: 0.55, yOffset: 0, parallax: 6 },
         { buildings: makeBuildingLayer({
-            minW: 26 * CITY_SCALE, maxW: 55 * CITY_SCALE, minH: 0.10 * CITY_SCALE, maxH: 0.20 * CITY_SCALE,
-            spireChance: 0.3, neonChance: 0.45, gapMin: 2 * CITY_SCALE, gapMax: 10 * CITY_SCALE,
+            minW: 38, maxW: 78, minH: 0.16, maxH: 0.30,
+            spireChance: 0.3, neonChance: 0.45, gapMin: 4, gapMax: 18,
             neonColors: ['#ff6ec7', '#6ec7ff', '#b48cff'] }),
-          baseColor: '14,16,34', alpha: 0.78, yOffset: H * 0.26 * CITY_SCALE, parallax: 16 },
+          baseColor: '14,16,34', alpha: 0.80, yOffset: 0, parallax: 16 },
         { buildings: makeBuildingLayer({
-            minW: 40 * CITY_SCALE, maxW: 90 * CITY_SCALE, minH: 0.14 * CITY_SCALE, maxH: 0.26 * CITY_SCALE,
-            spireChance: 0.45, neonChance: 0.7, gapMin: 3 * CITY_SCALE, gapMax: 14 * CITY_SCALE,
+            minW: 56, maxW: 130, minH: 0.22, maxH: 0.40,
+            spireChance: 0.45, neonChance: 0.7, gapMin: 5, gapMax: 24,
             neonColors: ['#ff6ec7', '#7fdbff', '#c77dff', '#ff9eda'] }),
-          baseColor: '6,6,16', alpha: 0.95, yOffset: H * 0.12 * CITY_SCALE, parallax: 32 }
+          baseColor: '6,6,16', alpha: 0.95, yOffset: 0, parallax: 32 }
       ];
     }
     function drawBuildingLayerSilhouette(layer, offsetX, colorOverride, alphaOverride) {
