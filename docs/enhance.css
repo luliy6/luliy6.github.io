@@ -462,14 +462,19 @@ body.luliy-home #pagination {
    --luliy-cat-h），设置面板里新增了对应滑块，可以自己再调，
    不用每次都来回找我改代码。 */
 #luliy-cats {
-  width: 100%;
-  max-width: var(--luliy-cat-w, 1500px);
+  /* ★ 修复宽度滑块"调大没反应"的真 bug：原来是 width:100% + max-width:var()，
+     而 max-width 只在"想要的值比容器自然宽度还小"时才生效——一旦滑块调
+     得比容器自然宽度（约 1300px 左右，取决于视口）还大，就彻底没效果了。
+     改成 width:min(var(...), 100%)，滑块的值永远优先生效，
+     只在超过视口实际可用宽度时才被压缩，调大调小都有反应。 */
+  width: min(var(--luliy-cat-w, 1500px), 100%);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 .luliy-cat-card {
   position: relative;
+  will-change: transform, box-shadow;
   height: var(--luliy-cat-h, 338px);
   display: flex;
   flex-direction: column;
@@ -488,6 +493,7 @@ body.luliy-home #pagination {
   position: absolute;
   inset: 0;
   z-index: 0;
+  will-change: transform, filter;
   background-image: var(--cat-img);
   background-size: cover;
   background-position: center;
@@ -547,10 +553,9 @@ body.luliy-home #pagination {
   color: rgba(255,255,255,0.86);
   text-shadow: 0 1px 10px rgba(0,0,0,0.6);
 }
-/* "more →" row, bottom-right, → archive ★ 恢复 1 倍 */
+/* "more →" row, bottom-right, → archive ★ 同步用 min() 写法 */
 #luliy-cats-more-row {
-  width: 100%;
-  max-width: var(--luliy-cat-w, 1500px);
+  width: min(var(--luliy-cat-w, 1500px), 100%);
   display: flex;
   justify-content: flex-end;
   margin: 18px auto 0;      /* 1 倍 */
@@ -2767,23 +2772,27 @@ body[data-luliy-theme="mono"] {
 ══════════════════════════════════════════════════════════ */
 /* 圆形折叠按钮，样式参照 #luliy-toc-fab，在它正上方紧接着排列 */
 #luliy-ap-fab {
-  position: fixed; bottom: 268px; right: 22px;
+  /* ★ 位置改由 JS 控制（left/top），支持拖拽 + 和播放器位置同步，
+     不再写死 bottom/right。 */
+  position: fixed;
   width: 44px; height: 44px; border-radius: 50%;
   background: var(--th-accent-soft, rgba(130,80,223,0.22));
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   border: 1px solid var(--th-accent-soft, rgba(130,80,223,0.35));
   color: var(--th-accent, #8250df); font-size: 18px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  cursor: grab; display: flex; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none; z-index: 9994;
-  transition: opacity 0.28s, transform 0.28s, background 0.25s, color 0.25s;
+  user-select: none; touch-action: none;
+  transition: opacity 0.28s, background 0.25s, color 0.25s, box-shadow 0.2s;
 }
 #luliy-ap-fab.is-visible { opacity: 1; pointer-events: all; }
+#luliy-ap-fab.is-dragging { cursor: grabbing; transition: none; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 #luliy-ap-fab.is-active {
   background: var(--th-accent, #8250df) !important;
   color: #fff !important;
   border-color: var(--th-accent, #8250df) !important;
 }
-#luliy-ap-fab:hover { transform: translateY(-3px); background: var(--th-accent-hover, rgba(130,80,223,0.35)); }
+#luliy-ap-fab:hover:not(.is-dragging) { background: var(--th-accent-hover, rgba(130,80,223,0.35)); }
 [data-color-mode="dark"] #luliy-ap-fab { color: var(--th-accent, #cba6f7); }
 
 /* 完整播放器：默认收起（不占地方、不拦截点击），点圆形按钮后展开 */
@@ -2802,8 +2811,7 @@ body[data-luliy-theme="mono"] {
   visibility: visible;
 }
 @media (max-width: 768px) {
-  /* 手机上圆形按钮和其它竖排按钮一起，间距收紧一点 */
-  #luliy-ap-fab { bottom: 252px; }
+  /* 位置已改由 JS 的 left/top 控制（含手机端默认值），这里不用再写 bottom */
 }
 
 
@@ -3761,6 +3769,7 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
   position: fixed; top: 0; left: 0; z-index: 10004;
   width: 300px; max-width: 86vw; height: 100%;
   display: flex; flex-direction: column;
+  will-change: transform;
   /* ★ 默认（赛博朋克主题）背景，下面按主题分别覆盖 */
   background: hsla(var(--luliy-glass-hue, 250), 45%, 12%, var(--luliy-glass-opacity, 0.5));
   -webkit-backdrop-filter: blur(var(--luliy-glass-blur, 22px)) saturate(1.6);

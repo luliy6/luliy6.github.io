@@ -348,6 +348,9 @@
       wrap.style.top  = y + 'px';
       setTimeout(function () { wrap.style.transition = ''; }, 300);
       savePos(x, y);
+      /* ★ 同步圆形按钮：收起后会出现在播放器最后停留的位置 */
+      var apFabEl = document.getElementById('luliy-ap-fab');
+      if (apFabEl) { apFabEl.style.left = x + 'px'; apFabEl.style.top = y + 'px'; }
     }
     wrap.addEventListener('mousedown', function(e) {
       if (e.target.closest('input,button,a,.aplayer-controller,.aplayer-list')) return;
@@ -472,6 +475,71 @@
           apFab.textContent = '\u266A';   /* ♪ */
           apFab.classList.add('is-visible');
 
+          /* ★ 圆形按钮也能拖动，并且和展开后的播放器位置双向同步：
+             拖按钮 → 下次点开播放器会出现在按钮当前位置；
+             拖播放器（原有逻辑）→ 收起后按钮也会出现在播放器最后停留的位置。
+             两者共用同一份位置存储（APOS），只是各自的默认初始值不同。 */
+          var fabPos = loadPos();
+          var fabDefX = window.innerWidth - 22 - 44;
+          var fabDefY = window.innerHeight - 268 - 44;
+          apFab.style.left = (fabPos ? fabPos.x : fabDefX) + 'px';
+          apFab.style.top  = (fabPos ? fabPos.y : fabDefY) + 'px';
+
+          var fabDragging = false, _fdx = 0, _fdy = 0;
+          function onFabDragStart(ex, ey) {
+            fabDragging = true;
+            var ox = parseInt(apFab.style.left) || 0;
+            var oy = parseInt(apFab.style.top)  || 0;
+            _fdx = ex - ox; _fdy = ey - oy;
+            apFab.classList.add('is-dragging');
+          }
+          function onFabDragMove(ex, ey) {
+            if (!fabDragging) return;
+            var nx = Math.max(0, Math.min(window.innerWidth  - apFab.offsetWidth,  ex - _fdx));
+            var ny = Math.max(0, Math.min(window.innerHeight - apFab.offsetHeight, ey - _fdy));
+            apFab.style.left = nx + 'px';
+            apFab.style.top  = ny + 'px';
+          }
+          function onFabDragEnd() {
+            if (!fabDragging) return;
+            fabDragging = false;
+            apFab.classList.remove('is-dragging');
+            var x = parseInt(apFab.style.left) || 0;
+            var y = parseInt(apFab.style.top)  || 0;
+            /* 同步给播放器：下次展开就出现在这里 */
+            wrap.style.left = x + 'px';
+            wrap.style.top  = y + 'px';
+            savePos(x, y);
+          }
+          var _fabMoved = false;
+          apFab.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            _fabMoved = false;
+            var p = zoomPos(e.clientX, e.clientY);
+            onFabDragStart(p.x, p.y);
+          });
+          document.addEventListener('mousemove', function (e) {
+            if (!fabDragging) return;
+            _fabMoved = true;
+            var p = zoomPos(e.clientX, e.clientY);
+            onFabDragMove(p.x, p.y);
+          });
+          document.addEventListener('mouseup', onFabDragEnd);
+          apFab.addEventListener('touchstart', function (e) {
+            _fabMoved = false;
+            var t = e.touches[0];
+            var p = zoomPos(t.clientX, t.clientY);
+            onFabDragStart(p.x, p.y);
+          }, { passive: true });
+          document.addEventListener('touchmove', function (e) {
+            if (!fabDragging) return;
+            _fabMoved = true;
+            var t = e.touches[0];
+            var p = zoomPos(t.clientX, t.clientY);
+            onFabDragMove(p.x, p.y);
+          }, { passive: true });
+          document.addEventListener('touchend', onFabDragEnd);
+
           var APOPEN = 'luliy-aplayer-open';
           var apOpen = false;
           function setApOpen(v) {
@@ -482,6 +550,7 @@
           }
           apFab.addEventListener('click', function (e) {
             e.stopPropagation();
+            if (_fabMoved) { _fabMoved = false; return; }   /* 刚拖动完不算点击，避免拖完误触展开 */
             setApOpen(!apOpen);
             playSfx('click');
           });
@@ -1298,12 +1367,8 @@
         for (var i = 0; i < bgParticles.length; i++) { bgParticles[i].update(speedMul, dir); bgParticles[i].draw(); }
       }
 
-      if (mouse.active) {
-        var grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 90);
-        grad.addColorStop(0, 'rgba(255,110,199,0.14)'); grad.addColorStop(1, 'rgba(255,110,199,0)');
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 90, 0, Math.PI * 2); ctx.fill();
-      }
+      /* ★ 鼠标跟随的炫光光晕已删除（用户反馈太晃眼）。
+         鼠标拖尾粒子（下面）和点击爆炸特效都还保留。 */
 
       for (var i = trailParticles.length - 1; i >= 0; i--) {
         var t = trailParticles[i]; t.update(); t.draw();
@@ -1323,13 +1388,19 @@
     }
     _cyberRAF = requestAnimationFrame(tick);
 
-    /* ── resize ── */
+    /* ── resize（加防抖，避免拖动改变窗口大小时频繁重建城市/粒子卡顿）── */
+    var _resizeTimer = null;
     function onResize() {
+      /* 画布尺寸本身跟手实时更新，不卡顿；只有"重建建筑/粒子分布"
+         这种较重的计算延后到停止拖动 150ms 后再做一次 */
       W = canvas.width = window.innerWidth;
       H = canvas.height = window.innerHeight;
-      updateTarget();
-      if (cyberStyle === 'city') rebuildCityLayers();
-      else rebuildCity();
+      if (_resizeTimer) clearTimeout(_resizeTimer);
+      _resizeTimer = setTimeout(function () {
+        updateTarget();
+        if (cyberStyle === 'city') rebuildCityLayers();
+        else rebuildCity();
+      }, 150);
     }
     window.addEventListener('resize', onResize, { passive: true });
     /* 标题位置可能因布局变化（比如展开抽屉、切换深浅模式）而移动，定时校正一下 */
@@ -1342,6 +1413,7 @@
       document.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('resize', onResize);
       clearInterval(targetTimer);
+      if (_resizeTimer) clearTimeout(_resizeTimer);
     };
   }
   root._luliyInitCyberParticles = initCyberParticles;
@@ -2843,9 +2915,22 @@
     reduceRow.addEventListener('click', function (e) {
       e.stopPropagation();
       var on = localStorage.getItem('luliy-reduce') === '1';
-      localStorage.setItem('luliy-reduce', on ? '0' : '1');
-      reduceRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
+      var turningOn = !on;
+      localStorage.setItem('luliy-reduce', turningOn ? '1' : '0');
+      reduceRow._bdg.textContent = turningOn ? '\u5f00\u542f' : '\u5173\u95ed';
       applyReduceMotion();
+      /* ★ 不只是切 CSS class（那只能停掉 CSS 动画），
+         不影响阅读的装饰性效果（背景粒子、樱花）要真的整套停掉/重启，
+         不能让它们在后台继续跑。各自的 init 函数内部仍会检查
+         luliy-cyber / luliy-sakura 这两个独立开关，不会覆盖用户
+         本来就关掉的选择。 */
+      if (turningOn) {
+        if (root._luliyStopCyberParticles) root._luliyStopCyberParticles();
+        if (root._luliyStopSakura) root._luliyStopSakura();
+      } else {
+        if (root._luliyInitCyberParticles) root._luliyInitCyberParticles();
+        if (root._luliyInitSakura) root._luliyInitSakura();
+      }
       playSfx('click');
     });
     panel.appendChild(reduceRow);
@@ -3397,6 +3482,7 @@
     _sakuraCanvas = null;
   }
   root._luliyStopSakura = stopSakura;
+  root._luliyInitSakura = initSakura;
 
   /* ---- 16b  Theme particles + meteors (all themes) -------- */
   var _particleRAF = null;
