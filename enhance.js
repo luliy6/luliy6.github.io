@@ -596,9 +596,13 @@
       'luliy-cyber':       '1',      /* 赛博朋克粒子系统总开关 */
       'luliy-cyber-speed': '1',      /* 0.2 ~ 3 */
       'luliy-cyber-dir':   'converge', /* converge | diverge | free */
+      'luliy-cyber-style': 'classic',  /* classic | city */
       'luliy-glass-blur':    '22',     /* px，0~50 */
       'luliy-glass-opacity': '0.5',    /* 0~1 */
       'luliy-glass-hue':     '250',    /* 0~360 */
+      'luliy-cat-w':        '1500',    /* 主页卡片宽度 px，900~1800 */
+      'luliy-cat-h':         '338',    /* 主页卡片高度 px，220~500 */
+      'luliy-article-opacity': '0.5',  /* 文章正文面板独立不透明度，0.1~0.95 */
       'luliy-fontsize':  '18',
       'luliy-sans':      '0',
       'luliy-cardview':  'grid',   /* grid | list */
@@ -814,6 +818,10 @@
     var v = localStorage.getItem('luliy-cyber-dir');
     return (v === 'diverge' || v === 'free') ? v : 'converge';   /* converge | diverge | free */
   }
+  function getCyberStyle() {
+    var v = localStorage.getItem('luliy-cyber-style');
+    return (v === 'city') ? 'city' : 'classic';   /* classic | city（新版多层视差城市，引力物理） */
+  }
 
   function stopCyberParticles() {
     if (_cyberRAF) { cancelAnimationFrame(_cyberRAF); _cyberRAF = null; }
@@ -902,12 +910,65 @@
       ctx.shadowBlur = 0; ctx.globalAlpha = 1;
     };
 
+    /* ── 「城市」风格粒子：真实引力物理（取自用户上传的新版页面）。
+       和经典风格的区别：不是简单地朝目标点平移，而是用 G/dist 的
+       引力加速度 + 切向角动量（绕转）模拟轨道运动，越靠近核心转得
+       越快，进入"捕获半径"就被吞噬重生——更接近黑洞吸积盘的观感。
+       方向设置（汇聚/发散/自由）对这套物理不自然，城市风格固定走
+       原生的引力汇聚效果，不受方向设置影响。 */
+    function CityBgParticle() { this.reset(); }
+    CityBgParticle.prototype.reset = function () {
+      var edge = Math.floor(rand(0, 4));
+      if (edge === 0) { this.x = rand(0, W); this.y = -20; }
+      else if (edge === 1) { this.x = W + 20; this.y = rand(0, H); }
+      else if (edge === 2) { this.x = rand(0, W); this.y = H + 20; }
+      else { this.x = -20; this.y = rand(0, H); }
+      this.r = rand(0.6, 2.2) * 0.2;
+      this.color = pick(NEON);
+      this.alpha = rand(0.2, 0.9);
+      this.pulse = rand(0, Math.PI * 2);
+      this.swirl = rand(0.015, 0.04) * (Math.random() < 0.5 ? 1 : -1);
+      this.vx = rand(-0.2, 0.2);
+      this.vy = rand(-0.2, 0.2);
+    };
+    CityBgParticle.prototype.update = function (speedMul) {
+      var dx = target.x - this.x, dy = target.y - this.y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+      var CAPTURE_RADIUS = 46;
+      if (dist < CAPTURE_RADIUS) { this.reset(); return; }
+      var G = 150 * speedMul;
+      var accel = G / dist;
+      this.vx += (dx / dist) * accel * 0.016;
+      this.vy += (dy / dist) * accel * 0.016;
+      var perpX = -dy / dist, perpY = dx / dist;
+      this.vx += perpX * this.swirl * speedMul;
+      this.vy += perpY * this.swirl * speedMul;
+      this.vx *= 0.95; this.vy *= 0.95;
+      this.x += this.vx; this.y += this.vy;
+      this.pulse += 0.02;
+    };
+    CityBgParticle.prototype.draw = function () {
+      var a = this.alpha * (0.6 + 0.4 * Math.sin(this.pulse));
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = a;
+      ctx.shadowBlur = 1.6; ctx.shadowColor = this.color;
+      ctx.fill();
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    };
+
+    var cyberStyle = getCyberStyle();
     var bgParticles = [];
-    var BG_COUNT = Math.min(70, Math.floor((W * H) / 25000));
-    for (var i = 0; i < BG_COUNT; i++) bgParticles.push(new BgParticle());
+    var BG_COUNT = (cyberStyle === 'city')
+      ? Math.min(350, Math.floor((W * H) / 5000))   /* 城市风格粒子更小更密 */
+      : Math.min(70, Math.floor((W * H) / 25000));
+    for (var i = 0; i < BG_COUNT; i++) {
+      bgParticles.push(cyberStyle === 'city' ? new CityBgParticle() : new BgParticle());
+    }
 
     /* ── 连接线 ── */
-    var CONNECT_DIST = 100;
+    var CONNECT_DIST = (cyberStyle === 'city') ? 20 : 100;   /* 100 * 0.2 = 20，城市风格粒子尺度缩小 */
     function drawConnections() {
       ctx.lineWidth = 0.4; ctx.strokeStyle = '#6ec7ff';
       for (var i = 0; i < bgParticles.length; i++) {
@@ -1086,6 +1147,122 @@
       ctx.restore();
     }
 
+    /* ── 「城市」风格：多层视差天际线（远/中/近三层）+ 鼠标视差 +
+       建筑窗户微光 + 霓虹招牌闪烁。取自用户上传的新版页面。 ── */
+    var cityLayers = [];
+    function makeBuildingLayer(opts) {
+      var buildings = [], x = -40;
+      while (x < W + 60) {
+        var bw = rand(opts.minW, opts.maxW);
+        var bh = rand(H * opts.minH, H * opts.maxH);
+        var hasSpire = Math.random() < opts.spireChance;
+        var hasNeonSign = Math.random() < opts.neonChance;
+        var neonColor = pick(opts.neonColors);
+        var windowRows = Math.max(2, Math.floor(bh / 22));
+        var windowCols = Math.max(1, Math.floor(bw / 14));
+        buildings.push({
+          x: x, w: bw, h: bh, hasSpire: hasSpire, hasNeonSign: hasNeonSign,
+          neonColor: neonColor, neonY: rand(0.2, 0.7), neonW: bw * rand(0.4, 0.85),
+          windowRows: windowRows, windowCols: windowCols, seed: Math.random() * 100
+        });
+        x += bw + rand(opts.gapMin, opts.gapMax);
+      }
+      return buildings;
+    }
+    function rebuildCityLayers() {
+      var CITY_SCALE = 0.2;
+      cityLayers = [
+        { buildings: makeBuildingLayer({
+            minW: 18 * CITY_SCALE, maxW: 36 * CITY_SCALE, minH: 0.06 * CITY_SCALE, maxH: 0.12 * CITY_SCALE,
+            spireChance: 0.15, neonChance: 0.25, gapMin: 1 * CITY_SCALE, gapMax: 6 * CITY_SCALE,
+            neonColors: ['#3a4a8c', '#4a6a9c'] }),
+          baseColor: '20,24,48', alpha: 0.55, yOffset: H * 0.42 * CITY_SCALE, parallax: 6 },
+        { buildings: makeBuildingLayer({
+            minW: 26 * CITY_SCALE, maxW: 55 * CITY_SCALE, minH: 0.10 * CITY_SCALE, maxH: 0.20 * CITY_SCALE,
+            spireChance: 0.3, neonChance: 0.45, gapMin: 2 * CITY_SCALE, gapMax: 10 * CITY_SCALE,
+            neonColors: ['#ff6ec7', '#6ec7ff', '#b48cff'] }),
+          baseColor: '14,16,34', alpha: 0.78, yOffset: H * 0.26 * CITY_SCALE, parallax: 16 },
+        { buildings: makeBuildingLayer({
+            minW: 40 * CITY_SCALE, maxW: 90 * CITY_SCALE, minH: 0.14 * CITY_SCALE, maxH: 0.26 * CITY_SCALE,
+            spireChance: 0.45, neonChance: 0.7, gapMin: 3 * CITY_SCALE, gapMax: 14 * CITY_SCALE,
+            neonColors: ['#ff6ec7', '#7fdbff', '#c77dff', '#ff9eda'] }),
+          baseColor: '6,6,16', alpha: 0.95, yOffset: H * 0.12 * CITY_SCALE, parallax: 32 }
+      ];
+    }
+    function drawBuildingLayerSilhouette(layer, offsetX, colorOverride, alphaOverride) {
+      var buildings = layer.buildings;
+      ctx.save();
+      ctx.globalAlpha = (alphaOverride !== undefined) ? alphaOverride : layer.alpha;
+      ctx.fillStyle = colorOverride || ('rgba(' + layer.baseColor + ',1)');
+      ctx.beginPath();
+      ctx.moveTo(offsetX, H);
+      buildings.forEach(function (b) {
+        var top = H - b.h;
+        ctx.lineTo(b.x + offsetX, top);
+        if (b.hasSpire) {
+          var spireX = b.x + offsetX + b.w * 0.5;
+          ctx.lineTo(spireX - 2, top - rand(10, 28));
+          ctx.lineTo(spireX + 2, top);
+        }
+        ctx.lineTo(b.x + b.w + offsetX, top);
+      });
+      ctx.lineTo(W + offsetX, H);
+      ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+    function drawBuildingWindowsAndNeon(layer, offsetX, t) {
+      var buildings = layer.buildings;
+      ctx.save();
+      buildings.forEach(function (b) {
+        var top = H - b.h;
+        for (var r = 0; r < b.windowRows; r++) {
+          for (var c = 0; c < b.windowCols; c++) {
+            var flickerSeed = b.seed + r * 3.1 + c * 1.7;
+            var on = (Math.sin(flickerSeed * 12.9898) * 43758.5453) % 1;
+            if (Math.abs(on) > 0.45) continue;
+            var flicker = 0.4 + 0.6 * Math.abs(Math.sin(t * 0.6 + flickerSeed));
+            ctx.globalAlpha = flicker * 0.5 * layer.alpha;
+            ctx.fillStyle = 'rgba(190,210,255,0.9)';
+            var wx = b.x + offsetX + 6 + c * 13, wy = top + 10 + r * 20;
+            if (wx < b.x + offsetX + b.w - 4) ctx.fillRect(wx, wy, 3, 5);
+          }
+        }
+        if (b.hasNeonSign) {
+          var ny = top + b.h * b.neonY;
+          var nflicker = 0.6 + 0.4 * Math.sin(t * 1.5 + b.seed);
+          ctx.globalAlpha = nflicker * layer.alpha;
+          ctx.shadowBlur = 10; ctx.shadowColor = b.neonColor;
+          ctx.fillStyle = b.neonColor;
+          ctx.fillRect(b.x + offsetX + (b.w - b.neonW) / 2, ny, b.neonW, 3);
+          ctx.shadowBlur = 0;
+        }
+      });
+      ctx.restore();
+    }
+    var cityGlitchTimeV2 = 0;
+    function drawCityGhostV2(speedMul) {
+      cityGlitchTimeV2 += 0.02 * speedMul;
+      var t = cityGlitchTimeV2;
+      var glitchSpike = Math.random() < 0.02 ? rand(4, 10) : 0;
+      var jitter = Math.sin(t * 3) * 1.0 + glitchSpike;
+      cityLayers.forEach(function (layer, i) {
+        ctx.save();
+        var parallaxX = ((mouse.x / W) - 0.5) * (layer.parallax || 0);
+        var parallaxY = ((mouse.y / H) - 0.5) * (layer.parallax || 0) * 0.3;
+        ctx.translate(parallaxX, layer.yOffset + parallaxY);
+        drawBuildingLayerSilhouette(layer, -3 + jitter * (i + 1) * 0.4, 'rgba(110,199,255,0.18)');
+        drawBuildingLayerSilhouette(layer, 3 - jitter * (i + 1) * 0.4, 'rgba(255,110,199,0.16)');
+        drawBuildingLayerSilhouette(layer, 0);
+        if (i > 0) drawBuildingWindowsAndNeon(layer, 0, t);
+        ctx.restore();
+      });
+      var fog = ctx.createLinearGradient(0, H * 0.75, 0, H);
+      fog.addColorStop(0, 'rgba(20,16,40,0)');
+      fog.addColorStop(1, 'rgba(20,16,40,0.55)');
+      ctx.fillStyle = fog;
+      ctx.fillRect(0, H * 0.75, W, H * 0.25);
+    }
+    if (cyberStyle === 'city') rebuildCityLayers();
+
     /* ── 主循环 ── */
     function tick() {
       if (!document.getElementById('luliy-cyber-canvas')) { _cyberRAF = null; return; }
@@ -1101,10 +1278,15 @@
       ctx.clearRect(0, 0, W, H);
 
       drawAurora(speedMul);
-      drawCityGhost(speedMul);
+      if (cyberStyle === 'city') drawCityGhostV2(speedMul);
+      else drawCityGhost(speedMul);
 
       drawConnections();
-      for (var i = 0; i < bgParticles.length; i++) { bgParticles[i].update(speedMul, dir); bgParticles[i].draw(); }
+      if (cyberStyle === 'city') {
+        for (var i = 0; i < bgParticles.length; i++) { bgParticles[i].update(speedMul); bgParticles[i].draw(); }
+      } else {
+        for (var i = 0; i < bgParticles.length; i++) { bgParticles[i].update(speedMul, dir); bgParticles[i].draw(); }
+      }
 
       if (mouse.active) {
         var grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 90);
@@ -1136,7 +1318,8 @@
       W = canvas.width = window.innerWidth;
       H = canvas.height = window.innerHeight;
       updateTarget();
-      rebuildCity();
+      if (cyberStyle === 'city') rebuildCityLayers();
+      else rebuildCity();
     }
     window.addEventListener('resize', onResize, { passive: true });
     /* 标题位置可能因布局变化（比如展开抽屉、切换深浅模式）而移动，定时校正一下 */
@@ -1574,26 +1757,69 @@
     if (isNaN(hue)) hue = 250;
     hue = ((hue % 360) + 360) % 360;
 
+    var artOp = parseFloat(localStorage.getItem('luliy-article-opacity'));
+    if (isNaN(artOp)) artOp = 0.5;
+    artOp = Math.min(0.95, Math.max(0.1, artOp));
+
     var root2 = document.documentElement.style;
     root2.setProperty('--luliy-glass-blur', blur + 'px');
     root2.setProperty('--luliy-glass-opacity', String(op));
     root2.setProperty('--luliy-glass-hue', String(hue));
+    root2.setProperty('--luliy-article-opacity', String(artOp));
   }
   root._luliyApplyGlassVars = applyGlassVars;
+
+  /* ---- 主页卡片宽 / 高（可调节） -------------------------- */
+  function applyCatSize() {
+    var w = parseFloat(localStorage.getItem('luliy-cat-w'));
+    if (isNaN(w)) w = 1500;
+    w = Math.min(1800, Math.max(900, w));
+
+    var h = parseFloat(localStorage.getItem('luliy-cat-h'));
+    if (isNaN(h)) h = 338;
+    h = Math.min(500, Math.max(220, h));
+
+    var root2 = document.documentElement.style;
+    root2.setProperty('--luliy-cat-w', w + 'px');
+    root2.setProperty('--luliy-cat-h', h + 'px');
+  }
+  root._luliyApplyCatSize = applyCatSize;
 
   /* ---- 13  Floating toolbar + unified sink (6 themes) ----- */
 
   /* ── 6 Sinks / Themes ───────────────────────────────────── */
-  /* ★ 大改后：不再是"用户手选一套主题锁死"，而是跟随深浅模式自动切换——
-     白天 = 你的名字（your-name），夜间 = 太空旅行（space）。
-     SINKS 仅保留这两项供抽屉里的"当前主题"展示用，applySink() 本身
-     已不再处理"选择"，而是委托给 applyThemeForColorMode()（见文件末尾）
-     根据当前 data-color-mode 自动决定。其余 4 套主题的 CSS 代码仍保留
-     未删，只是不会再被这套逻辑选中。 */
+  /* ★ 恢复多主题手动选择系统：赛博朋克为新增的默认主题，
+     原有 6 套主题全部加回来，用户可在抽屉「主题」分区里手动选择。
+     不再跟随深浅模式自动切换——选哪个主题由用户决定，
+     但每个主题内部仍各自适配白天/夜间两种配色（见上面 --th-* 变量）。 */
   var SINKS = [
     {
+      id: 'cyberpunk',
+      label: '\u8d5b\u535a\u670b\u514b\uff08\u9ed8\u8ba4\uff09',
+      dot:   '#ff2bd6',
+      theme: 'cyberpunk',
+      cardPalette: ['#00e5ff', '#ff2bd6', '#7b2fbe', '#6ec7ff'],
+      desc:  '\u9713\u8679\u90fd\u5e02\uff0c\u6545\u969c\u7f8e\u5b66'
+    },
+    {
+      id: 'default',
+      label: '\u9ed8\u8ba4',
+      dot:   '#8250df',
+      theme: 'default',
+      cardPalette: ['#8250df', '#0969da', '#ff6b9d', '#f0b429'],
+      desc:  '\u7ecf\u5178\u7d2b\u8c03\uff0c\u6e29\u548c\u6613\u8bfb'
+    },
+    {
+      id: 'sakura',
+      label: '\u6a31\u82b1\u5c11\u5973',
+      dot:   '#e05c8a',
+      theme: 'sakura',
+      cardPalette: ['#e05c8a', '#f9a8c9', '#c94070', '#ffb7c5'],
+      desc:  '\u6a31\u82b1\u7c89\u8c03\uff0c\u67d4\u8f6f\u7518\u7f8e'
+    },
+    {
       id: 'your-name',
-      label: '\u4f60\u7684\u540d\u5b57\uff08\u767d\u5929\uff09',
+      label: '\u4f60\u7684\u540d\u5b57',
       dot:   '#4a9de0',
       theme: 'your-name',
       cardPalette: ['#1a59a4', '#4a9de0', '#f4a738', '#60b8ff'],
@@ -1601,17 +1827,40 @@
     },
     {
       id: 'space',
-      label: '\u592a\u7a7a\u65c5\u884c\uff08\u9ed1\u591c\uff09',
+      label: '\u592a\u7a7a\u65c5\u884c',
       dot:   '#00e5ff',
       theme: 'space',
       cardPalette: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'],
       desc:  '\u6df1\u591c\u661f\u6d77\uff0c\u5b87\u5b99\u65c5\u8005'
+    },
+    {
+      id: 'sunset',
+      label: '\u65e5\u843d\u9ec4\u660f',
+      dot:   '#d9930d',
+      theme: 'sunset',
+      cardPalette: ['#f0b429', '#ffd98a', '#e8821e', '#d9930d'],
+      desc:  '\u66ed\u8272\u516c\u8def\uff0c\u6696\u91d1\u6982\u660f'
+    },
+    {
+      id: 'mono',
+      label: '\u6781\u7b80\u9ed1\u767d',
+      dot:   '#222222',
+      theme: 'mono',
+      cardPalette: ['#222222', '#555555', '#888888', '#bbbbbb'],
+      desc:  '\u9ed1\u767d\u7070\uff0c\u7eaf\u51c0\u514b\u5236'
     }
   ];
 
-  function applySink() {
-    /* 不再接受手选 id —— 始终交给"按深浅模式自动选主题"决定 */
-    if (root._luliyApplyThemeForColorMode) root._luliyApplyThemeForColorMode();
+  function applySink(id) {
+    var s = null;
+    for (var i = 0; i < SINKS.length; i++) { if (SINKS[i].id === id) { s = SINKS[i]; break; } }
+    if (!s) s = SINKS[0];   /* 找不到就回退到默认（赛博朋克） */
+    localStorage.setItem('luliy-sink', s.id);
+    document.body.setAttribute('data-luliy-theme', s.theme);
+    document.documentElement.style.setProperty('--card-c1', s.cardPalette[0]);
+    document.documentElement.style.setProperty('--card-c2', s.cardPalette[1]);
+    document.documentElement.style.setProperty('--card-c3', s.cardPalette[2]);
+    document.documentElement.style.setProperty('--card-c4', s.cardPalette[3]);
   }
   /* 暴露给抽屉系统复用 */
   root._luliyApplySink = applySink;
@@ -1670,6 +1919,7 @@
     var avatarSrc = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/tx.webp';
     var _brandName = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
     head.innerHTML =
+      '<button type="button" id="luliy-drawer-close" aria-label="\u5173\u95ed\u83dc\u5355">\u2715</button>' +
       '<a class="ldh-avatar" href="/about" aria-label="\u5173\u4e8e"><img src="' + avatarSrc + '" alt="avatar"></a>' +
       '<a class="ldh-name" href="/">' + esc(_brandName) + '</a>' +
       '<div class="ldh-accent"></div>' +
@@ -1852,17 +2102,13 @@
     }
     root._luliyFillDrawerQuick = fillQuick;
 
-    /* —— 分区②：主题（6 个）——
-       ★ 大改后：全站锁定太空主题，主题选择入口已无意义，整段隐藏。
-       代码保留（只加一个隐藏 class），日后想恢复多主题：
-       删掉下面这行 secTheme.classList.add('luliy-hidden-feature') 即可。 */
+    /* —— 分区②：主题（7 个，含新增「赛博朋克」默认主题）—— */
     var secTheme = mkSection('\u4e3b\u9898', false);   /* 主题 */
-    secTheme.classList.add('luliy-hidden-feature');
     drawer.appendChild(secTheme);
     var sinks = root._luliySINKS || [];
     var grid = document.createElement('div');
     grid.className = 'lds-theme-grid';
-    var curSink = localStorage.getItem('luliy-sink') || 'default';
+    var curSink = localStorage.getItem('luliy-sink') || 'cyberpunk';
     sinks.forEach(function (s) {
       var cell = document.createElement('button');
       cell.type = 'button';
@@ -1940,6 +2186,12 @@
     }
     ham.addEventListener('click', toggleDrawer);
     backdrop.addEventListener('click', closeDrawer);
+    var closeBtn = head.querySelector('#luliy-drawer-close');
+    if (closeBtn) closeBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      closeDrawer();
+      playSfx('click');
+    });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
     });
@@ -1954,14 +2206,24 @@
     document.body.appendChild(drawer);
     document.body.appendChild(ham);
 
-    /* ★ 左上角博客名 ΔιάΝους（纯文字，点击回主页），固定在汉堡按钮右侧。
-       全站可见，是「化繁为简」后的主要品牌标识。 */
+    /* ★ 左上角博客名 ΔιάΝους，固定在汉堡按钮右侧，全站可见。
+       ★ 样式套用自用户上传的新版粒子页面：「恒星核心」发光效果——
+       白色核心 + 多层粉/紫/青光晕模拟星光，结尾字符带十字星芒。
+       位置依然在左边（原文件里是居中的，这里只取它的视觉样式，
+       不取它的定位）。 */
     if (!document.getElementById('luliy-brand')) {
       var brand = document.createElement('a');
       brand.id = 'luliy-brand';
       brand.href = '/';
-      brand.textContent = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
-      brand.setAttribute('aria-label', brand.textContent + ' \u2014 \u8fd4\u56de\u4e3b\u9875');
+      var _brandText = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
+      var _bodyChars = _brandText.slice(0, -1);
+      var _lastChar = _brandText.slice(-1);
+      brand.appendChild(document.createTextNode(_bodyChars));
+      var _flare = document.createElement('span');
+      _flare.className = 'flare-anchor';
+      _flare.textContent = _lastChar;
+      brand.appendChild(_flare);
+      brand.setAttribute('aria-label', _brandText + ' \u2014 \u8fd4\u56de\u4e3b\u9875');
       document.body.appendChild(brand);
     }
     /* ★ 副标题：只在首页显示（文章页等其它页面顶部已经比较拥挤，
@@ -2170,6 +2432,7 @@
     previewWrap.className = 'luliy-ctrl-theme-preview';
 
     var THEME_PALETTES = {
+      'cyberpunk': { day: ['rgba(20,10,40,0.85)',    '#ff2bd6', '#f0e6ff'],  night: ['rgba(10,8,24,0.90)',   '#00e5ff', '#f0e6ff'] },
       'default':   { day: ['rgba(255,255,255,0.90)', '#8250df', '#1e1032'],  night: ['rgba(14,10,28,0.90)', '#cba6f7', '#cdd6f4'] },
       'sakura':    { day: ['rgba(255,238,245,0.92)', '#e05c8a', '#7a1040'],  night: ['rgba(42,10,28,0.88)',  '#f9a8c9', '#ffc5d0'] },
       'your-name': { day: ['rgba(230,244,255,0.92)', '#1a59a4', '#0d2b6b'],  night: ['rgba(4,14,52,0.90)',   '#93c5fd', '#c0e4ff'] },
@@ -2250,7 +2513,7 @@
     } catch (e) {}
 
     function syncThemeRows() {
-      var cur = localStorage.getItem('luliy-sink') || 'default';
+      var cur = localStorage.getItem('luliy-sink') || 'cyberpunk';
       panel.querySelectorAll('[data-sink]').forEach(function (r) {
         var active = r.getAttribute('data-sink') === cur;
         r.classList.toggle('is-active', active);
@@ -2328,6 +2591,26 @@
     });
     panel.appendChild(cyberDirRow);
 
+    /* 粒子风格：经典（汇聚标题，单层城市剪影）/ 城市（引力物理 +
+       多层视差天际线 + 鼠标视差 + 霓虹招牌，取自用户新上传的版本）。
+       两套风格内部结构差异较大，切换时直接停止重启整个粒子系统，
+       不做"实时融合"，更稳妥也更简单。 */
+    var _styleLabels = { classic: '\u7ecf\u5178', city: '\u57ce\u5e02\uff08\u65b0\uff09' };
+    function curCyberStyle() {
+      return localStorage.getItem('luliy-cyber-style') === 'city' ? 'city' : 'classic';
+    }
+    var cyberStyleRow = mkRow('\uD83C\uDFD9\uFE0F', '\u7c92\u5b50\u98ce\u683c', _styleLabels[curCyberStyle()]);
+    cyberStyleRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var next = curCyberStyle() === 'city' ? 'classic' : 'city';
+      localStorage.setItem('luliy-cyber-style', next);
+      cyberStyleRow._bdg.textContent = _styleLabels[next];
+      if (root._luliyStopCyberParticles) root._luliyStopCyberParticles();
+      if (root._luliyInitCyberParticles) root._luliyInitCyberParticles();
+      playSfx('click');
+    });
+    panel.appendChild(cyberStyleRow);
+
     /* ── 液态玻璃三个可调参数 ───────────────────────────── */
     panel.appendChild(mkSep());
     panel.appendChild(mkSec('\uD83E\uDE9E \u6db2\u6001\u73bb\u7483'));   /* 🪞 液态玻璃 */
@@ -2367,6 +2650,94 @@
       }
     });
     panel.appendChild(glassHueSlider);
+
+    var articleOpacitySlider = mkSlider({
+      emoji: '\uD83D\uDCC4', label: '\u6587\u7ae0\u9762\u677f\u900f\u660e\u5ea6',   /* 📄 文章面板透明度（独立于上面的玻璃透明度，单独控制阅读面板） */
+      min: 0.1, max: 0.95, step: 0.05,
+      value: parseFloat(localStorage.getItem('luliy-article-opacity')) || 0.5,
+      format: function (v) { return Math.round(v * 100) + '%'; },
+      onInput: function (v) {
+        localStorage.setItem('luliy-article-opacity', String(v));
+        applyGlassVars();
+      }
+    });
+    panel.appendChild(articleOpacitySlider);
+
+    /* ── 主页卡片尺寸（宽 / 高可调） ───────────────────── */
+    panel.appendChild(mkSep());
+    panel.appendChild(mkSec('\uD83D\uDCD0 \u5361\u7247\u5c3a\u5bf8'));   /* 📐 卡片尺寸 */
+
+    var catWSlider = mkSlider({
+      emoji: '\u2194\uFE0F', label: '\u5361\u7247\u5bbd\u5ea6',   /* ↔️ 卡片宽度 */
+      min: 900, max: 1800, step: 50,
+      value: parseFloat(localStorage.getItem('luliy-cat-w')) || 1500,
+      format: function (v) { return v + 'px'; },
+      onInput: function (v) {
+        localStorage.setItem('luliy-cat-w', String(v));
+        applyCatSize();
+      }
+    });
+    panel.appendChild(catWSlider);
+
+    var catHSlider = mkSlider({
+      emoji: '\u2195\uFE0F', label: '\u5361\u7247\u9ad8\u5ea6',   /* ↕️ 卡片高度 */
+      min: 220, max: 500, step: 10,
+      value: parseFloat(localStorage.getItem('luliy-cat-h')) || 338,
+      format: function (v) { return v + 'px'; },
+      onInput: function (v) {
+        localStorage.setItem('luliy-cat-h', String(v));
+        applyCatSize();
+      }
+    });
+    panel.appendChild(catHSlider);
+
+    /* ── 恢复默认值：一键重置上面这一串外观设置（粒子速度/方向、
+       玻璃模糊/透明度/色调、文章面板透明度、卡片宽/高），
+       省得调乱了找不回来。 */
+    var APPEARANCE_DEFAULTS = {
+      'luliy-cyber-speed':    '1',
+      'luliy-cyber-dir':      'converge',
+      'luliy-cyber-style':    'classic',
+      'luliy-glass-blur':     '22',
+      'luliy-glass-opacity':  '0.5',
+      'luliy-glass-hue':      '250',
+      'luliy-article-opacity':'0.5',
+      'luliy-cat-w':          '1500',
+      'luliy-cat-h':          '338'
+    };
+    var resetRow = mkRow('\u21BA', '\u6062\u590d\u9ed8\u8ba4\u503c', '');
+    resetRow._bdg.style.opacity = '0';
+    resetRow.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var styleChanged = curCyberStyle() !== 'classic';
+      Object.keys(APPEARANCE_DEFAULTS).forEach(function (k) {
+        localStorage.setItem(k, APPEARANCE_DEFAULTS[k]);
+      });
+      /* 同步滑块的视觉显示：改 value 再派发 input 事件，
+         会自动触发各自的 onInput（写 localStorage + 实时生效），
+         不用逐个手写重复逻辑。 */
+      [cyberSpeedSlider, glassBlurSlider, glassOpacitySlider,
+       glassHueSlider, articleOpacitySlider, catWSlider, catHSlider].forEach(function (s) {
+        s._range.value = APPEARANCE_DEFAULTS[
+          s === cyberSpeedSlider ? 'luliy-cyber-speed' :
+          s === glassBlurSlider ? 'luliy-glass-blur' :
+          s === glassOpacitySlider ? 'luliy-glass-opacity' :
+          s === glassHueSlider ? 'luliy-glass-hue' :
+          s === articleOpacitySlider ? 'luliy-article-opacity' :
+          s === catWSlider ? 'luliy-cat-w' : 'luliy-cat-h'
+        ];
+        s._range.dispatchEvent(new Event('input', { bubbles: false }));
+      });
+      cyberDirRow._bdg.textContent = _dirLabels['converge'];
+      cyberStyleRow._bdg.textContent = _styleLabels['classic'];
+      if (styleChanged) {
+        /* 风格变了（城市→经典），需要整套重启才能生效 */
+        if (root._luliyStopCyberParticles) root._luliyStopCyberParticles();
+        if (root._luliyInitCyberParticles) root._luliyInitCyberParticles();
+      }
+      playSfx('click');
+    });
+    panel.appendChild(resetRow);
 
     /* ── Reading settings (article pages only) ───────────── */
     if (document.getElementById('postBody')) {
@@ -2488,7 +2859,7 @@
     ctrlWrap.appendChild(panel);
     bar.appendChild(ctrlWrap);
     document.body.appendChild(bar);
-    applySink(localStorage.getItem('luliy-sink') || 'default');
+    applySink(localStorage.getItem('luliy-sink') || 'cyberpunk');
   }
 
   /* ---- 14  Home card rebuild ------------------------------ */
@@ -4335,46 +4706,19 @@
   initLocalStorage();
 
   /* Restore theme immediately to prevent FOUC.
-     ★ 大改后：白天模式锁定「你的名字」主题，夜间模式锁定「太空旅行」主题。
-     不再是单一锁死的主题——而是跟随 Gmeek 自带的深浅模式开关自动切换。
-     （其他 4 套主题 sunset/mono/default/sakura 的 CSS 代码仍保留未删，
-     只是不会再被选中；日后想恢复某一套，只需在下面的映射里加回去。） */
-  var THEME_PALETTES = {
-    'your-name': { theme: 'your-name', c: ['#1a59a4', '#4a9de0', '#f4a738', '#60b8ff'] },
-    'space':     { theme: 'space',     c: ['#00e5ff', '#4a9de0', '#7b2fbe', '#0d2149'] }
-  };
-  function themeForColorMode() {
-    var cm = document.documentElement.getAttribute('data-color-mode') || 'light';
-    return (cm === 'dark') ? THEME_PALETTES.space : THEME_PALETTES['your-name'];
-  }
-  function applyThemeForColorMode() {
-    if (!document.body) return;
-    var def = themeForColorMode();
-    document.body.setAttribute('data-luliy-theme', def.theme);
-    document.documentElement.style.setProperty('--card-c1', def.c[0]);
-    document.documentElement.style.setProperty('--card-c2', def.c[1]);
-    document.documentElement.style.setProperty('--card-c3', def.c[2]);
-    document.documentElement.style.setProperty('--card-c4', def.c[3]);
-  }
-  root._luliyApplyThemeForColorMode = applyThemeForColorMode;
+     ★ 恢复手动选主题系统：不再跟随深浅模式自动切换。
+     读取用户上次手动选的主题（localStorage 'luliy-sink'），
+     没选过就用新默认主题「赛博朋克」。直接复用前面已经定义好的
+     applySink()，它本身就会处理 data-luliy-theme + 卡片配色变量，
+     7 套主题（含新增的 cyberpunk）全部覆盖，不用再单独维护一份
+     精简版色板。 */
   (function () {
-    if (document.body) applyThemeForColorMode();
-    else document.addEventListener('DOMContentLoaded', applyThemeForColorMode);
-  })();
-  /* 监听深浅模式实时切换（用户点白天/黑夜按钮），同步换主题 + 重启粒子特效 */
-  (function () {
-    function onColorModeChange() {
-      applyThemeForColorMode();
-      if (root._luliyInitThemeParticles) root._luliyInitThemeParticles();
+    function boot() {
+      if (!document.body) return;
+      applySink(localStorage.getItem('luliy-sink') || 'cyberpunk');
     }
-    function start() {
-      try {
-        var mo = new MutationObserver(onColorModeChange);
-        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-color-mode'] });
-      } catch (e) {}
-    }
-    if (document.body) start();
-    else document.addEventListener('DOMContentLoaded', start);
+    if (document.body) boot();
+    else document.addEventListener('DOMContentLoaded', boot);
   })();
 
   /* ★ 背景图功能已全部移除 —— 全站背景统一改为纯色 #00020c，
@@ -4474,6 +4818,7 @@
     safe(applyReduceMotion,   'reduceMotion');
     safe(applyPbWidth,        'pbWidth');
     safe(applyGlassVars,      'glassVars');
+    safe(applyCatSize,        'catSize');
     safe(initViewTransitions, 'viewTransitions');
     safe(initTagCloud,        'tagCloud');
 
