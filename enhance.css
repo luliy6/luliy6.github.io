@@ -75,6 +75,13 @@
   --luliy-glass-blur: 22px;
   --luliy-glass-opacity: 0.5;
   --luliy-glass-hue: 250;
+
+  /* ★ 主页卡片宽 / 高，可在设置面板滑块调节 */
+  --luliy-cat-w: 1500px;
+  --luliy-cat-h: 338px;
+
+  /* ★ 文章正文面板独立不透明度（和卡片/标签云的玻璃透明度分开控制） */
+  --luliy-article-opacity: 0.5;
 }
 
 html { scroll-behavior: smooth; zoom: 1.1; }
@@ -334,7 +341,7 @@ body.luliy-reduce-motion #luliy-splash-text::before { animation: none; }
 #luliy-brand {
   position: fixed;
   top: 14px;
-  left: 70px;            /* sits just right of the 44px ☰ button at left:14px */
+  left: 70px;            /* sits just right of the 44px ☰ button at left:14px —— 位置不变，仍在左边 */
   z-index: 10002;
   height: 44px;
   display: inline-flex;
@@ -345,26 +352,55 @@ body.luliy-reduce-motion #luliy-splash-text::before { animation: none; }
   font-weight: 700;
   letter-spacing: 2px;
   line-height: 1;
-  color: #ff6ec7;
+  /* ★ 恒星核心发光效果：纯白文字 + 多层 text-shadow 叠出
+     "炽白核心 + 外层粉/紫/青晕染"的星光感，取代原来的霓虹故障风。 */
+  color: #fff;
   text-decoration: none !important;
-  text-shadow: 0 0 8px #ff6ec7, 0 0 20px #6ec7ff, 0 0 2px #fff;
-  animation: luliyBrandFlicker 3s infinite;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 10px #fff,
+    0 0 18px #ff9eda,
+    0 0 32px #ff6ec7,
+    0 0 55px #b48cff,
+    0 0 90px #6ec7ff;
+  animation: luliyBrandStarPulse 2.6s ease-in-out infinite;
   transition: transform 0.2s;
   white-space: nowrap;
 }
-#luliy-brand:hover {
-  transform: translateY(-1px);
-  text-shadow: 0 0 12px #ff6ec7, 0 0 28px #6ec7ff, 0 0 4px #fff;
+#luliy-brand:hover { transform: translateY(-1px); }
+@keyframes luliyBrandStarPulse {
+  0%, 100% { filter: brightness(1); opacity: 1; }
+  50%      { filter: brightness(1.35); opacity: 0.92; }
 }
-@keyframes luliyBrandFlicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
-  52% { opacity: 0.4; }
-  54% { opacity: 0.9; }
+/* 结尾字符的十字星芒：一道横、一道竖，叠在最后一个字的右侧 */
+#luliy-brand .flare-anchor {
+  position: relative;
+  display: inline-block;
 }
-body.luliy-reduce-motion #luliy-brand { animation: none; }
+#luliy-brand .flare-anchor::before,
+#luliy-brand .flare-anchor::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 100%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: luliyBrandStarPulse 2.6s ease-in-out infinite;
+}
+#luliy-brand .flare-anchor::before {
+  width: 52px; height: 1.4px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+}
+#luliy-brand .flare-anchor::after {
+  width: 1.4px; height: 24px;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.9), transparent);
+}
+body.luliy-reduce-motion #luliy-brand,
+body.luliy-reduce-motion #luliy-brand .flare-anchor::before,
+body.luliy-reduce-motion #luliy-brand .flare-anchor::after { animation: none; }
 @media (max-width: 600px) {
   #luliy-brand { font-size: 18px; left: 64px; }
+  #luliy-brand .flare-anchor::before { width: 38px; }
+  #luliy-brand .flare-anchor::after  { height: 18px; }
 }
 
 /* 副标题：紧贴在 ΔιάΝους 正下方，仅首页显示 */
@@ -421,19 +457,20 @@ body.luliy-home #pagination {
   box-sizing: border-box;
 }
 /* 卡片网格本身限制最大宽度并居中
-   ★ 1.75 倍太大、太丑，缩回 1.2 倍——比最初版本稍大一点，
-   更接近卡片背景图本身的自然比例。布局仍是 3 列 × 2 行不变；
-   平板/手机/矮屏的响应式收缩规则不受影响。 */
+   ★ 宽度在原 1200px 基础上 +25% = 1500px；卡片高度在 375px 基础上
+   -10% ≈ 338px。两个尺寸都改成 CSS 变量驱动（--luliy-cat-w /
+   --luliy-cat-h），设置面板里新增了对应滑块，可以自己再调，
+   不用每次都来回找我改代码。 */
 #luliy-cats {
   width: 100%;
-  max-width: 1200px;        /* ★ 宽度恢复 1 倍原始值 */
+  max-width: var(--luliy-cat-w, 1500px);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;                /* 1 倍 */
+  gap: 16px;
 }
 .luliy-cat-card {
   position: relative;
-  height: 375px;            /* ★ 高度在 1 倍(300px)基础上 +25% = 375px */
+  height: var(--luliy-cat-h, 338px);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -482,7 +519,7 @@ body.luliy-home #pagination {
 /* "more →" row, bottom-right, → archive ★ 恢复 1 倍 */
 #luliy-cats-more-row {
   width: 100%;
-  max-width: 1200px;        /* 1 倍 */
+  max-width: var(--luliy-cat-w, 1500px);
   display: flex;
   justify-content: flex-end;
   margin: 18px auto 0;      /* 1 倍 */
@@ -735,14 +772,29 @@ body[data-luliy-theme="space"] #postBody p,
 body[data-luliy-theme="space"] #postBody li,
 body[data-luliy-theme="space"] #postBody span,
 body[data-luliy-theme="space"] #postBody figcaption { color: #c8e8ff !important; }
+/* Space theme forces light text even in day mode */
+body[data-luliy-theme="cyberpunk"] #postBody,
+body[data-luliy-theme="cyberpunk"] #postBody p,
+body[data-luliy-theme="cyberpunk"] #postBody li,
+body[data-luliy-theme="cyberpunk"] #postBody span,
+body[data-luliy-theme="cyberpunk"] #postBody figcaption { color: #c8e8ff !important; }
 body[data-luliy-theme="space"] #postBody a { color: #00e5ff !important; }
+body[data-luliy-theme="cyberpunk"] #postBody a { color: #00e5ff !important; }
 body[data-luliy-theme="space"] #postBody a:hover { color: #80f4ff !important; }
+body[data-luliy-theme="cyberpunk"] #postBody a:hover { color: #80f4ff !important; }
 body[data-luliy-theme="space"] #postBody code  { color: #00e5ff !important; background: rgba(0,200,255,0.12) !important; }
+body[data-luliy-theme="cyberpunk"] #postBody code  { color: #00e5ff !important; background: rgba(0,200,255,0.12) !important; }
 body[data-luliy-theme="space"] #postBody strong { color: var(--th-strong, #00e5ff) !important; }
+body[data-luliy-theme="cyberpunk"] #postBody strong { color: var(--th-strong, #00e5ff) !important; }
 body[data-luliy-theme="space"] #postBody blockquote {
   color: rgba(180,220,255,0.80) !important;
   background: rgba(0,100,200,0.14) !important;
   border-left-color: rgba(0,200,255,0.50) !important;
+}
+body[data-luliy-theme="cyberpunk"] #postBody blockquote {
+  color: rgba(220,200,255,0.85) !important;
+  background: rgba(123,47,190,0.14) !important;
+  border-left-color: rgba(255,43,214,0.55) !important;
 }
 
 /* ── Focus-visible (keyboard accessibility) ─────────────── */
@@ -831,6 +883,7 @@ body[data-luliy-theme="default"] #luliy-nav-rebuilt  { border-top: 2px solid rgb
 body[data-luliy-theme="sakura"] #luliy-nav-rebuilt   { border-top: 2px solid rgba(201,64,112,0.55); }
 body[data-luliy-theme="your-name"] #luliy-nav-rebuilt{ border-top: 2px solid rgba(255,169,77,0.65); }
 body[data-luliy-theme="space"] #luliy-nav-rebuilt    { border-top: 2px solid rgba(0,229,255,0.55); }
+body[data-luliy-theme="cyberpunk"] #luliy-nav-rebuilt    { border-top: 2px solid rgba(255,43,214,0.55); }
 body[data-luliy-theme="sunset"] #luliy-nav-rebuilt   { border-top: 2px solid rgba(232,168,56,0.65); }
 body[data-luliy-theme="mono"] #luliy-nav-rebuilt     { border-top: 2px solid rgba(150,150,150,0.5); }
 
@@ -1229,11 +1282,30 @@ body[data-luliy-theme="space"] .luliy-card-deco {
     radial-gradient(circle 1px   at 5%  50%, rgba(180,220,255,0.60) 0%, transparent 80%);
   background-repeat: no-repeat;
 }
+/* Space theme: star field — tiny white twinkle dots */
+body[data-luliy-theme="cyberpunk"] .luliy-card-deco {
+  opacity: 0.60;
+  background-image:
+    radial-gradient(circle 1.5px at 12% 20%, rgba(255,255,255,0.90) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 78% 14%, rgba(180,230,255,0.85) 0%, transparent 80%),
+    radial-gradient(circle 2px   at 55% 30%, rgba(255,255,255,0.70) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 92% 55%, rgba(200,240,255,0.80) 0%, transparent 80%),
+    radial-gradient(circle 1.5px at 35% 68%, rgba(255,255,255,0.75) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 20% 82%, rgba(180,210,255,0.65) 0%, transparent 80%),
+    radial-gradient(circle 2px   at 68% 75%, rgba(255,255,255,0.60) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 47% 90%, rgba(200,230,255,0.70) 0%, transparent 80%),
+    radial-gradient(circle 1.5px at 85% 88%, rgba(255,255,255,0.55) 0%, transparent 80%),
+    radial-gradient(circle 1px   at 5%  50%, rgba(180,220,255,0.60) 0%, transparent 80%);
+  background-repeat: no-repeat;
+}
 /* Animate star twinkle on hover */
 @keyframes luliyStarTwinkle {
   0%,100% { opacity: 0.60; } 50% { opacity: 0.90; }
 }
 body[data-luliy-theme="space"] .luliy-card:hover .luliy-card-deco {
+  animation: luliyStarTwinkle 1.8s ease-in-out infinite;
+}
+body[data-luliy-theme="cyberpunk"] .luliy-card:hover .luliy-card-deco {
   animation: luliyStarTwinkle 1.8s ease-in-out infinite;
 }
 .luliy-card::after {
@@ -1360,7 +1432,7 @@ body.luliy-post-page .main {
 /* ── Default: 50% iOS26 liquid glass background ─────────── */
 body[data-luliy-theme="default"] #postBody,
 body:not([data-luliy-theme]) #postBody {
-  background: rgba(255,255,255,0.50) !important;
+  background: hsla(0, 0%, 100%, var(--luliy-article-opacity, 0.5)) !important;
   backdrop-filter: blur(40px) saturate(2.2) brightness(1.06) !important;
   -webkit-backdrop-filter: blur(40px) saturate(2.2) brightness(1.06) !important;
   border: 1px solid rgba(255,255,255,0.65) !important;
@@ -1375,7 +1447,7 @@ body:not([data-luliy-theme]) #postBody {
 }
 [data-color-mode="dark"] body[data-luliy-theme="default"] #postBody,
 [data-color-mode="dark"] body:not([data-luliy-theme]) #postBody {
-  background: rgba(14,10,28,0.50) !important;
+  background: hsla(252, 45%, 7%, var(--luliy-article-opacity, 0.5)) !important;
   backdrop-filter: blur(40px) saturate(2.2) brightness(0.96) !important;
   -webkit-backdrop-filter: blur(40px) saturate(2.2) brightness(0.96) !important;
   border-color: rgba(255,255,255,0.10) !important;
@@ -1388,7 +1460,7 @@ body:not([data-luliy-theme]) #postBody {
 
 /* ── Sakura: cherry blossom girl — pink frosted glass ────── */
 body[data-luliy-theme="sakura"] #postBody {
-  background: rgba(255,238,245,0.84) !important;
+  background: hsla(338, 100%, 97%, calc(var(--luliy-article-opacity, 0.5) + 0.34)) !important;
   backdrop-filter: blur(26px) saturate(1.6) !important;
   -webkit-backdrop-filter: blur(26px) saturate(1.6) !important;
   border: 1px solid rgba(249,168,201,0.50) !important;
@@ -1399,17 +1471,19 @@ body[data-luliy-theme="sakura"] #postBody {
   box-shadow: 0 6px 44px rgba(224,92,138,0.16), 0 0 60px rgba(249,168,201,0.08) !important;
 }
 [data-color-mode="dark"] body[data-luliy-theme="sakura"] #postBody {
-  background: rgba(42,10,28,0.80) !important;
+  background: hsla(340, 62%, 10%, calc(var(--luliy-article-opacity, 0.5) + 0.3)) !important;
   border-color: rgba(249,168,201,0.22) !important;
 }
 
 /* ── Your Name: sky blue frosted glass ───────────────────── */
-/* ── Your Name: 新海诚 sky-blue glass with golden top light ── */
+/* ── Your Name: 新海诚 sky-blue glass with golden top light ──
+   三层背景：上面两层是金色/紫色点缀光晕，固定透明度不受滑块影响；
+   只有最底下的主基调层（蓝调渐变）接入 --luliy-article-opacity。 */
 body[data-luliy-theme="your-name"] #postBody {
   background:
     radial-gradient(120% 80% at 80% -10%, rgba(255,212,59,0.18), transparent 55%),
     radial-gradient(120% 90% at 10% 0%, rgba(229,153,247,0.14), transparent 50%),
-    linear-gradient(165deg, rgba(225,242,255,0.90), rgba(206,234,255,0.86)) !important;
+    linear-gradient(165deg, hsla(204,100%,94%,calc(var(--luliy-article-opacity, 0.5) + 0.4)), hsla(204,100%,90%,calc(var(--luliy-article-opacity, 0.5) + 0.36))) !important;
   backdrop-filter: blur(28px) saturate(1.7) !important;
   -webkit-backdrop-filter: blur(28px) saturate(1.7) !important;
   border: 1px solid rgba(30,111,212,0.28) !important;
@@ -1426,14 +1500,14 @@ body[data-luliy-theme="your-name"] #postBody {
   background:
     radial-gradient(120% 80% at 80% -10%, rgba(255,212,59,0.12), transparent 55%),
     radial-gradient(120% 90% at 10% 0%, rgba(116,192,252,0.14), transparent 50%),
-    linear-gradient(165deg, rgba(8,24,64,0.88), rgba(4,16,46,0.90)) !important;
+    linear-gradient(165deg, hsla(220,75%,14%,calc(var(--luliy-article-opacity, 0.5) + 0.38)), hsla(220,85%,10%,calc(var(--luliy-article-opacity, 0.5) + 0.4))) !important;
   border-color: rgba(116,192,252,0.30) !important;
   border-top-color: rgba(255,212,59,0.55) !important;
 }
 
 /* ── Space: 液态玻璃文章面板（参数由设置面板的三个滑块控制） ── */
 body[data-luliy-theme="space"] #postBody {
-  background: hsla(var(--luliy-glass-hue), 70%, 9%, var(--luliy-glass-opacity)) !important;
+  background: hsla(var(--luliy-glass-hue), 70%, 9%, var(--luliy-article-opacity, 0.5)) !important;
   backdrop-filter: blur(var(--luliy-glass-blur)) saturate(2) !important;
   -webkit-backdrop-filter: blur(var(--luliy-glass-blur)) saturate(2) !important;
   border: 1px solid rgba(0,200,255,0.22) !important;
@@ -1443,13 +1517,24 @@ body[data-luliy-theme="space"] #postBody {
   margin-bottom: 48px !important;
   box-shadow: 0 6px 44px rgba(0,80,180,0.30), 0 0 80px rgba(0,200,255,0.08) !important;
 }
-
+/* ── Space: 液态玻璃文章面板（参数由设置面板的三个滑块控制） ── */
+body[data-luliy-theme="cyberpunk"] #postBody {
+  background: hsla(var(--luliy-glass-hue), 70%, 9%, var(--luliy-article-opacity, 0.5)) !important;
+  backdrop-filter: blur(var(--luliy-glass-blur)) saturate(2) !important;
+  -webkit-backdrop-filter: blur(var(--luliy-glass-blur)) saturate(2) !important;
+  border: 1px solid rgba(255,43,214,0.22) !important;
+  border-top: 3px solid rgba(255,43,214,0.55) !important;
+  border-radius: 20px !important;
+  padding: 36px 40px !important;
+  margin-bottom: 48px !important;
+  box-shadow: 0 6px 44px rgba(120,0,140,0.28), 0 0 80px rgba(0,200,255,0.10) !important;
+}
 /* ── Sunset: 日落大道 highway dusk gradient glass ─────────── */
 body[data-luliy-theme="sunset"] #postBody {
   background:
     radial-gradient(130% 70% at 50% -10%, rgba(255,214,120,0.42), transparent 55%),
     radial-gradient(120% 60% at 85% 110%, rgba(240,180,41,0.22), transparent 55%),
-    linear-gradient(170deg, rgba(255,248,228,0.94), rgba(255,238,200,0.90)) !important;
+    linear-gradient(170deg, hsla(45,100%,93%,calc(var(--luliy-article-opacity, 0.5) + 0.44)), hsla(42,100%,88%,calc(var(--luliy-article-opacity, 0.5) + 0.4))) !important;
   backdrop-filter: blur(26px) saturate(1.5) !important;
   -webkit-backdrop-filter: blur(26px) saturate(1.5) !important;
   border: 1px solid rgba(232,168,56,0.36) !important;
@@ -1466,14 +1551,14 @@ body[data-luliy-theme="sunset"] #postBody {
   background:
     radial-gradient(130% 70% at 50% -10%, rgba(255,193,77,0.20), transparent 55%),
     radial-gradient(120% 70% at 85% 115%, rgba(232,130,30,0.18), transparent 55%),
-    linear-gradient(170deg, rgba(40,30,14,0.92), rgba(28,22,10,0.94)) !important;
+    linear-gradient(170deg, hsla(38,48%,11%,calc(var(--luliy-article-opacity, 0.5) + 0.42)), hsla(35,45%,7%,calc(var(--luliy-article-opacity, 0.5) + 0.44))) !important;
   border-color: rgba(255,193,77,0.30) !important;
   border-top-color: rgba(255,193,77,0.58) !important;
 }
 
 /* ── Mono: minimalist black & white paper ────────────────── */
 body[data-luliy-theme="mono"] #postBody {
-  background: rgba(255,255,255,0.93) !important;
+  background: hsla(0, 0%, 100%, calc(var(--luliy-article-opacity, 0.5) + 0.43)) !important;
   backdrop-filter: blur(18px) saturate(0.2) !important;
   -webkit-backdrop-filter: blur(18px) saturate(0.2) !important;
   border: 1px solid rgba(0,0,0,0.16) !important;
@@ -1484,7 +1569,7 @@ body[data-luliy-theme="mono"] #postBody {
   box-shadow: 0 4px 30px rgba(0,0,0,0.12) !important;
 }
 [data-color-mode="dark"] body[data-luliy-theme="mono"] #postBody {
-  background: rgba(14,14,14,0.92) !important;
+  background: hsla(0, 0%, 5%, calc(var(--luliy-article-opacity, 0.5) + 0.42)) !important;
   border-color: rgba(255,255,255,0.16) !important;
   border-top-color: #ddd !important;
 }
@@ -1535,8 +1620,18 @@ body[data-luliy-theme="space"] #postBody pre {
   border-color: rgba(130,80,223,0.40) !important;
   box-shadow: 0 4px 24px rgba(0,0,0,0.55), 0 0 40px rgba(130,80,223,0.12) !important;
 }
+[data-color-mode="dark"] #postBody pre,
+body[data-luliy-theme="cyberpunk"] #postBody pre {
+  background: rgba(14,12,26,0.97) !important;
+  border-color: rgba(130,80,223,0.40) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.55), 0 0 40px rgba(130,80,223,0.12) !important;
+}
 [data-color-mode="dark"] #postBody pre:hover,
 body[data-luliy-theme="space"] #postBody pre:hover {
+  box-shadow: 0 10px 40px rgba(0,0,0,0.65), 0 0 55px rgba(130,80,223,0.22) !important;
+}
+[data-color-mode="dark"] #postBody pre:hover,
+body[data-luliy-theme="cyberpunk"] #postBody pre:hover {
   box-shadow: 0 10px 40px rgba(0,0,0,0.65), 0 0 55px rgba(130,80,223,0.22) !important;
 }
 /* Mono theme: grayscale code blocks */
@@ -1563,6 +1658,8 @@ body[data-luliy-theme="mono"] .mac-lang { color: rgba(0,0,0,0.50); }
 #postBody pre code { color: #2d2040 !important; background: none !important; padding: 0 !important; font-weight: normal !important; }
 [data-color-mode="dark"] #postBody pre code,
 body[data-luliy-theme="space"] #postBody pre code { color: #cdd6f4 !important; }
+[data-color-mode="dark"] #postBody pre code,
+body[data-luliy-theme="cyberpunk"] #postBody pre code { color: #cdd6f4 !important; }
 
 /* macOS title strip */
 .mac-strip {
@@ -1574,6 +1671,11 @@ body[data-luliy-theme="space"] #postBody pre code { color: #cdd6f4 !important; }
 }
 [data-color-mode="dark"] .mac-strip,
 body[data-luliy-theme="space"] .mac-strip {
+  background: rgba(22,18,40,0.92);
+  border-bottom-color: rgba(130,80,223,0.28);
+}
+[data-color-mode="dark"] .mac-strip,
+body[data-luliy-theme="cyberpunk"] .mac-strip {
   background: rgba(22,18,40,0.92);
   border-bottom-color: rgba(130,80,223,0.28);
 }
@@ -1598,6 +1700,8 @@ body[data-luliy-theme="space"] .mac-strip {
 }
 [data-color-mode="dark"] .mac-lang,
 body[data-luliy-theme="space"] .mac-lang { color: rgba(160,140,255,0.70); }
+[data-color-mode="dark"] .mac-lang,
+body[data-luliy-theme="cyberpunk"] .mac-lang { color: rgba(160,140,255,0.70); }
 
 /* Folded state */
 pre.is-folded { max-height: 40px !important; overflow: hidden !important; }
@@ -1649,10 +1753,22 @@ body[data-luliy-theme="space"] #postBody table {
     rgba(18,14,32,0.90);
   box-shadow: 0 2px 16px rgba(0,0,0,0.50), 0 0 0 1px rgba(130,80,223,0.22);
 }
+[data-color-mode="dark"] #postBody table,
+body[data-luliy-theme="cyberpunk"] #postBody table {
+  /* 深色 / 星空主题：深色底上同样叠加主题色调 */
+  background:
+    linear-gradient(var(--th-accent-soft, rgba(0,200,255,0.12)), var(--th-accent-soft, rgba(0,200,255,0.12))),
+    rgba(18,14,32,0.90);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.50), 0 0 0 1px rgba(130,80,223,0.22);
+}
 /* 表头渐变也跟随主题强调色（原为固定紫色） */
 #postBody thead tr { background: linear-gradient(90deg, var(--th-accent-soft, rgba(130,80,223,0.10)), transparent); }
 [data-color-mode="dark"] #postBody thead tr,
 body[data-luliy-theme="space"] #postBody thead tr {
+  background: linear-gradient(90deg, rgba(130,80,223,0.26), rgba(9,105,218,0.20));
+}
+[data-color-mode="dark"] #postBody thead tr,
+body[data-luliy-theme="cyberpunk"] #postBody thead tr {
   background: linear-gradient(90deg, rgba(130,80,223,0.26), rgba(9,105,218,0.20));
 }
 #postBody th {
@@ -1677,6 +1793,10 @@ body[data-luliy-theme="space"] #postBody th {
   color: #00e5ff !important;
   background: rgba(8,14,38,0.97);
 }
+body[data-luliy-theme="cyberpunk"] #postBody th {
+  color: #00e5ff !important;
+  background: rgba(8,14,38,0.97);
+}
 body[data-luliy-theme="sakura"] #postBody th  { background: rgba(253,236,243,0.97); }
 body[data-luliy-theme="your-name"] #postBody th { background: rgba(232,243,253,0.97); }
 body[data-luliy-theme="sunset"] #postBody th  { background: rgba(255,243,214,0.97); }
@@ -1691,6 +1811,8 @@ body[data-luliy-theme="mono"] #postBody th    { background: rgba(245,245,245,0.9
 }
 [data-color-mode="dark"] #postBody td,
 body[data-luliy-theme="space"] #postBody td { color: #cdd6f4 !important; border-bottom-color: rgba(130,80,223,0.12); }
+[data-color-mode="dark"] #postBody td,
+body[data-luliy-theme="cyberpunk"] #postBody td { color: #cdd6f4 !important; border-bottom-color: rgba(130,80,223,0.12); }
 #postBody tr:last-child td { border-bottom: none; }
 #postBody tbody tr:nth-child(even) { background: rgba(130,80,223,0.03); }
 [data-color-mode="dark"] #postBody tbody tr:nth-child(even) { background: rgba(130,80,223,0.07); }
@@ -1755,6 +1877,17 @@ body[data-luliy-theme="space"] {
   --th-accent: #00c8ff;
   --th-accent-soft: rgba(0,200,255,0.12);
   --th-accent-hover: rgba(0,200,255,0.20);
+}
+/* 4  Space — deep night blue */
+body[data-luliy-theme="cyberpunk"] {
+  /* ★ 赛博朋克主题专属配色：青 + 品红双色调，呼应粒子背景/品牌名/光标
+     的统一霓虹色板，和纯青色调的「太空旅行」主题做出区分。 */
+  --th-h1: #ff2bd6; --th-h1-border: 2px solid rgba(255,43,214,0.35);
+  --th-h2: #00c8ff; --th-h2-bl: 5px solid #ff2bd6; --th-h2-bg: rgba(123,47,190,0.12);
+  --th-h3: #c77dff; --th-h4: #6ec7ff; --th-strong: #ff6ec7;
+  --th-accent: #00e5ff;
+  --th-accent-soft: rgba(255,43,214,0.14);
+  --th-accent-hover: rgba(255,43,214,0.24);
 }
 
 /* 5  Sunset — dusk orange */
@@ -1833,6 +1966,13 @@ body[data-luliy-theme="mono"] {
   --th-accent: #40d8ff;
   --th-accent-soft: rgba(0,229,255,0.18);
   --th-accent-hover: rgba(0,229,255,0.30);
+}
+/* cyberpunk：黑夜也是霓虹都市，白天/夜间都一样亮 */
+[data-color-mode="dark"] body[data-luliy-theme="cyberpunk"] {
+  --th-h1: #ff6ec7; --th-h2: #6ec7ff; --th-h3: #c77dff; --th-strong: #ff9eda;
+  --th-accent: #00e5ff;
+  --th-accent-soft: rgba(255,43,214,0.18);
+  --th-accent-hover: rgba(255,43,214,0.30);
 }
 [data-color-mode="dark"] body[data-luliy-theme="sunset"] {
   --th-h1: #ffce6b; --th-h2: #ffd98a; --th-h3: #ffe2a8; --th-h4: #ffecc4; --th-strong: #ffb347;
@@ -2914,6 +3054,7 @@ body[data-luliy-theme="mono"] .luliy-series-prog     { background: #444; }
 body[data-luliy-theme="your-name"] .luliy-series-prog{ background: #1e6fd4; }
 body[data-luliy-theme="sakura"] .luliy-series-prog   { background: #c94070; }
 body[data-luliy-theme="space"] .luliy-series-prog    { background: #0070b8; }
+body[data-luliy-theme="cyberpunk"] .luliy-series-prog    { background: #0070b8; }
 .luliy-series-dots { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .luliy-series-dot {
   width: 12px; height: 12px; border-radius: 50%;
@@ -3321,6 +3462,15 @@ body.luliy-reduce-motion * {
   body[data-luliy-theme="mono"] #postBody {
     border-radius: 0 !important; padding: 20px 15px !important;
   }
+  body[data-luliy-theme="default"] #postBody,
+  body:not([data-luliy-theme]) #postBody,
+  body[data-luliy-theme="sakura"] #postBody,
+  body[data-luliy-theme="your-name"] #postBody,
+  body[data-luliy-theme="cyberpunk"] #postBody,
+  body[data-luliy-theme="sunset"] #postBody,
+  body[data-luliy-theme="mono"] #postBody {
+    border-radius: 0 !important; padding: 20px 15px !important;
+  }
 
   /* ── 表格横向滚动（≥600px 时；<600px 由 section 31 卡片化接管）─── */
   #luliy-back-top { right: 14px; bottom: 94px; }
@@ -3563,14 +3713,17 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
 [data-color-mode="light"] #luliy-ham-btn span { background: rgba(40,30,60,0.88); }
 
 /* ── 遮罩 ── */
+/* ★ 不再给页面其它区域加黑色蒙版——保留这个元素只是为了
+   "点击抽屉外部关闭抽屉"的交互能继续工作，但视觉上完全透明，
+   旁边的页面内容保持原样可见。 */
 #luliy-drawer-mask {
   position: fixed; inset: 0; z-index: 10003;
-  background: rgba(0,0,0,0.45);
+  background: transparent;
   opacity: 0; visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
-  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  pointer-events: none;
+  transition: visibility 0.3s;
 }
-#luliy-drawer-mask.is-open { opacity: 1; visibility: visible; }
+#luliy-drawer-mask.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
 
 /* ── 抽屉本体（从左滑入）── */
 #luliy-drawer {
@@ -3600,6 +3753,33 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 [data-color-mode="light"] #luliy-drawer-head { border-bottom-color: rgba(0,0,0,0.06); }
+
+/* 抽屉关闭按钮：右上角，明确可见的退出入口
+   （之前蒙版改透明后，光靠"点外面关闭"不够直观，加这个更保险） */
+#luliy-drawer-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.75);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+  z-index: 2;
+}
+#luliy-drawer-close:hover {
+  background: var(--th-accent, #8250df);
+  color: #fff;
+  transform: scale(1.08);
+}
+[data-color-mode="light"] #luliy-drawer-close {
+  background: rgba(0,0,0,0.06);
+  color: rgba(20,15,40,0.65);
+}
 .ldh-avatar { display: inline-block; width: 72px; height: 72px; overflow: visible; }
 .ldh-avatar img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .ldh-name {
