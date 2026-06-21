@@ -546,6 +546,11 @@
             apOpen = v;
             wrap.classList.toggle('is-open', apOpen);
             apFab.classList.toggle('is-active', apOpen);
+            /* ★ 修复播放器展开后和圆形按钮重叠的问题：两者共用同一个
+               坐标点（展开时"从按钮位置长出来"），player 展开后体积
+               比按钮大得多，按钮原地不隐藏的话会糊在展开后面板的
+               左上角。展开时把按钮隐藏，收起后再让它重新出现。 */
+            apFab.classList.toggle('is-hidden-while-open', apOpen);
             try { localStorage.setItem(APOPEN, apOpen ? '1' : '0'); } catch (e) {}
           }
           apFab.addEventListener('click', function (e) {
@@ -662,15 +667,18 @@
   function initLocalStorage() {
     var defs = {
       'luliy-sfx':       (('ontouchstart' in window) || window.innerWidth < 768) ? '0' : '1',
-      'luliy-sakura':    '1',
-      'luliy-cyber':       '1',      /* 赛博朋克粒子系统总开关 */
+      /* ★ 手机端（触屏或窄屏）默认关闭所有不影响阅读的动态效果——
+         赛博粒子背景、樱花飘落，纯净阅读；桌面端保持开启。
+         用户依然可以在设置里手动重新打开，这里只是改默认值。 */
+      'luliy-sakura':    (('ontouchstart' in window) || window.innerWidth < 768) ? '0' : '1',
+      'luliy-cyber':     (('ontouchstart' in window) || window.innerWidth < 768) ? '0' : '1',
       'luliy-cyber-speed': '1',      /* 0.2 ~ 3 */
       'luliy-cyber-dir':   'converge', /* converge | diverge | free */
       'luliy-cyber-style': 'classic',  /* classic | city */
       'luliy-glass-blur':    '22',     /* px，0~50 */
       'luliy-glass-opacity': '0.5',    /* 0~1 */
       'luliy-glass-hue':     '250',    /* 0~360 */
-      'luliy-cat-w':        '1500',    /* 主页卡片宽度 px，900~1800 */
+      'luliy-cat-w':        '1700',    /* 主页卡片宽度 px，900~2000，★默认再加宽 */
       'luliy-cat-h':         '338',    /* 主页卡片高度 px，220~500 */
       'luliy-article-opacity': '0.5',  /* 文章正文面板独立不透明度，0.1~0.95 */
       'luliy-fontsize':  '18',
@@ -1854,8 +1862,8 @@
   /* ---- 主页卡片宽 / 高（可调节） -------------------------- */
   function applyCatSize() {
     var w = parseFloat(localStorage.getItem('luliy-cat-w'));
-    if (isNaN(w)) w = 1500;
-    w = Math.min(1800, Math.max(900, w));
+    if (isNaN(w)) w = 1700;
+    w = Math.min(2000, Math.max(900, w));
 
     var h = parseFloat(localStorage.getItem('luliy-cat-h'));
     if (isNaN(h)) h = 338;
@@ -2308,6 +2316,45 @@
       brand.setAttribute('aria-label', _brandText + ' \u2014 \u8fd4\u56de\u4e3b\u9875');
       document.body.appendChild(brand);
     }
+    /* ★ 博客名右边的小图标：Q 版「沉思者」雕塑侧身剪影，
+       点击跳转到 GitHub issues（也就是后台写文章的地方）。
+       背景透明，发光样式和左边的博客名保持一致。 */
+    if (!document.getElementById('luliy-issues-link')) {
+      var thinkerLink = document.createElement('a');
+      thinkerLink.id = 'luliy-issues-link';
+      thinkerLink.href = 'https://github.com/luliy6/luliy6.github.io/issues';
+      thinkerLink.target = '_blank';
+      thinkerLink.rel = 'noopener noreferrer';
+      thinkerLink.setAttribute('aria-label', '\u524d\u5f80 GitHub Issues');
+      thinkerLink.title = '\u524d\u5f80 GitHub Issues';
+      thinkerLink.innerHTML =
+        '<svg viewBox="0 0 60 60" width="22" height="22" fill="currentColor" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect x="12" y="52" width="36" height="6" rx="1"/>' +
+        '<path d="M30 52 L30 44 Q30 38 34 35 L38 35 Q38 41 36 44 L36 52 Z" opacity="0.55"/>' +
+        '<path d="M16 52 L16 42 Q16 38 20 37 L25 39 Q24 43 22 44 L22 52 Z"/>' +
+        '<path d="M19 38 Q18 33 22 31 L33 31 Q35 33 34 36 L23 38 Q21 39 19 38 Z"/>' +
+        '<path d="M24 32 Q21 26 22 19 Q23 13 29 11 L34 12 Q36 16 35 21 L33 31 Q28 33 24 32 Z"/>' +
+        '<path d="M24 16 Q19 18 18 24 Q17 28 20 30 L23 30 Q21 27 22 23 Q23 19 27 17 Z"/>' +
+        '<path d="M18 25 Q15 21 16 16 Q17 12 22 11 L25 14 Q21 15 20 19 Q19 22 21 25 Z"/>' +
+        '<ellipse cx="28" cy="9" rx="6.5" ry="7"/>' +
+        '<path d="M33 8 Q35.5 9 34.5 11.5 Q33 12 32 10.5 Z"/>' +
+        '</svg>';
+      document.body.appendChild(thinkerLink);
+      /* 动态测量博客名实际宽度，把图标精确定位在它右边——
+         不写死间距，名字长短变化（比如以后改成别的站名）也不会错位。 */
+      function positionThinkerIcon() {
+        var b = document.getElementById('luliy-brand');
+        if (!b || !thinkerLink) return;
+        var r = b.getBoundingClientRect();
+        thinkerLink.style.left = (r.right + 10) + 'px';
+      }
+      positionThinkerIcon();
+      window.addEventListener('resize', positionThinkerIcon, { passive: true });
+      /* 字体加载完成后宽度可能变化，再校正一次 */
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(positionThinkerIcon).catch(function () {});
+      }
+    }
     /* ★ 副标题：只在首页显示（文章页等其它页面顶部已经比较拥挤，
        不重复放）。位置紧贴在 ΔιάΝους 正下方。 */
     if (isIndexPage() && LULIY_OPTS.siteSubtitle && !document.getElementById('luliy-subtitle')) {
@@ -2751,8 +2798,8 @@
 
     var catWSlider = mkSlider({
       emoji: '\u2194\uFE0F', label: '\u5361\u7247\u5bbd\u5ea6',   /* ↔️ 卡片宽度 */
-      min: 900, max: 1800, step: 50,
-      value: parseFloat(localStorage.getItem('luliy-cat-w')) || 1500,
+      min: 900, max: 2000, step: 50,
+      value: parseFloat(localStorage.getItem('luliy-cat-w')) || 1700,
       format: function (v) { return v + 'px'; },
       onInput: function (v) {
         localStorage.setItem('luliy-cat-w', String(v));
@@ -2784,7 +2831,7 @@
       'luliy-glass-opacity':  '0.5',
       'luliy-glass-hue':      '250',
       'luliy-article-opacity':'0.5',
-      'luliy-cat-w':          '1500',
+      'luliy-cat-w':          '1700',
       'luliy-cat-h':          '338'
     };
     var resetRow = mkRow('\u21BA', '\u6062\u590d\u9ed8\u8ba4\u503c', '');
@@ -3802,16 +3849,6 @@
      · 2+ images → responsive grid
      · ✎ button → add custom image URLs (stored in localStorage)
      · click any image → lightbox zoom                          */
-  function getGalleryImages() {
-    var imgs = (LULIY_OPTS.galleryImages || []).slice();
-    try {
-      var custom = JSON.parse(localStorage.getItem('luliy-gallery') || '[]');
-      if (Array.isArray(custom)) imgs = imgs.concat(custom);
-    } catch (e) {}
-    return imgs.filter(Boolean);
-  }
-
-
   /* ---- 19  Favorites page front-end lock --------------------
      Hides the favorites page behind a password prompt.
      NOTE: this is a deterrent only — page content still exists in
@@ -4822,15 +4859,18 @@
      不再需要任何 JS 早期注入/恢复逻辑。 */
 
   /* Welcome splash (before DOM ready, append after body exists) */
-  /* ★ 大改后：网站打开时的加载动画。
-     不再用图片，改成居中的"ΔιάΝους"文字 + 赛博朋克荧光循环缠绕效果
-     （动画细节见 enhance.css 的 #luliy-splash-text）。
+  /* ★ 大改后：网站打开时的加载动画，两种随机出现：
+       · flow ：居中"ΔιάΝους"文字 + 荧光循环缠绕流动色（原有那版）
+       · sweep：居中文字默认暗，一道白光从 Δ 扫向结尾十字星，
+                光扫到哪个字母哪个字母才亮，扫过之后变暗，
+                光到达十字星时更亮地闪一下、停顿，然后循环
      显示 splashMaxMs(默认1.5s) 后自动淡出移除。 */
   (function initSplash() {
     /* 避免重复、避免在 iframe / 打印时出现 */
     if (window.top !== window.self) return;
     var TEXT = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
     var MAXMS = (LULIY_OPTS && LULIY_OPTS.splashMaxMs) || 1500;
+    var VARIANT = Math.random() < 0.5 ? 'flow' : 'sweep';
 
     function build() {
       if (!document.body) { return setTimeout(build, 10); }
@@ -4840,8 +4880,21 @@
       splash.id = 'luliy-splash';
       var txt = document.createElement('div');
       txt.id = 'luliy-splash-text';
-      txt.textContent = TEXT;
       txt.setAttribute('data-text', TEXT);   /* 用于 CSS 荧光叠层 */
+
+      if (VARIANT === 'sweep') {
+        txt.classList.add('is-sweep');
+        var bodyChars = TEXT.slice(0, -1);
+        var lastChar = TEXT.slice(-1);
+        txt.appendChild(document.createTextNode(bodyChars));
+        var flare = document.createElement('span');
+        flare.className = 'flare-anchor';
+        flare.textContent = lastChar;
+        txt.appendChild(flare);
+      } else {
+        txt.textContent = TEXT;
+      }
+
       splash.appendChild(txt);
       document.body.appendChild(splash);
       /* 锁滚动，避免加载时页面在动画底下乱跳 */
