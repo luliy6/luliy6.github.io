@@ -476,21 +476,50 @@ body.luliy-home #pagination {
   justify-content: flex-end;
   padding: 24px;            /* 1 倍 */
   border-radius: 16px;      /* 1 倍 */
-  background-size: cover;
-  background-position: center;
   text-decoration: none !important;
   overflow: hidden;
   isolation: isolate;
   box-shadow: 0 6px 26px rgba(0,0,0,0.35);
-  transition: transform 0.35s cubic-bezier(.2,.7,.3,1), box-shadow 0.35s ease, filter 0.35s ease;
+  transition: transform 0.35s cubic-bezier(.2,.7,.3,1), box-shadow 0.35s ease;
 }
+/* ★ 图片单独一层（::before），可以独立缩放/加滤镜而不带歪文字 */
+.luliy-cat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--cat-img);
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.5s ease, filter 0.5s ease;
+}
+/* 底部渐变暗化遮罩，固定不跟着图片缩放，保证文字始终清晰可读 */
+.luliy-cat-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(6,5,16,0.88) 8%, rgba(6,5,16,0.30) 50%, rgba(6,5,16,0.10) 100%);
+  pointer-events: none;
+}
+/* ★ 悬停效果：卡片本身上浮 6px + 阴影变大变深 + 一圈粉色霓虹光晕，
+   营造"悬浮发光"的赛博朋克质感。 */
 .luliy-cat-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
-  filter: brightness(1.08);
+  box-shadow:
+    0 18px 46px rgba(0,0,0,0.55),
+    0 0 0 1.5px rgba(255,110,199,0.55),
+    0 0 36px 6px rgba(255,110,199,0.40);
+}
+/* ★ 悬停时图片单独放大到 106%（轻微视差/呼吸感）+ 滤镜增强
+   （饱和度/对比度/亮度都提高），瞬间更鲜艳更清晰 */
+.luliy-cat-card:hover::before {
+  transform: scale(1.06);
+  filter: saturate(1.35) contrast(1.15) brightness(1.12);
 }
 .luliy-cat-card:hover .luliy-cat-title { transform: translateY(-3px); }
 .luliy-cat-kicker {
+  position: relative; z-index: 2;
   align-self: flex-start;
   font-size: 12px;          /* 1 倍 */
   letter-spacing: 4px;      /* 1 倍 */
@@ -501,6 +530,7 @@ body.luliy-home #pagination {
   text-shadow: 0 1px 8px rgba(0,0,0,0.7);
 }
 .luliy-cat-title {
+  position: relative; z-index: 2;
   margin: 0 0 8px;          /* 1 倍 */
   font-size: 26px;          /* 1 倍 */
   font-weight: 900;
@@ -510,6 +540,7 @@ body.luliy-home #pagination {
   transition: transform 0.3s ease;
 }
 .luliy-cat-desc {
+  position: relative; z-index: 2;
   margin: 0;
   font-size: 13px;          /* 1 倍 */
   line-height: 1.5;
@@ -1460,7 +1491,7 @@ body:not([data-luliy-theme]) #postBody {
 
 /* ── Sakura: cherry blossom girl — pink frosted glass ────── */
 body[data-luliy-theme="sakura"] #postBody {
-  background: hsla(338, 100%, 97%, calc(var(--luliy-article-opacity, 0.5) + 0.34)) !important;
+  background: hsla(338, 100%, 97%, var(--luliy-article-opacity, 0.5)) !important;
   backdrop-filter: blur(26px) saturate(1.6) !important;
   -webkit-backdrop-filter: blur(26px) saturate(1.6) !important;
   border: 1px solid rgba(249,168,201,0.50) !important;
@@ -1471,7 +1502,7 @@ body[data-luliy-theme="sakura"] #postBody {
   box-shadow: 0 6px 44px rgba(224,92,138,0.16), 0 0 60px rgba(249,168,201,0.08) !important;
 }
 [data-color-mode="dark"] body[data-luliy-theme="sakura"] #postBody {
-  background: hsla(340, 62%, 10%, calc(var(--luliy-article-opacity, 0.5) + 0.3)) !important;
+  background: hsla(340, 62%, 10%, var(--luliy-article-opacity, 0.5)) !important;
   border-color: rgba(249,168,201,0.22) !important;
 }
 
@@ -1483,7 +1514,7 @@ body[data-luliy-theme="your-name"] #postBody {
   background:
     radial-gradient(120% 80% at 80% -10%, rgba(255,212,59,0.18), transparent 55%),
     radial-gradient(120% 90% at 10% 0%, rgba(229,153,247,0.14), transparent 50%),
-    linear-gradient(165deg, hsla(204,100%,94%,calc(var(--luliy-article-opacity, 0.5) + 0.4)), hsla(204,100%,90%,calc(var(--luliy-article-opacity, 0.5) + 0.36))) !important;
+    linear-gradient(165deg, hsla(204,100%,94%,var(--luliy-article-opacity, 0.5)), hsla(204,100%,90%,var(--luliy-article-opacity, 0.5))) !important;
   backdrop-filter: blur(28px) saturate(1.7) !important;
   -webkit-backdrop-filter: blur(28px) saturate(1.7) !important;
   border: 1px solid rgba(30,111,212,0.28) !important;
@@ -1500,7 +1531,7 @@ body[data-luliy-theme="your-name"] #postBody {
   background:
     radial-gradient(120% 80% at 80% -10%, rgba(255,212,59,0.12), transparent 55%),
     radial-gradient(120% 90% at 10% 0%, rgba(116,192,252,0.14), transparent 50%),
-    linear-gradient(165deg, hsla(220,75%,14%,calc(var(--luliy-article-opacity, 0.5) + 0.38)), hsla(220,85%,10%,calc(var(--luliy-article-opacity, 0.5) + 0.4))) !important;
+    linear-gradient(165deg, hsla(220,75%,14%,var(--luliy-article-opacity, 0.5)), hsla(220,85%,10%,var(--luliy-article-opacity, 0.5))) !important;
   border-color: rgba(116,192,252,0.30) !important;
   border-top-color: rgba(255,212,59,0.55) !important;
 }
@@ -1534,7 +1565,7 @@ body[data-luliy-theme="sunset"] #postBody {
   background:
     radial-gradient(130% 70% at 50% -10%, rgba(255,214,120,0.42), transparent 55%),
     radial-gradient(120% 60% at 85% 110%, rgba(240,180,41,0.22), transparent 55%),
-    linear-gradient(170deg, hsla(45,100%,93%,calc(var(--luliy-article-opacity, 0.5) + 0.44)), hsla(42,100%,88%,calc(var(--luliy-article-opacity, 0.5) + 0.4))) !important;
+    linear-gradient(170deg, hsla(45,100%,93%,var(--luliy-article-opacity, 0.5)), hsla(42,100%,88%,var(--luliy-article-opacity, 0.5))) !important;
   backdrop-filter: blur(26px) saturate(1.5) !important;
   -webkit-backdrop-filter: blur(26px) saturate(1.5) !important;
   border: 1px solid rgba(232,168,56,0.36) !important;
@@ -1551,14 +1582,14 @@ body[data-luliy-theme="sunset"] #postBody {
   background:
     radial-gradient(130% 70% at 50% -10%, rgba(255,193,77,0.20), transparent 55%),
     radial-gradient(120% 70% at 85% 115%, rgba(232,130,30,0.18), transparent 55%),
-    linear-gradient(170deg, hsla(38,48%,11%,calc(var(--luliy-article-opacity, 0.5) + 0.42)), hsla(35,45%,7%,calc(var(--luliy-article-opacity, 0.5) + 0.44))) !important;
+    linear-gradient(170deg, hsla(38,48%,11%,var(--luliy-article-opacity, 0.5)), hsla(35,45%,7%,var(--luliy-article-opacity, 0.5))) !important;
   border-color: rgba(255,193,77,0.30) !important;
   border-top-color: rgba(255,193,77,0.58) !important;
 }
 
 /* ── Mono: minimalist black & white paper ────────────────── */
 body[data-luliy-theme="mono"] #postBody {
-  background: hsla(0, 0%, 100%, calc(var(--luliy-article-opacity, 0.5) + 0.43)) !important;
+  background: hsla(0, 0%, 100%, var(--luliy-article-opacity, 0.5)) !important;
   backdrop-filter: blur(18px) saturate(0.2) !important;
   -webkit-backdrop-filter: blur(18px) saturate(0.2) !important;
   border: 1px solid rgba(0,0,0,0.16) !important;
@@ -1569,7 +1600,7 @@ body[data-luliy-theme="mono"] #postBody {
   box-shadow: 0 4px 30px rgba(0,0,0,0.12) !important;
 }
 [data-color-mode="dark"] body[data-luliy-theme="mono"] #postBody {
-  background: hsla(0, 0%, 5%, calc(var(--luliy-article-opacity, 0.5) + 0.42)) !important;
+  background: hsla(0, 0%, 5%, var(--luliy-article-opacity, 0.5)) !important;
   border-color: rgba(255,255,255,0.16) !important;
   border-top-color: #ddd !important;
 }
@@ -3730,17 +3761,41 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
   position: fixed; top: 0; left: 0; z-index: 10004;
   width: 300px; max-width: 86vw; height: 100%;
   display: flex; flex-direction: column;
-  background: rgba(16,12,28,0.92);
-  -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6);
+  /* ★ 默认（赛博朋克主题）背景，下面按主题分别覆盖 */
+  background: hsla(var(--luliy-glass-hue, 250), 45%, 12%, var(--luliy-glass-opacity, 0.5));
+  -webkit-backdrop-filter: blur(var(--luliy-glass-blur, 22px)) saturate(1.6);
+  backdrop-filter: blur(var(--luliy-glass-blur, 22px)) saturate(1.6);
   border-right: 1px solid rgba(255,255,255,0.10);
   box-shadow: 6px 0 40px rgba(0,0,0,0.45);
   transform: translateX(-105%);
-  transition: transform 0.34s cubic-bezier(.4,.0,.2,1);
+  transition: transform 0.34s cubic-bezier(.4,.0,.2,1), background 0.3s;
   overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 #luliy-drawer.is-open { transform: translateX(0); }
-[data-color-mode="light"] #luliy-drawer { background: rgba(248,246,252,0.94); border-right-color: rgba(0,0,0,0.08); }
+
+/* ★ 抽屉样式跟文章正文面板一样，按当前选择的主题变化——
+   每套主题给抽屉一个专属色相，模糊/透明度仍由液态玻璃滑块统一控制。 */
+body[data-luliy-theme="cyberpunk"] #luliy-drawer { background: hsla(320, 60%, 12%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(255,110,199,0.18); }
+body[data-luliy-theme="default"]   #luliy-drawer,
+body:not([data-luliy-theme])       #luliy-drawer { background: hsla(265, 45%, 12%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(130,80,223,0.18); }
+body[data-luliy-theme="sakura"]    #luliy-drawer { background: hsla(338, 55%, 14%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(249,168,201,0.22); }
+body[data-luliy-theme="your-name"] #luliy-drawer { background: hsla(212, 60%, 12%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(116,192,252,0.20); }
+body[data-luliy-theme="space"]     #luliy-drawer { background: hsla(195, 65%, 9%,  var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(0,200,255,0.20); }
+body[data-luliy-theme="sunset"]    #luliy-drawer { background: hsla(36,  55%, 13%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(255,193,77,0.22); }
+body[data-luliy-theme="mono"]      #luliy-drawer { background: hsla(0,   0%,  10%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(255,255,255,0.14); }
+
+/* 白天 / 浅色外观时，抽屉换成对应的浅色玻璃质感 */
+[data-color-mode="light"] #luliy-drawer { background: hsla(var(--luliy-glass-hue, 250), 35%, 95%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(0,0,0,0.08); }
+[data-color-mode="light"] body[data-luliy-theme="default"]   #luliy-drawer,
+[data-color-mode="light"] body:not([data-luliy-theme])       #luliy-drawer { background: hsla(265, 40%, 95%, var(--luliy-glass-opacity, 0.5)); }
+[data-color-mode="light"] body[data-luliy-theme="sakura"]    #luliy-drawer { background: hsla(338, 70%, 96%, var(--luliy-glass-opacity, 0.5)); }
+[data-color-mode="light"] body[data-luliy-theme="your-name"] #luliy-drawer { background: hsla(204, 70%, 94%, var(--luliy-glass-opacity, 0.5)); }
+[data-color-mode="light"] body[data-luliy-theme="sunset"]    #luliy-drawer { background: hsla(45,  80%, 94%, var(--luliy-glass-opacity, 0.5)); }
+[data-color-mode="light"] body[data-luliy-theme="mono"]      #luliy-drawer { background: hsla(0,   0%,  98%, var(--luliy-glass-opacity, 0.5)); }
+/* cyberpunk / space 主题本来就是常驻深色调，浅色模式下也保持深色玻璃质感 */
+[data-color-mode="light"] body[data-luliy-theme="cyberpunk"] #luliy-drawer { background: hsla(320, 60%, 12%, var(--luliy-glass-opacity, 0.5)); }
+[data-color-mode="light"] body[data-luliy-theme="space"]     #luliy-drawer { background: hsla(195, 65%, 9%,  var(--luliy-glass-opacity, 0.5)); }
 
 /* 抽屉滚动条 */
 #luliy-drawer::-webkit-scrollbar { width: 6px; }
