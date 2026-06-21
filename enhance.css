@@ -2006,12 +2006,6 @@ body[data-luliy-theme="your-name"] {
   --th-accent: #1e6fd4;
   --th-accent-soft: rgba(30,111,212,0.11);
   --th-accent-hover: rgba(30,111,212,0.18);
-  /* twilight / golden accents used by the panel gradient */
-  --yn-sky-top: #1e6fd4;
-  --yn-sky-mid: #74c0fc;
-  --yn-glow:    #ffd43b;
-  --yn-warm:    #ffa94d;
-  --yn-twilight:#e599f7;
 }
 
 /* 4  Space — deep night blue */
@@ -2023,7 +2017,7 @@ body[data-luliy-theme="space"] {
   --th-accent-soft: rgba(0,200,255,0.12);
   --th-accent-hover: rgba(0,200,255,0.20);
 }
-/* 4  Space — deep night blue */
+/* 5  Cyberpunk — neon city (青 + 品红，默认主题) */
 body[data-luliy-theme="cyberpunk"] {
   /* ★ 赛博朋克主题专属配色：青 + 品红双色调，呼应粒子背景/品牌名/光标
      的统一霓虹色板，和纯青色调的「太空旅行」主题做出区分。 */
@@ -2046,12 +2040,6 @@ body[data-luliy-theme="sunset"] {
   --th-accent: #d9930d;
   --th-accent-soft: rgba(217,147,13,0.13);
   --th-accent-hover: rgba(217,147,13,0.22);
-  /* warm gradient stops used by the panel */
-  --ss-sky:    #fff3d6;
-  --ss-amber:  #ffd98a;
-  --ss-gold:   #f0b429;
-  --ss-orange: #e8821e;
-  --ss-glow:   #fff0c4;
 }
 /* Markdown text colours (light) */
 body[data-luliy-theme="sunset"] #postBody a,
