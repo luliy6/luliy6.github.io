@@ -646,17 +646,24 @@ Therefore, it is imperative that [强调].
 (function(){
   try{
     var d=document.documentElement;
-    /* ★ 白天模式锁定「你的名字」主题，夜间模式锁定「太空旅行」主题 */
-    var cm=d.getAttribute('data-color-mode')||'light';
-    var th=(cm==='dark')?'space':'your-name';
+    /* ★ 恢复手动选主题：读取用户上次手动选的主题，没选过就用新默认
+       主题「赛博朋克」(cyberpunk)。不再跟随深浅模式自动切换。 */
+    var th=localStorage.getItem('luliy-sink')||'cyberpunk';
     d.setAttribute('data-luliy-theme',th);
     /* 阅读宽度默认拉到最大(400) */
     var pw=parseInt(localStorage.getItem('luliy-pbwidth')||'400',10);
     if(isNaN(pw))pw=400;
     d.style.setProperty('--luliy-pb-extra',pw+'px');
     var sans=localStorage.getItem('luliy-sans')||'0';
-    /* 纯色背景 #00020c,深浅模式都用它,首屏即生效,杜绝白底闪烁与旧背景图 */
-    var css='html,body{background:#00020c!important;background-image:none!important;}';
+    /* 液态玻璃三个参数也提前写入，首屏即生效 */
+    var gb=localStorage.getItem('luliy-glass-blur')||'22';
+    var go=localStorage.getItem('luliy-glass-opacity')||'0.5';
+    var gh=localStorage.getItem('luliy-glass-hue')||'250';
+    d.style.setProperty('--luliy-glass-blur',gb+'px');
+    d.style.setProperty('--luliy-glass-opacity',go);
+    d.style.setProperty('--luliy-glass-hue',gh);
+    /* 赛博朋克渐变背景兜底，首屏即生效，杜绝白底/纯黑闪烁 */
+    var css='html{background:linear-gradient(160deg,#0a0e2a 0%,#1a1140 30%,#3d1a5c 55%,#5c1a4a 75%,#1a0e2e 100%)!important;background-attachment:fixed!important;}body{background:transparent!important;background-image:none!important;}';
     var st=document.createElement('style');st.id='luliy-fouc';st.textContent=css;
     (d.head||d).appendChild(st);
     document.addEventListener('DOMContentLoaded',function(){
