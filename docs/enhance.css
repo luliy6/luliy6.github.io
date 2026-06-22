@@ -3266,7 +3266,7 @@ body.luliy-hide-pagination .pagenav {
 }
 .luliy-chron-table {
   width: 100%; border-collapse: collapse; font-size: 14px;
-  background: hsla(var(--luliy-glass-hue, 250), 45%, 9%, 0.35);
+  background: transparent;   /* ★ 表格整体透明 */
 }
 .luliy-chron-table td[rowspan],
 .luliy-chron-table .luliy-chron-month-cell {
@@ -3274,18 +3274,19 @@ body.luliy-hide-pagination .pagenav {
   font-weight: 600;
   white-space: nowrap;
   min-width: 52px;
-  border-right: 1px solid rgba(255,43,214,0.30);
+  text-align: center;        /* ★ 月份列水平居中 */
+  border-right: 1px solid rgba(255,255,255,0.35);
 }
 .luliy-chron-table th, .luliy-chron-table td {
-  border: 1px solid rgba(255,43,214,0.20);
+  border: 1px solid rgba(255,255,255,0.25);   /* ★ 边框改为白色 */
   padding: 10px 14px; text-align: left; vertical-align: top;
 }
 .luliy-chron-table th {
-  background: hsla(var(--luliy-glass-hue, 250), 55%, 14%, 0.55);
+  background: hsla(var(--luliy-glass-hue, 250), 55%, 14%, 0.55);  /* 表头保持有底色 */
   color: var(--th-accent, #00e5ff); font-weight: 700;
   white-space: nowrap; letter-spacing: 0.5px;
 }
-.luliy-chron-table td { color: rgba(230,225,250,0.9); }
+.luliy-chron-table td { background: transparent; color: rgba(230,225,250,0.9); }  /* ★ td 完全透明 */
 .luliy-chron-table a { color: var(--th-accent, #6ec7ff); text-decoration: none; }
 .luliy-chron-table a:hover { text-decoration: underline; color: #fff; }
 
