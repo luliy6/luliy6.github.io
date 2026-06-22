@@ -3270,25 +3270,31 @@ body.luliy-hide-pagination .pagenav {
 }
 .luliy-chron-table td[rowspan],
 .luliy-chron-table .luliy-chron-month-cell {
-  vertical-align: top;
+  vertical-align: middle;    /* ★ 垂直居中 */
   font-weight: 600;
   white-space: nowrap;
   min-width: 52px;
-  text-align: center;        /* ★ 月份列水平居中 */
+  text-align: center;        /* ★ 水平居中 */
   border-right: 1px solid rgba(255,255,255,0.35);
 }
 .luliy-chron-table th, .luliy-chron-table td {
-  border: 1px solid rgba(255,255,255,0.25);   /* ★ 边框改为白色 */
+  border: 1px solid rgba(255,255,255,0.25);
   padding: 10px 14px; text-align: left; vertical-align: top;
 }
 .luliy-chron-table th {
-  background: hsla(var(--luliy-glass-hue, 250), 55%, 14%, 0.55);  /* 表头保持有底色 */
+  background: hsla(var(--luliy-glass-hue, 250), 55%, 14%, 0.55);
   color: var(--th-accent, #00e5ff); font-weight: 700;
   white-space: nowrap; letter-spacing: 0.5px;
 }
-.luliy-chron-table td { background: transparent; color: rgba(230,225,250,0.9); }  /* ★ td 完全透明 */
+/* ★ 夜间模式下 td 完全无底纹 */
+[data-color-mode="dark"] .luliy-chron-table td,
+.luliy-chron-table td { background: transparent; color: rgba(230,225,250,0.9); }
 .luliy-chron-table a { color: var(--th-accent, #6ec7ff); text-decoration: none; }
 .luliy-chron-table a:hover { text-decoration: underline; color: #fff; }
+
+/* ★ Chronicle 页面：隐藏顶部「预计阅读 X 分钟 | 共 XX 字」和文末字数信息条 */
+body.luliy-chronicle-takeover #luliy-readmeta,
+body.luliy-chronicle-takeover #luliy-post-footer-bar { display: none !important; }
 
 /* 海报墙 7/5/3 列响应式 */
 .luliy-chron-posters {
