@@ -280,12 +280,19 @@
 
     /* Track list (default + user-added) */
     function loadTracks() {
-      var base = [{ name: cfg.name||'dark', artist: cfg.artist||'Luliy', url: cfg.url, cover: cfg.cover||'' }];
+      /* ★ 默认曲库：在这里维护「出厂曲目」，用户可在播放器里再增删 */
+      var base = [
+        { name: cfg.name||'dark', artist: cfg.artist||'Luliy', url: cfg.url, cover: cfg.cover||'' },
+        { name: '1 to 2', artist: 'Luliy', url: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/music/1%20to%202%20.mp3', cover: cfg.cover||'' }
+      ];
       try {
         var extra = JSON.parse(localStorage.getItem(ALIST) || '[]');
         if (Array.isArray(extra)) return base.concat(extra);
       } catch(e) {}
       return base;
+    }
+    function saveTracks(extraList) {
+      try { localStorage.setItem(ALIST, JSON.stringify(extraList)); } catch(e) {}
     }
 
     /* Wrapper that takes full position control */
@@ -433,16 +440,15 @@
           });
         } else { try { ap.pause(); } catch(e){} }
 
-        /* ── Mini control strip: add-music only ──────────────── */
+        /* ── 工具栏：添曲 / 删曲 / 随机 ───────────────────────── */
         if (!wrap.querySelector('.luliy-ap-tools')) {
           var tools = document.createElement('div');
           tools.className = 'luliy-ap-tools';
 
-          /* Add-music button — prompts for a direct URL */
+          /* ① 添加音乐 */
           var addBtn = document.createElement('button');
           addBtn.type = 'button'; addBtn.className = 'luliy-ap-tool luliy-ap-add';
-          addBtn.textContent = '+';
-          addBtn.title = '添加音乐直链';
+          addBtn.textContent = '+'; addBtn.title = '添加音乐直链';
           addBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             var url = window.prompt('输入音乐直链 URL（mp3/m4a 等）：');
@@ -454,16 +460,67 @@
               if (!Array.isArray(list)) list = [];
               var track = { name: name, artist: 'Luliy', url: url, cover: cfg.cover || '' };
               list.push(track);
-              localStorage.setItem(ALIST, JSON.stringify(list));
-              ap.list.add(track);          /* live-add without reload */
+              saveTracks(list);
+              ap.list.add(track);
               ap.list.switch(ap.list.audios.length - 1);
               ap.play();
             } catch(err) { try { console.warn('[luliy] add track failed', err); } catch(e2){} }
           });
 
+          /* ② 删除当前曲目（默认曲库前两首不可删） */
+          var BASE_COUNT = 2;
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button'; delBtn.className = 'luliy-ap-tool luliy-ap-del';
+          delBtn.textContent = '−'; delBtn.title = '删除当前曲目';
+          delBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            try {
+              var idx = ap.list.index;
+              if (idx < BASE_COUNT) { window.alert('默认曲目不可删除'); return; }
+              ap.list.remove(idx);
+              var list = JSON.parse(localStorage.getItem(ALIST) || '[]');
+              var extraIdx = idx - BASE_COUNT;
+              if (extraIdx >= 0 && extraIdx < list.length) {
+                list.splice(extraIdx, 1);
+                saveTracks(list);
+              }
+            } catch(err) {}
+          });
+
+          /* ③ 随机/顺序切换 */
+          var shuffleBtn = document.createElement('button');
+          shuffleBtn.type = 'button'; shuffleBtn.className = 'luliy-ap-tool luliy-ap-shuffle';
+          shuffleBtn.title = '随机播放';
+          shuffleBtn.innerHTML = '&#x1F500;';   /* 🔀 */
+          var _shuffle = false;
+          shuffleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            _shuffle = !_shuffle;
+            shuffleBtn.style.opacity = _shuffle ? '1' : '0.45';
+            shuffleBtn.title = _shuffle ? '已开启随机' : '随机播放';
+            /* APlayer 没有直接的 shuffle API，用 setMode 模拟 */
+            try {
+              if (ap.mode !== undefined) ap.setMode(_shuffle ? 'random' : 'list');
+            } catch(err) {}
+          });
+          shuffleBtn.style.opacity = '0.45';
+
           tools.appendChild(addBtn);
+          tools.appendChild(delBtn);
+          tools.appendChild(shuffleBtn);
           wrap.appendChild(tools);
         }
+
+        /* ── 键盘快捷键（仅播放器展开时生效，避免和全局冲突）── */
+        document.addEventListener('keydown', function(e) {
+          if (!apOpen) return;           /* 播放器收起时不响应 */
+          if (e.target && e.target.tagName && ['INPUT','TEXTAREA','SELECT'].indexOf(e.target.tagName) !== -1) return;
+          try {
+            if (e.code === 'Space' || e.keyCode === 32) { e.preventDefault(); ap.toggle(); }
+            if (e.code === 'ArrowRight' || e.keyCode === 39) ap.skipForward();
+            if (e.code === 'ArrowLeft'  || e.keyCode === 37) ap.skipBack();
+          } catch(err) {}
+        });
 
         /* ── ★ 圆形折叠按钮（参照目录 #luliy-toc-fab 的交互方式）：
            默认收起成一个圆形按钮，点击展开成完整播放器（拖拽/歌词全都还在），
@@ -3417,18 +3474,99 @@
     function renderPosters(list) {
       if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
       var h = '<div class="luliy-chron-posters">';
-      list.forEach(function (p) {
-        var inner =
-          '<div class="luliy-poster-img" style="background-image:url(\'' +
-            esc(p.image || '') + '\')"></div>' +
-          '<div class="luliy-poster-title">' + esc(p.title || '') + '</div>';
-        if (p.url) {
-          h += '<a class="luliy-poster-item" href="' + esc(buildPostLink(p.url)) + '">' + inner + '</a>';
-        } else {
-          h += '<div class="luliy-poster-item">' + inner + '</div>';
-        }
+      list.forEach(function (p, i) {
+        /* ★ 点击海报触发灯箱，data-index 记录位置；有 url 的单独在灯箱里提供跳转按钮 */
+        h += '<button type="button" class="luliy-poster-item" data-index="' + i + '"' +
+          (p.url ? ' data-url="' + esc(buildPostLink(p.url)) + '"' : '') + '>' +
+          '<div class="luliy-poster-img" style="background-image:url(\'' + esc(p.image || '') + '\')"></div>' +
+          '<div class="luliy-poster-title">' + esc(p.title || '') + '</div>' +
+          '</button>';
       });
       h += '</div>';
+
+      /* 灯箱初始化（在 DOM 插入后由 body.click 事件委托触发） */
+      setTimeout(function () {
+        var body = document.querySelector('.luliy-chron-body');
+        if (!body || body._lightboxBound) return;
+        body._lightboxBound = true;
+
+        function openLightbox(idx) {
+          var lb = document.getElementById('luliy-lb');
+          if (!lb) {
+            lb = document.createElement('div'); lb.id = 'luliy-lb';
+            lb.innerHTML =
+              '<div class="luliy-lb-bg"></div>' +
+              '<button class="luliy-lb-prev" aria-label="\u4e0a\u4e00\u5f20">&#8249;</button>' +
+              '<button class="luliy-lb-next" aria-label="\u4e0b\u4e00\u5f20">&#8250;</button>' +
+              '<div class="luliy-lb-img-wrap"><img class="luliy-lb-img" alt=""><div class="luliy-lb-cap"></div>' +
+              '<a class="luliy-lb-link" target="_blank" rel="noopener">\u67e5\u770b\u6587\u7ae0 \u2192</a></div>' +
+              '<button class="luliy-lb-close" aria-label="\u5173\u95ed">&#10005;</button>';
+            document.body.appendChild(lb);
+
+            /* 背景/关闭按钮关闭 */
+            lb.querySelector('.luliy-lb-bg').addEventListener('click', closeLightbox);
+            lb.querySelector('.luliy-lb-close').addEventListener('click', closeLightbox);
+            lb.querySelector('.luliy-lb-prev').addEventListener('click', function () { navLightbox(-1); });
+            lb.querySelector('.luliy-lb-next').addEventListener('click', function () { navLightbox(1); });
+
+            /* 键盘 */
+            document.addEventListener('keydown', function (e) {
+              if (!lb.classList.contains('is-open')) return;
+              if (e.key === 'ArrowLeft'  || e.keyCode === 37) navLightbox(-1);
+              if (e.key === 'ArrowRight' || e.keyCode === 39) navLightbox(1);
+              if (e.key === 'Escape'     || e.keyCode === 27) closeLightbox();
+            });
+
+            /* 触摸滑动 */
+            var _tx = 0;
+            lb.addEventListener('touchstart', function (e) { _tx = e.touches[0].clientX; }, { passive: true });
+            lb.addEventListener('touchend', function (e) {
+              var diff = e.changedTouches[0].clientX - _tx;
+              if (Math.abs(diff) > 40) navLightbox(diff < 0 ? 1 : -1);
+            }, { passive: true });
+          }
+
+          lb._list = list; lb._idx = idx;
+          showLightboxItem(lb, idx);
+          lb.classList.add('is-open');
+          document.body.classList.add('luliy-lb-open');
+        }
+
+        function showLightboxItem(lb, idx) {
+          var p = lb._list[idx];
+          lb.querySelector('.luliy-lb-img').src = p.image || '';
+          lb.querySelector('.luliy-lb-cap').textContent = p.title || '';
+          var linkEl = lb.querySelector('.luliy-lb-link');
+          if (p.url) { linkEl.href = buildPostLink(p.url); linkEl.style.display = ''; }
+          else { linkEl.style.display = 'none'; }
+          /* 更新前后箭头可用状态 */
+          lb.querySelector('.luliy-lb-prev').disabled = idx <= 0;
+          lb.querySelector('.luliy-lb-next').disabled = idx >= lb._list.length - 1;
+          lb._idx = idx;
+        }
+
+        function navLightbox(dir) {
+          var lb = document.getElementById('luliy-lb');
+          if (!lb) return;
+          var next = lb._idx + dir;
+          if (next < 0 || next >= lb._list.length) return;
+          showLightboxItem(lb, next);
+        }
+
+        function closeLightbox() {
+          var lb = document.getElementById('luliy-lb');
+          if (lb) lb.classList.remove('is-open');
+          document.body.classList.remove('luliy-lb-open');
+        }
+
+        body.addEventListener('click', function (e) {
+          var btn = e.target.closest('.luliy-poster-item');
+          if (!btn) return;
+          var idx = parseInt(btn.getAttribute('data-index') || '0', 10);
+          openLightbox(idx);
+        });
+      }, 0);
+
       return h;
     }
   }
