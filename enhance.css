@@ -3261,7 +3261,17 @@ body.luliy-hide-pagination .pagenav {
   background: #ff2bd6; box-shadow: 0 0 8px #ff2bd6;
 }
 
-.luliy-chron-tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* 横向滚动用外层容器处理，避免 overflow-x:auto 隐式把 overflow-y 也改成
+   auto，导致表格高度被截断、内容从顶部被裁掉 */
+.luliy-chron-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+.luliy-chron-tablewrap {
+  /* 不再在这里设置 overflow */
+  min-width: 580px;   /* 确保窄屏下触发外层横向滚动 */
+}
 .luliy-chron-table {
   width: 100%; border-collapse: collapse; font-size: 14px;
   background: hsla(var(--luliy-glass-hue, 250), 45%, 9%, 0.35);
@@ -3271,6 +3281,7 @@ body.luliy-hide-pagination .pagenav {
   vertical-align: top;
   font-weight: 600;
   white-space: nowrap;
+  min-width: 52px;
   border-right: 1px solid rgba(255,43,214,0.30);
 }
 .luliy-chron-table th, .luliy-chron-table td {
