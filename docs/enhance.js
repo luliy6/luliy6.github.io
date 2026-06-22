@@ -2374,7 +2374,14 @@
     if (isIndexPage() && LULIY_OPTS.siteSubtitle && !document.getElementById('luliy-subtitle')) {
       var subEl = document.createElement('div');
       subEl.id = 'luliy-subtitle';
-      subEl.textContent = LULIY_OPTS.siteSubtitle;
+      /* ★ 三个词分别链接到 Chronicle / Book / Favorites 页面，
+         点哪个词就跳对应页面，样式继承副标题的整体发光风格。 */
+      var _words = LULIY_OPTS.siteSubtitle.split(/\s+/);
+      var _links = ['/chronicle.html', '/book.html', '/favorites.html'];
+      subEl.innerHTML = _words.map(function (w, i) {
+        var href = _links[i] || '#';
+        return '<a href="' + esc(href) + '" class="luliy-subtitle-link">' + esc(w) + '</a>';
+      }).join(' ');
       document.body.appendChild(subEl);
     }
 
