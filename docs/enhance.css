@@ -3347,6 +3347,85 @@ body.luliy-chronicle-takeover #luliy-post-footer-bar { display: none !important;
   .luliy-arch-title, .luliy-chron-title { font-size: 23px; }
 }
 
+/* ══════════════════════════════════════════════════════
+   Chronicle 手机端适配（≤ 640px）
+   两个表格在小屏下从「多列横排」转为「卡片堆叠」，
+   每条记录变成一块独立卡片，清晰易读。
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  /* 容器收窄 */
+  .luliy-chronicle { padding: 4px 0 32px; }
+
+  /* 标题和年份标签竖排（年份多时不挤在一行） */
+  .luliy-chron-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .luliy-chron-years  { gap: 12px; }
+  .luliy-chron-cats   { gap: 16px; margin: 12px 0 16px; }
+  .luliy-chron-title  { font-size: 22px; }
+
+  /* ── 出游 / 书影游：卡片化 ── */
+  /* 关掉外层横向滚动，改用纵向卡片堆叠 */
+  .luliy-chron-scroll-x { overflow-x: visible; }
+  .luliy-chron-tablewrap { min-width: 0; }
+
+  /* 整个表格变成 block 流式排列 */
+  .luliy-chron-table,
+  .luliy-chron-table thead,
+  .luliy-chron-table tbody,
+  .luliy-chron-table tr,
+  .luliy-chron-table th,
+  .luliy-chron-table td { display: block; width: 100% !important; box-sizing: border-box; }
+
+  /* 表头隐藏 */
+  .luliy-chron-table thead { display: none !important; }
+
+  /* 每行变成一张卡片 */
+  .luliy-chron-table tbody tr {
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* 每个 td：flex 横排「列名 + 内容」 */
+  .luliy-chron-table td {
+    display: flex !important;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 14px;
+    border: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+    text-align: left !important;
+    vertical-align: top !important;
+    white-space: normal !important;
+    min-width: 0;
+  }
+  .luliy-chron-table td:last-child { border-bottom: none !important; }
+
+  /* data-label 前置标签（给非月份格用） */
+  .luliy-chron-table td:not(.luliy-chron-month-cell)::before {
+    content: attr(data-label);
+    flex: 0 0 4.5em;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+    color: var(--th-accent, #00e5ff);
+    opacity: 0.75;
+    white-space: nowrap;
+    padding-top: 1px;
+  }
+
+  /* 月份行：居中、加粗、深色背景突出 */
+  .luliy-chron-table .luliy-chron-month-cell {
+    justify-content: center !important;
+    background: hsla(var(--luliy-glass-hue,250), 55%, 20%, 0.45) !important;
+    font-size: 13px; font-weight: 800;
+    border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+    border-right: none !important;
+    white-space: nowrap !important;
+  }
+
+  /* 海报墙：手机端 2 列（3 列图片偏小） */
+  .luliy-chron-posters { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+}
+
 /* Mobile: collapse to single left-aligned column */
 @media (max-width: 768px) {
   .luliy-card-timeline::before { left: 16px; margin-left: 0; }
