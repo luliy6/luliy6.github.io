@@ -3370,15 +3370,15 @@
         /* 第一行：带 rowspan 的月份格 */
         h += '<tr>' +
           '<td rowspan="' + span + '" class="luliy-chron-month-cell">' + esc(month) + '</td>' +
-          '<td>' + esc(list[i].city || '') + '</td>' +
-          '<td>' + makeActs(list[i]) + '</td>' +
+          '<td data-label="\u57ce\u5e02">' + esc(list[i].city || '') + '</td>' +
+          '<td data-label="\u6d3b\u52a8">' + makeActs(list[i]) + '</td>' +
         '</tr>';
 
         /* 同月的后续行：不再重复月份格 */
         for (var j = 1; j < span; j++) {
           h += '<tr>' +
-            '<td>' + esc(list[i + j].city || '') + '</td>' +
-            '<td>' + makeActs(list[i + j]) + '</td>' +
+            '<td data-label="\u57ce\u5e02">' + esc(list[i + j].city || '') + '</td>' +
+            '<td data-label="\u6d3b\u52a8">' + makeActs(list[i + j]) + '</td>' +
           '</tr>';
         }
         i += span;
@@ -3404,10 +3404,10 @@
         '<th>\u6f14\u51fa/\u653e\u6620</th><th>\u6e38\u620f/\u5b9e\u51b5</th></tr></thead><tbody>';
       list.forEach(function (row) {
         h += '<tr><td class="luliy-chron-month-cell">' + esc(row.month || '') + '</td>' +
-          '<td>' + cell(row.books) + '</td>' +
-          '<td>' + cell(row.watch) + '</td>' +
-          '<td>' + cell(row.shows) + '</td>' +
-          '<td>' + cell(row.games) + '</td></tr>';
+          '<td data-label="\u8bfb\u4e66">' + cell(row.books) + '</td>' +
+          '<td data-label="\u89c2\u5f71">' + cell(row.watch) + '</td>' +
+          '<td data-label="\u6f14\u51fa">' + cell(row.shows) + '</td>' +
+          '<td data-label="\u6e38\u620f">' + cell(row.games) + '</td></tr>';
       });
       h += '</tbody></table></div></div>';
       return h;
