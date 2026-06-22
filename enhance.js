@@ -3318,21 +3318,45 @@
       renderBody();
     }
 
-    /* —— 出游：月份 | 城市 | 活动 三列 —— */
+    /* —— 出游：月份 | 城市 | 活动 三列 ——
+       ★ 同月份的多条记录合并月份格（rowspan），实现"Jan. 跨多行"效果。 */
     function renderTravel(list) {
       if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
       var h = '<div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
         '<th>\u6708\u4efd</th><th>\u57ce\u5e02</th><th>\u6d3b\u52a8</th></tr></thead><tbody>';
-      list.forEach(function (row) {
-        var acts = (row.items || []).map(function (it) {
+
+      function makeActs(row) {
+        return (row.items || []).map(function (it) {
           if (it && it.url) {
             return '<a href="' + esc(buildPostLink(it.url)) + '">' + esc(it.title || '') + '</a>';
           }
           return esc((it && it.title) || String(it || ''));
         }).join('\u3001');
-        h += '<tr><td>' + esc(row.month || '') + '</td><td>' + esc(row.city || '') +
-          '</td><td>' + acts + '</td></tr>';
-      });
+      }
+
+      var i = 0;
+      while (i < list.length) {
+        var month = list[i].month || '';
+        /* 统计连续相同月份的条数，用于 rowspan */
+        var span = 1;
+        while (i + span < list.length && (list[i + span].month || '') === month) span++;
+
+        /* 第一行：带 rowspan 的月份格 */
+        h += '<tr>' +
+          '<td rowspan="' + span + '" class="luliy-chron-month-cell">' + esc(month) + '</td>' +
+          '<td>' + esc(list[i].city || '') + '</td>' +
+          '<td>' + makeActs(list[i]) + '</td>' +
+        '</tr>';
+
+        /* 同月的后续行：不再重复月份格 */
+        for (var j = 1; j < span; j++) {
+          h += '<tr>' +
+            '<td>' + esc(list[i + j].city || '') + '</td>' +
+            '<td>' + makeActs(list[i + j]) + '</td>' +
+          '</tr>';
+        }
+        i += span;
+      }
       h += '</tbody></table></div>';
       return h;
     }
