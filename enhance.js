@@ -191,7 +191,9 @@
   root._luliyToggleMode = _luliyToggleMode;
   root._luliyResolveMode = _luliyResolveMode;
   function isArchivePage() {
-    return location.pathname.includes('archive');
+    /* ★ 精确匹配 archive.html，不用宽松的 includes('archive')——
+       否则 URL 里凑巧含 archive 的普通文章会被误判成归档页。 */
+    return /(^|\/)archive(\.html)?$/i.test(location.pathname);
   }
   function fetchPosts() {
     function norm(data) {
@@ -3052,6 +3054,8 @@
   function initArchivesPage() {
     var pb = document.getElementById('postBody');
     if (!pb) return;
+    /* ★ 幂等防护：已经初始化过就直接返回，避免重复渲染/重复绑事件 */
+    if (document.getElementById('luliy-archives')) return;
     /* 标记 body：隐藏 Gmeek 原生翻页器等 */
     document.body.classList.add('luliy-archives-takeover', 'luliy-hide-pagination');
 
@@ -3211,6 +3215,8 @@
   function initChroniclePage() {
     var pb = document.getElementById('postBody');
     if (!pb) return;
+    /* ★ 幂等防护：已经初始化过就直接返回 */
+    if (document.getElementById('luliy-chronicle')) return;
     document.body.classList.add('luliy-chronicle-takeover', 'luliy-hide-pagination');
 
     /* 把可能存在的内置 fallback JSON 先抢救出来（pb.innerHTML 会被覆盖） */
@@ -3230,6 +3236,13 @@
         return;
       }
       renderChronicle(data);
+    }).catch(function () {
+      /* 兜底：万一渲染过程本身抛错（比如数据结构异常），也优雅降级 */
+      var data = fallbackJson;
+      if (data && data.years && data.years.length) {
+        try { renderChronicle(data); return; } catch (e) {}
+      }
+      root2.innerHTML = '<div class="luliy-chron-error">\u65e0\u6cd5\u8bfb\u53d6\u7f16\u5e74\u53f2\u6570\u636e\u3002</div>';
     });
 
     function renderChronicle(data) {
@@ -3371,7 +3384,12 @@
   }
 
   function isChroniclePage() {
-    return /chronicle/i.test(location.pathname) || !!document.getElementById('luliy-chronicle-fallback');
+    /* ★ 只用 URL 路径判断，绝不能再看「页面里有没有 fallback 元素」——
+       否则任何一篇文章只要正文里出现了 luliy-chronicle-fallback 这串字符
+       （比如把本功能的部署指南当文章发出来），就会被误判成 Chronicle 页、
+       整篇内容被接管替换掉。这是之前的严重 bug。
+       Gmeek 生成的单页文件名就是 chronicle.html，按路径认最稳妥。 */
+    return /(^|\/)chronicle(\.html)?$/i.test(location.pathname);
   }
 
   function initCards() {
