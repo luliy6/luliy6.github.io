@@ -3231,6 +3231,13 @@
     if (document.getElementById('luliy-chronicle')) return;
     document.body.classList.add('luliy-chronicle-takeover', 'luliy-hide-pagination');
 
+    /* ★ 移除「预计阅读」和「文末字数」元素（Chronicle 不是普通文章，
+       不需要显示这些信息；CSS 也有隐藏，这里双重保险）。 */
+    ['luliy-readmeta', 'luliy-post-footer-bar'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    });
+
     /* 把可能存在的内置 fallback JSON 先抢救出来（pb.innerHTML 会被覆盖） */
     var fallbackJson = chronicleGetFallback();
 
