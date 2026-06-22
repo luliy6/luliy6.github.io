@@ -3016,9 +3016,371 @@
     return lnk;
   }
 
+  /* ============================================================
+     归档页 Archives —— 双标签页（Weekly / Other）+ 按年分组 + 分页
+     ★ 替换原来的「时间线视图」归档页。复用现成的 fetchPosts() /
+     esc() / buildPostLink()，赛博朋克风格沿用全站 CSS 变量。
+     ============================================================ */
+  var ARCHIVE_WEEKLY_LABELS = ['Weekly', 'weekly', '\u5468\u8bb0', '\u5468\u62a5', '\u4e8c\u5341\u56db\u8282\u6c14'];
+  var ARCHIVE_SYSTEM_LABELS = ['archives', 'archive', 'chronicle', 'chronicle-data',
+    'about', 'page', 'Pages', '\u9875\u9762', 'book', 'favorites', 'stock', 'link', 'gallery'];
+
+  function archiveIsWeekly(post) {
+    var names = (post.labels || []).map(function (l) { return l.name; });
+    for (var i = 0; i < names.length; i++) {
+      if (ARCHIVE_WEEKLY_LABELS.indexOf(names[i]) !== -1) return true;
+    }
+    return false;
+  }
+  function archiveIsSystem(post) {
+    var names = (post.labels || []).map(function (l) { return l.name; });
+    for (var i = 0; i < names.length; i++) {
+      if (ARCHIVE_SYSTEM_LABELS.indexOf(names[i]) !== -1) return true;
+    }
+    return false;
+  }
+  function archiveGroupByYear(posts) {
+    var groups = {};
+    posts.forEach(function (p) {
+      var y = (p.created || '').slice(0, 4) || '\u672a\u77e5';   /* 未知 */
+      if (!groups[y]) groups[y] = [];
+      groups[y].push(p);
+    });
+    return groups;
+  }
+
+  function initArchivesPage() {
+    var pb = document.getElementById('postBody');
+    if (!pb) return;
+    /* 标记 body：隐藏 Gmeek 原生翻页器等 */
+    document.body.classList.add('luliy-archives-takeover', 'luliy-hide-pagination');
+
+    pb.innerHTML = '<div id="luliy-archives" class="luliy-archives">' +
+      '<div class="luliy-arch-loading">\u52a0\u8f7d\u4e2d\u2026</div></div>';
+    var root2 = document.getElementById('luliy-archives');
+
+    var PER_PAGE = 10;
+    var TAB_KEY = 'luliy-archive-tab';
+    var state = {
+      tab: (localStorage.getItem(TAB_KEY) === 'other') ? 'other' : 'weekly',
+      pageWeekly: 1,
+      pageOther: 1,
+      weekly: [],
+      other: []
+    };
+
+    fetchPosts().then(function (posts) {
+      if (!posts || !posts.length) {
+        root2.innerHTML = '<div class="luliy-arch-error">\u65e0\u6cd5\u8bfb\u53d6\u6587\u7ae0\u5217\u8868\uff0c' +
+          '\u8bf7\u786e\u8ba4 Gmeek \u5df2\u751f\u6210 postList.json\u3002</div>';
+        return;
+      }
+      /* 按日期降序 */
+      posts.sort(function (a, b) {
+        return String(b.created).localeCompare(String(a.created));
+      });
+      posts.forEach(function (p) {
+        if (archiveIsWeekly(p)) state.weekly.push(p);
+        else if (!archiveIsSystem(p)) state.other.push(p);
+      });
+      renderArchivesShell();
+    }).catch(function () {
+      root2.innerHTML = '<div class="luliy-arch-error">\u65e0\u6cd5\u8bfb\u53d6\u6587\u7ae0\u5217\u8868\uff0c' +
+        '\u8bf7\u786e\u8ba4 Gmeek \u5df2\u751f\u6210 postList.json\u3002</div>';
+    });
+
+    function renderArchivesShell() {
+      root2.innerHTML =
+        '<div class="luliy-arch-header">' +
+          '<h1 class="luliy-arch-title">Archives</h1>' +
+          '<div class="luliy-arch-tabbar">' +
+            '<button type="button" class="luliy-arch-tab" data-tab="weekly">Weekly</button>' +
+            '<span class="luliy-arch-tabsep"></span>' +
+            '<button type="button" class="luliy-arch-tab" data-tab="other">Other</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="luliy-arch-body"></div>';
+
+      root2.querySelectorAll('.luliy-arch-tab').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var t = btn.getAttribute('data-tab');
+          if (t === state.tab) return;
+          state.tab = t;
+          localStorage.setItem(TAB_KEY, t);
+          renderArchiveBody();
+        });
+      });
+      renderArchiveBody();
+    }
+
+    function renderArchiveBody() {
+      /* 高亮当前标签 */
+      root2.querySelectorAll('.luliy-arch-tab').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.getAttribute('data-tab') === state.tab);
+      });
+      var body = root2.querySelector('.luliy-arch-body');
+      var list = (state.tab === 'weekly') ? state.weekly : state.other;
+      var page = (state.tab === 'weekly') ? state.pageWeekly : state.pageOther;
+      var totalPages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+      if (page > totalPages) { page = totalPages; }
+
+      if (!list.length) {
+        body.innerHTML = '<div class="luliy-arch-empty">\u6682\u65e0\u6587\u7ae0</div>';   /* 暂无文章 */
+        return;
+      }
+
+      var start = (page - 1) * PER_PAGE;
+      var pageItems = list.slice(start, start + PER_PAGE);
+      var groups = archiveGroupByYear(pageItems);
+      var years = Object.keys(groups).sort(function (a, b) { return b.localeCompare(a); });
+
+      var html = '<div class="luliy-arch-list">';
+      years.forEach(function (y) {
+        html += '<div class="luliy-arch-year">' + esc(y) + '</div>';
+        groups[y].forEach(function (p) {
+          var href = buildPostLink(p.link);
+          var date = (p.created || '').slice(0, 10);
+          html += '<a class="luliy-arch-row" href="' + esc(href) + '">' +
+            '<span class="luliy-arch-date">' + esc(date) + '</span>' +
+            '<span class="luliy-arch-name">' + esc(p.title) + '</span>' +
+          '</a>';
+        });
+      });
+      html += '</div>';
+
+      /* 分页（超过一页才显示） */
+      if (totalPages > 1) {
+        html += '<div class="luliy-arch-pagination">' +
+          '<button type="button" class="luliy-arch-pgbtn" data-dir="prev"' +
+            (page <= 1 ? ' disabled' : '') + '>&lt;</button>' +
+          '<span class="luliy-arch-pginfo">Page ' + page + ' of ' + totalPages + '</span>' +
+          '<button type="button" class="luliy-arch-pgbtn" data-dir="next"' +
+            (page >= totalPages ? ' disabled' : '') + '>&gt;</button>' +
+        '</div>';
+      }
+      body.innerHTML = html;
+
+      body.querySelectorAll('.luliy-arch-pgbtn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (btn.disabled) return;
+          var dir = btn.getAttribute('data-dir');
+          var cur = (state.tab === 'weekly') ? state.pageWeekly : state.pageOther;
+          cur += (dir === 'next' ? 1 : -1);
+          cur = Math.max(1, Math.min(totalPages, cur));
+          if (state.tab === 'weekly') state.pageWeekly = cur; else state.pageOther = cur;
+          renderArchiveBody();
+          /* 翻页后滚回列表顶部，体验更顺 */
+          try { root2.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+        });
+      });
+    }
+  }
+
+  /* ============================================================
+     编年史 Chronicle —— 年份 + 分类（出游/书影游/海报墙）
+     ★ 优先读 GitHub API（chronicle-data 标签的 issue），失败则
+     回退到页面内置的 JSON。赛博朋克风格沿用全站 CSS 变量。
+     ============================================================ */
+  var CHRONICLE_REPO = (window.LULIY_CHRONICLE_REPO || 'luliy6/luliy6.github.io');
+
+  function chronicleExtractJson(body) {
+    if (!body) return null;
+    var m = body.match(/<!--\s*chronicle:data:start\s*-->([\s\S]*?)<!--\s*chronicle:data:end\s*-->/);
+    if (!m) return null;
+    try { return JSON.parse(m[1].trim()); } catch (e) { return null; }
+  }
+
+  function chronicleFetchIssueData() {
+    var url = 'https://api.github.com/repos/' + CHRONICLE_REPO +
+      '/issues?state=open&labels=chronicle-data&per_page=1';
+    return fetch(url, { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (arr) {
+        if (!arr || !arr.length) return null;
+        return chronicleExtractJson(arr[0].body);
+      })
+      .catch(function () { return null; });
+  }
+
+  function chronicleGetFallback() {
+    var el = document.getElementById('luliy-chronicle-fallback');
+    if (!el) return null;
+    try { return JSON.parse(el.textContent.trim()); } catch (e) { return null; }
+  }
+
+  function initChroniclePage() {
+    var pb = document.getElementById('postBody');
+    if (!pb) return;
+    document.body.classList.add('luliy-chronicle-takeover', 'luliy-hide-pagination');
+
+    /* 把可能存在的内置 fallback JSON 先抢救出来（pb.innerHTML 会被覆盖） */
+    var fallbackJson = chronicleGetFallback();
+
+    pb.innerHTML = '<div id="luliy-chronicle" class="luliy-chronicle">' +
+      '<div class="luliy-chron-loading">\u52a0\u8f7d\u4e2d\u2026</div></div>';
+    var root2 = document.getElementById('luliy-chronicle');
+
+    var YEAR_KEY = 'luliy-chronicle-year';
+    var CAT_KEY = 'luliy-chronicle-category';
+
+    chronicleFetchIssueData().then(function (apiData) {
+      var data = apiData || fallbackJson;
+      if (!data || !data.years || !data.years.length) {
+        root2.innerHTML = '<div class="luliy-chron-error">\u65e0\u6cd5\u8bfb\u53d6\u7f16\u5e74\u53f2\u6570\u636e\u3002</div>';
+        return;
+      }
+      renderChronicle(data);
+    });
+
+    function renderChronicle(data) {
+      var years = data.years;
+      var cats = data.categories || [];
+
+      var savedYear = localStorage.getItem(YEAR_KEY);
+      var savedCat = localStorage.getItem(CAT_KEY);
+      var curYear = (years.indexOf(savedYear) !== -1) ? savedYear : years[0];
+      var catKeys = cats.map(function (c) { return c.key; });
+      var curCat = (catKeys.indexOf(savedCat) !== -1) ? savedCat : (cats[0] && cats[0].key);
+
+      root2.innerHTML =
+        '<div class="luliy-chron-header">' +
+          '<h1 class="luliy-chron-title">Chronicle</h1>' +
+          '<div class="luliy-chron-years"></div>' +
+        '</div>' +
+        '<div class="luliy-chron-cats"></div>' +
+        '<div class="luliy-chron-body"></div>';
+
+      var yearsBox = root2.querySelector('.luliy-chron-years');
+      years.forEach(function (y) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'luliy-chron-year-tab';
+        b.textContent = y;
+        b.setAttribute('data-year', y);
+        b.addEventListener('click', function () {
+          if (y === curYear) return;
+          curYear = y;
+          localStorage.setItem(YEAR_KEY, y);
+          syncTabs(); renderBody();
+        });
+        yearsBox.appendChild(b);
+      });
+
+      var catsBox = root2.querySelector('.luliy-chron-cats');
+      cats.forEach(function (c) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'luliy-chron-cat-tab';
+        b.textContent = c.label;
+        b.setAttribute('data-cat', c.key);
+        b.addEventListener('click', function () {
+          if (c.key === curCat) return;
+          curCat = c.key;
+          localStorage.setItem(CAT_KEY, c.key);
+          syncTabs(); renderBody();
+        });
+        catsBox.appendChild(b);
+      });
+
+      function syncTabs() {
+        root2.querySelectorAll('.luliy-chron-year-tab').forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-year') === curYear);
+        });
+        root2.querySelectorAll('.luliy-chron-cat-tab').forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-cat') === curCat);
+        });
+      }
+
+      function renderBody() {
+        var body = root2.querySelector('.luliy-chron-body');
+        var yearData = (data.data && data.data[curYear]) || {};
+        var list = yearData[curCat] || [];
+        if (curCat === 'travel') body.innerHTML = renderTravel(list);
+        else if (curCat === 'media') body.innerHTML = renderMedia(list);
+        else if (curCat === 'posters') body.innerHTML = renderPosters(list);
+        else body.innerHTML = '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
+      }
+
+      syncTabs();
+      renderBody();
+    }
+
+    /* —— 出游：月份 | 城市 | 活动 三列 —— */
+    function renderTravel(list) {
+      if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
+      var h = '<div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
+        '<th>\u6708\u4efd</th><th>\u57ce\u5e02</th><th>\u6d3b\u52a8</th></tr></thead><tbody>';
+      list.forEach(function (row) {
+        var acts = (row.items || []).map(function (it) {
+          if (it && it.url) {
+            return '<a href="' + esc(buildPostLink(it.url)) + '">' + esc(it.title || '') + '</a>';
+          }
+          return esc((it && it.title) || String(it || ''));
+        }).join('\u3001');
+        h += '<tr><td>' + esc(row.month || '') + '</td><td>' + esc(row.city || '') +
+          '</td><td>' + acts + '</td></tr>';
+      });
+      h += '</tbody></table></div>';
+      return h;
+    }
+
+    /* —— 书影游：月份 | 读书 | 观影 | 演出 | 游戏 五列 —— */
+    function renderMedia(list) {
+      if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
+      function cell(arr) {
+        if (!arr || !arr.length) return '';
+        return arr.map(function (it) {
+          if (it && typeof it === 'object' && it.url) {
+            return '<a href="' + esc(buildPostLink(it.url)) + '">' + esc(it.title || '') + '</a>';
+          }
+          return esc(typeof it === 'object' ? (it.title || '') : String(it));
+        }).join(' / ');
+      }
+      var h = '<div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
+        '<th>\u6708\u4efd</th><th>\u8bfb\u4e66/\u6f2b\u753b</th><th>\u89c2\u5f71/\u5267\u96c6/\u756a\u5267</th>' +
+        '<th>\u6f14\u51fa/\u653e\u6620</th><th>\u6e38\u620f/\u5b9e\u51b5</th></tr></thead><tbody>';
+      list.forEach(function (row) {
+        h += '<tr><td>' + esc(row.month || '') + '</td>' +
+          '<td>' + cell(row.books) + '</td>' +
+          '<td>' + cell(row.watch) + '</td>' +
+          '<td>' + cell(row.shows) + '</td>' +
+          '<td>' + cell(row.games) + '</td></tr>';
+      });
+      h += '</tbody></table></div>';
+      return h;
+    }
+
+    /* —— 海报墙：响应式网格 7/5/3 列 —— */
+    function renderPosters(list) {
+      if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
+      var h = '<div class="luliy-chron-posters">';
+      list.forEach(function (p) {
+        var inner =
+          '<div class="luliy-poster-img" style="background-image:url(\'' +
+            esc(p.image || '') + '\')"></div>' +
+          '<div class="luliy-poster-title">' + esc(p.title || '') + '</div>';
+        if (p.url) {
+          h += '<a class="luliy-poster-item" href="' + esc(buildPostLink(p.url)) + '">' + inner + '</a>';
+        } else {
+          h += '<div class="luliy-poster-item">' + inner + '</div>';
+        }
+      });
+      h += '</div>';
+      return h;
+    }
+  }
+
+  function isChroniclePage() {
+    return /chronicle/i.test(location.pathname) || !!document.getElementById('luliy-chronicle-fallback');
+  }
+
   function initCards() {
     var isTagPage = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
     var isArchive = isArchivePage();
+
+    /* ★ 归档页改用全新的「Archives 双标签页」模块（Weekly/Other + 分页），
+       不再走下面这套「卡片 + 时间线」渲染。 */
+    if (isArchive) { initArchivesPage(); return; }
 
     /* ★ 真正的首页（既不是分类页也不是归档页）只要「Hero + 六张分类卡片」，
        绝不在这里渲染文章列表——哪怕 Gmeek 原生还在首页 DOM 里塞了一份 SideNav。 */
@@ -4973,6 +5335,13 @@
 
     var isPost    = !!document.getElementById('postBody');
     var hasList   = !!document.querySelector('.SideNav,.post-item,.postList,.post-list');
+
+    /* ★ 编年史 Chronicle 单页：优先识别（它也有 #postBody，但要走自己的
+       渲染，不能当普通文章页）。识别后直接接管，不再往下走文章页逻辑。 */
+    if (isChroniclePage()) {
+      safe(initChroniclePage, 'chronicle');
+      return;
+    }
 
     if (isPost) root._luliyInitPost();
     if (isIndexPage() || isArchivePage() || (!isPost && hasList)) root._luliyInitIndex();
