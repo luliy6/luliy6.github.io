@@ -2132,10 +2132,21 @@
               : (u.pathname.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '') || '\u94fe\u63a5');
           } catch (e) { label = '\u94fe\u63a5'; }
         }
-        /* ★ 不保留原生链接里的 SVG 图标（Gmeek 导航链接自带的箭头等），
-           抽屉链接只用圆点或空来保持简洁，不需要外部图标。 */
+        /* ★ 用链接内 <path> 的 id 反查 Gmeek 已填好的 d 属性，
+           自己构建纯净的 SVG 图标（不含 Gmeek 加的箭头装饰）。
+           如果 path 数据为空（Gmeek 还没填），icon 留空，
+           fillQuick 会有 retry 机制，稍后再重试一次。 */
+        var pathEl = a.querySelector('path[id]');
+        var iconSvg = '';
+        if (pathEl) {
+          var pd = pathEl.getAttribute('d') || '';
+          if (pd) {
+            iconSvg = '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">' +
+              '<path fill-rule="evenodd" d="' + pd.replace(/"/g, '&quot;') + '"></path></svg>';
+          }
+        }
         out.push({ href: a.href || href, target: a.getAttribute('target') || (external ? '_blank' : ''),
-                   label: label, icon: '', external: external });
+                   label: label, icon: iconSvg, external: external });
       });
       return out;
     }
