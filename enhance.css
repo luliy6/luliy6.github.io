@@ -957,7 +957,7 @@ button:focus-visible, a:focus-visible {
 
 /* Global selections & external link indicator */
 ::selection { background: #f0b429; color: #000; }
-a[target='_blank']::after { content: ' \2197'; font-size: 0.75em; opacity: 0.6; }
+/* ★ 外链 ↗ 箭头已删除（会出现在沉思者图标、Music 等所有 target=_blank 元素上，影响美观） */
 
 /* ── Label tags ─────────────────────────────────────────── */
 a.Label {
@@ -4322,10 +4322,7 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 [data-color-mode="light"] #luliy-drawer-quick { border-bottom-color: rgba(0,0,0,0.05); }
-/* .lds-link 样式已在 section 35 定义，这里复用；外链加 ↗ */
-#luliy-drawer-quick .lds-link.is-ext .lds-link-txt::after {
-  content: ' \2197'; font-size: 0.82em; opacity: 0.6;
-}
+/* ★ 抽屉快捷链接的外链 ↗ 箭头已删除 */
 
 /* ── 设置分区：隐藏搬进抽屉后的「风格主题」标题+6行（抽屉已有独立主题分区）── */
 #luliy-ctrl-panel.in-drawer .luliy-panel-theme-block { display: none !important; }
