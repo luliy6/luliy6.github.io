@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark_colorblind" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js'></script><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js' onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js'></script><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js'></script><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script><meta name='theme-color' content='#0d2149'><link rel='apple-touch-icon' href='https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=180'><script>window.addEventListener('load',function(){if(window.Prism){Prism.plugins.autoloader.languages_path='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/';Prism.highlightAll();}if(window.mermaid){mermaid.initialize({startOnLoad:false,securityLevel:'loose',theme:document.documentElement.getAttribute('data-color-mode')==='dark'?'dark':'default'});document.querySelectorAll('pre>code.language-mermaid,code.language-mermaid').forEach(function(code){var block=document.createElement('div');block.className='mermaid';block.textContent=code.textContent.trim();(code.parentElement&&code.parentElement.tagName==='PRE'?code.parentElement:code).replaceWith(block);});if(mermaid.run){mermaid.run({querySelector:'.mermaid'});}else if(mermaid.init){mermaid.init(undefined,document.querySelectorAll('.mermaid'));}}if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}});</script><script src='https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js'></script><script src='https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js'></script><script src='https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/dplayer/dist/DPlayer.min.css'><script src='https://cdn.jsdelivr.net/npm/dplayer/dist/DPlayer.min.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css'><script src='https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js'></script><link rel='stylesheet' href='/enhance.css'><script defer src='/enhance.js'></script>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="# Archives 和 Chronicle 两个页面 —— 部署操作指南
+
+这次给你做了两个 singlePage 页面，**全部是赛博朋克风（和你整站统一）**，不是文档里那种黑白灰。">
+<meta property="og:title" content="Archives 和 Chronicle 两个页面 —— 部署操作指南">
+<meta property="og:description" content="# Archives 和 Chronicle 两个页面 —— 部署操作指南
+
+这次给你做了两个 singlePage 页面，**全部是赛博朋克风（和你整站统一）**，不是文档里那种黑白灰。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://luliy.me/post/Archives%20-he-%20Chronicle%20-liang-ge-ye-mian-%20%E2%80%94%E2%80%94%20-bu-shu-cao-zuo-zhi-nan.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
+<title>Archives 和 Chronicle 两个页面 —— 部署操作指南</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+<script>
+(function(){
+  try{
+    var d=document.documentElement;
+    /* ★ 恢复手动选主题：读取用户上次手动选的主题，没选过就用新默认
+       主题「赛博朋克」(cyberpunk)。不再跟随深浅模式自动切换。 */
+    var th=localStorage.getItem('luliy-sink')||'cyberpunk';
+    d.setAttribute('data-luliy-theme',th);
+    /* 阅读宽度默认拉到最大(400) */
+    var pw=parseInt(localStorage.getItem('luliy-pbwidth')||'400',10);
+    if(isNaN(pw))pw=400;
+    d.style.setProperty('--luliy-pb-extra',pw+'px');
+    var sans=localStorage.getItem('luliy-sans')||'0';
+    /* 液态玻璃三个参数也提前写入，首屏即生效 */
+    var gb=localStorage.getItem('luliy-glass-blur')||'22';
+    var go=localStorage.getItem('luliy-glass-opacity')||'0.5';
+    var gh=localStorage.getItem('luliy-glass-hue')||'250';
+    d.style.setProperty('--luliy-glass-blur',gb+'px');
+    d.style.setProperty('--luliy-glass-opacity',go);
+    d.style.setProperty('--luliy-glass-hue',gh);
+    /* 赛博朋克渐变背景兜底，首屏即生效，杜绝白底/纯黑闪烁 */
+    var css='html{background:linear-gradient(160deg,#0a0e2a 0%,#1a1140 30%,#3d1a5c 55%,#5c1a4a 75%,#1a0e2e 100%)!important;background-attachment:fixed!important;}body{background:transparent!important;background-image:none!important;}';
+    var st=document.createElement('style');st.id='luliy-fouc';st.textContent=css;
+    (d.head||d).appendChild(st);
+    document.addEventListener('DOMContentLoaded',function(){
+      if(document.body){
+        document.body.setAttribute('data-luliy-theme',th);
+        if(sans==='1')document.body.classList.add('luliy-sans');
+        if(sans==='2')document.body.classList.add('luliy-canger');
+      }
+    });
+  }catch(e){}
+})();
+</script>
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">Archives 和 Chronicle 两个页面 —— 部署操作指南</h1>
+<div class="title-right">
+    <a href="https://luliy.me" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/luliy6/luliy6.github.io/issues/40" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>Archives 和 Chronicle 两个页面 —— 部署操作指南</h1>
+<p>这次给你做了两个 singlePage 页面，<strong>全部是赛博朋克风（和你整站统一）</strong>，不是文档里那种黑白灰。</p>
+<ul>
+<li><strong>Archives（归档页）</strong>：替换了你原来的「时间线」归档页，URL 还是 <code class="notranslate">/archive.html</code> 不变。新的样子是「Weekly / Other」双标签页 + 按年份分组 + 每页 10 篇分页。</li>
+<li><strong>Chronicle（编年史页）</strong>：全新页面，URL 是 <code class="notranslate">/chronicle.html</code>。年份切换 + 分类切换（出游 / 书影游 / 海报墙），优先读 GitHub 上的数据 Issue，读不到就用页面里写死的备用数据。</li>
+</ul>
+<hr>
+<h2>一、改了哪些文件</h2>
+<p>直接用我给你的这 3 个文件替换仓库里的旧版本：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>文件</th>
+<th>放到哪里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="notranslate">enhance.js</code></td>
+<td><code class="notranslate">docs/enhance.js</code></td>
+</tr>
+<tr>
+<td><code class="notranslate">enhance.css</code></td>
+<td><code class="notranslate">docs/enhance.css</code></td>
+</tr>
+<tr>
+<td><code class="notranslate">config.json</code></td>
+<td>仓库根目录 <code class="notranslate">config.json</code></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p><code class="notranslate">config.json</code> 我只动了一处：在 <code class="notranslate">singlePage</code> 数组末尾加了 <code class="notranslate">"chronicle"</code>（<code class="notranslate">archive</code> 本来就在，没动）。你已有的其它配置一个都没删。</p>
+<hr>
+<h2>二、操作步骤（按顺序做）</h2>
+<h3>第 1 步：替换上面 3 个文件，提交推送</h3>
+<p>把 <code class="notranslate">enhance.js</code>、<code class="notranslate">enhance.css</code>、<code class="notranslate">config.json</code> 三个文件传上去覆盖旧的，commit + push。</p>
+<h3>第 2 步：确认/创建归档页 Issue</h3>
+<p>你应该<strong>已经有</strong>一个归档页 Issue 了（标题 Archives 或别的、标签 <code class="notranslate">archive</code>）。如果有，不用动——新代码会自动接管它的渲染。</p>
+<p>如果没有，新建一个 Issue：</p>
+<ul>
+<li><strong>标题</strong>：<code class="notranslate">Archives</code></li>
+<li><strong>标签</strong>：<code class="notranslate">archive</code></li>
+<li><strong>正文</strong>：随便写一句占位就行（比如「归档」），正文内容会被新页面自动替换掉。</li>
+</ul>
+<blockquote>
+<p>注意：你站里 singlePage 用的标签是 <strong><code class="notranslate">archive</code>（单数）</strong>，不是文档里的 <code class="notranslate">archives</code>。保持你原有的就好。</p>
+</blockquote>
+<h3>第 3 步：创建 Chronicle 页面 Issue</h3>
+<p>新建一个 Issue：</p>
+<ul>
+<li><strong>标题</strong>：<code class="notranslate">Chronicle</code></li>
+<li><strong>标签</strong>：<code class="notranslate">chronicle</code></li>
+<li><strong>正文</strong>：复制 <code class="notranslate">chronicle-page-issue.md</code> 文件里的全部内容粘进去。</li>
+</ul>
+<p>这段正文里内置了一份「备用数据」（空的框架），万一 GitHub API 读不到数据时，页面会用它兜底，不至于报错白屏。</p>
+<h3>第 4 步：创建 Chronicle 数据 Issue</h3>
+<p>再新建一个 Issue（这个是真正放编年史内容的地方）：</p>
+<ul>
+<li><strong>标题</strong>：<code class="notranslate">chronicle data</code>（随便取，标签才是关键）</li>
+<li><strong>标签</strong>：<code class="notranslate">chronicle-data</code></li>
+<li><strong>正文</strong>：复制 <code class="notranslate">chronicle-data-issue.md</code> 文件里的全部内容粘进去。</li>
+</ul>
+<p>以后你想增删编年史的内容，<strong>只改这个 Issue 的正文就行</strong>，改完不用重新生成站点，刷新页面就能看到（因为是前端实时读 GitHub API 的）。</p>
+<blockquote>
+<p>数据必须夹在 <code class="notranslate">&lt;!-- chronicle:data:start --&gt;</code> 和 <code class="notranslate">&lt;!-- chronicle:data:end --&gt;</code> 两行注释中间，中间是一段 JSON。</p>
+</blockquote>
+<h3>第 5 步：运行 Gmeek 全局生成</h3>
+<p>跑一次 Gmeek 的全局生成（和你平时更新博客一样的操作），让它把新的 singlePage 生成出来。</p>
+<hr>
+<h2>三、编年史数据怎么填</h2>
+<p><code class="notranslate">chronicle-data</code> Issue 正文里的 JSON 结构：</p>
+<ul>
+<li><code class="notranslate">years</code>：有哪些年份，比如 <code class="notranslate">["2026", "2025"]</code>。第一个是默认选中的。</li>
+<li><code class="notranslate">categories</code>：三个分类，别改 <code class="notranslate">key</code>（<code class="notranslate">travel</code>/<code class="notranslate">media</code>/<code class="notranslate">posters</code> 是写死对应渲染逻辑的），<code class="notranslate">label</code> 是显示的中文名可以改。</li>
+<li><code class="notranslate">data</code>：每个年份下，三个分类各自的内容。</li>
+</ul>
+<p>**出游（travel）**每条：</p>
+<div class="highlight highlight-source-json"><pre class="notranslate">{ <span class="pl-ent">"month"</span>: <span class="pl-s"><span class="pl-pds">"</span>Jan.<span class="pl-pds">"</span></span>, <span class="pl-ent">"city"</span>: <span class="pl-s"><span class="pl-pds">"</span>上海<span class="pl-pds">"</span></span>, <span class="pl-ent">"items"</span>: [
+  { <span class="pl-ent">"title"</span>: <span class="pl-s"><span class="pl-pds">"</span>去了某展<span class="pl-pds">"</span></span>, <span class="pl-ent">"url"</span>: <span class="pl-s"><span class="pl-pds">"</span>/post/xxx.html<span class="pl-pds">"</span></span> },
+  { <span class="pl-ent">"title"</span>: <span class="pl-s"><span class="pl-pds">"</span>纯文字活动没链接<span class="pl-pds">"</span></span> }
+]}</pre></div>
+<p><code class="notranslate">items</code> 里有 <code class="notranslate">url</code> 就是链接，没有就是纯文字，多个用「、」连起来。</p>
+<p>**书影游（media）**每条：</p>
+<div class="highlight highlight-source-json"><pre class="notranslate">{ <span class="pl-ent">"month"</span>: <span class="pl-s"><span class="pl-pds">"</span>Jan.<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"books"</span>: [<span class="pl-s"><span class="pl-pds">"</span>《书名》<span class="pl-pds">"</span></span>],
+  <span class="pl-ent">"watch"</span>: [<span class="pl-s"><span class="pl-pds">"</span>《电影名》<span class="pl-pds">"</span></span>],
+  <span class="pl-ent">"shows"</span>: [<span class="pl-s"><span class="pl-pds">"</span>《演出名》<span class="pl-pds">"</span></span>],
+  <span class="pl-ent">"games"</span>: [<span class="pl-s"><span class="pl-pds">"</span>游戏名<span class="pl-pds">"</span></span>] }</pre></div>
+<p>四个数组哪个空着就留 <code class="notranslate">[]</code>，显示出来就是空格。数组项也可以写成 <code class="notranslate">{"title":"x","url":"/post/x.html"}</code> 变成链接。</p>
+<p>**海报墙（posters）**每条：</p>
+<div class="highlight highlight-source-json"><pre class="notranslate">{ <span class="pl-ent">"title"</span>: <span class="pl-s"><span class="pl-pds">"</span>海报名<span class="pl-pds">"</span></span>, <span class="pl-ent">"image"</span>: <span class="pl-s"><span class="pl-pds">"</span>图片URL<span class="pl-pds">"</span></span>, <span class="pl-ent">"url"</span>: <span class="pl-s"><span class="pl-pds">"</span>/post/xxx.html<span class="pl-pds">"</span></span> }</pre></div>
+<p><code class="notranslate">image</code> 建议用你仓库里的图（比如 <code class="notranslate">https://raw.githubusercontent.com/luliy6/luliy6.github.io/main/static/img/xxx.jpg</code>）。<code class="notranslate">url</code> 可省略（省略就不可点击）。</p>
+<hr>
+<h2>四、归档页 Weekly / Other 怎么分</h2>
+<p>文章会自动按标签分到两个标签页：</p>
+<ul>
+<li><strong>Weekly</strong>：文章标签里有这些任意一个 → <code class="notranslate">Weekly</code>、<code class="notranslate">weekly</code>、<code class="notranslate">周记</code>、<code class="notranslate">周报</code>、<code class="notranslate">二十四节气</code></li>
+<li><strong>Other</strong>：不是 Weekly、也不是系统页的，都进 Other</li>
+<li><strong>不会出现的</strong>：标签是 <code class="notranslate">archive</code>/<code class="notranslate">chronicle</code>/<code class="notranslate">chronicle-data</code>/<code class="notranslate">about</code>/<code class="notranslate">book</code>/<code class="notranslate">favorites</code>/<code class="notranslate">stock</code>/<code class="notranslate">link</code>/<code class="notranslate">gallery</code> 这些系统页，会被自动排除</li>
+</ul>
+<p>归档页的文章列表是<strong>自动跟着你的 GitHub Issues 更新的</strong>，你正常发文章（带标签）就会自动出现，不用手动维护列表。</p>
+<hr>
+<h2>五、验收清单</h2>
+<p>部署后逐项检查：</p>
+<p><strong>Archives（<code class="notranslate">/archive.html</code>）</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 页面右上角有「Weekly | Other」两个标签，中间有竖线分隔</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 当前标签是高亮的（白色 + 发光）</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 点标签切换内容，页面不刷新</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 文章按年份分组，年份是青色发光大字</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 每行左边灰色日期、右边文章标题，鼠标悬停会高亮 + 右移</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 点标题能跳到对应文章</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 超过 10 篇时底部出现「&lt; Page 1 of N &gt;」分页</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 点分页换内容、不刷新页面</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 刷新页面后，还记得上次选的是 Weekly 还是 Other</li>
+</ul>
+<p><strong>Chronicle（<code class="notranslate">/chronicle.html</code>）</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 右上角有年份切换（2026 | 2025...），当前年份下面有青色短下划线</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 下面有分类切换（出游 / 书影游 / 海报墙），当前分类下面有品红下划线</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 切年份、切分类都不刷新页面</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 出游是 3 列表格（月份 / 城市 / 活动）</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 书影游是 5 列表格（月份 / 读书 / 观影 / 演出 / 游戏）</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 海报墙是网格（桌面 7 列、平板 5 列、手机 3 列），图片 2:3 比例</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 海报鼠标悬停时图片轻微放大 + 底部浮出标题</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 改 <code class="notranslate">chronicle-data</code> Issue 的内容后，刷新页面能看到更新（不用重新生成站点）</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 刷新页面后，还记得上次选的年份和分类</li>
+</ul>
+<p><strong>两个页面共通</strong></p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 整体是赛博朋克霓虹风，和你站里其它页面风格一致</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 手机上表格能横向滑动，不会撑破屏幕</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 数据读取失败时显示友好的错误提示，不会白屏</li>
+</ul>
+<hr>
+<h2>六、小提示</h2>
+<ul>
+<li>编年史的 repo 默认是 <code class="notranslate">luliy6/luliy6.github.io</code>，已经写死在代码里了，不用配置。如果以后换仓库，在网页 <code class="notranslate">&lt;head&gt;</code> 里加一句 <code class="notranslate">&lt;script&gt;window.LULIY_CHRONICLE_REPO='你的用户名/仓库名';&lt;/script&gt;</code> 就能覆盖。</li>
+<li>GitHub API 有调用频率限制（未登录每小时 60 次），正常浏览完全够用。万一触发限制，页面会自动回退到 Chronicle Issue 里内置的备用数据。</li>
+</ul></div>
+<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://luliy.me">ΔιάΝους</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if("05/30/2026"!=""){
+    var startSite=new Date("05/30/2026");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行 "+diffDay+" 天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","luliy6/luliy6.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script>function luliyWaitPost(){if(window._luliyInitPost){window._luliyInitPost();}else{setTimeout(luliyWaitPost,50);}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',luliyWaitPost);}else{luliyWaitPost();}</script>
+
+</html>
