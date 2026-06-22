@@ -1921,14 +1921,6 @@ body[data-luliy-theme="cyberpunk"] #postBody thead tr {
   color: var(--th-h2, #8250df) !important; text-align: left;
   border-bottom: 2px solid rgba(130,80,223,0.18);
   font-family: 'Noto Sans SC', sans-serif;
-  /* ── Sticky header: stays visible while scrolling long tables ── */
-  position: sticky;
-  top: 60px;                 /* below fixed navbar */
-  z-index: 5;
-  /* Sticky cells need an opaque-ish background of their own */
-  background: rgba(244,240,252,0.97);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 [data-color-mode="dark"] #postBody th {
   color: #cba6f7 !important; border-bottom-color: rgba(130,80,223,0.32);
@@ -3294,9 +3286,6 @@ body.luliy-hide-pagination .pagenav {
   white-space: nowrap; letter-spacing: 0.5px;
 }
 .luliy-chron-table td { color: rgba(230,225,250,0.9); }
-.luliy-chron-table tbody tr:hover td {
-  background: hsla(var(--luliy-glass-hue, 250), 50%, 50%, 0.08);
-}
 .luliy-chron-table a { color: var(--th-accent, #6ec7ff); text-decoration: none; }
 .luliy-chron-table a:hover { text-decoration: underline; color: #fff; }
 
