@@ -3266,6 +3266,13 @@ body.luliy-hide-pagination .pagenav {
   width: 100%; border-collapse: collapse; font-size: 14px;
   background: hsla(var(--luliy-glass-hue, 250), 45%, 9%, 0.35);
 }
+.luliy-chron-table td[rowspan],
+.luliy-chron-table .luliy-chron-month-cell {
+  vertical-align: top;
+  font-weight: 600;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,43,214,0.30);
+}
 .luliy-chron-table th, .luliy-chron-table td {
   border: 1px solid rgba(255,43,214,0.20);
   padding: 10px 14px; text-align: left; vertical-align: top;
