@@ -3322,7 +3322,7 @@
        ★ 同月份的多条记录合并月份格（rowspan），实现"Jan. 跨多行"效果。 */
     function renderTravel(list) {
       if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
-      var h = '<div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
+      var h = '<div class="luliy-chron-scroll-x"><div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
         '<th>\u6708\u4efd</th><th>\u57ce\u5e02</th><th>\u6d3b\u52a8</th></tr></thead><tbody>';
 
       function makeActs(row) {
@@ -3357,7 +3357,7 @@
         }
         i += span;
       }
-      h += '</tbody></table></div>';
+      h += '</tbody></table></div></div>';
       return h;
     }
 
@@ -3373,17 +3373,17 @@
           return esc(typeof it === 'object' ? (it.title || '') : String(it));
         }).join(' / ');
       }
-      var h = '<div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
+      var h = '<div class="luliy-chron-scroll-x"><div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
         '<th>\u6708\u4efd</th><th>\u8bfb\u4e66/\u6f2b\u753b</th><th>\u89c2\u5f71/\u5267\u96c6/\u756a\u5267</th>' +
         '<th>\u6f14\u51fa/\u653e\u6620</th><th>\u6e38\u620f/\u5b9e\u51b5</th></tr></thead><tbody>';
       list.forEach(function (row) {
-        h += '<tr><td>' + esc(row.month || '') + '</td>' +
+        h += '<tr><td class="luliy-chron-month-cell">' + esc(row.month || '') + '</td>' +
           '<td>' + cell(row.books) + '</td>' +
           '<td>' + cell(row.watch) + '</td>' +
           '<td>' + cell(row.shows) + '</td>' +
           '<td>' + cell(row.games) + '</td></tr>';
       });
-      h += '</tbody></table></div>';
+      h += '</tbody></table></div></div>';
       return h;
     }
 
