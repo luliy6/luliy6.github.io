@@ -521,8 +521,15 @@ body.luliy-reduce-motion #luliy-issues-link { transition: none; }
 }
 @media (max-width: 600px) {
   #luliy-subtitle {
-    top: 50px; left: 64px; font-size: 10px; letter-spacing: 1px;
-    max-width: calc(100vw - 80px); overflow: hidden; text-overflow: ellipsis;
+    /* 手机端：副标题下移到导航栏下方，避免和博客名/图标重叠导致误触 */
+    top: 58px;
+    left: 14px;
+    right: 14px;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    white-space: normal;     /* 允许折行，不裁剪 */
+    max-width: none;
+    overflow: visible;
   }
 }
 
@@ -2845,6 +2852,23 @@ body[data-luliy-theme="mono"] {
 [data-color-mode="dark"] #luliy-aplayer .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-loaded {
   background: rgba(255,255,255,0.18) !important;
 }
+/* ★ 修复夜间模式播放列表一黑一白问题：
+   APlayer 默认用 nth-child 给奇偶行设不同背景，强制全部统一为深色 */
+[data-color-mode="dark"] #luliy-aplayer .aplayer-list ol li,
+[data-color-mode="dark"] #luliy-aplayer .aplayer-list ol li:nth-child(even) {
+  background: rgba(14,10,28,0.92) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+[data-color-mode="dark"] #luliy-aplayer .aplayer-list ol li:hover,
+[data-color-mode="dark"] #luliy-aplayer .aplayer-list ol li.aplayer-list-cur {
+  background: rgba(var(--luliy-glass-hue, 250), 0%, 0%, 0.12) !important;
+  background: hsla(var(--luliy-glass-hue, 250), 40%, 30%, 0.30) !important;
+}
+[data-color-mode="dark"] #luliy-aplayer .aplayer-list-author,
+[data-color-mode="dark"] #luliy-aplayer .aplayer-list-index,
+[data-color-mode="dark"] #luliy-aplayer .aplayer-list-title { color: rgba(220,215,250,0.80) !important; }
+[data-color-mode="dark"] #luliy-aplayer .aplayer-list-cur .aplayer-list-title { color: var(--th-accent, #00e5ff) !important; }
+
 /* Theme accent on progress bar */
 #luliy-aplayer .aplayer-bar .aplayer-played { background: var(--th-accent, #e8a838) !important; }
 #luliy-aplayer .aplayer-volume-bar .aplayer-volume { background: var(--th-accent, #e8a838) !important; }
@@ -3323,7 +3347,81 @@ body.luliy-chronicle-takeover #luliy-post-footer-bar { display: none !important;
   aspect-ratio: 2 / 3; text-decoration: none !important;
   border: 1px solid rgba(255,43,214,0.22);
   background: hsla(var(--luliy-glass-hue, 250), 45%, 9%, 0.4);
+  cursor: pointer; padding: 0;   /* button reset */
+  -webkit-appearance: none; appearance: none;
 }
+
+/* ══════════════════════════════════════════════════════
+   海报灯箱（全屏展示 + 左右切换 + 触摸滑动）
+══════════════════════════════════════════════════════ */
+#luliy-lb {
+  position: fixed; inset: 0; z-index: 200000;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.25s, visibility 0.25s;
+}
+#luliy-lb.is-open { opacity: 1; visibility: visible; }
+body.luliy-lb-open { overflow: hidden; }
+
+.luliy-lb-bg {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.88);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.luliy-lb-img-wrap {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  max-width: min(90vw, 520px); max-height: 90vh;
+}
+.luliy-lb-img {
+  display: block; max-width: 100%; max-height: calc(90vh - 80px);
+  object-fit: contain; border-radius: 12px;
+  box-shadow: 0 8px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,43,214,0.25);
+  transition: opacity 0.2s;
+}
+.luliy-lb-cap {
+  margin-top: 12px; font-size: 14px; color: rgba(240,235,255,0.85);
+  text-align: center; letter-spacing: 0.5px;
+  text-shadow: 0 0 12px rgba(180,140,255,0.4);
+}
+.luliy-lb-link {
+  display: inline-block; margin-top: 8px;
+  font-size: 12px; color: var(--th-accent, #00e5ff);
+  text-decoration: none; letter-spacing: 0.5px;
+  opacity: 0.8; transition: opacity 0.15s;
+}
+.luliy-lb-link:hover { opacity: 1; text-decoration: underline; }
+
+/* 左右箭头 */
+.luliy-lb-prev, .luliy-lb-next {
+  position: absolute; z-index: 2; top: 50%; transform: translateY(-50%);
+  width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(255,255,255,0.10); color: #fff; font-size: 26px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: background 0.15s, transform 0.15s;
+}
+.luliy-lb-prev { left: 16px; }
+.luliy-lb-next { right: 16px; }
+.luliy-lb-prev:hover, .luliy-lb-next:hover { background: rgba(255,43,214,0.40); transform: translateY(-50%) scale(1.08); }
+.luliy-lb-prev:disabled, .luliy-lb-next:disabled { opacity: 0.2; cursor: default; }
+
+/* 关闭按钮 */
+.luliy-lb-close {
+  position: absolute; z-index: 2; top: 16px; right: 16px;
+  width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(255,255,255,0.12); color: #fff; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.luliy-lb-close:hover { background: rgba(255,43,214,0.45); }
+
+@media (max-width: 640px) {
+  .luliy-lb-prev { left: 4px; width: 38px; height: 38px; font-size: 20px; }
+  .luliy-lb-next { right: 4px; width: 38px; height: 38px; font-size: 20px; }
+  .luliy-lb-img-wrap { max-width: 96vw; }
+}
+
 .luliy-poster-img {
   position: absolute; inset: 0;
   background-size: cover; background-position: center;
