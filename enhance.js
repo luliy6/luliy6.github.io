@@ -2132,9 +2132,10 @@
               : (u.pathname.replace(/^\//, '').replace(/\.html?$/, '').replace(/\/$/, '') || '\u94fe\u63a5');
           } catch (e) { label = '\u94fe\u63a5'; }
         }
-        var svg = a.querySelector('svg');
+        /* ★ 不保留原生链接里的 SVG 图标（Gmeek 导航链接自带的箭头等），
+           抽屉链接只用圆点或空来保持简洁，不需要外部图标。 */
         out.push({ href: a.href || href, target: a.getAttribute('target') || (external ? '_blank' : ''),
-                   label: label, icon: svg ? svg.outerHTML : '', external: external });
+                   label: label, icon: '', external: external });
       });
       return out;
     }
@@ -2148,7 +2149,7 @@
           return h && !/\/about(\.html)?$|^about(\.html)?$/i.test(h) && !/rss|feed|atom/i.test(h);
         }).map(function (m) {
           return { href: m.absHref || m.href, target: m.target || '', label: m.label || '\u94fe\u63a5',
-                   icon: (m.html && /<svg/i.test(m.html)) ? m.html : '', external: m.target === '_blank' };
+                   icon: '', external: m.target === '_blank' };
         });
       }
       /* ★ 兜底②（bug修复）：上面两条都失败时，直接读 hero capsule 里
@@ -2165,7 +2166,7 @@
               href: a.href || a.getAttribute('href') || '',
               target: a.getAttribute('target') || '',
               label: (txt ? txt.textContent : a.textContent || '').trim() || a.getAttribute('aria-label') || '\u94fe\u63a5',
-              icon: svg ? svg.outerHTML : '',
+              icon: '',   /* ★ 不带箭头等 SVG 图标 */
               external: a.getAttribute('target') === '_blank'
             };
           }).filter(function (it) { return it.href; });
