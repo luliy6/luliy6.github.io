@@ -4388,7 +4388,7 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
 
 /* ── 抽屉本体（从左滑入）── */
 #luliy-drawer {
-  position: fixed; top: 0; left: 0; z-index: 10004;
+  position: fixed; top: 0; right: 0; z-index: 10004;
   width: 300px; max-width: 86vw; height: 100%;
   display: flex; flex-direction: column;
   will-change: transform;
@@ -4396,9 +4396,9 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
   background: hsla(var(--luliy-glass-hue, 250), 45%, 12%, var(--luliy-glass-opacity, 0.5));
   -webkit-backdrop-filter: blur(var(--luliy-glass-blur, 22px)) saturate(1.6);
   backdrop-filter: blur(var(--luliy-glass-blur, 22px)) saturate(1.6);
-  border-right: 1px solid rgba(255,255,255,0.10);
-  box-shadow: 6px 0 40px rgba(0,0,0,0.45);
-  transform: translateX(-105%);
+  border-left: 1px solid rgba(255,255,255,0.10);
+  box-shadow: -6px 0 40px rgba(0,0,0,0.45);
+  transform: translateX(105%);
   transition: transform 0.34s cubic-bezier(.4,.0,.2,1), background 0.3s;
   overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -4407,17 +4407,17 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
 
 /* ★ 抽屉样式跟文章正文面板一样，按当前选择的主题变化——
    每套主题给抽屉一个专属色相，模糊/透明度仍由液态玻璃滑块统一控制。 */
-body[data-luliy-theme="cyberpunk"] #luliy-drawer { background: hsla(320, 60%, 12%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(255,110,199,0.18); }
+body[data-luliy-theme="cyberpunk"] #luliy-drawer { background: hsla(320, 60%, 12%, var(--luliy-glass-opacity, 0.5)); border-left-color: rgba(255,110,199,0.18); }
 body[data-luliy-theme="default"]   #luliy-drawer,
-body:not([data-luliy-theme])       #luliy-drawer { background: hsla(265, 45%, 12%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(130,80,223,0.18); }
-body[data-luliy-theme="sakura"]    #luliy-drawer { background: hsla(338, 55%, 14%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(249,168,201,0.22); }
-body[data-luliy-theme="your-name"] #luliy-drawer { background: hsla(212, 60%, 12%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(116,192,252,0.20); }
-body[data-luliy-theme="space"]     #luliy-drawer { background: hsla(195, 65%, 9%,  var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(0,200,255,0.20); }
-body[data-luliy-theme="sunset"]    #luliy-drawer { background: hsla(36,  55%, 13%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(255,193,77,0.22); }
-body[data-luliy-theme="mono"]      #luliy-drawer { background: hsla(0,   0%,  10%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(255,255,255,0.14); }
+body:not([data-luliy-theme])       #luliy-drawer { background: hsla(265, 45%, 12%, var(--luliy-glass-opacity, 0.5)); border-left-color: rgba(130,80,223,0.18); }
+body[data-luliy-theme="sakura"]    #luliy-drawer { background: hsla(338, 55%, 14%, var(--luliy-glass-opacity, 0.5)); border-left-color: rgba(249,168,201,0.22); }
+body[data-luliy-theme="your-name"] #luliy-drawer { background: hsla(212, 60%, 12%, var(--luliy-glass-opacity, 0.5)); border-left-color: rgba(116,192,252,0.20); }
+body[data-luliy-theme="space"]     #luliy-drawer { background: hsla(195, 65%, 9%,  var(--luliy-glass-opacity, 0.5)); border-left-color: rgba(0,200,255,0.20); }
+body[data-luliy-theme="sunset"]    #luliy-drawer { background: hsla(36,  55%, 13%, var(--luliy-glass-opacity, 0.5)); border-left-color: rgba(255,193,77,0.22); }
+body[data-luliy-theme="mono"]      #luliy-drawer { background: hsla(0,   0%,  10%, var(--luliy-glass-opacity, 0.5)); border-left-color: rgba(255,255,255,0.14); }
 
 /* 白天 / 浅色外观时，抽屉换成对应的浅色玻璃质感 */
-[data-color-mode="light"] #luliy-drawer { background: hsla(var(--luliy-glass-hue, 250), 35%, 95%, var(--luliy-glass-opacity, 0.5)); border-right-color: rgba(0,0,0,0.08); }
+[data-color-mode="light"] #luliy-drawer { background: hsla(var(--luliy-glass-hue, 250), 35%, 95%, var(--luliy-glass-opacity, 0.5)); border-left-color: rgba(0,0,0,0.08); }
 [data-color-mode="light"] body[data-luliy-theme="default"]   #luliy-drawer,
 [data-color-mode="light"] body:not([data-luliy-theme])       #luliy-drawer { background: hsla(265, 40%, 95%, var(--luliy-glass-opacity, 0.5)); }
 [data-color-mode="light"] body[data-luliy-theme="sakura"]    #luliy-drawer { background: hsla(338, 70%, 96%, var(--luliy-glass-opacity, 0.5)); }
@@ -4463,7 +4463,7 @@ body[data-luliy-theme="mono"]      #luliy-drawer { background: hsla(0,   0%,  10
    （之前蒙版改透明后，光靠"点外面关闭"不够直观，加这个更保险） */
 #luliy-drawer-close {
   position: absolute;
-  top: 12px; right: 12px;
+  top: 12px; left: 12px;
   width: 30px; height: 30px;
   border-radius: 50%;
   border: none;
@@ -4712,3 +4712,346 @@ select, summary, label[for],
     cursor: auto !important;
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   极简系统 Minimal System
+   黑白灰 + 衬线大标题 + 账本式留白。配色/字体/留白/组件/布局
+   严格按规范。只在 body.luliy-minimal 下生效，绝不影响赛博系统。
+   ════════════════════════════════════════════════════════════ */
+body.luliy-minimal {
+  /* —— 配色 —— */
+  --min-bg: rgb(230, 225, 212);
+  --min-title: #1c1c1e;       /* 标题：近黑炭灰 */
+  --min-text: #3a3a3a;        /* 正文：深灰，不用纯黑 */
+  --min-muted: #8c8c8c;       /* 次要：中灰（日期/字数/未激活tab） */
+  --min-line: #3a3a3a;        /* 硬边框线：深灰近黑 */
+  --min-serif: 'Noto Serif SC', 'Songti SC', Georgia, 'Times New Roman', serif;
+  --min-sans: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  background: var(--min-bg) !important;
+  color: var(--min-text);
+  font-family: var(--min-sans);
+  zoom: 1 !important;
+}
+/* 极简系统下：彻底隐藏所有赛博系统的元素（保险，即使没初始化） */
+body.luliy-minimal #luliy-cyber-canvas,
+body.luliy-minimal #luliy-sakura-canvas,
+body.luliy-minimal #luliy-splash,
+body.luliy-minimal #luliy-brand,
+body.luliy-minimal #luliy-subtitle,
+body.luliy-minimal #luliy-issues-link,
+body.luliy-minimal #luliy-to-minimal,
+body.luliy-minimal #luliy-ham-btn,
+body.luliy-minimal #luliy-drawer,
+body.luliy-minimal #luliy-drawer-scrim,
+body.luliy-minimal #luliy-aplayer,
+body.luliy-minimal #luliy-ap-fab,
+body.luliy-minimal #luliy-ctrl-panel,
+body.luliy-minimal #luliy-ctrl-fab,
+body.luliy-minimal .luliy-cats,
+body.luliy-minimal #header,
+body.luliy-minimal #footer {
+  display: none !important;
+}
+body.luliy-minimal #content { background: transparent !important; }
+
+/* —— 顶部导航：Home / Archives / Chronicle / About —— */
+#luliy-min-nav {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 48px 0;
+  font-family: var(--min-sans);
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  color: var(--min-muted);
+}
+#luliy-min-nav a {
+  color: var(--min-title);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+#luliy-min-nav a:hover { opacity: 0.55; }
+.luliy-min-nav-sep { margin: 0 10px; color: var(--min-muted); }
+
+/* —— 系统切换按钮（极简 → 赛博） —— */
+#luliy-system-toggle {
+  position: fixed; top: 22px; right: 28px; z-index: 100;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--min-line);
+  background: transparent; color: var(--min-title);
+  font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+#luliy-system-toggle:hover { background: var(--min-title); color: var(--min-bg); }
+
+/* —— 赛博系统里「切到极简」的按钮（放沉思者图标旁） —— */
+#luliy-to-minimal {
+  position: fixed; top: 14px; z-index: 10002;
+  width: 30px; height: 44px;
+  background: transparent; border: none; cursor: pointer;
+  color: #fff; font-size: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 6px rgba(110,199,255,0.6));
+  transition: opacity 0.2s, transform 0.2s;
+}
+#luliy-to-minimal:hover { opacity: 1; transform: scale(1.15); }
+
+/* ════════ 主页：楼梯图 + 隐形热区 ════════ */
+#luliy-min-home {
+  position: fixed; inset: 0;
+  background: var(--min-bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+}
+.luliy-min-home-stage {
+  position: relative;
+  width: 100%; max-width: 1400px;
+  margin: 0 auto;
+}
+.luliy-min-home-img {
+  display: block; width: 100%; height: auto;
+  user-select: none; -webkit-user-drag: none;
+}
+.luliy-min-hot {
+  position: absolute;
+  display: block;
+  cursor: pointer;
+  /* 透明热区；hover 时极淡描边提示可点击 */
+  border-radius: 4px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.luliy-min-hot:hover {
+  background: rgba(28,28,30,0.04);
+  box-shadow: inset 0 0 0 1px rgba(28,28,30,0.18);
+}
+
+/* ════════ 普通文章 / about：极简排版 ════════ */
+body.luliy-min-article #content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 48px 120px;
+}
+body.luliy-min-article #postBody {
+  max-width: 680px;          /* 正文主列偏左、不居中 */
+  margin: 0;
+  margin-right: auto;
+  font-family: var(--min-sans);
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--min-text);
+}
+/* 文章标题：衬线、全站最大 */
+body.luliy-min-article #postBody h1 {
+  font-family: var(--min-serif);
+  font-weight: 700;
+  font-size: 34px;
+  color: var(--min-title);
+  letter-spacing: 1px;
+  margin: 18px 0 8px;
+  line-height: 1.3;
+}
+/* 二级小标题：无衬线加粗 + # 前缀 */
+body.luliy-min-article #postBody h2 {
+  font-family: var(--min-sans);
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--min-title);
+  margin: 48px 0 14px;
+}
+body.luliy-min-article #postBody h2::before { content: '# '; color: var(--min-muted); }
+body.luliy-min-article #postBody h3 {
+  font-family: var(--min-sans);
+  font-weight: 600; font-size: 16px; color: var(--min-title);
+  margin: 32px 0 10px;
+}
+body.luliy-min-article #postBody p {
+  margin: 0 0 26px;          /* 段落间留白明显大于行内行距 */
+  color: var(--min-text);
+}
+body.luliy-min-article #postBody a { color: var(--min-title); text-decoration: underline; text-underline-offset: 3px; }
+body.luliy-min-article #postBody img { max-width: 100%; border-radius: 2px; }
+/* 文章 meta（日期/字数）：最小、浅灰、等宽数字感 */
+body.luliy-min-article #postBody .luliy-readmeta,
+body.luliy-min-article .luliy-readmeta {
+  font-family: var(--min-sans);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px; color: var(--min-muted) !important;
+  margin-bottom: 40px;
+}
+
+/* —— 右侧悬浮目录（漂浮在留白区，不占主列） —— */
+#luliy-min-toc {
+  position: fixed;
+  top: 120px; right: max(40px, calc((100vw - 1100px) / 2 + 48px));
+  width: 220px; max-height: 70vh; overflow-y: auto;
+  font-family: var(--min-sans); font-size: 13px; line-height: 1.7;
+  z-index: 40;
+}
+#luliy-min-toc a { display: block; color: var(--min-muted); text-decoration: none; transition: color 0.15s; }
+#luliy-min-toc a:hover { color: var(--min-title); }
+#luliy-min-toc .luliy-min-toc-h1 { color: var(--min-text); font-weight: 600; margin-top: 10px; }
+#luliy-min-toc .luliy-min-toc-h2 { padding-left: 14px; }
+#luliy-min-toc .luliy-min-toc-h3 { padding-left: 28px; font-size: 12px; }
+@media (max-width: 1080px) {
+  #luliy-min-toc { display: none; }   /* 窄屏不显示边注目录 */
+  body.luliy-min-article #content { padding: 0 24px 80px; }
+}
+
+/* ════════ Archives / Chronicle / Book 的极简皮肤 ════════
+   复用现有结构，只覆盖颜色/字体/边框，做成黑白灰账本风。 */
+body.luliy-minimal .luliy-archives,
+body.luliy-minimal .luliy-chronicle,
+body.luliy-minimal .luliy-bookshelf {
+  max-width: 1100px; margin: 0 auto; padding: 8px 48px 80px;
+}
+/* 年份/分组大标题：衬线斜体数字感 */
+body.luliy-minimal .luliy-arch-title,
+body.luliy-minimal .luliy-chron-title,
+body.luliy-minimal .luliy-book-title,
+body.luliy-minimal .luliy-arch-year {
+  font-family: var(--min-serif) !important;
+  font-weight: 700 !important; font-style: italic;
+  color: var(--min-title) !important;
+  text-shadow: none !important;
+}
+body.luliy-minimal .luliy-arch-title,
+body.luliy-minimal .luliy-chron-title,
+body.luliy-minimal .luliy-book-title { font-size: 32px !important; font-style: normal; }
+body.luliy-minimal .luliy-arch-year {
+  font-size: 28px !important; margin: 56px 0 14px !important;   /* 年份间大留白 */
+}
+/* Tab：纯文字，激活态仅下划线 */
+body.luliy-minimal .luliy-arch-tab,
+body.luliy-minimal .luliy-chron-year-tab,
+body.luliy-minimal .luliy-chron-cat-tab {
+  background: none !important; color: var(--min-muted) !important;
+  text-shadow: none !important; font-family: var(--min-sans) !important;
+  border-radius: 0 !important;
+}
+body.luliy-minimal .luliy-arch-tab.is-active,
+body.luliy-minimal .luliy-chron-year-tab.is-active,
+body.luliy-minimal .luliy-chron-cat-tab.is-active {
+  color: var(--min-title) !important;
+}
+body.luliy-minimal .luliy-arch-tab.is-active::after,
+body.luliy-minimal .luliy-chron-year-tab.is-active::after,
+body.luliy-minimal .luliy-chron-cat-tab.is-active::after {
+  background: var(--min-title) !important; box-shadow: none !important;
+}
+body.luliy-minimal .luliy-arch-tabsep { background: var(--min-muted) !important; }
+/* 归档列表：无卡片无分割线，靠两栏对齐 + 行距 */
+body.luliy-minimal .luliy-arch-row { background: none !important; }
+body.luliy-minimal .luliy-arch-row:hover { background: rgba(28,28,30,0.04) !important; transform: none !important; }
+body.luliy-minimal .luliy-arch-date { color: var(--min-muted) !important; font-variant-numeric: tabular-nums; }
+body.luliy-minimal .luliy-arch-name { color: var(--min-title) !important; }
+body.luliy-minimal .luliy-arch-row:hover .luliy-arch-date,
+body.luliy-minimal .luliy-arch-row:hover .luliy-arch-name { color: var(--min-title) !important; }
+body.luliy-minimal .luliy-arch-header,
+body.luliy-minimal .luliy-chron-header { border-bottom: none !important; }
+/* 分页 */
+body.luliy-minimal .luliy-arch-pgbtn {
+  background: none !important; border: 1px solid var(--min-line) !important;
+  color: var(--min-title) !important; box-shadow: none !important;
+}
+body.luliy-minimal .luliy-arch-pgbtn:hover:not(:disabled) {
+  background: var(--min-title) !important; color: var(--min-bg) !important;
+}
+body.luliy-minimal .luliy-arch-pginfo { color: var(--min-muted) !important; font-variant-numeric: tabular-nums; }
+
+/* 编年史表格：全站唯一硬边框组件，1px 直角网格，无底色无斑马纹 */
+body.luliy-minimal .luliy-chron-table { background: transparent !important; }
+body.luliy-minimal .luliy-chron-table th,
+body.luliy-minimal .luliy-chron-table td {
+  border: 1px solid var(--min-line) !important;
+  color: var(--min-text) !important;
+  background: transparent !important;
+}
+body.luliy-minimal .luliy-chron-table th {
+  font-weight: 700 !important; color: var(--min-title) !important;
+  background: transparent !important;
+}
+body.luliy-minimal .luliy-chron-month-cell {
+  border-right: 1px solid var(--min-line) !important;
+  color: var(--min-title) !important; font-weight: 700 !important;
+}
+body.luliy-minimal .luliy-chron-table a { color: var(--min-title) !important; text-decoration: underline; }
+/* 海报墙：去霓虹，简单灰边框 */
+body.luliy-minimal .luliy-poster-item {
+  background: rgba(28,28,30,0.04) !important; border: 1px solid var(--min-line) !important;
+}
+body.luliy-minimal .luliy-poster-title { background: linear-gradient(to top, rgba(28,28,30,0.8), transparent) !important; }
+
+/* 书架：去木质/霓虹，做成极简层架 */
+body.luliy-minimal .luliy-bookcase {
+  background: transparent !important; border: none !important;
+  box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  gap: 40px !important;
+}
+body.luliy-minimal .luliy-shelf-plaque {
+  background: none !important; color: var(--min-title) !important;
+  box-shadow: none !important; font-family: var(--min-serif) !important;
+  font-style: italic; font-size: 18px !important; padding-left: 0 !important; margin-left: 0 !important;
+}
+body.luliy-minimal .luliy-shelf-count { color: var(--min-muted) !important; }
+body.luliy-minimal .luliy-shelf-board {
+  background: var(--min-line) !important; opacity: 1 !important; height: 1px !important; box-shadow: none !important;
+}
+body.luliy-minimal .luliy-spine {
+  background: rgba(28,28,30,0.06) !important;
+  color: var(--min-title) !important;
+  box-shadow: inset 0 0 0 1px var(--min-line) !important;
+}
+body.luliy-minimal .luliy-spine:hover {
+  box-shadow: inset 0 0 0 1px var(--min-line), 0 8px 16px rgba(0,0,0,0.12) !important;
+}
+body.luliy-minimal .luliy-spine-title { color: var(--min-title) !important; text-shadow: none !important; }
+body.luliy-minimal .luliy-spine-tip {
+  background: var(--min-bg) !important; border: 1px solid var(--min-line) !important; color: var(--min-text) !important;
+}
+body.luliy-minimal .luliy-spine-note { color: var(--min-muted) !important; }
+body.luliy-minimal .luliy-flat-book { color: var(--min-title) !important; background: rgba(28,28,30,0.08) !important; }
+body.luliy-minimal .luliy-reading-label { color: var(--min-muted) !important; }
+body.luliy-minimal .luliy-book-sub,
+body.luliy-minimal .luliy-shelf-empty { color: var(--min-muted) !important; }
+
+@media (max-width: 720px) {
+  #luliy-min-nav { padding: 20px 20px 0; }
+  body.luliy-minimal .luliy-archives,
+  body.luliy-minimal .luliy-chronicle,
+  body.luliy-minimal .luliy-bookshelf { padding: 8px 20px 60px; }
+}
+
+/* ── 极简系统：强制压过赛博系统的文章面板/标题装饰/文字色 ── */
+body.luliy-minimal #postBody,
+body.luliy-min-article #postBody {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.luliy-min-article #postBody h1,
+body.luliy-min-article #postBody h2,
+body.luliy-min-article #postBody h3 {
+  color: #1c1c1e !important;
+  border: none !important;
+  border-left: none !important;
+  padding-left: 0 !important;
+  background: none !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  text-shadow: none !important;
+}
+body.luliy-min-article #postBody h1 {
+  font-family: 'Noto Serif SC', Georgia, serif !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+}
+body.luliy-min-article #postBody p,
+body.luliy-min-article #postBody li {
+  color: #3a3a3a !important;
+  -webkit-text-fill-color: #3a3a3a !important;
+}
+/* 去掉赛博系统给 h2 加的竖条/色块装饰 */
+body.luliy-min-article #postBody h2::after,
+body.luliy-min-article #postBody h2::marker { content: none !important; }
