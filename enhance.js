@@ -2434,6 +2434,30 @@
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(positionThinkerIcon).catch(function () {});
       }
+
+      /* ★ 切换到极简系统的按钮：放在沉思者图标右边 */
+      if (!document.getElementById('luliy-to-minimal')) {
+        var toMin = document.createElement('button');
+        toMin.id = 'luliy-to-minimal';
+        toMin.type = 'button';
+        toMin.title = '\u5207\u6362\u5230\u7b80\u6d01\u7cfb\u7edf';   /* 切换到简洁系统 */
+        toMin.textContent = '\u25C7';   /* ◇ 空心菱形，区别于极简里的实心 ◈ */
+        toMin.addEventListener('click', function () {
+          if (root._luliySetSystem) root._luliySetSystem('minimal');
+        });
+        document.body.appendChild(toMin);
+        function positionToMin() {
+          var t = document.getElementById('luliy-issues-link');
+          if (!t) return;
+          var r = t.getBoundingClientRect();
+          toMin.style.left = (r.right + 8) + 'px';
+        }
+        positionToMin();
+        window.addEventListener('resize', positionToMin, { passive: true });
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(positionToMin).catch(function () {});
+        }
+      }
     }
     /* ★ 副标题：只在首页显示（文章页等其它页面顶部已经比较拥挤，
        不重复放）。位置紧贴在 ΔιάΝους 正下方。 */
@@ -5631,7 +5655,121 @@
     }
   }
 
+  /* ============================================================
+     极简系统 Minimal System —— 与赛博朋克系统并存，可切换
+     · localStorage 键 luliy-system：'cyber'(默认) / 'minimal'
+     · 极简系统下不加载任何赛博特效，走自己的黑白灰衬线排版。
+     ============================================================ */
+  var SYSTEM_KEY = 'luliy-system';
+  var MINIMAL_HOME_IMG = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/happy.png';
+
+  function getSystem() {
+    try { return localStorage.getItem(SYSTEM_KEY) === 'minimal' ? 'minimal' : 'cyber'; }
+    catch (e) { return 'cyber'; }
+  }
+  function setSystem(sys) {
+    try { localStorage.setItem(SYSTEM_KEY, sys); } catch (e) {}
+    location.reload();
+  }
+  root._luliySetSystem = setSystem;
+  root._luliyGetSystem = getSystem;
+
+  function initMinimalSystem() {
+    document.body.classList.add('luliy-minimal');
+    try { document.documentElement.style.zoom = '1'; } catch (e) {}
+
+    if (!isIndexPage()) buildMinimalNav();
+    buildSystemToggle();
+
+    if (isIndexPage()) {
+      renderMinimalHome();
+    } else if (isChroniclePage()) {
+      safe(initChroniclePage, 'chronicle');
+    } else if (isBookPage()) {
+      safe(initBookPage, 'book');
+    } else if (isArchivePage()) {
+      safe(initArchivesPage, 'archives');
+    } else {
+      renderMinimalArticle();
+    }
+  }
+
+  function buildMinimalNav() {
+    if (document.getElementById('luliy-min-nav')) return;
+    var nav = document.createElement('nav');
+    nav.id = 'luliy-min-nav';
+    var links = [
+      { label: 'Home', href: '/' },
+      { label: 'Archives', href: '/archive.html' },
+      { label: 'Chronicle', href: '/chronicle.html' },
+      { label: 'About', href: '/about.html' }
+    ];
+    nav.innerHTML = links.map(function (l) {
+      return '<a href="' + l.href + '">' + l.label + '</a>';
+    }).join('<span class="luliy-min-nav-sep">/</span>');
+    document.body.insertBefore(nav, document.body.firstChild);
+  }
+
+  function buildSystemToggle() {
+    if (document.getElementById('luliy-system-toggle')) return;
+    var btn = document.createElement('button');
+    btn.id = 'luliy-system-toggle';
+    btn.type = 'button';
+    btn.title = '\u5207\u6362\u5230\u8d5b\u535a\u670b\u514b\u7cfb\u7edf';
+    btn.textContent = '\u25C8';
+    btn.addEventListener('click', function () { setSystem('cyber'); });
+    document.body.appendChild(btn);
+  }
+
+  function renderMinimalHome() {
+    var wrap = document.createElement('div');
+    wrap.id = 'luliy-min-home';
+    var hot = [
+      { href: '/about.html',     label: 'About',     style: 'left:74%;top:54%;width:8%;height:34%;' },
+      { href: '/book.html',      label: 'Book',      style: 'left:84%;top:42%;width:9%;height:38%;' },
+      { href: '/archive.html',   label: 'Archives',  style: 'left:12%;top:8%;width:58%;height:62%;' },
+      { href: '/chronicle.html', label: 'Chronicle', style: 'left:55%;top:62%;width:6%;height:34%;' }
+    ];
+    var hotHtml = hot.map(function (h) {
+      return '<a class="luliy-min-hot" href="' + h.href + '" aria-label="' + h.label +
+        '" style="' + h.style + '"></a>';
+    }).join('');
+    wrap.innerHTML =
+      '<div class="luliy-min-home-stage">' +
+        '<img class="luliy-min-home-img" src="' + MINIMAL_HOME_IMG + '" alt="" draggable="false">' +
+        hotHtml +
+      '</div>';
+    document.body.appendChild(wrap);
+  }
+
+  function renderMinimalArticle() {
+    document.body.classList.add('luliy-min-article');
+    var pb = document.getElementById('postBody');
+    if (!pb) return;
+    var heads = pb.querySelectorAll('h1, h2, h3');
+    if (heads.length >= 2) {
+      var toc = document.createElement('nav');
+      toc.id = 'luliy-min-toc';
+      var html = '';
+      heads.forEach(function (h, i) {
+        if (!h.id) h.id = 'luliy-min-h-' + i;
+        var lvl = h.tagName === 'H1' ? 'h1' : (h.tagName === 'H2' ? 'h2' : 'h3');
+        var prefix = lvl === 'h1' ? '#' : '\u2022';
+        html += '<a class="luliy-min-toc-' + lvl + '" href="#' + h.id + '">' +
+          prefix + ' ' + esc(h.textContent) + '</a>';
+      });
+      toc.innerHTML = html;
+      document.body.appendChild(toc);
+    }
+  }
+
   ready(function () {
+    /* ★ 极简系统拦截：在任何赛博初始化之前判断。命中则走极简分支并 return。 */
+    if (getSystem() === 'minimal') {
+      safe(initMinimalSystem, 'minimalSystem');
+      return;
+    }
+
     /* ★ 大改后：全站锁定「抽屉导航」，首屏直接应用，避免两套导航闪现 */
     try {
       document.body.classList.remove('luliy-nav-hero');
