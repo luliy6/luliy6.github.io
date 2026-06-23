@@ -5676,7 +5676,12 @@
 
   function initMinimalSystem() {
     document.body.classList.add('luliy-minimal');
-    try { document.documentElement.style.zoom = '1'; } catch (e) {}
+    /* ★ 移除赛博主题属性，切断所有 body[data-luliy-theme=...] 规则，
+       否则赛博的表格青色表头/粉色标题等会继续泄漏进极简页。 */
+    try {
+      document.body.removeAttribute('data-luliy-theme');
+      document.documentElement.style.zoom = '1';
+    } catch (e) {}
 
     if (!isIndexPage()) buildMinimalNav();
     buildSystemToggle();
@@ -5722,22 +5727,25 @@
   }
 
   function renderMinimalHome() {
+    /* 主页：背景铺满 + 楼梯图居中 + 顶部一排文字导航（在切换按钮左边） */
+    var nav = document.createElement('nav');
+    nav.id = 'luliy-min-home-nav';
+    var links = [
+      { href: '/archive.html',   label: 'Archives' },
+      { href: '/chronicle.html', label: 'Chronicle' },
+      { href: '/book.html',      label: 'Book' },
+      { href: '/about.html',     label: 'About' }
+    ];
+    nav.innerHTML = links.map(function (l) {
+      return '<a href="' + l.href + '">' + l.label + '</a>';
+    }).join('<span class="luliy-min-nav-sep">/</span>');
+    document.body.appendChild(nav);
+
     var wrap = document.createElement('div');
     wrap.id = 'luliy-min-home';
-    var hot = [
-      { href: '/about.html',     label: 'About',     style: 'left:74%;top:54%;width:8%;height:34%;' },
-      { href: '/book.html',      label: 'Book',      style: 'left:84%;top:42%;width:9%;height:38%;' },
-      { href: '/archive.html',   label: 'Archives',  style: 'left:12%;top:8%;width:58%;height:62%;' },
-      { href: '/chronicle.html', label: 'Chronicle', style: 'left:55%;top:62%;width:6%;height:34%;' }
-    ];
-    var hotHtml = hot.map(function (h) {
-      return '<a class="luliy-min-hot" href="' + h.href + '" aria-label="' + h.label +
-        '" style="' + h.style + '"></a>';
-    }).join('');
     wrap.innerHTML =
       '<div class="luliy-min-home-stage">' +
         '<img class="luliy-min-home-img" src="' + MINIMAL_HOME_IMG + '" alt="" draggable="false">' +
-        hotHtml +
       '</div>';
     document.body.appendChild(wrap);
   }
