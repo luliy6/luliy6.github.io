@@ -5055,3 +5055,342 @@ body.luliy-min-article #postBody li {
 /* 去掉赛博系统给 h2 加的竖条/色块装饰 */
 body.luliy-min-article #postBody h2::after,
 body.luliy-min-article #postBody h2::marker { content: none !important; }
+
+/* ════════════════════════════════════════════════════════════
+   极简系统 v2 总清洗 —— 彻底压掉所有泄漏的赛博样式
+   规则：背景全屏 RGB(230,225,212)、文字纯黑/灰、表格无底色、
+   md 装饰色全清、面板透明、目录在右。优先级用 html/body 双重限定。
+   ════════════════════════════════════════════════════════════ */
+
+/* —— 1. 背景全屏铺满（html + body + 所有容器都强制纯色） —— */
+html:has(body.luliy-minimal),
+html:has(body.luliy-minimal) body.luliy-minimal {
+  background: rgb(230,225,212) !important;
+  background-image: none !important;
+}
+body.luliy-minimal,
+body.luliy-minimal #content,
+body.luliy-minimal .markdown-body,
+body.luliy-minimal #postBody,
+body.luliy-minimal .SideNav,
+body.luliy-minimal main,
+body.luliy-minimal article {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* body 本体保留底色（作为全屏背景） */
+body.luliy-minimal { background: rgb(230,225,212) !important; }
+
+/* —— 2. 所有文字强制黑/灰，清除一切发光、渐变、彩色 —— */
+body.luliy-minimal #postBody,
+body.luliy-minimal #postBody *,
+body.luliy-minimal .luliy-archives *,
+body.luliy-minimal .luliy-chronicle *,
+body.luliy-minimal .luliy-bookshelf * {
+  text-shadow: none !important;
+}
+/* md 正文里所有元素：统一深灰，标题近黑 */
+body.luliy-min-article #postBody,
+body.luliy-min-article #postBody p,
+body.luliy-min-article #postBody li,
+body.luliy-min-article #postBody span,
+body.luliy-min-article #postBody td,
+body.luliy-min-article #postBody div,
+body.luliy-min-article #postBody strong,
+body.luliy-min-article #postBody em,
+body.luliy-min-article #postBody blockquote {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  background: transparent !important;
+}
+body.luliy-min-article #postBody h1,
+body.luliy-min-article #postBody h2,
+body.luliy-min-article #postBody h3,
+body.luliy-min-article #postBody h4 {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+}
+/* md 链接：黑色带下划线 */
+body.luliy-min-article #postBody a {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  text-decoration: underline !important;
+}
+/* md 里的 blockquote / 代码块 / 高亮：去掉所有底色和彩边，变成极简 */
+body.luliy-min-article #postBody blockquote {
+  background: transparent !important;
+  border: none !important;
+  border-left: 2px solid #3a3a3a !important;
+  padding-left: 16px !important;
+  margin-left: 0 !important;
+}
+body.luliy-min-article #postBody pre,
+body.luliy-min-article #postBody code {
+  background: rgba(28,28,30,0.05) !important;
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+body.luliy-min-article #postBody pre * {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  text-shadow: none !important;
+  background: transparent !important;
+}
+
+/* —— 3. 编年史表格：全屏背景下无底色、纯黑细线网格、文字纯黑 —— */
+body.luliy-minimal .luliy-chron-table,
+body.luliy-minimal .luliy-chron-table thead,
+body.luliy-minimal .luliy-chron-table tbody,
+body.luliy-minimal .luliy-chron-table tr {
+  background: transparent !important;
+}
+body.luliy-minimal .luliy-chron-table th,
+body.luliy-minimal .luliy-chron-table td,
+body.luliy-minimal .luliy-chron-month-cell {
+  background: transparent !important;
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  border: 1px solid #3a3a3a !important;
+  text-shadow: none !important;
+}
+body.luliy-minimal .luliy-chron-table th { font-weight: 700 !important; }
+body.luliy-minimal .luliy-chron-table a {
+  color: #1c1c1e !important; -webkit-text-fill-color: #1c1c1e !important;
+  text-decoration: underline !important;
+}
+/* 表格外层那个圆角玻璃容器也去掉 */
+body.luliy-minimal .luliy-chron-tablewrap,
+body.luliy-minimal .luliy-chron-scroll-x {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* —— 4. 归档列表：文字纯黑/灰，无底色，激活行不要色块 —— */
+body.luliy-minimal .luliy-arch-row,
+body.luliy-minimal .luliy-arch-row * {
+  background: transparent !important;
+  text-shadow: none !important;
+}
+body.luliy-minimal .luliy-arch-name { color: #1c1c1e !important; -webkit-text-fill-color:#1c1c1e !important; }
+body.luliy-minimal .luliy-arch-date { color: #8c8c8c !important; -webkit-text-fill-color:#8c8c8c !important; }
+body.luliy-minimal .luliy-arch-row:hover { background: rgba(28,28,30,0.05) !important; }
+/* 标题 Chronicle/Archives：去掉粉色渐变和下划线发光，改纯黑衬线 */
+body.luliy-minimal .luliy-arch-title,
+body.luliy-minimal .luliy-chron-title,
+body.luliy-minimal .luliy-book-title {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  background: none !important;
+  text-shadow: none !important;
+  border-bottom: none !important;
+}
+/* 标题下面那条粉色装饰线删除 */
+body.luliy-minimal .luliy-arch-title::after,
+body.luliy-minimal .luliy-chron-title::after,
+body.luliy-minimal .luliy-book-title::after { display: none !important; }
+
+/* —— 5. Tab 文字（事件/书影音/海报墙、年份、Weekly|Other）：灰→黑，激活仅下划线 —— */
+body.luliy-minimal .luliy-arch-tab,
+body.luliy-minimal .luliy-chron-cat-tab,
+body.luliy-minimal .luliy-chron-year-tab {
+  color: #8c8c8c !important; -webkit-text-fill-color: #8c8c8c !important;
+  text-shadow: none !important; background: none !important;
+}
+body.luliy-minimal .luliy-arch-tab.is-active,
+body.luliy-minimal .luliy-chron-cat-tab.is-active,
+body.luliy-minimal .luliy-chron-year-tab.is-active {
+  color: #1c1c1e !important; -webkit-text-fill-color: #1c1c1e !important;
+}
+body.luliy-minimal .luliy-arch-tab.is-active::after,
+body.luliy-minimal .luliy-chron-cat-tab.is-active::after,
+body.luliy-minimal .luliy-chron-year-tab.is-active::after {
+  background: #1c1c1e !important; box-shadow: none !important;
+}
+
+/* —— 6. 目录固定在右侧（之前可能被覆盖），切换按钮左边留给主页导航 —— */
+#luliy-min-toc {
+  position: fixed !important;
+  top: 110px !important;
+  right: 40px !important;
+  left: auto !important;
+  width: 200px !important;
+  text-align: left;
+  z-index: 60 !important;
+}
+#luliy-min-toc a { color: #8c8c8c !important; -webkit-text-fill-color:#8c8c8c !important; }
+#luliy-min-toc a:hover,
+#luliy-min-toc .luliy-min-toc-h1 { color: #1c1c1e !important; -webkit-text-fill-color:#1c1c1e !important; }
+
+/* —— 7. 主页：背景全屏 + 图片居中 + 顶部文字导航（切换按钮左边） —— */
+#luliy-min-home {
+  position: fixed !important; inset: 0 !important;
+  background: rgb(230,225,212) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  z-index: 50 !important;
+}
+#luliy-min-home-nav {
+  position: fixed; top: 24px; right: 76px; z-index: 120;
+  font-family: var(--min-sans); font-size: 14px; letter-spacing: 0.5px;
+  color: #8c8c8c;
+}
+#luliy-min-home-nav a { color: #1c1c1e; text-decoration: none; }
+#luliy-min-home-nav a:hover { opacity: 0.55; }
+#luliy-min-home-nav .luliy-min-nav-sep { margin: 0 8px; color: #8c8c8c; }
+
+/* —— 8. 切换按钮：极简风、放右上角 —— */
+#luliy-system-toggle {
+  background: transparent !important;
+  border: 1px solid #3a3a3a !important;
+  color: #1c1c1e !important;
+}
+#luliy-system-toggle:hover { background: #1c1c1e !important; color: rgb(230,225,212) !important; }
+
+@media (max-width: 1080px) {
+  #luliy-min-toc { display: none !important; }
+}
+@media (max-width: 720px) {
+  #luliy-min-home-nav { right: 64px; font-size: 12px; }
+  #luliy-min-home-nav .luliy-min-nav-sep { margin: 0 5px; }
+}
+
+/* —— v2 补丁：标题/表头颜色 + 表格外框，更强覆盖 —— */
+body.luliy-minimal .luliy-chron-title,
+body.luliy-minimal .luliy-arch-title,
+body.luliy-minimal .luliy-book-title {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  background: none !important; background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+  font-family: 'Noto Serif SC', Georgia, serif !important;
+  font-style: normal !important;
+}
+/* 表头文字纯黑（去青色） */
+body.luliy-minimal .luliy-chron-table th,
+body.luliy-minimal .luliy-chron-table thead th,
+body.luliy-minimal .luliy-chron-table thead td {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+}
+/* 表格内容文字纯黑（去淡蓝） */
+body.luliy-minimal .luliy-chron-table tbody td,
+body.luliy-minimal .luliy-chron-table tbody th,
+body.luliy-minimal .luliy-chron-month-cell {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+}
+/* 表格最外层容器：去圆角去描边去阴影 */
+body.luliy-minimal .luliy-chron-tablewrap,
+body.luliy-minimal .luliy-chron-scroll-x,
+body.luliy-minimal .luliy-chronicle .luliy-chron-body {
+  border: none !important; border-radius: 0 !important;
+  box-shadow: none !important; background: transparent !important;
+  outline: none !important;
+}
+/* 表格本身直角无圆角 */
+body.luliy-minimal .luliy-chron-table { border-radius: 0 !important; overflow: visible !important; }
+
+/* ════════ v3 最终覆盖：用 [data-color-mode] 前缀提足优先级 ════════
+   赛博的泄漏规则多是 [data-color-mode="dark"] body:not([data-luliy-theme]) #xxx，
+   优先级很高。极简覆盖必须同等或更高，这里统一加 [data-color-mode] 前缀。 */
+
+/* 文章面板：彻底透明（压掉 :not([data-luliy-theme]) #postBody 的深色面板） */
+[data-color-mode] body.luliy-minimal #postBody,
+[data-color-mode] body.luliy-minimal .markdown-body,
+[data-color-mode] body.luliy-minimal #content {
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Chronicle/Archives/Book 标题：纯黑衬线（压掉粉色渐变） */
+[data-color-mode] body.luliy-minimal .luliy-chron-title,
+[data-color-mode] body.luliy-minimal .luliy-arch-title,
+[data-color-mode] body.luliy-minimal .luliy-book-title {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  font-family: 'Noto Serif SC', Georgia, serif !important;
+  text-shadow: none !important;
+}
+
+/* 表头 + 表格内容：纯黑（压掉青色/淡蓝） */
+[data-color-mode] body.luliy-minimal .luliy-chron-table th,
+[data-color-mode] body.luliy-minimal .luliy-chron-table td,
+[data-color-mode] body.luliy-minimal .luliy-chron-month-cell,
+[data-color-mode] body.luliy-minimal .luliy-chron-table tbody td,
+[data-color-mode] body.luliy-minimal .luliy-chron-table thead th {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  background: transparent !important;
+  border: 1px solid #3a3a3a !important;
+  text-shadow: none !important;
+}
+
+/* 归档列表文字 */
+[data-color-mode] body.luliy-minimal .luliy-arch-name { color:#1c1c1e !important; -webkit-text-fill-color:#1c1c1e !important; }
+[data-color-mode] body.luliy-minimal .luliy-arch-date { color:#8c8c8c !important; -webkit-text-fill-color:#8c8c8c !important; }
+
+/* Tab 文字 */
+[data-color-mode] body.luliy-minimal .luliy-arch-tab,
+[data-color-mode] body.luliy-minimal .luliy-chron-cat-tab,
+[data-color-mode] body.luliy-minimal .luliy-chron-year-tab { color:#8c8c8c !important; -webkit-text-fill-color:#8c8c8c !important; }
+[data-color-mode] body.luliy-minimal .luliy-arch-tab.is-active,
+[data-color-mode] body.luliy-minimal .luliy-chron-cat-tab.is-active,
+[data-color-mode] body.luliy-minimal .luliy-chron-year-tab.is-active { color:#1c1c1e !important; -webkit-text-fill-color:#1c1c1e !important; }
+
+/* ════════ v4 终极方案：极简模式下重定义所有主题色变量为黑/灰 ════════
+   赛博的标题/表头/链接大量用 var(--th-accent) var(--th-h1) 等，
+   与其逐个覆盖，不如直接把这些变量在极简模式下全设成黑灰，
+   所有引用它们的地方自动变成极简配色。这是最干净的根治。 */
+[data-color-mode] body.luliy-minimal,
+body.luliy-minimal {
+  --th-accent: #1c1c1e !important;
+  --th-accent-soft: rgba(28,28,30,0.08) !important;
+  --th-accent-hover: rgba(28,28,30,0.15) !important;
+  --th-h1: #1c1c1e !important;
+  --th-h2: #1c1c1e !important;
+  --th-h3: #1c1c1e !important;
+  --th-h4: #1c1c1e !important;
+  --th-strong: #1c1c1e !important;
+  --th-h1-border: none !important;
+  --th-h2-bl: none !important;
+  --th-h2-bg: transparent !important;
+  --luliy-glass-opacity: 0 !important;
+}
+
+/* ════════ v5 暴力覆盖：html 前缀拉满特异性，强制标题/表头黑色 ════════ */
+html body.luliy-minimal .luliy-chron-title,
+html body.luliy-minimal .luliy-arch-title,
+html body.luliy-minimal .luliy-book-title,
+html body.luliy-minimal .luliy-chron-table th,
+html body.luliy-minimal .luliy-chron-table thead th,
+html body.luliy-minimal .luliy-chron-table td,
+html body.luliy-minimal .luliy-chron-month-cell,
+html body.luliy-minimal .luliy-arch-year {
+  color: #1c1c1e !important;
+  -webkit-text-fill-color: #1c1c1e !important;
+  text-fill-color: #1c1c1e !important;
+  background: transparent !important;
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  text-shadow: none !important;
+}
+html body.luliy-minimal .luliy-chron-title,
+html body.luliy-minimal .luliy-arch-title,
+html body.luliy-minimal .luliy-book-title,
+html body.luliy-minimal .luliy-arch-year {
+  font-family: 'Noto Serif SC', Georgia, serif !important;
+}
