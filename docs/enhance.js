@@ -974,8 +974,12 @@
 
     var canvas = document.createElement('canvas');
     canvas.id = 'luliy-cyber-canvas';
+    /* ★ z-index 从 -1 提到 9990：让点击爆炸 / 鼠标拖尾显示在文章面板之上
+       （之前在最底层被面板盖住看不到）。仍 pointer-events:none 不挡点击，
+       且低于导航(10002)/抽屉，不会盖住交互控件。背景粒子很稀疏半透明，
+       飘在文字上方视觉影响很小。 */
     canvas.setAttribute('style',
-      'position:fixed;left:0;top:0;pointer-events:none;z-index:-1;');
+      'position:fixed;left:0;top:0;pointer-events:none;z-index:9990;');
     document.body.appendChild(canvas);
     _cyberCanvas = canvas;
     var ctx = canvas.getContext('2d');
@@ -1140,12 +1144,16 @@
       ctx.fill(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
     };
     function onMouseMove(e) {
-      mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true;
+      /* ★ zoom 校正：页面 html{zoom:1.1}，clientX/Y 要除以 zoom 才是 canvas 实际坐标，
+         否则越往右偏差越大（右边拖尾和鼠标有距离）。 */
+      var p = zoomPos(e.clientX, e.clientY);
+      mouse.x = p.x; mouse.y = p.y; mouse.active = true;
       if (Math.random() > 0.5 && trailParticles.length < 80) trailParticles.push(new TrailParticle(mouse.x, mouse.y));
     }
     function onTouchMove(e) {
       var t = e.touches[0]; if (!t) return;
-      mouse.x = t.clientX; mouse.y = t.clientY; mouse.active = true;
+      var p = zoomPos(t.clientX, t.clientY);
+      mouse.x = p.x; mouse.y = p.y; mouse.active = true;
       trailParticles.push(new TrailParticle(mouse.x, mouse.y));
     }
     window.addEventListener('mousemove', onMouseMove);
@@ -1216,7 +1224,8 @@
     }
     function onTouchStart(e) {
       var t = e.touches[0]; if (!t) return;
-      spawnClickEffect(t.clientX, t.clientY);
+      var p = zoomPos(t.clientX, t.clientY);
+      spawnClickEffect(p.x, p.y);
     }
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('touchstart', onTouchStart, { passive: true });

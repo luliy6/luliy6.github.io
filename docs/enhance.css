@@ -409,7 +409,7 @@ body.luliy-reduce-motion #luliy-splash-text.is-sweep .flare-anchor::after { anim
 #luliy-brand {
   position: fixed;
   top: 14px;
-  left: 70px;            /* sits just right of the 44px ☰ button at left:14px —— 位置不变，仍在左边 */
+  left: 18px;            /* ☰ 已移到右上角，站名左移贴边 */
   z-index: 10002;
   height: 44px;
   display: inline-flex;
@@ -499,7 +499,7 @@ body.luliy-reduce-motion #luliy-issues-link { transition: none; }
 #luliy-subtitle {
   position: fixed;
   top: 56px;
-  left: 70px;
+  left: 18px;            /* 和站名左对齐 */
   z-index: 10001;
   color: rgba(180,140,255,0.6);
   font-family: 'Courier New', monospace;
@@ -4350,7 +4350,7 @@ body.luliy-nav-drawer #luliy-hero-banner { margin-top: 70px; }
 
 /* ── ☰「更多」按钮（固定左上角）── */
 #luliy-ham-btn {
-  position: fixed; top: 14px; left: 14px; z-index: 10002;
+  position: fixed; top: 14px; right: 14px; z-index: 10002;
   width: 44px; height: 44px; padding: 12px 10px;
   display: flex; flex-direction: column; justify-content: space-between;
   box-sizing: border-box; cursor: pointer;
