@@ -3580,6 +3580,132 @@
     return /(^|\/)chronicle(\.html)?$/i.test(location.pathname);
   }
 
+  /* ============================================================
+     书架 Bookshelf（singlePage: book）—— 赛博朋克风
+     自动读 postList.json 里带 Library 标签的文章，按第二个标签
+     归入「小说 / 成长 / 投资 / 现实 / 杂项」五大类，带「在读」标签
+     的书额外放进右侧在读书堆。点击书脊跳到对应文章。
+     ============================================================ */
+  var BOOK_LABEL = 'Library';
+  var BOOK_CATEGORIES = ['\u5c0f\u8bf4', '\u6210\u957f', '\u6295\u8d44', '\u73b0\u5b9e', '\u6742\u9879'];  /* 小说 成长 投资 现实 杂项 */
+  var BOOK_READING_LABEL = '\u5728\u8bfb';   /* 在读 */
+  /* ★ 手动补充的书（还没写文章、想先占位的）：
+     { title, href, category, reading } —— category 必须是上面五类之一 */
+  var BOOK_EXTRA = (window.LULIY_EXTRA_BOOKS && Array.isArray(window.LULIY_EXTRA_BOOKS))
+    ? window.LULIY_EXTRA_BOOKS : [];
+
+  var BOOK_PALETTE = ['#7A2E6B', '#2C4E6B', '#2E5C5A', '#5C2E6B', '#6B2E4A', '#3E2E6B'];
+  function bookHash(s) {
+    var h = 0; s = String(s);
+    for (var i = 0; i < s.length; i++) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; }
+    return Math.abs(h);
+  }
+
+  function isBookPage() {
+    return /(^|\/)book(\.html)?$/i.test(location.pathname);
+  }
+
+  function initBookPage() {
+    var pb = document.getElementById('postBody');
+    if (!pb) return;
+    if (document.getElementById('luliy-bookshelf')) return;   /* 幂等 */
+    document.body.classList.add('luliy-book-takeover', 'luliy-hide-pagination');
+
+    pb.innerHTML = '<div id="luliy-bookshelf" class="luliy-bookshelf">' +
+      '<div class="luliy-book-loading">\u52a0\u8f7d\u4e2d\u2026</div></div>';
+    var root2 = document.getElementById('luliy-bookshelf');
+
+    fetchPosts().then(function (posts) {
+      var books = [];
+      (posts || []).forEach(function (p) {
+        var names = (p.labels || []).map(function (l) { return l.name; });
+        if (names.indexOf(BOOK_LABEL) === -1) return;   /* 只要 Library 文章 */
+        /* 分类 = 第一个命中五大类的标签，否则归杂项 */
+        var cat = '\u6742\u9879';
+        for (var i = 0; i < names.length; i++) {
+          if (BOOK_CATEGORIES.indexOf(names[i]) !== -1) { cat = names[i]; break; }
+        }
+        books.push({
+          title: p.title, href: buildPostLink(p.link), created: (p.created || '').slice(0, 10),
+          category: cat, reading: names.indexOf(BOOK_READING_LABEL) !== -1
+        });
+      });
+      /* 合并手动补充的书 */
+      BOOK_EXTRA.forEach(function (b) {
+        books.push({
+          title: b.title || '\u672a\u547d\u540d', href: b.href || '#',
+          created: b.created || '', category: BOOK_CATEGORIES.indexOf(b.category) !== -1 ? b.category : '\u6742\u9879',
+          reading: !!b.reading
+        });
+      });
+      renderBookshelf(books);
+    }).catch(function () {
+      root2.innerHTML = '<div class="luliy-book-error">\u65e0\u6cd5\u8bfb\u53d6\u6587\u7ae0\u5217\u8868\uff0c' +
+        '\u8bf7\u786e\u8ba4 Gmeek \u5df2\u751f\u6210 postList.json\u3002</div>';
+    });
+
+    function renderBookshelf(books) {
+      var readingBooks = books.filter(function (b) { return b.reading; });
+
+      var html = '<div class="luliy-book-header">' +
+        '<h1 class="luliy-book-title">\u6211\u7684\u4e66\u67b6</h1>' +   /* 我的书架 */
+        '<p class="luliy-book-sub">\u70b9\u51fb\u4e66\u810a\uff0c\u524d\u5f80\u5bf9\u5e94\u7684\u6587\u7ae0 \u00b7 \u5171 ' +
+          books.length + ' \u672c</p></div>';   /* 点击书脊，前往对应的文章 · 共 N 本 */
+
+      html += '<div class="luliy-bookcase">';
+      BOOK_CATEGORIES.forEach(function (cat, ci) {
+        var inCat = books.filter(function (b) { return b.category === cat; });
+        html += '<section class="luliy-shelf">';
+        html += '<div class="luliy-shelf-plaque">' + esc(cat) +
+          ' <span class="luliy-shelf-count">' + inCat.length + ' \u672c</span></div>';   /* N 本 */
+        html += '<div class="luliy-shelf-row">';
+        if (!inCat.length) {
+          html += '<div class="luliy-shelf-empty">\u6682\u65e0\u4e66\u7c4d</div>';   /* 暂无书籍 */
+        } else {
+          inCat.forEach(function (b) { html += buildSpine(b); });
+        }
+        /* 在读书堆放在第一个有在读书的分类那一层尾部 */
+        if (ci === 0 && readingBooks.length) {
+          html += buildReadingZone(readingBooks);
+        }
+        html += '</div><div class="luliy-shelf-board"></div></section>';
+      });
+      html += '</div>';
+
+      root2.innerHTML = html;
+    }
+
+    function buildSpine(b) {
+      var h = bookHash(b.title);
+      var w = 44 + (h % 20);          /* 44–64px */
+      var ht = 150 + (h % 36);        /* 150–186px */
+      var tilt = (h % 7) - 3;         /* -3..3deg */
+      var color = BOOK_PALETTE[h % BOOK_PALETTE.length];
+      var meta = b.created ? ('<span class="luliy-spine-note">' + esc(b.created) + '</span>') : '';
+      return '<a class="luliy-spine" href="' + esc(b.href) + '" ' +
+        'style="--tilt:' + tilt + 'deg;width:' + w + 'px;height:' + ht + 'px;' +
+        'background:linear-gradient(90deg,' + color + ',' + color + 'cc);" ' +
+        'aria-label="' + esc(b.title) + '">' +
+        '<span class="luliy-spine-title">' + esc(b.title) + '</span>' +
+        '<span class="luliy-spine-tip"><strong>' + esc(b.title) + '</strong>' + meta + '</span>' +
+        '</a>';
+    }
+
+    function buildReadingZone(readingBooks) {
+      var h = '<div class="luliy-reading-zone"><span class="luliy-reading-label">\u5728\u8bfb</span>' +   /* 在读 */
+        '<div class="luliy-reading-stack">';
+      readingBooks.slice(0, 3).forEach(function (b, i) {
+        var color = BOOK_PALETTE[bookHash(b.title) % BOOK_PALETTE.length];
+        h += '<a class="luliy-flat-book' + (i === 0 ? ' is-top' : '') + '" href="' + esc(b.href) + '" ' +
+          'style="bottom:' + (i * 12) + 'px;z-index:' + (10 - i) + ';background:' + color + ';" ' +
+          'aria-label="\u5728\u8bfb\uff1a' + esc(b.title) + '">' + esc(b.title) + '</a>';
+      });
+      h += '</div></div>';
+      return h;
+    }
+  }
+
+
   function initCards() {
     var isTagPage = /tag\.html?$|\/tag\/?$/i.test(location.pathname);
     var isArchive = isArchivePage();
@@ -5546,6 +5672,12 @@
        渲染，不能当普通文章页）。识别后直接接管，不再往下走文章页逻辑。 */
     if (isChroniclePage()) {
       safe(initChroniclePage, 'chronicle');
+      return;
+    }
+
+    /* ★ 书架 Bookshelf 单页：同理，自己接管渲染 */
+    if (isBookPage()) {
+      safe(initBookPage, 'book');
       return;
     }
 
