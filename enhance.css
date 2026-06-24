@@ -4498,7 +4498,18 @@ body[data-luliy-theme="mono"]      #luliy-drawer { background: hsla(0,   0%,  10
 .ldh-date { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 3px; letter-spacing: 0.5px; }
 [data-color-mode="light"] .ldh-date { color: rgba(40,30,60,0.6); }
 
-/* 抽屉导航模式切换按钮已删除（顶部导航系统整体移除） */
+/* 抽屉里的导航模式切换按钮 */
+#luliy-drawer-modebtn {
+  margin-top: 14px; width: 100%;
+  padding: 9px 12px; border-radius: 10px;
+  background: var(--th-accent-soft, rgba(130,80,223,0.18));
+  border: 1px solid var(--th-accent, #8250df);
+  color: var(--th-accent, #cba6f7); font-size: 13px; font-weight: 600;
+  font-family: 'Noto Sans SC', sans-serif; cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+}
+#luliy-drawer-modebtn:hover { background: var(--th-accent, #8250df); color: #fff; }
+#luliy-drawer-modebtn:active { transform: scale(0.97); }
 
 /* ── 折叠分区 ── */
 .luliy-drawer-section { border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -4616,7 +4627,7 @@ body.luliy-drawer-open #luliy-aplayer { z-index: 8000; }
 
 /* ── 抽屉顶部：切换按钮 + 日夜按钮 并排 ── */
 .ldh-btn-row { display: flex; gap: 8px; margin-top: 14px; align-items: stretch; }
-#luliy-drawer-dnbtn { margin-top: 0 !important; flex: 1; }   /* 日夜按钮占满该行 */
+#luliy-drawer-modebtn { margin-top: 0 !important; flex: 1; }   /* 覆盖原 margin-top */
 #luliy-drawer-dnbtn {
   flex: 0 0 auto; width: 42px;
   display: flex; align-items: center; justify-content: center;
@@ -5382,117 +5393,4 @@ html body.luliy-minimal .luliy-arch-title,
 html body.luliy-minimal .luliy-book-title,
 html body.luliy-minimal .luliy-arch-year {
   font-family: 'Noto Serif SC', Georgia, serif !important;
-}
-
-/* ════════════════════════════════════════════════════════════
-   高对比度收尾层 —— 提升所有主题日/夜模式下文章可读性
-   核心：提高文章面板不透明度（默认 0.5 → 0.82），让文字坐在
-   更实的底上；强化正文/标题/链接/代码/按钮对比度。
-   放在文件最末尾，确保优先级最高。
-   ════════════════════════════════════════════════════════════ */
-
-/* 1. 文章面板：默认不透明度大幅提高（除非用户手动调过滑块） */
-body[data-luliy-theme] #postBody,
-body:not([data-luliy-theme]) #postBody {
-  --luliy-article-opacity: 0.86;
-}
-[data-color-mode="dark"] body[data-luliy-theme] #postBody,
-[data-color-mode="dark"] body:not([data-luliy-theme]) #postBody {
-  --luliy-article-opacity: 0.88;
-}
-
-/* 2. 白天模式：正文深色、标题更黑，保证 7:1 以上对比 */
-[data-color-mode="light"] #postBody,
-[data-color-mode="light"] #postBody p,
-[data-color-mode="light"] #postBody li,
-[data-color-mode="light"] #postBody span,
-[data-color-mode="light"] #postBody td,
-[data-color-mode="light"] #postBody figcaption {
-  color: #1a1a1f !important;
-  -webkit-text-fill-color: #1a1a1f !important;
-}
-[data-color-mode="light"] #postBody h1,
-[data-color-mode="light"] #postBody h2,
-[data-color-mode="light"] #postBody h3,
-[data-color-mode="light"] #postBody h4 {
-  color: #0d0d12 !important;
-  -webkit-text-fill-color: #0d0d12 !important;
-}
-
-/* 3. 夜间模式：正文足够亮（避免灰蒙蒙），标题更白 */
-[data-color-mode="dark"] #postBody,
-[data-color-mode="dark"] #postBody p,
-[data-color-mode="dark"] #postBody li,
-[data-color-mode="dark"] #postBody span,
-[data-color-mode="dark"] #postBody td,
-[data-color-mode="dark"] #postBody figcaption {
-  color: #e8e6f0 !important;
-  -webkit-text-fill-color: #e8e6f0 !important;
-}
-[data-color-mode="dark"] #postBody h1,
-[data-color-mode="dark"] #postBody h2,
-[data-color-mode="dark"] #postBody h3,
-[data-color-mode="dark"] #postBody h4 {
-  color: #f5f3fb !important;
-  -webkit-text-fill-color: #f5f3fb !important;
-}
-
-/* 4. 链接：日/夜都用高对比强调色 + 下划线，确保可识别 */
-[data-color-mode="light"] #postBody a {
-  color: #5b21b6 !important; -webkit-text-fill-color: #5b21b6 !important;
-  text-decoration: underline !important; text-underline-offset: 2px !important;
-}
-[data-color-mode="dark"] #postBody a {
-  color: #b9a3ff !important; -webkit-text-fill-color: #b9a3ff !important;
-  text-decoration: underline !important; text-underline-offset: 2px !important;
-}
-
-/* 5. 行内代码：日/夜都有清晰底色和高对比文字 */
-[data-color-mode="light"] #postBody code {
-  background: rgba(28,28,34,0.07) !important; color: #9333ea !important;
-  -webkit-text-fill-color: #9333ea !important; padding: 2px 6px; border-radius: 4px;
-}
-[data-color-mode="dark"] #postBody code {
-  background: rgba(255,255,255,0.10) !important; color: #d6bcfa !important;
-  -webkit-text-fill-color: #d6bcfa !important; padding: 2px 6px; border-radius: 4px;
-}
-
-/* 6. 功能按钮（浮动面板/抽屉/FAB）高对比 */
-[data-color-mode="light"] #luliy-ham-btn span { background: #1a1a1f !important; }
-[data-color-mode="dark"] #luliy-ham-btn span { background: #f0eef8 !important; }
-[data-color-mode="light"] #luliy-issues-link,
-[data-color-mode="light"] #luliy-to-minimal,
-[data-color-mode="light"] #luliy-top-link { color: #2a2440 !important; }
-[data-color-mode="dark"] #luliy-issues-link,
-[data-color-mode="dark"] #luliy-to-minimal,
-[data-color-mode="dark"] #luliy-top-link { color: #e8e6f0 !important; }
-
-/* 7. 文末字数信息条：日/夜都清晰可读 */
-[data-color-mode="light"] #luliy-post-footer-bar { color: #555 !important; border-top-color: rgba(0,0,0,0.10) !important; }
-[data-color-mode="dark"] #luliy-post-footer-bar { color: #aaa !important; border-top-color: rgba(255,255,255,0.12) !important; }
-
-/* ── 顶部操作组：[Link] [简洁模式]（沉思者图标右边）── */
-#luliy-top-actions {
-  position: fixed; top: 14px; z-index: 10002;
-  display: inline-flex; align-items: center; gap: 14px;
-  height: 44px;
-}
-#luliy-top-link, #luliy-to-minimal {
-  background: transparent; border: none; cursor: pointer;
-  font-family: inherit; font-size: 13px; font-weight: 600;
-  letter-spacing: 0.5px; color: #fff; padding: 4px 2px;
-  opacity: 0.78; transition: opacity 0.2s, transform 0.2s;
-  text-decoration: none; white-space: nowrap;
-  filter: drop-shadow(0 0 6px rgba(110,199,255,0.5));
-}
-#luliy-top-link:hover, #luliy-to-minimal:hover { opacity: 1; transform: translateY(-1px); }
-#luliy-to-minimal {
-  border: 1px solid rgba(255,255,255,0.35); border-radius: 14px;
-  padding: 4px 12px;
-}
-[data-color-mode="light"] #luliy-to-minimal { border-color: rgba(0,0,0,0.25); }
-@media (max-width: 600px) {
-  #luliy-top-actions { gap: 8px; }
-  #luliy-top-link, #luliy-to-minimal { font-size: 11px; }
-  #luliy-to-minimal { padding: 3px 8px; }
 }
