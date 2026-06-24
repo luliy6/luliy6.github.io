@@ -3290,7 +3290,7 @@
   }
 
   /* ============================================================
-     编年史 Chronicle —— 年份 + 分类（出游/书影游/海报墙）
+     编年史 Chronicle —— 年份 + 分类（事件/书视事/海报墙）
      ★ 优先读 GitHub API（chronicle-data 标签的 issue），失败则
      回退到页面内置的 JSON。赛博朋克风格沿用全站 CSS 变量。
      ============================================================ */
@@ -3424,7 +3424,7 @@
         var body = root2.querySelector('.luliy-chron-body');
         var yearData = (data.data && data.data[curYear]) || {};
         var list = yearData[curCat] || [];
-        if (curCat === 'travel') body.innerHTML = renderTravel(list);
+        if (curCat === 'event' || curCat === 'travel') body.innerHTML = renderTravel(list);
         else if (curCat === 'media') body.innerHTML = renderMedia(list);
         else if (curCat === 'posters') body.innerHTML = renderPosters(list);
         else body.innerHTML = '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
@@ -3434,12 +3434,12 @@
       renderBody();
     }
 
-    /* —— 出游：月份 | 城市 | 活动 三列 ——
+    /* —— 事件：月份 | 地点 | 记录 三列 ——
        ★ 同月份的多条记录合并月份格（rowspan），实现"Jan. 跨多行"效果。 */
     function renderTravel(list) {
       if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
       var h = '<div class="luliy-chron-scroll-x"><div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
-        '<th>\u6708\u4efd</th><th>\u57ce\u5e02</th><th>\u6d3b\u52a8</th></tr></thead><tbody>';
+        '<th>\u6708\u4efd</th><th>\u5730\u70b9</th><th>\u8bb0\u5f55</th></tr></thead><tbody>';
 
       function makeActs(row) {
         return (row.items || []).map(function (it) {
@@ -3460,15 +3460,15 @@
         /* 第一行：带 rowspan 的月份格 */
         h += '<tr>' +
           '<td rowspan="' + span + '" class="luliy-chron-month-cell">' + esc(month) + '</td>' +
-          '<td data-label="\u57ce\u5e02">' + esc(list[i].city || '') + '</td>' +
-          '<td data-label="\u6d3b\u52a8">' + makeActs(list[i]) + '</td>' +
+          '<td data-label="\u5730\u70b9">' + esc(list[i].city || '') + '</td>' +
+          '<td data-label="\u8bb0\u5f55">' + makeActs(list[i]) + '</td>' +
         '</tr>';
 
         /* 同月的后续行：不再重复月份格 */
         for (var j = 1; j < span; j++) {
           h += '<tr>' +
-            '<td data-label="\u57ce\u5e02">' + esc(list[i + j].city || '') + '</td>' +
-            '<td data-label="\u6d3b\u52a8">' + makeActs(list[i + j]) + '</td>' +
+            '<td data-label="\u5730\u70b9">' + esc(list[i + j].city || '') + '</td>' +
+            '<td data-label="\u8bb0\u5f55">' + makeActs(list[i + j]) + '</td>' +
           '</tr>';
         }
         i += span;
@@ -3477,7 +3477,7 @@
       return h;
     }
 
-    /* —— 书影游：月份 | 读书 | 观影 | 演出 | 游戏 五列 —— */
+    /* —— 书视事：月份 | 读书 | 视频/电影 | 事件/新闻 | 讲座/成长 五列 —— */
     function renderMedia(list) {
       if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
       function toArr(v) { if (!v) return []; return Array.isArray(v) ? v : [v]; }
@@ -3491,14 +3491,14 @@
         }).join(' / ');
       }
       var h = '<div class="luliy-chron-scroll-x"><div class="luliy-chron-tablewrap"><table class="luliy-chron-table"><thead><tr>' +
-        '<th>\u6708\u4efd</th><th>\u8bfb\u4e66/\u6f2b\u753b</th><th>\u89c2\u5f71/\u5267\u96c6/\u756a\u5267</th>' +
-        '<th>\u6f14\u51fa/\u653e\u6620</th><th>\u6e38\u620f/\u5b9e\u51b5</th></tr></thead><tbody>';
+        '<th>\u6708\u4efd</th><th>\u8bfb\u4e66</th><th>\u89c6\u9891/\u7535\u5f71</th>' +
+        '<th>\u4e8b\u4ef6/\u65b0\u95fb</th><th>\u8bb2\u5ea7/\u6210\u957f</th></tr></thead><tbody>';
       list.forEach(function (row) {
         h += '<tr><td class="luliy-chron-month-cell">' + esc(row.month || '') + '</td>' +
           '<td data-label="\u8bfb\u4e66">' + cell(toArr(row.books || row.book)) + '</td>' +
-          '<td data-label="\u89c2\u5f71">' + cell(toArr(row.watch || row.movie)) + '</td>' +
-          '<td data-label="\u6f14\u51fa">' + cell(toArr(row.shows || row.show)) + '</td>' +
-          '<td data-label="\u6e38\u620f">' + cell(toArr(row.games || row.game)) + '</td></tr>';
+          '<td data-label="\u89c6\u9891/\u7535\u5f71">' + cell(toArr(row.watch || row.movie)) + '</td>' +
+          '<td data-label="\u4e8b\u4ef6/\u65b0\u95fb">' + cell(toArr(row.shows || row.show)) + '</td>' +
+          '<td data-label="\u8bb2\u5ea7/\u6210\u957f">' + cell(toArr(row.games || row.game)) + '</td></tr>';
       });
       h += '</tbody></table></div></div>';
       return h;
