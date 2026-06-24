@@ -1,6 +1,6 @@
 <!-- chronicle:data:start -->
 {
-  "years": ["2026", "2025"],
+  "years": [2026],
   "categories": [
     {"key": "event", "label": "事件"},
     {"key": "media", "label": "书视事"},
@@ -8,12 +8,16 @@
   ],
   "data": {
     "2026": {
-      "event": [],
-      "media": [],
-      "posters": []
-    },
-    "2025": {
-      "event": [],
+      "event": [
+        {
+          "month": "6月",
+          "city": "宁夏",
+          "items": [
+            {"title": "创建博客", "url": ""},
+            {"title": "历代更迭", "url": ""}
+          ]
+        }
+      ],
       "media": [],
       "posters": []
     }
