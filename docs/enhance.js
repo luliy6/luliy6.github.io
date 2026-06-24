@@ -2101,22 +2101,7 @@
     }
     updDrawerTime(); setInterval(updDrawerTime, 1000);
 
-    /* —— 导航模式切换按钮（B 套里的切换入口）—— */
-    var modeBtn = document.createElement('button');
-    modeBtn.type = 'button';
-    modeBtn.id = 'luliy-drawer-modebtn';
-    function refreshModeBtn() {
-      var m = getNavMode();
-      /* 当前抽屉模式 → 提示切到桌面顶部导航；反之提示切到抽屉 */
-      modeBtn.innerHTML = (m === 'drawer')
-        ? '\u5207\u6362\u5230\u9876\u90e8\u5bfc\u822a'   /* 切换到顶部导航 */
-        : '\u5207\u6362\u5230\u62bd\u5c49\u5bfc\u822a';  /* 切换到抽屉导航 */
-    }
-    refreshModeBtn();
-    modeBtn.addEventListener('click', function () {
-      if (root._luliyToggleNavMode) root._luliyToggleNavMode();
-      refreshModeBtn();
-    });
+    /* —— 导航模式切换按钮已删除：顶部导航系统整体移除，全站只用抽屉 —— */
 
     /* ★ 顶部日夜切换按钮（图标随当前模式切换） */
     var dnBtn = document.createElement('button');
@@ -2138,10 +2123,9 @@
       if (playSfx) playSfx('theme');
     });
 
-    /* 切换按钮 + 日夜按钮 并排一行 */
+    /* 日夜按钮单独一行（导航模式切换按钮已删除——顶部导航系统整体移除） */
     var btnRow = document.createElement('div');
     btnRow.className = 'ldh-btn-row';
-    btnRow.appendChild(modeBtn);
     btnRow.appendChild(dnBtn);
     head.appendChild(btnRow);
 
@@ -2186,6 +2170,11 @@
         if (!href || href.charAt(0) === '#') return;
         if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/i.test(href)) return;        /* 排除 RSS */
         if (/\/about(\.html)?$|^about(\.html)?$/i.test(href)) return;        /* about 只走头像 */
+        /* ★ 抽屉只保留「搜索」一项，其余（gallery/archive/music/stock/link/
+           chronicle/book/favorites 等）一律不放进抽屉。用 href/title 判断是否搜索。 */
+        var isSearch = /\/tag(\.html)?$|search/i.test(href) ||
+                       /\u641c\u7d22|search/i.test(a.getAttribute('title') || '');
+        if (!isSearch) return;
         var key = (a.href || href).toLowerCase();
         if (seen[key]) return; seen[key] = 1;
         var external = a.target === '_blank';
@@ -2340,7 +2329,6 @@
       ham.classList.add('is-open');
       document.body.classList.add('luliy-drawer-open');
       document.body.style.overflow = 'hidden';   /* 锁背景滚动 */
-      refreshModeBtn();
     }
     function closeDrawer() {
       drawer.classList.remove('is-open');
@@ -2435,27 +2423,49 @@
         document.fonts.ready.then(positionThinkerIcon).catch(function () {});
       }
 
-      /* ★ 切换到极简系统的按钮：放在沉思者图标右边 */
-      if (!document.getElementById('luliy-to-minimal')) {
+      /* ★ 顶部链接组：沉思者图标右边依次放 [link 链接] [切换简洁模式]。
+         link 来自 config.exlink.link（若配置了），切换按钮跳到极简系统。 */
+      if (!document.getElementById('luliy-top-actions')) {
+        var actions = document.createElement('div');
+        actions.id = 'luliy-top-actions';
+
+        /* link 外链（仅当配置了 exlink.link 时显示） */
+        var linkUrl = (LULIY_OPTS.exlink && LULIY_OPTS.exlink.link) || '';
+        if (linkUrl) {
+          var linkA = document.createElement('a');
+          linkA.id = 'luliy-top-link';
+          linkA.href = linkUrl;
+          linkA.target = '_blank';
+          linkA.rel = 'noopener noreferrer';
+          linkA.title = 'Link';
+          linkA.textContent = 'Link';
+          actions.appendChild(linkA);
+        }
+
+        /* 切换简洁模式文字按钮 */
         var toMin = document.createElement('button');
         toMin.id = 'luliy-to-minimal';
         toMin.type = 'button';
-        toMin.title = '\u5207\u6362\u5230\u7b80\u6d01\u7cfb\u7edf';   /* 切换到简洁系统 */
-        toMin.textContent = '\u25C7';   /* ◇ 空心菱形，区别于极简里的实心 ◈ */
+        toMin.title = '\u5207\u6362\u5230\u7b80\u6d01\u6a21\u5f0f';
+        toMin.textContent = '\u7b80\u6d01\u6a21\u5f0f';   /* 简洁模式 */
         toMin.addEventListener('click', function () {
           if (root._luliySetSystem) root._luliySetSystem('minimal');
         });
-        document.body.appendChild(toMin);
-        function positionToMin() {
+        actions.appendChild(toMin);
+
+        document.body.appendChild(actions);
+
+        /* 定位在沉思者图标右边 */
+        function positionActions() {
           var t = document.getElementById('luliy-issues-link');
-          if (!t) return;
+          if (!t || !actions) return;
           var r = t.getBoundingClientRect();
-          toMin.style.left = (r.right + 8) + 'px';
+          actions.style.left = (r.right + 12) + 'px';
         }
-        positionToMin();
-        window.addEventListener('resize', positionToMin, { passive: true });
+        positionActions();
+        window.addEventListener('resize', positionActions, { passive: true });
         if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(positionToMin).catch(function () {});
+          document.fonts.ready.then(positionActions).catch(function () {});
         }
       }
     }
@@ -2475,15 +2485,16 @@
       document.body.appendChild(subEl);
     }
 
-    /* ── 双导航模式切换实现 ── */
+    /* ── 导航模式切换已废弃（全站锁定抽屉）。保留空实现以防旧引用报错。 ── */
     root._luliyToggleNavMode = function () {
+      /* no-op：顶部导航系统已移除，不再切换 */
+    };
+    var _deadToggle = function () {
       var next = (getNavMode() === 'hero') ? 'drawer' : 'hero';
       localStorage.setItem(NAV_MODE_KEY, next);
       applyNavMode(next);
-      refreshModeBtn();
       if (next === 'hero') {
         closeDrawer();
-        /* 切回 hero：把设置面板还给右下角浮动工具条 */
         if (root._luliyRestorePanelToFloat) root._luliyRestorePanelToFloat();
       }
       if (playSfx) playSfx('click');
@@ -4793,20 +4804,7 @@
       pbody.appendChild(bar);
     }
 
-    /* Reading time estimate */
-    if (!document.getElementById('luliy-readmeta')) {
-      /* 性能优化：用 textContent 替代 innerText。innerText 会触发一次
-         同步布局重排（计算渲染后的可见文本），而字数估算并不需要这种
-         精度，textContent 直接读取、零重排。 */
-      var wc = (pbody.textContent || '').length;
-      var rt = document.createElement('p');
-      rt.id = 'luliy-readmeta';
-      rt.innerHTML =
-        '\u9884\u8ba1\u9605\u8bfb\uff1a\u7ea6 <strong>' + Math.max(1, Math.round(wc / 300)) +
-        '</strong> \u5206\u949f &nbsp;|&nbsp; \u5171 <strong>' + wc + '</strong> \u5b57';
-      rt.style.cssText = 'color:#888;font-size:13px;margin-bottom:1.5rem';
-      pbody.insertBefore(rt, pbody.firstChild);
-    }
+    /* ★ 顶部「预计阅读」已删除——只保留文末的字数+阅读时长信息条，避免重复。 */
 
     /* Heading click → copy anchor link */
     pbody.querySelectorAll('h1,h2,h3').forEach(function (h) {
