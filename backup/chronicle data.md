@@ -1,6 +1,6 @@
 <!-- chronicle:data:start -->
 {
-  "years": ["2026", "2027"],
+  "years": ["2026", "2025"],
   "categories": [
     { "key": "travel", "label": "出游" },
     { "key": "media", "label": "书影游" },
@@ -35,7 +35,7 @@
         }
       ]
     },
-    "2027": {
+    "2025": {
       "travel": [],
       "media": [],
       "posters": []
