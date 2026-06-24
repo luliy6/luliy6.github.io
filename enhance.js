@@ -3480,6 +3480,7 @@
     /* —— 书影游：月份 | 读书 | 观影 | 演出 | 游戏 五列 —— */
     function renderMedia(list) {
       if (!list || !list.length) return '<div class="luliy-chron-empty">\u6682\u65e0\u5185\u5bb9</div>';
+      function toArr(v) { if (!v) return []; return Array.isArray(v) ? v : [v]; }
       function cell(arr) {
         if (!arr || !arr.length) return '';
         return arr.map(function (it) {
@@ -3494,10 +3495,10 @@
         '<th>\u6f14\u51fa/\u653e\u6620</th><th>\u6e38\u620f/\u5b9e\u51b5</th></tr></thead><tbody>';
       list.forEach(function (row) {
         h += '<tr><td class="luliy-chron-month-cell">' + esc(row.month || '') + '</td>' +
-          '<td data-label="\u8bfb\u4e66">' + cell(row.books) + '</td>' +
-          '<td data-label="\u89c2\u5f71">' + cell(row.watch) + '</td>' +
-          '<td data-label="\u6f14\u51fa">' + cell(row.shows) + '</td>' +
-          '<td data-label="\u6e38\u620f">' + cell(row.games) + '</td></tr>';
+          '<td data-label="\u8bfb\u4e66">' + cell(toArr(row.books || row.book)) + '</td>' +
+          '<td data-label="\u89c2\u5f71">' + cell(toArr(row.watch || row.movie)) + '</td>' +
+          '<td data-label="\u6f14\u51fa">' + cell(toArr(row.shows || row.show)) + '</td>' +
+          '<td data-label="\u6e38\u620f">' + cell(toArr(row.games || row.game)) + '</td></tr>';
       });
       h += '</tbody></table></div></div>';
       return h;
