@@ -7,8 +7,21 @@
     {"key": "posters", "label": "海报墙"}
   ],
   "data": {
-    "2026": { "travel": [], "media": [], "posters": [] },
-    "2025": { "travel": [], "media": [], "posters": [] }
+    "2026": {
+      "travel": [
+        {"month": "1月", "city": "北京", "items": [{"title": "故宫"}, {"title": "颐和园"}]},
+        {"month": "3月", "city": "杭州", "items": [{"title": "西湖"}]}
+      ],
+      "media": [
+        {"month": "1月", "book": "《活着》", "movie": "《奥本海默》", "show": "", "game": "塞尔达"}
+      ],
+      "posters": []
+    },
+    "2025": {
+      "travel": [],
+      "media": [],
+      "posters": []
+    }
   }
 }
 </script></div>`
