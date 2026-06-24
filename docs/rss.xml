@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Wed, 24 Jun 2026 12:23:24 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>恶习-烟，熬夜。迷失</title><link>https://luliy.me/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</link><description>## 烟
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Wed, 24 Jun 2026 13:06:55 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>恶习-烟，熬夜。迷失</title><link>https://luliy.me/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</link><description>## 烟
 说句不敞亮的话，我花费烟的钱，可以让我不再这么颓废了。</description><guid isPermaLink="true">https://luliy.me/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</guid><pubDate>Wed, 24 Jun 2026 02:31:08 +0000</pubDate></item><item><title>博客完整说明指南</title><link>https://luliy.me/post/bo-ke-wan-zheng-shuo-ming-zhi-nan.html</link><description>&lt;html&gt;
 &lt;body&gt;
 &lt;!--StartFragment--&gt;&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;ΔιάΝους 博客完整说明指南&lt;/h1&gt;
@@ -2212,23 +2212,18 @@ The user will provide learning material (a single sentence or a full article/par
 {
   'years': ['2026', '2025'],
   'categories': [
-    {'key': 'travel', 'label': '出游'},
-    {'key': 'media', 'label': '书影游'},
+    {'key': 'event', 'label': '事件'},
+    {'key': 'media', 'label': '书视事'},
     {'key': 'posters', 'label': '海报墙'}
   ],
   'data': {
     '2026': {
-      'travel': [
-        {'month': '1月', 'city': '北京', 'items': [{'title': '故宫'}, {'title': '颐和园'}]},
-        {'month': '3月', 'city': '杭州', 'items': [{'title': '西湖'}]}
-      ],
-      'media': [
-        {'month': '1月', 'book': '《活着》', 'movie': '《奥本海默》', 'show': '', 'game': '塞尔达'}
-      ],
+      'event': [],
+      'media': [],
       'posters': []
     },
     '2025': {
-      'travel': [],
+      'event': [],
       'media': [],
       'posters': []
     }
