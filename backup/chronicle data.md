@@ -10,33 +10,28 @@
     "2026": {
       "travel": [
         {
-          "month": "Jun.",
-          "city": "家里",
+          "month": "Jan.",
+          "city": "上海",
           "items": [
-            { "title": "写博客开始构建" }
-          ]
-        },
-        {
-          "month": "Jun.",
-          "city": "学校",
-          "items": [
-            { "title": "博客V3版本基本完成" }
+            { "title": "《JOJ 与他的朋友们》", "url": "/post/example.html#section" },
+            { "title": "漫展" }
           ]
         }
       ],
-      "media": [],
+      "media": [
+        {
+          "month": "Jan.",
+          "books": ["《梦幻之街》"],
+          "watch": ["《世说新语：翩若惊鸿》"],
+          "shows": ["《道林格雷的画像》"],
+          "games": ["Pokopia"]
+        }
+      ],
       "posters": [
         {
-          "title": "Guidebook",
-          "image": "https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/Guidebook.png"
-        },
-        {
-          "title": "Library",
-          "image": "https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/Library.png"
-        },
-        {
-          "title": "AI",
-          "image": "https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/AI.png"
+          "title": "梦幻之街",
+          "image": "https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/doc/Journal.png",
+          "url": "/post/example.html"
         }
       ]
     },
