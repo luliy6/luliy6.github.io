@@ -1,15 +1,95 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy.me</link></image><lastBuildDate>Wed, 24 Jun 2026 13:22:23 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>恶习-烟，熬夜。迷失</title><link>https://luliy.me/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</link><description>## 烟
-说句不敞亮的话，我花费烟的钱，可以让我不再这么颓废了。</description><guid isPermaLink="true">https://luliy.me/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</guid><pubDate>Wed, 24 Jun 2026 02:31:08 +0000</pubDate></item><item><title>博客完整说明指南</title><link>https://luliy.me/post/bo-ke-wan-zheng-shuo-ming-zhi-nan.html</link><description>&lt;html&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://luliy6.github.io</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://luliy6.github.io</link></image><lastBuildDate>Thu, 27 Aug 2026 21:31:40 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>汽车构造</title><link>https://luliy6.github.io/post/qi-che-gou-zao.html</link><description># 汽车构造
+
+## 一、名词解释汇总
+
+| 序号 | 名词                 | 解释                                                         |
+| ---- | -------------------- | ------------------------------------------------------------ |
+| 1    | 摩擦离合器           | 借主动部分与从动部分两者接触之间的摩擦作用来传递转矩的离合器 |
+| 2    | 液力耦合器           | 利用液体作为传动介质的离合器                                 |
+| 3    | 电磁离合器           | 利用磁力传递转矩的离合器                                     |
+| 4    | 单盘离合器           | 设有一片从动盘的，前后两面都装有摩擦片                       |
+| 5    | 离合器的自由间隙     | 离合器接合时分离轴承端面与分离杠杆端头之间的间隙             |
+| 6    | 分离间隙             | 离合器分离后从动盘前后端面与飞轮及压盘表面之间的间隙         |
+| 7    | 离合器踏板的自由行程 | 为消除自由间隙所需的离合器踏板行程                           |
+| 8    | 不等速性             | 单十字轴万向节在输入轴和输出轴之间有夹角的情况下，两转轴的角速度不相等 |
+| 9    | 单级式主减速器       | 只有一对传动齿轮副的主减速器                                 |
+| 10   | 全浮式半轴支撑       | 使半轴只承受转矩，而两端均不承受任何反力和弯矩               |
+| 11   | 半浮式半轴支撑       | 只能使半轴内端免受弯矩，而外端却承受全部弯矩                 |
+| 12   | 自动回正             | 当转向轮在偶遇外力作用发生偏转时，一旦作用的外力消失后，应能立即自动回到原来直线行驶的位置 |
+| 13   | 双向作用式减震器     | 在压缩和伸张两行程内均能起作用的减震器                       |
+| 14   | 单向作用式减震器     | 仅在伸张行程内起作用的减震器                                 |
+| 15   | 汽车转向系统         | 用来改变或恢复汽车行驶方向的专设机构                         |
+| 16   | 转向器传动效率       | 转向器的输出功率与输入功率之比                               |
+| 17   | 转向盘自由行程       | 转向盘在空转阶段中的角行程                                   |
+| 18   | 摩擦制动器           | 凡利用固定元件与旋转元件工作表面的摩擦作用产生制动力矩的制动器 |
+| 19   | 领蹄                 | 制动蹄张开时的旋转方向与制动鼓的旋转方向相同（增势）         |
+| 20   | 从蹄                 | 制动蹄张开时的旋转方向与制动鼓的旋转方向相反（减势）         |
+
+## 二、汽车构造填空题汇总
+
+| 序号 | 主题/部件            | 内容                                                   |
+| ---- | -------------------- | ------------------------------------------------------ |
+| 1    | 增速增矩             | 实现增速增矩的是**变速器**和**主减速器**               |
+| 2    | 变速                 | 实现汽车变速的是**变速器**                             |
+| 3    | 倒退                 | 实现汽车倒退的是**变速器**                             |
+| 4    | 中断动力传递         | 实现必要时中断传动系统动力传递的是**离合器**           |
+| 5    | 差速作用             | 实现两驱动车轮差速作用的是**差速器**                   |
+| 6    | 离合器主动部分       | **飞轮、离合器盖、压盘**                               |
+| 7    | 离合器从动部分       | **从动盘总成**                                         |
+| 8    | 摩擦离合器组成       | **主动部分、从动部分、压紧机构、操纵机构**四部分       |
+| 9    | 离合器操纵机构       | 分**人力式**和**气压式**                               |
+| 10   | 变速器分类(传动比)   | **有级式、无级式、综合式**                             |
+| 11   | 变速器分类(操纵方式) | **手动操纵式**和**自动操纵式**                         |
+| 12   | 同步器组成           | **同步装置、锁止装置、结合装置**                       |
+| 13   | 惯性式同步器         | 分**锁环式**和**锁销式**                               |
+| 14   | 变速器操纵机构       | 分**直接操纵式**和**远距离操纵式**                     |
+| 15   | 液力变矩器组成       | **泵轮、涡轮、导轮**                                   |
+| 16   | 万向传动装置组成     | **万向节、传动轴、中间支撑**                           |
+| 17   | 万向节分类           | **刚性万向节**和**挠性万向节**                         |
+| 18   | 挠性万向节分类       | **不等速万向节、准等速万向节、等速万向节**             |
+| 19   | 主减速器分类         | 按齿轮副数分**单级式**和**双级式**                     |
+| 20   | 车轮与地面相对运动   | **滚动和滑动**（滑动又分**滑转**和**滑移**）           |
+| 21   | 半轴分类             | **全浮式半轴支撑**和**半浮式半轴支撑**                 |
+| 22   | 行驶系统组成         | **车架、车桥、车轮、悬架**                             |
+| 23   | 车架分类             | **边梁式、中梁式、综合式**                             |
+| 24   | 车桥分类(按悬架结构) | **整体式车桥**和**断开式车桥**                         |
+| 25   | 车桥分类(按作用)     | **转向桥、驱动桥、转向驱动桥、支持桥**                 |
+| 26   | 转向轮定位参数       | **主销后倾角、主销内倾角、前轮外倾角、前轮前束**       |
+| 27   | 前轮前束调整         | 通过改变**转向横拉杆长度**调整                         |
+| 28   | 胎面分区             | **胎冠、胎肩、胎间**                                   |
+| 29   | 车轮组成             | **轮辋**和**轮辐**                                     |
+| 30   | 轮胎分类(按结构)     | **斜交轮胎、带束斜交轮胎、子午线轮胎**                 |
+| 31   | 轮胎分类(按气压)     | **高压胎、低压胎、超低压胎**                           |
+| 32   | 悬架组成             | **弹性元件、减震器、导向机构**                         |
+| 33   | 悬架分类             | **非独立悬架**和**独立悬架**                           |
+| 34   | 钢板弹簧定义         | 若干片宽但不等长的合金弹簧片组合而成的近似等强度弹性梁 |
+| 35   | 转向系统分类         | 按能源不同分**机械转向系统**和**助力转向系统**         |
+| 36   | 机械转向系统组成     | **操纵机构、转向器、转向传动机构**                     |
+| 37   | 转向器分类           | **可逆式、不可逆式、极限可逆式**                       |
+| 38   | 循环球式转向器       | 第一级**螺杆螺母传动**，第二级**齿条齿扇传动**         |
+| 39   | 转向加力装置组成     | **机械转向器、转向助力缸、转向控制阀**                 |
+| 40   | 制动力极限           | 由**地面附着力**决定                                   |
+| 41   | 摩擦制动器分类       | **鼓式**和**盘式**                                     |
+
+## 三、功用汇总
+
+- 1. | 部件/系统                        | 功用                                                         |
+     | -------------------------------- | ------------------------------------------------------------ |
+     | **离合器**                       | 1. **保证汽车平稳起步**：起步时主从动部分通过滑磨，转速逐渐接近，确保起步平稳；&lt;br&gt;2. **保证变速器换挡工作平顺**：换挡时分离切断动力传递，减轻齿轮齿间冲击；&lt;br&gt;3. **防止传动系统过载**：转矩超过最大传递转矩时主从动部分滑磨，防止过载 |
+     | **变速器**                       | 1. 改变传动比，扩大驱动轮转矩和转速的变化范围，适应行驶条件变化；&lt;br&gt;2. 在发动机旋转方向不变前提下，使汽车能倒退行驶；&lt;br&gt;3. 利用空挡，中断动力传递，便于启动怠速、换挡或动力输出 |
+     | **同步器**                       | 使接合套与待啮合齿圈迅速同步，缩短换挡时间，防止啮合时产生结合齿之间的冲击 |
+     | **液力变矩器**                   | 起到离合器的作用，传递或切断发动机与自动变速器传动机构之间的动力。</description><guid isPermaLink="true">https://luliy6.github.io/post/qi-che-gou-zao.html</guid><pubDate>Wed, 24 Jun 2026 15:28:48 +0000</pubDate></item><item><title>恶习-烟，熬夜。迷失</title><link>https://luliy6.github.io/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</link><description>## 烟
+说句不敞亮的话，我花费烟的钱，可以让我不再这么颓废了。</description><guid isPermaLink="true">https://luliy6.github.io/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</guid><pubDate>Wed, 24 Jun 2026 02:31:08 +0000</pubDate></item><item><title>博客完整说明指南</title><link>https://luliy6.github.io/post/bo-ke-wan-zheng-shuo-ming-zhi-nan.html</link><description>&lt;html&gt;
 &lt;body&gt;
 &lt;!--StartFragment--&gt;&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;ΔιάΝους 博客完整说明指南&lt;/h1&gt;
 &lt;blockquote&gt;
-&lt;p&gt;这份文档是你这个博客的「使用手册 + 功能清单 + 维护说明」，存档备查用。</description><guid isPermaLink="true">https://luliy.me/post/bo-ke-wan-zheng-shuo-ming-zhi-nan.html</guid><pubDate>Tue, 23 Jun 2026 05:41:46 +0000</pubDate></item><item><title>自卑与超越</title><link>https://luliy.me/post/zi-bei-yu-chao-yue.html</link><description>本来是测试用的，不知道可不可以。</description><guid isPermaLink="true">https://luliy.me/post/zi-bei-yu-chao-yue.html</guid><pubDate>Tue, 23 Jun 2026 04:17:37 +0000</pubDate></item><item><title>考试安排</title><link>https://luliy.me/post/kao-shi-an-pai.html</link><description># 考试安排
+&lt;p&gt;这份文档是你这个博客的「使用手册 + 功能清单 + 维护说明」，存档备查用。</description><guid isPermaLink="true">https://luliy6.github.io/post/bo-ke-wan-zheng-shuo-ming-zhi-nan.html</guid><pubDate>Tue, 23 Jun 2026 05:41:46 +0000</pubDate></item><item><title>自卑与超越</title><link>https://luliy6.github.io/post/zi-bei-yu-chao-yue.html</link><description>本来是测试用的，不知道可不可以。</description><guid isPermaLink="true">https://luliy6.github.io/post/zi-bei-yu-chao-yue.html</guid><pubDate>Tue, 23 Jun 2026 04:17:37 +0000</pubDate></item><item><title>考试安排</title><link>https://luliy6.github.io/post/kao-shi-an-pai.html</link><description># 考试安排
 科目 | 日期 | 时间 | 地点
 -- | -- | -- | --
 **汽车构造** | 7月7日 | 8:30–10:30 | 10#205
 **汽车电器** | 7月9日 | 8:30–10:30 | 12#207
-**汽车电池** | 7月10日 | 8:30–10:30 | 10#204。</description><guid isPermaLink="true">https://luliy.me/post/kao-shi-an-pai.html</guid><pubDate>Mon, 22 Jun 2026 09:05:54 +0000</pubDate></item><item><title>chronicle data</title><link>https://luliy.me/post/chronicle%20data.html</link><description>&lt;!-- chronicle:data:start --&gt;
+**汽车电池** | 7月10日 | 8:30–10:30 | 10#204。</description><guid isPermaLink="true">https://luliy6.github.io/post/kao-shi-an-pai.html</guid><pubDate>Mon, 22 Jun 2026 09:05:54 +0000</pubDate></item><item><title>chronicle data</title><link>https://luliy6.github.io/post/chronicle%20data.html</link><description>&lt;!-- chronicle:data:start --&gt;
 {
   'years': [2026],
   'categories': [
@@ -34,8 +114,8 @@
     }
   }
 }
-&lt;!-- chronicle:data:end --&gt;。</description><guid isPermaLink="true">https://luliy.me/post/chronicle%20data.html</guid><pubDate>Mon, 22 Jun 2026 05:02:14 +0000</pubDate></item><item><title>Plan</title><link>https://luliy.me/post/Plan.html</link><description>1. 学会issue的使用
-2. 学会自己博客架构，并生成指南。</description><guid isPermaLink="true">https://luliy.me/post/Plan.html</guid><pubDate>Sun, 21 Jun 2026 08:26:50 +0000</pubDate></item><item><title>四级清单</title><link>https://luliy.me/post/si-ji-qing-dan.html</link><description># 作文
+&lt;!-- chronicle:data:end --&gt;。</description><guid isPermaLink="true">https://luliy6.github.io/post/chronicle%20data.html</guid><pubDate>Mon, 22 Jun 2026 05:02:14 +0000</pubDate></item><item><title>Plan</title><link>https://luliy6.github.io/post/Plan.html</link><description>1. 学会issue的使用
+2. 学会自己博客架构，并生成指南。</description><guid isPermaLink="true">https://luliy6.github.io/post/Plan.html</guid><pubDate>Sun, 21 Jun 2026 08:26:50 +0000</pubDate></item><item><title>四级清单</title><link>https://luliy6.github.io/post/si-ji-qing-dan.html</link><description># 作文
 ## The controversy surrounding () has fueled public discussions for long time,As modern society advances at a staggering pace in recent decades.
 People from diverse fields are playing more heed to this topic.people hold vastly different standards. I Find myself more inclined to endorse 
 My reasoning is elaborate as follows
@@ -347,7 +427,7 @@ Therefore, it is imperative that [强调].
 	1.	正式文体 → 优先使用 therefore, moreover, furthermore, however, in conclusion
 	2.	口语文体 → 可使用 so, and, but, also, for example
 	3.	学术风格 → 多用 thus, hence, consequently, in addition, notwithstanding
-	4.	避免重复 → 同一篇文章不要频繁使用同一个关系词，要变换使用。</description><guid isPermaLink="true">https://luliy.me/post/si-ji-qing-dan.html</guid><pubDate>Fri, 12 Jun 2026 19:05:43 +0000</pubDate></item><item><title>本站js，css，指南</title><link>https://luliy.me/post/ben-zhan-js%EF%BC%8Ccss%EF%BC%8C-zhi-nan.html</link><description># Luliy Blog 增强系统完全指南
+	4.	避免重复 → 同一篇文章不要频繁使用同一个关系词，要变换使用。</description><guid isPermaLink="true">https://luliy6.github.io/post/si-ji-qing-dan.html</guid><pubDate>Fri, 12 Jun 2026 19:05:43 +0000</pubDate></item><item><title>本站js，css，指南</title><link>https://luliy6.github.io/post/ben-zhan-js%EF%BC%8Ccss%EF%BC%8C-zhi-nan.html</link><description># Luliy Blog 增强系统完全指南
 &gt; `enhance.js v10` + `enhance.css v9` — 功能说明 · DIY 方法 · 运行原理
 
 ## 1. 系统总览
@@ -372,7 +452,7 @@ enhance.css  →  样式层（主题变量 / 布局 / 过渡动画）
 ⑤ 页面类型判断              — isPost → initPost()  /  isIndex → initIndex()
 ```
 
-所有滚动监听统一经过 **`onScrollRAF`** 调度器，合并到单个 `requestAnimationFrame` 帧里执行，避免多个模块各自注册 scroll 事件造成卡顿。</description><guid isPermaLink="true">https://luliy.me/post/ben-zhan-js%EF%BC%8Ccss%EF%BC%8C-zhi-nan.html</guid><pubDate>Fri, 12 Jun 2026 12:43:52 +0000</pubDate></item><item><title>CET短文</title><link>https://luliy.me/post/CET-duan-wen.html</link><description># 四六级必考词汇 · 分类短文
+所有滚动监听统一经过 **`onScrollRAF`** 调度器，合并到单个 `requestAnimationFrame` 帧里执行，避免多个模块各自注册 scroll 事件造成卡顿。</description><guid isPermaLink="true">https://luliy6.github.io/post/ben-zhan-js%EF%BC%8Ccss%EF%BC%8C-zhi-nan.html</guid><pubDate>Fri, 12 Jun 2026 12:43:52 +0000</pubDate></item><item><title>CET短文</title><link>https://luliy6.github.io/post/CET-duan-wen.html</link><description># 四六级必考词汇 · 分类短文
 
 
 ## 一、时政类 Politics &amp; Current Affairs
@@ -381,7 +461,7 @@ enhance.css  →  样式层（主题变量 / 布局 / 过渡动画）
 
 Since the Reform and Opening up, China has undergone dramatic transformation. The Belt and Road Initiative has become a cornerstone of international cooperation. Urbanization has accelerated rapidly, while Rural Revitalization programs have been established to address regional disparities. The government has made significant efforts in Poverty Alleviation to improve living standards across the nation. Enhanced Productivity and High-quality Development have become central to Chinese Modernization strategies. Infrastructure projects like High-speed Rail systems have revolutionized transportation, connecting the Yangtze River Delta and Pearl River Delta regions. The Greater Bay Area initiative promotes integration between cities. Free Trade Zones and Pilot Free Trade Zones serve as experimental grounds for economic innovation. Meanwhile, the Silver Economy has emerged as governments recognize the needs of aging societies. Elderly Care and Elderly Care Services have become priorities, supported by robust Social Welfare and Social Security systems.
 
-自改革开放以来，中国经历了翻天覆地的变化。</description><guid isPermaLink="true">https://luliy.me/post/CET-duan-wen.html</guid><pubDate>Thu, 11 Jun 2026 18:23:12 +0000</pubDate></item><item><title>CET4高频词汇与文章</title><link>https://luliy.me/post/CET4-gao-pin-ci-hui-yu-wen-zhang.html</link><description># 四六级必考词汇
+自改革开放以来，中国经历了翻天覆地的变化。</description><guid isPermaLink="true">https://luliy6.github.io/post/CET-duan-wen.html</guid><pubDate>Thu, 11 Jun 2026 18:23:12 +0000</pubDate></item><item><title>CET4高频词汇与文章</title><link>https://luliy6.github.io/post/CET4-gao-pin-ci-hui-yu-wen-zhang.html</link><description># 四六级必考词汇
 
 &gt; 来源：瑞斯拜《考前50分系列》26年新版 | BV1FAEi6DEiT
 
@@ -686,7 +766,7 @@ Since the Reform and Opening up, China has undergone dramatic transformation. Th
 |Inflation    |通货膨胀   |Deflation    |通货紧缩|
 |Afforestation|植树造林   |Deforestation|砍伐森林|
 
------。</description><guid isPermaLink="true">https://luliy.me/post/CET4-gao-pin-ci-hui-yu-wen-zhang.html</guid><pubDate>Thu, 11 Jun 2026 18:22:31 +0000</pubDate></item><item><title>gmeek</title><link>https://luliy.me/post/gmeek.html</link><description>Luliy 博客功能清单 - 完整280个
+-----。</description><guid isPermaLink="true">https://luliy6.github.io/post/CET4-gao-pin-ci-hui-yu-wen-zhang.html</guid><pubDate>Thu, 11 Jun 2026 18:22:31 +0000</pubDate></item><item><title>gmeek</title><link>https://luliy6.github.io/post/gmeek.html</link><description>Luliy 博客功能清单 - 完整280个
 
 &gt; ✅ = 强烈推荐 | ⚡ = 简单 | 🔧 = 需要写代码 | 🚀 = 进阶
 
@@ -1107,9 +1187,9 @@ Since the Reform and Opening up, China has undergone dramatic transformation. Th
 
 ---
 
-*共239个功能 + 修复项。</description><guid isPermaLink="true">https://luliy.me/post/gmeek.html</guid><pubDate>Thu, 11 Jun 2026 09:38:58 +0000</pubDate></item><item><title>Luliy Blog 三件套完整说明书</title><link>https://luliy.me/post/Luliy%20Blog%20-san-jian-tao-wan-zheng-shuo-ming-shu.html</link><description># 🌸 Luliy Blog 三件套完整说明书
+*共239个功能 + 修复项。</description><guid isPermaLink="true">https://luliy6.github.io/post/gmeek.html</guid><pubDate>Thu, 11 Jun 2026 09:38:58 +0000</pubDate></item><item><title>Luliy Blog 三件套完整说明书</title><link>https://luliy6.github.io/post/Luliy%20Blog%20-san-jian-tao-wan-zheng-shuo-ming-shu.html</link><description># 🌸 Luliy Blog 三件套完整说明书
 
-&gt; 本文档用中文详细解释 `config.json`、`enhance.css`、`enhance.js` 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。</description><guid isPermaLink="true">https://luliy.me/post/Luliy%20Blog%20-san-jian-tao-wan-zheng-shuo-ming-shu.html</guid><pubDate>Mon, 08 Jun 2026 15:28:11 +0000</pubDate></item><item><title>JS CSS 详解</title><link>https://luliy.me/post/JS%20CSS%20-xiang-jie.html</link><description># 📘 Luliy Blog v8 完整技术说明书
+&gt; 本文档用中文详细解释 `config.json`、`enhance.css`、`enhance.js` 三个文件的每一处功能、可修改的参数，以及新手如何理解和动手改动。</description><guid isPermaLink="true">https://luliy6.github.io/post/Luliy%20Blog%20-san-jian-tao-wan-zheng-shuo-ming-shu.html</guid><pubDate>Mon, 08 Jun 2026 15:28:11 +0000</pubDate></item><item><title>JS CSS 详解</title><link>https://luliy6.github.io/post/JS%20CSS%20-xiang-jie.html</link><description># 📘 Luliy Blog v8 完整技术说明书
 
 ## 一、架构总览
 
@@ -1956,7 +2036,7 @@ const ROUTES = {
 
 ### `Section 06-07` — Hero 区域
 
-见 Module 09-10 说明。</description><guid isPermaLink="true">https://luliy.me/post/JS%20CSS%20-xiang-jie.html</guid><pubDate>Mon, 08 Jun 2026 14:14:40 +0000</pubDate></item><item><title>Luliy Blog v8 详细说明书</title><link>https://luliy.me/post/Luliy%20Blog%20v8%20-xiang-xi-shuo-ming-shu.html</link><description>## 📋 JavaScript 模块详解（enhance.js）
+见 Module 09-10 说明。</description><guid isPermaLink="true">https://luliy6.github.io/post/JS%20CSS%20-xiang-jie.html</guid><pubDate>Mon, 08 Jun 2026 14:14:40 +0000</pubDate></item><item><title>Luliy Blog v8 详细说明书</title><link>https://luliy6.github.io/post/Luliy%20Blog%20v8%20-xiang-xi-shuo-ming-shu.html</link><description>## 📋 JavaScript 模块详解（enhance.js）
 
 ### 核心初始化模块
 | 模块 | 功能 | 修改建议 | 增强思路 |
@@ -2136,7 +2216,7 @@ const ROUTES = {
 
 ---
 
-需要我详细讲解某个具体模块或帮你修改特定功能吗？。</description><guid isPermaLink="true">https://luliy.me/post/Luliy%20Blog%20v8%20-xiang-xi-shuo-ming-shu.html</guid><pubDate>Mon, 08 Jun 2026 14:07:56 +0000</pubDate></item><item><title>gmeek ui</title><link>https://luliy.me/post/gmeek%20ui.html</link><description># 🍎 Gmeek UI 增强插件使用教程
+需要我详细讲解某个具体模块或帮你修改特定功能吗？。</description><guid isPermaLink="true">https://luliy6.github.io/post/Luliy%20Blog%20v8%20-xiang-xi-shuo-ming-shu.html</guid><pubDate>Mon, 08 Jun 2026 14:07:56 +0000</pubDate></item><item><title>gmeek ui</title><link>https://luliy6.github.io/post/gmeek%20ui.html</link><description># 🍎 Gmeek UI 增强插件使用教程
 
 ## 📦 插件简介
 
@@ -2147,10 +2227,10 @@ Gmeek UI 插件通过纯前端增强的方式，为 Gmeek 框架博客带来 App
 | `GmeekBaseTheme.css`     | 基础布局样式：字体、圆角、卡片排版，兼容原始结构不污染构建样式                          |
 | `GmeekCustomizeCss.js`   | UI 动态增强：卡片结构重构、玻璃拟态样式、深浅模式自适应、渐变背景、标签配色自动对比等功能       |
 
-&gt; 🧠 零依赖、构建无侵入、插拔可选、明暗自动识别、视觉沉浸体验，100% 兼容 Gmeek 原生内容结构。</description><guid isPermaLink="true">https://luliy.me/post/gmeek%20ui.html</guid><pubDate>Thu, 04 Jun 2026 16:33:48 +0000</pubDate></item><item><title>在线 Markdown 编辑器</title><link>https://luliy.me/post/zai-xian-%20Markdown%20-bian-ji-qi.html</link><description>## 在线 Markdown 编辑器
-- 地址：[点击前往](https://markdown.buxiantang.top/)。</description><guid isPermaLink="true">https://luliy.me/post/zai-xian-%20Markdown%20-bian-ji-qi.html</guid><pubDate>Thu, 04 Jun 2026 15:54:39 +0000</pubDate></item><item><title>看病</title><link>https://luliy.me/post/kan-bing.html</link><description>## 1.外地的病人，最好先在当地三甲做完该做的检查，拿着报告来北京找大夫看，要不然到北京大医院检查排队时间可就没准了。</description><guid isPermaLink="true">https://luliy.me/post/kan-bing.html</guid><pubDate>Wed, 03 Jun 2026 15:20:22 +0000</pubDate></item><item><title>money</title><link>https://luliy.me/post/money.html</link><description>![image](https://github.com/user-attachments/assets/ac73014b-6f0a-42f7-873c-cb8420e0da4a)。</description><guid isPermaLink="true">https://luliy.me/post/money.html</guid><pubDate>Wed, 03 Jun 2026 13:39:12 +0000</pubDate></item><item><title>本站指南</title><link>https://luliy.me/post/ben-zhan-zhi-nan.html</link><description># Luliy Blog v6 增强功能完整说明书
+&gt; 🧠 零依赖、构建无侵入、插拔可选、明暗自动识别、视觉沉浸体验，100% 兼容 Gmeek 原生内容结构。</description><guid isPermaLink="true">https://luliy6.github.io/post/gmeek%20ui.html</guid><pubDate>Thu, 04 Jun 2026 16:33:48 +0000</pubDate></item><item><title>在线 Markdown 编辑器</title><link>https://luliy6.github.io/post/zai-xian-%20Markdown%20-bian-ji-qi.html</link><description>## 在线 Markdown 编辑器
+- 地址：[点击前往](https://markdown.buxiantang.top/)。</description><guid isPermaLink="true">https://luliy6.github.io/post/zai-xian-%20Markdown%20-bian-ji-qi.html</guid><pubDate>Thu, 04 Jun 2026 15:54:39 +0000</pubDate></item><item><title>看病</title><link>https://luliy6.github.io/post/kan-bing.html</link><description>## 1.外地的病人，最好先在当地三甲做完该做的检查，拿着报告来北京找大夫看，要不然到北京大医院检查排队时间可就没准了。</description><guid isPermaLink="true">https://luliy6.github.io/post/kan-bing.html</guid><pubDate>Wed, 03 Jun 2026 15:20:22 +0000</pubDate></item><item><title>money</title><link>https://luliy6.github.io/post/money.html</link><description>![image](https://github.com/user-attachments/assets/ac73014b-6f0a-42f7-873c-cb8420e0da4a)。</description><guid isPermaLink="true">https://luliy6.github.io/post/money.html</guid><pubDate>Wed, 03 Jun 2026 13:39:12 +0000</pubDate></item><item><title>本站指南</title><link>https://luliy6.github.io/post/ben-zhan-zhi-nan.html</link><description># Luliy Blog v6 增强功能完整说明书
 
-本文档基于您提供的 `enhance.js`、`enhance.css` 以及 Gmeek 配置文件 `config.json` 编写。</description><guid isPermaLink="true">https://luliy.me/post/ben-zhan-zhi-nan.html</guid><pubDate>Tue, 02 Jun 2026 13:37:56 +0000</pubDate></item><item><title>Music</title><link>https://luliy.me/post/Music.html</link><guid isPermaLink="true">https://luliy.me/post/Music.html</guid><pubDate>Mon, 01 Jun 2026 17:53:07 +0000</pubDate></item><item><title>养生</title><link>https://luliy.me/post/yang-sheng.html</link><description>&gt; 补充一篇 24 年初的文章，分享最近一年的一些个人实践：[养生博主的 23 年总结](https://zhuanlan.zhihu.com/p/675470252)。</description><guid isPermaLink="true">https://luliy.me/post/yang-sheng.html</guid><pubDate>Sat, 30 May 2026 13:58:09 +0000</pubDate></item><item><title>prompt</title><link>https://luliy.me/post/prompt.html</link><description># 英语
+本文档基于您提供的 `enhance.js`、`enhance.css` 以及 Gmeek 配置文件 `config.json` 编写。</description><guid isPermaLink="true">https://luliy6.github.io/post/ben-zhan-zhi-nan.html</guid><pubDate>Tue, 02 Jun 2026 13:37:56 +0000</pubDate></item><item><title>Music</title><link>https://luliy6.github.io/post/Music.html</link><guid isPermaLink="true">https://luliy6.github.io/post/Music.html</guid><pubDate>Mon, 01 Jun 2026 17:53:07 +0000</pubDate></item><item><title>养生</title><link>https://luliy6.github.io/post/yang-sheng.html</link><description>&gt; 补充一篇 24 年初的文章，分享最近一年的一些个人实践：[养生博主的 23 年总结](https://zhuanlan.zhihu.com/p/675470252)。</description><guid isPermaLink="true">https://luliy6.github.io/post/yang-sheng.html</guid><pubDate>Sat, 30 May 2026 13:58:09 +0000</pubDate></item><item><title>prompt</title><link>https://luliy6.github.io/post/prompt.html</link><description># 英语
 ## CET4
 &lt;details&gt;
 &lt;summary&gt;CET pro&lt;/summary&gt;
@@ -2168,24 +2248,24 @@ The user will provide learning material (a single sentence or a full article/par
 #### Phase 1: Morphological Segmentation (Table Driven)
 1. 	**Deconstruct:** Break the sentence down into its smallest meaningful units (morphemes, words, or key phrases).
 2. 	**Format:** Present these units in a **Markdown Table**.
-3. 	**Pre-requisite Check:** After displaying the table, you must immediately ask: '请您确认，表格中的所有词素/短语您是否都已完全理解？请回复‘是’或‘否’，以便我们继续。</description><guid isPermaLink="true">https://luliy.me/post/prompt.html</guid><pubDate>Sat, 30 May 2026 10:45:20 +0000</pubDate></item><item><title>Gmeek上手</title><link>https://luliy.me/post/Gmeek-shang-shou.html</link><description>&lt;!-- ##{'timestamp':1743429389}## --&gt;
+3. 	**Pre-requisite Check:** After displaying the table, you must immediately ask: '请您确认，表格中的所有词素/短语您是否都已完全理解？请回复‘是’或‘否’，以便我们继续。</description><guid isPermaLink="true">https://luliy6.github.io/post/prompt.html</guid><pubDate>Sat, 30 May 2026 10:45:20 +0000</pubDate></item><item><title>Gmeek上手</title><link>https://luliy6.github.io/post/Gmeek-shang-shou.html</link><description>&lt;!-- ##{'timestamp':1743429389}## --&gt;
 
 # 0. 简介
-&gt; [Gmeek](https://github.com/Meekdai/Gmeek) 一个博客框架，超轻量级个人博客模板，完全基于Github Pages 、 Github Issues 和 Github Actions，可以称作All in Github。</description><guid isPermaLink="true">https://luliy.me/post/Gmeek-shang-shou.html</guid><pubDate>Mon, 31 Mar 2025 13:56:29 +0000</pubDate></item><item><title>about</title><link>https://luliy.me/about.html</link><description># ΔιάΝους
+&gt; [Gmeek](https://github.com/Meekdai/Gmeek) 一个博客框架，超轻量级个人博客模板，完全基于Github Pages 、 Github Issues 和 Github Actions，可以称作All in Github。</description><guid isPermaLink="true">https://luliy6.github.io/post/Gmeek-shang-shou.html</guid><pubDate>Mon, 31 Mar 2025 13:56:29 +0000</pubDate></item><item><title>about</title><link>https://luliy6.github.io/about.html</link><description># ΔιάΝους
 
 &gt; **Διά**,希腊语前缀，通过（through），穿越（across），贯穿（via），
-&gt; **Νους**,古希腊哲学中的重要概念，意为：理智（Intellect），心智（Mind），智慧（Wisdom），思维（Reason）。</description><guid isPermaLink="true">https://luliy.me/about.html</guid><pubDate>Sat, 30 May 2026 10:29:29 +0000</pubDate></item><item><title>book</title><link>https://luliy.me/book.html</link><description>`Gmeek-html&lt;div id='luliy-bookshelf-mount'&gt;&lt;/div&gt;`
-。</description><guid isPermaLink="true">https://luliy.me/book.html</guid><pubDate>Sat, 30 May 2026 10:43:19 +0000</pubDate></item><item><title>gallery</title><link>https://luliy.me/gallery.html</link><description>&lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/4a6cb22c-6459-4605-9605-3daa7b7da42b' /&gt;
+&gt; **Νους**,古希腊哲学中的重要概念，意为：理智（Intellect），心智（Mind），智慧（Wisdom），思维（Reason）。</description><guid isPermaLink="true">https://luliy6.github.io/about.html</guid><pubDate>Sat, 30 May 2026 10:29:29 +0000</pubDate></item><item><title>book</title><link>https://luliy6.github.io/book.html</link><description>`Gmeek-html&lt;div id='luliy-bookshelf-mount'&gt;&lt;/div&gt;`
+。</description><guid isPermaLink="true">https://luliy6.github.io/book.html</guid><pubDate>Sat, 30 May 2026 10:43:19 +0000</pubDate></item><item><title>gallery</title><link>https://luliy6.github.io/gallery.html</link><description>&lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/4a6cb22c-6459-4605-9605-3daa7b7da42b' /&gt;
 &lt;img width='3344' height='1882' alt='Image' src='https://github.com/user-attachments/assets/7ecae118-93d7-4c83-9a6c-2973535bf479' /&gt;
 &lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/c7f210ae-89e9-4912-82b5-40d409dbf4f4' /&gt;
 &lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/6d1940a4-e3c9-44ea-af27-a58f8a9d015c' /&gt;
 &lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/7632475b-8b65-4643-b386-6526650559a0' /&gt;
 &lt;img width='1672' height='941' alt='Image' src='https://github.com/user-attachments/assets/3872b636-5649-4653-8f85-da035c9f0024' /&gt;
-&lt;img width='3344' height='1882' alt='Image' src='https://github.com/user-attachments/assets/f8995d38-20f4-4da4-9706-b427f214137e' /&gt;。</description><guid isPermaLink="true">https://luliy.me/gallery.html</guid><pubDate>Mon, 01 Jun 2026 17:52:29 +0000</pubDate></item><item><title>favorites</title><link>https://luliy.me/favorites.html</link><description># 日记
+&lt;img width='3344' height='1882' alt='Image' src='https://github.com/user-attachments/assets/f8995d38-20f4-4da4-9706-b427f214137e' /&gt;。</description><guid isPermaLink="true">https://luliy6.github.io/gallery.html</guid><pubDate>Mon, 01 Jun 2026 17:52:29 +0000</pubDate></item><item><title>favorites</title><link>https://luliy6.github.io/favorites.html</link><description># 日记
 ## 还是来了 20260601
 我发现一个非常重要的问题，
 我的大计划是学习英语四级，
-小计划是个人成长，却一项都没有落实。</description><guid isPermaLink="true">https://luliy.me/favorites.html</guid><pubDate>Tue, 02 Jun 2026 16:25:37 +0000</pubDate></item><item><title>link</title><link>https://luliy.me/link.html</link><description># 学习
+小计划是个人成长，却一项都没有落实。</description><guid isPermaLink="true">https://luliy6.github.io/favorites.html</guid><pubDate>Tue, 02 Jun 2026 16:25:37 +0000</pubDate></item><item><title>link</title><link>https://luliy6.github.io/link.html</link><description># 学习
 
 &lt;details&gt;
 &lt;summary&gt;CET pro&lt;/summary&gt;
@@ -2207,9 +2287,9 @@ The user will provide learning material (a single sentence or a full article/par
 &lt;summary&gt;学习&lt;/summary&gt;
 
 1. [Bro code](https://www.youtube.com/)
-如果您想学习编程，这个频道适合您。</description><guid isPermaLink="true">https://luliy.me/link.html</guid><pubDate>Wed, 03 Jun 2026 13:54:14 +0000</pubDate></item><item><title>stock</title><link>https://luliy.me/stock.html</link><description>1。</description><guid isPermaLink="true">https://luliy.me/stock.html</guid><pubDate>Thu, 11 Jun 2026 00:35:37 +0000</pubDate></item><item><title>archive</title><link>https://luliy.me/archive.html</link><description>1。</description><guid isPermaLink="true">https://luliy.me/archive.html</guid><pubDate>Thu, 11 Jun 2026 11:30:43 +0000</pubDate></item><item><title>chronicle</title><link>https://luliy.me/chronicle.html</link><description>`Gmeek-html&lt;div id='luliy-chronicle-fallback-wrap'&gt;&lt;script type='application/json' id='luliy-chronicle-fallback'&gt;
+如果您想学习编程，这个频道适合您。</description><guid isPermaLink="true">https://luliy6.github.io/link.html</guid><pubDate>Wed, 03 Jun 2026 13:54:14 +0000</pubDate></item><item><title>stock</title><link>https://luliy6.github.io/stock.html</link><description>1。</description><guid isPermaLink="true">https://luliy6.github.io/stock.html</guid><pubDate>Thu, 11 Jun 2026 00:35:37 +0000</pubDate></item><item><title>archive</title><link>https://luliy6.github.io/archive.html</link><description>1。</description><guid isPermaLink="true">https://luliy6.github.io/archive.html</guid><pubDate>Thu, 11 Jun 2026 11:30:43 +0000</pubDate></item><item><title>chronicle</title><link>https://luliy6.github.io/chronicle.html</link><description>`Gmeek-html&lt;div id='luliy-chronicle-fallback-wrap'&gt;&lt;script type='application/json' id='luliy-chronicle-fallback'&gt;
 {
-  'years': ['2026', '2025'],
+  'years': [2026],
   'categories': [
     {'key': 'event', 'label': '事件'},
     {'key': 'media', 'label': '书视事'},
@@ -2217,15 +2297,19 @@ The user will provide learning material (a single sentence or a full article/par
   ],
   'data': {
     '2026': {
-      'event': [],
-      'media': [],
-      'posters': []
-    },
-    '2025': {
-      'event': [],
+      'event': [
+        {
+          'month': '6月',
+          'city': '宁夏',
+          'items': [
+            {'title': '创建博客', 'url': ''},
+            {'title': '历代更迭', 'url': ''}
+          ]
+        }
+      ],
       'media': [],
       'posters': []
     }
   }
 }
-&lt;/script&gt;&lt;/div&gt;`。</description><guid isPermaLink="true">https://luliy.me/chronicle.html</guid><pubDate>Mon, 22 Jun 2026 04:55:14 +0000</pubDate></item></channel></rss>
+&lt;/script&gt;&lt;/div&gt;`。</description><guid isPermaLink="true">https://luliy6.github.io/chronicle.html</guid><pubDate>Mon, 22 Jun 2026 04:55:14 +0000</pubDate></item></channel></rss>
