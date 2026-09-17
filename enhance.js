@@ -124,6 +124,28 @@
     homeUrl: '/'
   };
 
+  /* System and visual theme are separate dimensions:
+     - luliy-system: cyber | minimal
+     - luliy-sink: a palette used only by the cyber system
+     Resolve the system immediately, before any self-starting module runs. */
+  var SYSTEM_KEY = 'luliy-system';
+  function getSystem() {
+    try { return localStorage.getItem(SYSTEM_KEY) === 'minimal' ? 'minimal' : 'cyber'; }
+    catch (e) { return 'cyber'; }
+  }
+  document.documentElement.setAttribute('data-luliy-system', getSystem());
+
+  /* Kept separate from enhance.css so the minimal system can evolve without
+     adding another end-of-file override block to the cyber stylesheet. */
+  function loadMinimalStyles() {
+    if (document.getElementById('luliy-minimal-styles')) return;
+    var link = document.createElement('link');
+    link.id = 'luliy-minimal-styles';
+    link.rel = 'stylesheet';
+    link.href = '/minimal.css';
+    (document.head || document.documentElement).appendChild(link);
+  }
+
   /* ---- Utilities ------------------------------------------ */
   function ready(fn) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
@@ -5576,6 +5598,9 @@
   (function () {
     function boot() {
       if (!document.body) return;
+      /* 极简系统不需要赛博主题变量。此前这里总会先 applySink()，
+         随后再由极简分支撤销属性，造成首屏闪烁和不必要的样式竞争。 */
+      if (getSystem() === 'minimal') return;
       applySink(localStorage.getItem('luliy-sink') || 'cyberpunk');
     }
     if (document.body) boot();
@@ -5596,6 +5621,8 @@
   (function initSplash() {
     /* 避免重复、避免在 iframe / 打印时出现 */
     if (window.top !== window.self) return;
+    /* 加载页属于赛博体验；极简模式从第一帧起保持安静。 */
+    if (getSystem() === 'minimal') return;
     var TEXT = (LULIY_OPTS && LULIY_OPTS.siteName) || '\u0394\u03b9\u03ac\u039d\u03bf\u03c5\u03c2';
     var MAXMS = (LULIY_OPTS && LULIY_OPTS.splashMaxMs) || 1500;
     var VARIANT = Math.random() < 0.5 ? 'flow' : 'sweep';
@@ -5643,7 +5670,8 @@
   })();
 
   /* Sakura petals */
-  if (localStorage.getItem('luliy-sakura') !== '0') {
+  if (getSystem() !== 'minimal' &&
+      localStorage.getItem('luliy-sakura') !== '0') {
     if (document.body) initSakura();
     else document.addEventListener('DOMContentLoaded', initSakura);
   }
@@ -5661,26 +5689,24 @@
      · localStorage 键 luliy-system：'cyber'(默认) / 'minimal'
      · 极简系统下不加载任何赛博特效，走自己的黑白灰衬线排版。
      ============================================================ */
-  var SYSTEM_KEY = 'luliy-system';
   var MINIMAL_HOME_IMG = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/happy.png';
-
-  function getSystem() {
-    try { return localStorage.getItem(SYSTEM_KEY) === 'minimal' ? 'minimal' : 'cyber'; }
-    catch (e) { return 'cyber'; }
-  }
   function setSystem(sys) {
+    sys = sys === 'minimal' ? 'minimal' : 'cyber';
     try { localStorage.setItem(SYSTEM_KEY, sys); } catch (e) {}
+    document.documentElement.setAttribute('data-luliy-system', sys);
     location.reload();
   }
   root._luliySetSystem = setSystem;
   root._luliyGetSystem = getSystem;
 
   function initMinimalSystem() {
+    document.documentElement.setAttribute('data-luliy-system', 'minimal');
     document.body.classList.add('luliy-minimal');
     /* ★ 移除赛博主题属性，切断所有 body[data-luliy-theme=...] 规则，
        否则赛博的表格青色表头/粉色标题等会继续泄漏进极简页。 */
     try {
       document.body.removeAttribute('data-luliy-theme');
+      document.documentElement.removeAttribute('data-luliy-theme');
       document.documentElement.style.zoom = '1';
     } catch (e) {}
 
@@ -5775,9 +5801,12 @@
   ready(function () {
     /* ★ 极简系统拦截：在任何赛博初始化之前判断。命中则走极简分支并 return。 */
     if (getSystem() === 'minimal') {
+      loadMinimalStyles();
       safe(initMinimalSystem, 'minimalSystem');
       return;
     }
+
+    document.documentElement.setAttribute('data-luliy-system', 'cyber');
 
     /* ★ 大改后：全站锁定「抽屉导航」，首屏直接应用，避免两套导航闪现 */
     try {
