@@ -84,6 +84,22 @@
   --luliy-article-opacity: 0.5;
 }
 
+/* A single system attribute is the source of truth. enhance.js writes it
+   before either renderer starts, so downstream styles can be scoped to a
+   system instead of competing through repeated override patches. */
+html[data-luliy-system="minimal"] {
+  background: rgb(230,225,212) !important;
+  zoom: 1;
+}
+html[data-luliy-system="minimal"] body {
+  background: rgb(230,225,212) !important;
+}
+html[data-luliy-system="minimal"] #luliy-splash,
+html[data-luliy-system="minimal"] #luliy-cyber-canvas,
+html[data-luliy-system="minimal"] #luliy-sakura-canvas {
+  display: none !important;
+}
+
 html { scroll-behavior: smooth; zoom: 1.1; }
 *, *::before, *::after { box-sizing: border-box; }
 
