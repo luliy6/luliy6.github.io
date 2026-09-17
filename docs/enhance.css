@@ -81,7 +81,7 @@
   --luliy-cat-h: 338px;
 
   /* ★ 文章正文面板独立不透明度（和卡片/标签云的玻璃透明度分开控制） */
-  --luliy-article-opacity: 0.5;
+  --luliy-article-opacity: 0.95;
 }
 
 /* A single system attribute is the source of truth. enhance.js writes it
@@ -732,6 +732,11 @@ body.luliy-home #pagination {
   #luliy-cats-wrap { justify-content: flex-start; padding: 80px 16px 32px; }
   .luliy-cat-card { height: 200px; padding: 20px; }
   .luliy-cat-title { font-size: 24px; }
+}
+
+/* 高度由设置滑块控制；早期的响应式固定高度会覆盖变量，导致滑块无效。 */
+@media (max-width: 860px), (min-width: 861px) and (max-height: 800px) {
+  .luliy-cat-card { height: var(--luliy-cat-h, 338px) !important; }
 }
 body.luliy-reduce-motion .luliy-cat-card,
 body.luliy-reduce-motion #luliy-cats-more { transition: none; }
