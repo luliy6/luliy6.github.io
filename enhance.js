@@ -755,13 +755,13 @@
       'luliy-cyber':     (('ontouchstart' in window) || window.innerWidth < 768) ? '0' : '1',
       'luliy-cyber-speed': '1',      /* 0.2 ~ 3 */
       'luliy-cyber-dir':   'converge', /* converge | diverge | free */
-      'luliy-cyber-style': 'classic',  /* classic | city */
+      'luliy-cyber-style': 'classic',  /* 城市风格已退役，只保留经典粒子 */
       'luliy-glass-blur':    '22',     /* px，0~50 */
       'luliy-glass-opacity': '0.5',    /* 0~1 */
       'luliy-glass-hue':     '250',    /* 0~360 */
       'luliy-cat-w':        '1700',    /* 主页卡片宽度 px，900~2000，★默认再加宽 */
       'luliy-cat-h':         '338',    /* 主页卡片高度 px，220~500 */
-      'luliy-article-opacity': '0.5',  /* 文章正文面板独立不透明度，0.1~0.95 */
+      'luliy-article-opacity': _luliyResolveMode() === 'dark' ? '0' : '0.95',
       'luliy-fontsize':  '18',
       'luliy-sans':      '0',
       'luliy-cardview':  'grid',   /* grid | list */
@@ -978,8 +978,8 @@
     return (v === 'diverge' || v === 'free') ? v : 'converge';   /* converge | diverge | free */
   }
   function getCyberStyle() {
-    var v = localStorage.getItem('luliy-cyber-style');
-    return (v === 'city') ? 'city' : 'classic';   /* classic | city（新版多层视差城市，引力物理） */
+    /* 城市天际线会覆盖首页卡片与阅读面板，已永久停用。 */
+    return 'classic';
   }
 
   function stopCyberParticles() {
@@ -1938,8 +1938,9 @@
     hue = ((hue % 360) + 360) % 360;
 
     var artOp = parseFloat(localStorage.getItem('luliy-article-opacity'));
-    if (isNaN(artOp)) artOp = 0.5;
-    artOp = Math.min(0.95, Math.max(0.1, artOp));
+    /* 首次使用：日间为接近实底的 95%，夜间为完全透明。 */
+    if (isNaN(artOp)) artOp = _luliyResolveMode() === 'dark' ? 0 : 0.95;
+    artOp = Math.min(0.95, Math.max(0, artOp));
 
     var root2 = document.documentElement.style;
     root2.setProperty('--luliy-glass-blur', blur + 'px');
@@ -2915,8 +2916,11 @@
 
     var articleOpacitySlider = mkSlider({
       emoji: '\uD83D\uDCC4', label: '\u6587\u7ae0\u9762\u677f\u900f\u660e\u5ea6',   /* 📄 文章面板透明度（独立于上面的玻璃透明度，单独控制阅读面板） */
-      min: 0.1, max: 0.95, step: 0.05,
-      value: parseFloat(localStorage.getItem('luliy-article-opacity')) || 0.5,
+      min: 0, max: 0.95, step: 0.05,
+      value: (function () {
+        var v = parseFloat(localStorage.getItem('luliy-article-opacity'));
+        return isNaN(v) ? (_luliyResolveMode() === 'dark' ? 0 : 0.95) : v;
+      })(),
       format: function (v) { return Math.round(v * 100) + '%'; },
       onInput: function (v) {
         localStorage.setItem('luliy-article-opacity', String(v));
@@ -2963,7 +2967,7 @@
       'luliy-glass-blur':     '22',
       'luliy-glass-opacity':  '0.5',
       'luliy-glass-hue':      '250',
-      'luliy-article-opacity':'0.5',
+      'luliy-article-opacity': _luliyResolveMode() === 'dark' ? '0' : '0.95',
       'luliy-cat-w':          '1700',
       'luliy-cat-h':          '338'
     };
