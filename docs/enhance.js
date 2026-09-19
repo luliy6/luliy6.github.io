@@ -1314,7 +1314,7 @@
          （life -= ...），效果不受影响。 */
       ctx.clearRect(0, 0, W, H);
 
-      drawAurora(speedMul);
+      if (_lsGet('luliy-aurora') !== '0') drawAurora(speedMul);
 
 
       drawConnections();
@@ -1374,309 +1374,14 @@
   root._luliyStopCyberParticles = stopCyberParticles;
 
 
-  /* ---- 09  Navbar — rebuilt: avatar+name centred, time top-left, icons spread */
+
   /* 黑洞特效已删除（副标题改为导航切换按钮）。_bhActive 保留为常量，
      供 View Transitions 判断使用（永远 false，不再拦截）。 */
   var _bhActive = false;
 
-  function initHeroCluster() {
-    function tryBuild() {
-      var header = document.getElementById('header'); if (!header) return false;
-      if (document.getElementById('luliy-nav-rebuilt')) return true;
+  
 
-      /* Wait briefly for Gmeek to render nav links */
-      var trProbe = header.querySelector('.title-right, [class*="title-right"]');
-      var probeCount = trProbe ? trProbe.querySelectorAll('a, button, .circle').length
-                               : header.querySelectorAll('a, button, .circle').length;
-      if (probeCount === 0 && (tryBuild._waits || 0) < 8) {
-        tryBuild._waits = (tryBuild._waits || 0) + 1;
-        return false;
-      }
 
-      header.setAttribute('data-luliy-nav', '1');
-
-      /* ── Collect nav links BEFORE hiding anything ───────── */
-      var tr = header.querySelector('.title-right, [class*="title-right"]');
-      var rawLinks = [];
-      if (tr) rawLinks = Array.from(tr.querySelectorAll('a, button, .circle'));
-      if (rawLinks.length === 0) {
-        rawLinks = Array.from(header.querySelectorAll('a, button, .circle'));
-      }
-
-      /* Hide every existing child (links captured above) */
-      Array.from(header.children).forEach(function (el) {
-        var id = el.id || '';
-        if (id === 'luliy-toolbar' || id === 'luliy-nav-rebuilt' || id === 'luliy-nav-ham') return;
-        el.style.display = 'none';
-      });
-
-      /* Filter: drop RSS + about (about lives behind avatar) + circle */
-      var circleBtn = null;
-      var links = rawLinks.filter(function (a) {
-        var id = a.id || '';
-        if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return false;
-        var href = a.getAttribute('href') || '';
-        if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/.test(href)) return false;
-        if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
-        if (a.classList && a.classList.contains('circle')) { circleBtn = a; return false; }
-        return true;
-      });
-      /* Stash metadata for the mobile drawer + quick bar */
-      root._luliyNavLinks = links.map(function (a) {
-        return {
-          href: a.getAttribute('href') || '',
-          absHref: a.href || '',
-          label: a.getAttribute('title') || (a.textContent || '').trim(),
-          target: a.getAttribute('target') || '',
-          html: a.innerHTML
-        };
-      });
-
-      /* ════════ Build the new hero card (design-image layout) ════════ */
-      var shell = document.createElement('div');
-      shell.id = 'luliy-nav-rebuilt';
-
-      /* ── LEFT: avatar + name + divider + time/date ───────── */
-      var leftZone = document.createElement('div');
-      leftZone.id = 'luliy-hero-left';
-
-      var avatarLink = document.createElement('a');
-      avatarLink.href = '/about'; avatarLink.id = 'luliy-nav-avatar-link';
-      avatarLink.setAttribute('aria-label', '\u5173\u4e8e');
-      var avatarImg = document.createElement('img');
-      avatarImg.src = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/Luliy.jpg';
-      avatarImg.id = 'luliy-nav-avatar'; avatarImg.alt = 'Luliy';
-      avatarLink.appendChild(avatarImg);
-
-      var blogName = document.createElement('a');
-      blogName.href = '/'; blogName.id = 'luliy-nav-blogname';
-      blogName.textContent = 'Luliy';
-
-      var divider = document.createElement('span');
-      divider.id = 'luliy-hero-divider';
-
-      /* Time + date block (live Beijing time, UTC+8) */
-      var timeBlock = document.createElement('div');
-      timeBlock.id = 'luliy-hero-timeblock';
-      var timeRow = document.createElement('div');
-      timeRow.id = 'luliy-hero-time';
-      var clockIcon = document.createElement('span');
-      clockIcon.id = 'luliy-hero-clock';
-      clockIcon.innerHTML = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.4"/><path d="M8 4.4V8l2.6 1.6" stroke-linecap="round"/></svg>';
-      var timeText = document.createElement('span');
-      timeText.id = 'luliy-hero-time-text';
-      timeRow.appendChild(clockIcon); timeRow.appendChild(timeText);
-      var dateText = document.createElement('div');
-      dateText.id = 'luliy-hero-date';
-      timeBlock.appendChild(timeRow); timeBlock.appendChild(dateText);
-
-      var WEEK = ['\u65e5','\u4e00','\u4e8c','\u4e09','\u56db','\u4e94','\u516d'];
-      function updTime() {
-        /* Beijing time = UTC+8 regardless of viewer's timezone */
-        var now = new Date();
-        var bj = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000));
-        var hh = String(bj.getHours()).padStart(2, '0');
-        var mm = String(bj.getMinutes()).padStart(2, '0');
-        var ss = String(bj.getSeconds()).padStart(2, '0');
-        timeText.textContent = hh + ':' + mm + ':' + ss;
-        dateText.textContent =
-          bj.getFullYear() + ' / ' +
-          String(bj.getMonth() + 1).padStart(2, '0') + ' / ' +
-          String(bj.getDate()).padStart(2, '0') + '\u3000\u5468' + WEEK[bj.getDay()];
-      }
-      updTime(); setInterval(updTime, 1000);
-
-      leftZone.appendChild(avatarLink);
-      leftZone.appendChild(blogName);
-      leftZone.appendChild(divider);
-      leftZone.appendChild(timeBlock);
-
-      /* ── CENTRE-BOTTOM: link capsule bar ─────────────────── */
-      var capsule = document.createElement('div');
-      capsule.id = 'luliy-hero-capsule';
-      links.forEach(function (a, i) {
-        if (i > 0) {
-          var sep = document.createElement('span');
-          sep.className = 'luliy-hero-cap-sep';
-          capsule.appendChild(sep);
-        }
-        var c = a.cloneNode(true);
-        c.classList.add('luliy-hero-cap-link');
-        c.removeAttribute('id');
-        c.style.display = ''; c.style.visibility = '';
-        var lbl = a.getAttribute('title') || (a.textContent || '').trim();
-        if (lbl) {
-          c.setAttribute('aria-label', lbl);
-          /* ★ 补 title：纯图标模式（窄屏文字隐藏）下，鼠标悬停仍能看到
-             原生 tooltip 提示文字是什么，不靠 aria-label（那个只对屏
-             幕阅读器生效，鼠标悬停不会显示）。 */
-          c.setAttribute('title', lbl);
-          var span = document.createElement('span');
-          span.className = 'luliy-hero-cap-txt';
-          span.textContent = lbl;
-          c.appendChild(span);
-        }
-        capsule.appendChild(c);
-      });
-
-      /* 链接溢出处理改为纯 CSS 响应式降级（窄屏只显示图标，见 CSS
-         section 38），不再用 JS 检测溢出/挪到下拉菜单，没有"测量
-         时机不对"这类问题。 */
-      var rightZone = document.createElement('div');
-      rightZone.id = 'luliy-hero-right';
-      /* the #luliy-toolbar pill is relocated here after it's built */
-      root._luliyHeroRightSlot = rightZone;
-
-      /* ── Native day/night circle: tuck beside the name ───── */
-      if (circleBtn) {
-        circleBtn.id = 'luliy-nav-circle';
-        circleBtn.classList.add('luliy-hero-circle');
-        circleBtn.style.display = ''; circleBtn.style.visibility = '';
-        leftZone.appendChild(circleBtn);
-      }
-
-      /* ── subTitle：副标题 = 导航模式切换按钮（A套hero / B套抽屉） ───
-         ★ 需求：点击副标题在「桌面hero导航」和「抽屉导航」之间切换；
-            原黑洞特效已删除。切换逻辑由 root._luliyToggleNavMode 实现。 */
-      var subTitleEl = document.createElement('span');
-      subTitleEl.id = 'luliy-hero-subtitle';
-      subTitleEl.textContent = LULIY_OPTS.heroSubtitle || '\u6211\u5c06\u65e0\u9650\u8fdb\u6b65';
-      subTitleEl.title = '\u70b9\u51fb\u5207\u6362\u5bfc\u822a\u6837\u5f0f\uff08\u62bd\u5c49 / \u9876\u90e8\uff09';  /* 点击切换导航样式（抽屉/顶部） */
-      subTitleEl.style.cursor = 'pointer';
-      subTitleEl.addEventListener('click', function () {
-        if (root._luliyToggleNavMode) root._luliyToggleNavMode();
-      });
-
-      /* 移动端链接行 mobRow 已删除（导航统一由左滑抽屉承担）。
-         subTitleEl（副标题=导航切换按钮）直接放入 hero。 */
-      shell.appendChild(leftZone);
-      shell.appendChild(subTitleEl);
-      shell.appendChild(capsule);
-      shell.appendChild(rightZone);
-      header.insertBefore(shell, header.firstChild);
-
-      /* Self-heal: capsule empty but links exist → rebuild from title-right */
-      if (capsule.querySelectorAll('.luliy-hero-cap-link').length === 0) {
-        var late = header.querySelector('.title-right, [class*="title-right"]');
-        if (late) {
-          Array.from(late.querySelectorAll('a')).filter(function (a) {
-            var href = a.getAttribute('href') || '';
-            if (/rss\.xml$|\/rss$|\/feed/.test(href)) return false;
-            if (/\/about(\.html)?$|^about(\.html)?$/.test(href)) return false;
-            return true;
-          }).forEach(function (a, i) {
-            if (i > 0) {
-              var sep = document.createElement('span');
-              sep.className = 'luliy-hero-cap-sep'; capsule.appendChild(sep);
-            }
-            var c = a.cloneNode(true);
-            c.classList.add('luliy-hero-cap-link'); c.removeAttribute('id');
-            c.style.display = ''; c.style.visibility = '';
-            var lbl = a.getAttribute('title') || (a.textContent || '').trim();
-            if (lbl) {
-              c.setAttribute('title', lbl);   /* 纯图标模式下悬停可见提示 */
-              var s = document.createElement('span'); s.className = 'luliy-hero-cap-txt'; s.textContent = lbl; c.appendChild(s);
-            }
-            capsule.appendChild(c);
-          });
-        }
-      }
-
-      /* Relocate the toolbar pill into the hero right slot, if ready */
-      relocatePill();
-
-      return true;
-    }
-
-    /* Move the existing #luliy-toolbar pill into the hero right slot */
-    function relocatePill() {
-      var slot = root._luliyHeroRightSlot;
-      var pill = document.getElementById('luliy-toolbar');
-      if (slot && pill && pill.parentElement !== slot) {
-        slot.appendChild(pill);
-      }
-    }
-    root._luliyRelocatePill = relocatePill;
-
-    /* Scroll-fade: hero card fades to transparent on scroll so it never
-       covers page content; reappears (fully opaque) when the mouse moves
-       to the top region of the viewport. */
-    function initHeroScrollFade() {
-      var shell = document.getElementById('luliy-nav-rebuilt');
-      var header = document.getElementById('header');
-      if (!shell) return;
-      /* Header is always fully transparent — only the hero card carries
-         the glass background, and it fades out completely on scroll. */
-      if (header) header.style.background = 'transparent';
-
-      var nearTop = false;        /* 鼠标是否在视口顶部热区 */
-      var zoneBottom = 110;       /* 顶部热区下边界(px)，按卡片高度动态测量 */
-
-      /* opacity 不影响布局，卡片几何与滚动无关，故只在构建/缩放时测一次。
-         热区 = 卡片底边 + 16px 缓冲，最少 90px，确保整张卡片都在热区内。 */
-      function measureZone() {
-        var r = shell.getBoundingClientRect();
-        zoneBottom = Math.max(90, r.bottom + 16);
-      }
-      measureZone();
-      window.addEventListener('resize', measureZone, { passive: true });
-
-      function scrollOpacity() {
-        var sy = window.scrollY || window.pageYOffset || 0;
-        return 1 - Math.min(1, sy / 140);   /* 下拉越多越透明，>140px 全透明 */
-      }
-      function render() {
-        /* ★ 透明度开关：若用户关闭了导航透明度功能，始终保持完全不透明 */
-        var shell = document.getElementById('luliy-nav-rebuilt');
-        var fadeOff = shell && shell._luliyFadeEnabled === false;
-        var op = (nearTop || fadeOff) ? 1 : scrollOpacity();
-        shell.style.opacity = String(op);
-        /* 透明时放行点击穿透（不挡下方内容）；不透明时恢复可点 */
-        shell.style.pointerEvents = (op <= 0.02) ? 'none' : '';
-      }
-
-      /* ★ 需求：下拉后导航栏变透明；鼠标移到网页顶部区域 → 透明度变回、
-         完全不透明。用文档级 mousemove + 廉价的 clientY 比较（不触发布局），
-         且仅在状态变化时写样式，开销极小。关键：即便卡片已 pointer-events
-         :none（收不到自身悬停事件），靠顶部热区检测也能可靠唤回。 */
-      document.addEventListener('mousemove', function (e) {
-        var inZone = e.clientY <= zoneBottom;
-        if (inZone !== nearTop) { nearTop = inZone; render(); }
-      }, { passive: true });
-
-      onScrollRAF(render);
-      render();
-    }
-
-    if (!tryBuild()) {
-      var tries = 0;
-      var iv = setInterval(function () {
-        if (tryBuild() || ++tries > 30) {
-          clearInterval(iv);
-          initHeroScrollFade();
-          /* ★ bug修复：hero 构建成功（_luliyNavLinks 已就位）后，立即显式
-             触发一次抽屉快捷链接填充，不再单纯依赖抽屉自己的轮询去“偶遇”
-             这个时机——两边各自重试容易在时序上错过，直接调用最可靠。 */
-          if (root._luliyFillDrawerQuick) root._luliyFillDrawerQuick();
-        }
-      }, 200);
-    } else {
-      initHeroScrollFade();
-      if (root._luliyFillDrawerQuick) root._luliyFillDrawerQuick();
-    }
-    /* In case the pill / nav links are ready after the hero, retry a few times */
-    var pn = 0;
-    var piv = setInterval(function () {
-      if (root._luliyRelocatePill) root._luliyRelocatePill();
-      var pillDone = document.getElementById('luliy-toolbar') &&
-          document.getElementById('luliy-toolbar').parentElement &&
-          document.getElementById('luliy-toolbar').parentElement.id === 'luliy-hero-right';
-      if (pillDone) clearInterval(piv);
-      if (++pn > 40) clearInterval(piv);
-    }, 200);
-  }
-
-  /* ---- 10  Hero banner (homepage, scroll-fold) ------------ */
 
   /* ---- 11  Tag page search toolbar ----------------------- */
   function initTagEnhance() {
@@ -1908,6 +1613,13 @@
     for (var i = 0; i < SINKS.length; i++) { if (SINKS[i].id === id) { s = SINKS[i]; break; } }
     if (!s) s = SINKS[0];   /* 找不到就回退到默认（赛博朋克） */
     _lsSet('luliy-sink', s.id);
+    document.querySelectorAll('[data-sink]').forEach(function (button) {
+      var active = button.getAttribute('data-sink') === s.id;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+      if (button._bdg) button._bdg.style.opacity = active ? '1' : '0';
+    });
+    document.dispatchEvent(new CustomEvent('luliy:themechange', { detail: { id: s.id } }));
     if (getSystem() === 'minimal') return;
     document.body.setAttribute('data-luliy-theme', s.theme);
     document.documentElement.setAttribute('data-luliy-theme', s.theme);
@@ -1915,39 +1627,13 @@
     document.documentElement.style.setProperty('--card-c2', s.cardPalette[1]);
     document.documentElement.style.setProperty('--card-c3', s.cardPalette[2]);
     document.documentElement.style.setProperty('--card-c4', s.cardPalette[3]);
+    if (_meteorCanvas) initThemeParticles();
   }
   /* 暴露给抽屉系统复用 */
   root._luliyApplySink = applySink;
   root._luliySINKS = SINKS;
 
-  /* ════════════════════════════════════════════════════════
-     18d  左滑抽屉导航 + 双导航模式切换  ★全新
-     - ☰「更多」按钮固定左上角，点击从左滑出抽屉
-     - 抽屉顶部：头像 + 博客名 + 时钟 + 时间 + 日期 + 导航模式切换按钮
-     - 折叠分区：快捷访问(singlePage+exlink) / 主题(6个) / 设置(复用浮动面板内容)
-     - 双导航模式：A=桌面 hero 导航栏；B=抽屉。副标题 / 抽屉顶部按钮切换
-       · 桌面默认 A，手机(≤768)默认 B；全端可互相切换；状态存 localStorage
-  ════════════════════════════════════════════════════════ */
-  var NAV_MODE_KEY = 'luliy-nav-mode';   /* 'hero' | 'drawer' */
-
-  /* 当前生效的导航模式。
-     ★ 大改后：全站锁定「抽屉导航」，不再提供顶部 hero 导航。
-     （切换逻辑代码保留，但 getNavMode 恒定返回 'drawer'，
-     这样顶部导航那一套永远不会显示，又不破坏原有结构。
-     若日后想恢复双模式，把下面这行删掉、解开注释即可。） */
-  function getNavMode() {
-    return 'drawer';
-    /* var saved = _lsGet(NAV_MODE_KEY);
-    if (saved === 'hero' || saved === 'drawer') return saved;
-    return (window.innerWidth <= 768) ? 'drawer' : 'hero'; */
-  }
-
-  /* 应用导航模式：切换 body class，由 CSS 控制 hero / ☰ 的显隐 */
-  function applyNavMode(mode) {
-    document.body.classList.toggle('luliy-nav-hero',   mode === 'hero');
-    document.body.classList.toggle('luliy-nav-drawer', mode === 'drawer');
-  }
-
+  /* Drawer navigation: the only cyber navigation layout. */
   function initDrawerNav() {
     if (document.getElementById('luliy-ham-btn')) return;
 
@@ -1983,7 +1669,7 @@
       '<div class="ldh-date">----/--/--</div>';
     drawer.appendChild(head);
 
-    /* 抽屉内时钟（北京时间，与 hero 一致） */
+    /* 抽屉内时钟（北京时间，北京时间） */
     var WEEK = ['\u65e5','\u4e00','\u4e8c','\u4e09','\u56db','\u4e94','\u516d'];
     var dTimeEl = head.querySelector('.ldh-time-text');
     var dDateEl = head.querySelector('.ldh-date');
@@ -1996,23 +1682,6 @@
         '\u3000\u5468' + WEEK[bj.getDay()];
     }
     updDrawerTime(); setInterval(updDrawerTime, 1000);
-
-    /* —— 导航模式切换按钮（B 套里的切换入口）—— */
-    var modeBtn = document.createElement('button');
-    modeBtn.type = 'button';
-    modeBtn.id = 'luliy-drawer-modebtn';
-    function refreshModeBtn() {
-      var m = getNavMode();
-      /* 当前抽屉模式 → 提示切到桌面顶部导航；反之提示切到抽屉 */
-      modeBtn.innerHTML = (m === 'drawer')
-        ? '\u5207\u6362\u5230\u9876\u90e8\u5bfc\u822a'   /* 切换到顶部导航 */
-        : '\u5207\u6362\u5230\u62bd\u5c49\u5bfc\u822a';  /* 切换到抽屉导航 */
-    }
-    refreshModeBtn();
-    modeBtn.addEventListener('click', function () {
-      if (root._luliyToggleNavMode) root._luliyToggleNavMode();
-      refreshModeBtn();
-    });
 
     /* ★ 顶部日夜切换按钮（图标随当前模式切换） */
     var dnBtn = document.createElement('button');
@@ -2034,10 +1703,9 @@
       if (playSfx) playSfx('theme');
     });
 
-    /* 切换按钮 + 日夜按钮 并排一行 */
+    /* 抽屉日夜按钮 */
     var btnRow = document.createElement('div');
     btnRow.className = 'ldh-btn-row';
-    btnRow.appendChild(modeBtn);
     btnRow.appendChild(dnBtn);
     head.appendChild(btnRow);
 
@@ -2076,8 +1744,7 @@
       Array.prototype.forEach.call(scope.querySelectorAll('a[href]'), function (a) {
         var id = a.id || '';
         if (id === 'luliy-nav-avatar-link' || id === 'luliy-nav-blogname') return;
-        if (a.closest('#luliy-hero-capsule, #luliy-drawer')) return;
-        if (a.classList && (a.classList.contains('luliy-hero-cap-link') || a.classList.contains('circle'))) return;
+        if (a.closest('#luliy-drawer')) return;
         var href = a.getAttribute('href') || '';
         if (!href || href.charAt(0) === '#') return;
         if (/rss\.xml$|atom\.xml$|\/rss$|\/feed/i.test(href)) return;        /* 排除 RSS */
@@ -2115,36 +1782,6 @@
 
     function fillQuick() {
       var items = readNavAnchors();
-      /* 兜底①：.title-right 还没渲染（或读取失败）时用 _luliyNavLinks 缓存救场 */
-      if (!items.length && root._luliyNavLinks && root._luliyNavLinks.length) {
-        items = root._luliyNavLinks.filter(function (m) {
-          var h = (m.href || m.absHref || '');
-          return h && !/\/about(\.html)?$|^about(\.html)?$/i.test(h) && !/rss|feed|atom/i.test(h);
-        }).map(function (m) {
-          return { href: m.absHref || m.href, target: m.target || '', label: m.label || '\u94fe\u63a5',
-                   icon: '', external: m.target === '_blank' };
-        });
-      }
-      /* ★ 兜底②（bug修复）：上面两条都失败时，直接读 hero capsule 里
-         已克隆好的链接——capsule 在抽屉模式下只是 display:none，元素
-         本身始终在 DOM 里，且其内容已被证明渲染正确（截图里桌面 hero
-         能正常显示这些链接），是最可靠的最后一层数据源。 */
-      if (!items.length) {
-        var capLinks = document.querySelectorAll('#luliy-hero-capsule .luliy-hero-cap-link');
-        if (capLinks.length) {
-          items = Array.prototype.map.call(capLinks, function (a) {
-            var svg = a.querySelector('svg');
-            var txt = a.querySelector('.luliy-hero-cap-txt');
-            return {
-              href: a.href || a.getAttribute('href') || '',
-              target: a.getAttribute('target') || '',
-              label: (txt ? txt.textContent : a.textContent || '').trim() || a.getAttribute('aria-label') || '\u94fe\u63a5',
-              icon: '',   /* ★ 不带箭头等 SVG 图标 */
-              external: a.getAttribute('target') === '_blank'
-            };
-          }).filter(function (it) { return it.href; });
-        }
-      }
       if (!items.length) return false;
       quickWrap.innerHTML = '';
       items.forEach(function (it) {
@@ -2180,6 +1817,7 @@
       cell.type = 'button';
       cell.className = 'luliy-drawer-theme-cell' + (s.id === curSink ? ' is-active' : '');
       cell.setAttribute('data-sink', s.id);
+      cell.setAttribute('aria-pressed', String(s.id === curSink));
       cell.innerHTML =
         '<span class="ldt-dot" style="background:' + s.dot + '"></span>' +
         '<span class="ldt-name">' + esc(s.label) + '</span>';
@@ -2200,28 +1838,14 @@
     var settingsHost = document.createElement('div');
     settingsHost.className = 'lds-settings-host';
     secSettings._body.appendChild(settingsHost);
-    var panelMoved = false;
     function ensurePanelInDrawer() {
       var panel = document.getElementById('luliy-ctrl-panel');
       if (panel && settingsHost && panel.parentElement !== settingsHost) {
         settingsHost.appendChild(panel);
         panel.classList.add('in-drawer');
-        panelMoved = true;
       }
     }
-    /* 切回 hero 模式时，把面板搬回右下角浮动工具条 */
-    function restorePanelToFloat() {
-      var panel = document.getElementById('luliy-ctrl-panel');
-      var bar = document.getElementById('luliy-toolbar');
-      if (panel && bar && panel.parentElement !== bar) {
-        panel.classList.remove('in-drawer');
-        panel.style.position = '';
-        panel.style.display = '';
-        bar.appendChild(panel);
-        panelMoved = false;
-      }
-    }
-    root._luliyRestorePanelToFloat = restorePanelToFloat;
+    
     /* 展开「设置」时把面板搬进来 */
     secSettings.querySelector('.lds-header').addEventListener('click', function () {
       setTimeout(ensurePanelInDrawer, 0);
@@ -2236,7 +1860,6 @@
       ham.classList.add('is-open');
       document.body.classList.add('luliy-drawer-open');
       document.body.style.overflow = 'hidden';   /* 锁背景滚动 */
-      refreshModeBtn();
     }
     function closeDrawer() {
       drawer.classList.remove('is-open');
@@ -2371,34 +1994,11 @@
       document.body.appendChild(subEl);
     }
 
-    /* ── 双导航模式切换实现 ── */
-    root._luliyToggleNavMode = function () {
-      var next = (getNavMode() === 'hero') ? 'drawer' : 'hero';
-      _lsSet(NAV_MODE_KEY, next);
-      applyNavMode(next);
-      refreshModeBtn();
-      if (next === 'hero') {
-        closeDrawer();
-        /* 切回 hero：把设置面板还给右下角浮动工具条 */
-        if (root._luliyRestorePanelToFloat) root._luliyRestorePanelToFloat();
-      }
-      if (playSfx) playSfx('click');
-    };
-
-    /* 初始应用当前模式 */
-    applyNavMode(getNavMode());
-
-    /* 窗口缩放跨过 768 断点时，若用户从未手动选择，则跟随宽度更新默认 */
-    window.addEventListener('resize', function () {
-      if (_lsGet(NAV_MODE_KEY)) return;   /* 用户已手选，不自动改 */
-      applyNavMode(getNavMode());
-    }, { passive: true });
+    document.body.classList.add('luliy-nav-drawer');
   }
 
-  /* ---- Nav transparency on scroll (article pages) --------- */
-  function initNavTransparency() {
-    /* Merged into initHeroScrollFade — no-op here to avoid dual scroll handlers */
-  }
+
+  
 
   function initToolbar() {
     if (document.getElementById('luliy-toolbar')) return;
@@ -2517,57 +2117,6 @@
       panel.appendChild(row);
     });
 
-    /* ★ 需求④：导航栏透明度开关——在夜间模式按钮左侧加一个按钮
-       状态存 localStorage('luliy-nav-fade')，默认开启('1')。
-       关闭后 initHeroScrollFade 不再绑定透明度，导航栏始终完全不透明。 */
-    var FADE_KEY = 'luliy-nav-fade';
-    function isFadeEnabled() { return _lsGet(FADE_KEY) !== '0'; }
-    /* 切换函数——供按钮点击和初始化共用 */
-    function applyFadeState(enabled) {
-      _lsSet(FADE_KEY, enabled ? '1' : '0');
-      var shell = document.getElementById('luliy-nav-rebuilt');
-      if (shell) {
-        if (enabled) {
-          /* 恢复透明度逻辑：触发一次虚拟 scroll 事件让现有 render() 重新计算 */
-          shell._luliyFadeEnabled = true;
-          window.dispatchEvent(new Event('scroll'));
-        } else {
-          /* 关闭：立刻把导航栏设为完全不透明，停止响应滚动 */
-          shell._luliyFadeEnabled = false;
-          shell.style.opacity = '1';
-          shell.style.pointerEvents = '';
-        }
-      }
-    }
-    /* 透明度开关行（图标：半透明方块感 SVG） */
-    var fadeRow = document.createElement('button');
-    fadeRow.type = 'button';
-    fadeRow.className = 'luliy-ctrl-row luliy-fade-toggle-row';
-    fadeRow.id = 'luliy-fade-toggle-btn';
-    var fadeIcon = '<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">' +
-      '<rect x="1" y="1" width="8" height="8" rx="1.5" opacity="0.9"/>' +
-      '<rect x="7" y="7" width="8" height="8" rx="1.5" opacity="0.35"/>' +
-      '</svg>';
-    function refreshFadeRow() {
-      var on = isFadeEnabled();
-      fadeRow.innerHTML =
-        '<span class="luliy-ctrl-lbl">' + fadeIcon +
-        ' \u5bfc\u822a\u900f\u660e\u5ea6</span>' +   /* 导航透明度 */
-        '<span class="luliy-ctrl-badge luliy-fade-badge">' +
-        (on ? '\u5f00\u542f' : '\u5173\u95ed') + '</span>';  /* 开启/关闭 */
-      fadeRow.classList.toggle('is-active', on);
-      applyFadeState(on);
-    }
-    refreshFadeRow();
-    fadeRow.addEventListener('click', function () {
-      var next = !isFadeEnabled();
-      _lsSet(FADE_KEY, next ? '1' : '0');
-      refreshFadeRow();
-      playSfx && playSfx('click');
-    });
-    panel.appendChild(fadeRow);
-    panel.appendChild(mkSep());
-
     /* Day / Night theme preview cards */
     var previewWrap = document.createElement('div');
     previewWrap.className = 'luliy-ctrl-theme-preview';
@@ -2658,6 +2207,7 @@
       panel.querySelectorAll('[data-sink]').forEach(function (r) {
         var active = r.getAttribute('data-sink') === cur;
         r.classList.toggle('is-active', active);
+        r.setAttribute('aria-pressed', String(active));
         if (r._bdg) r._bdg.style.opacity = active ? '1' : '0';
       });
       /* Update preview cards for active theme */
@@ -2675,6 +2225,9 @@
     }
 
     panel.appendChild(mkSep());
+
+    document.addEventListener('luliy:themechange', syncThemeRows);
+    syncThemeRows();
 
     /* Sakura */
     var sakuraOn  = _lsGet('luliy-sakura') !== '0';
@@ -2704,6 +2257,28 @@
       playSfx('click');
     });
     panel.appendChild(cyberRow);
+
+    function addEffectSwitch(id, key, label, changed) {
+      var button = document.createElement('button');
+      button.type = 'button'; button.id = id; button.className = 'luliy-ctrl-row';
+      var name = document.createElement('span'); name.className = 'luliy-ctrl-lbl'; name.textContent = label;
+      var badge = document.createElement('span'); badge.className = 'luliy-ctrl-badge';
+      button.appendChild(name); button.appendChild(badge);
+      function sync() {
+        var on = _lsGet(key) !== '0';
+        button.setAttribute('aria-pressed', String(on));
+        button.classList.toggle('is-active', on);
+        badge.textContent = on ? '开启' : '关闭';
+      }
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        _lsSet(key, _lsGet(key) !== '0' ? '0' : '1');
+        sync(); if (changed) changed();
+      });
+      sync(); panel.appendChild(button);
+    }
+    addEffectSwitch('luliy-rising-toggle', 'luliy-particles', '上浮呼吸粒子', initThemeParticles);
+    addEffectSwitch('luliy-aurora-toggle', 'luliy-aurora', '背景光晕（随赛博粒子）');
 
     /* Cyberpunk particles — 速度 */
     var cyberSpeedSlider = mkSlider({
@@ -4181,6 +3756,7 @@
 
   function initThemeParticles() {
     stopThemeParticles();
+    if (getSystem() === 'minimal') return;
     if (prefersReduce && prefersReduce()) return;
     var theme = (document.body && document.body.getAttribute('data-luliy-theme')) || 'default';
     var cfg = THEME_PARTICLE_CFG[theme] || THEME_PARTICLE_CFG['default'];
@@ -4194,6 +3770,8 @@
     function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
     resize();
     window.addEventListener('resize', resize, { passive: true });
+
+    initThemeParticles._cleanup = function () { window.removeEventListener('resize', resize); };
 
     /* Particles — gated by the toggle; right-heavy distribution.
        Meteors stay on regardless (they're the global "流星" effect). */
@@ -4304,6 +3882,7 @@
   }
 
   function stopThemeParticles() {
+    if (initThemeParticles._cleanup) { initThemeParticles._cleanup(); initThemeParticles._cleanup = null; }
     if (_particleRAF) { cancelAnimationFrame(_particleRAF); _particleRAF = null; }
     var c = document.getElementById('luliy-meteor-canvas');
     if (c && c.parentNode) c.parentNode.removeChild(c);
@@ -5739,7 +5318,6 @@
 
     /* ★ 大改后：全站锁定「抽屉导航」，首屏直接应用，避免两套导航闪现 */
     try {
-      document.body.classList.remove('luliy-nav-hero');
       document.body.classList.add('luliy-nav-drawer');
     } catch (e) {}
 
@@ -5762,10 +5340,8 @@
     safe(initCyberParticles,  'cyberParticles');
     safe(initThemeRipple,     'ripple');
     safe(initTagEnhance,      'tagEnhance');
-    safe(initHeroCluster,     'navbar');
     safe(initLightbox,        'lightbox');
     safe(initToolbar,         'toolbar');
-    safe(initNavTransparency, 'navTransparency');
     safe(initDrawerNav,       'drawerNav');           /* ★ 左滑抽屉导航（全端） */
     safe(initKeyboardShortcuts, 'keyboardShortcuts'); /* ★ 键盘快捷键 / j k g t ←→ */
     safe(initThemeParticles,  'themeParticles');
