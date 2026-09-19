@@ -1,4 +1,6 @@
-/* enhance.js - Luliy Blog v10
+/* enhance.js - Luliy Blog A enhanced 2026-09-19
+   Based on A d4d498f; selected B improvements, A data and identity retained.
+   Original modules:
    Modules:
    00  Homepage Hero (first-visit full-screen, animation sequence)
    01  localStorage init
@@ -31,6 +33,87 @@
 */
 (function (root) {
   'use strict';
+
+  // Per-page fallback also preserves user changes if the browser rejects storage writes.
+  var _preferenceFallback = Object.create(null);
+  function _lsGet(key) {
+    if (Object.prototype.hasOwnProperty.call(_preferenceFallback, key)) return _preferenceFallback[key];
+    try { return window.localStorage.getItem(key); } catch (_) { return null; }
+  }
+  function _lsSet(key, value) {
+    _preferenceFallback[key] = String(value);
+    try { window.localStorage.setItem(key, String(value)); return true; } catch (_) { return false; }
+  }
+  function _lsRemove(key) {
+    _preferenceFallback[key] = null;
+    try { window.localStorage.removeItem(key); } catch (_) {}
+  }
+  var _sessionFallback = Object.create(null);
+  function _ssGet(key) {
+    if (Object.prototype.hasOwnProperty.call(_sessionFallback, key)) return _sessionFallback[key];
+    try { return window.sessionStorage.getItem(key); } catch (_) { return null; }
+  }
+  function _ssSet(key, value) {
+    _sessionFallback[key] = String(value);
+    try { window.sessionStorage.setItem(key, String(value)); } catch (_) {}
+  }
+  function readNumber(key, fallback, min, max) {
+    var n = parseFloat(_lsGet(key));
+    return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
+  }
+  var _resizeCallbacks = [], _resizeRAF = null;
+  function _luliyOnResize(fn) {
+    if (_resizeCallbacks.indexOf(fn) < 0) _resizeCallbacks.push(fn);
+    return function () { var i = _resizeCallbacks.indexOf(fn); if (i >= 0) _resizeCallbacks.splice(i, 1); };
+  }
+  window.addEventListener('resize', function () {
+    if (_resizeRAF !== null) return;
+    _resizeRAF = requestAnimationFrame(function () {
+      _resizeRAF = null;
+      _resizeCallbacks.slice().forEach(function (fn) { safe(fn, 'resize'); });
+    });
+  }, { passive: true });
+
+  function isArticleOpacityAuto() {
+    var mode = _lsGet('luliy-article-opacity-mode');
+    if (mode === 'auto') return true;
+    if (mode === 'manual') return false;
+    // Existing preferences are preserved; the new control explicitly restores automatic mode.
+    return _lsGet('luliy-article-opacity') === null;
+  }
+  function getArticleOpacitySetting() {
+    return isArticleOpacityAuto() ? (_luliyResolveMode() === 'dark' ? 0 : 0.95) :
+      readNumber('luliy-article-opacity', 0.95, 0, 0.95);
+  }
+
+  function initMinimalInkClick() {
+    if (initMinimalInkClick._bound) return;
+    initMinimalInkClick._bound = true;
+    var active = 0, last = 0;
+    document.addEventListener('click', function (e) {
+      if (e.detail === 0 || prefersReduce() || document.hidden || active >= 3 || Date.now() - last < 100) return;
+      if (e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+      last = Date.now(); active++;
+      var wrap = document.createElement('div');
+      wrap.className = 'luliy-ink-wrap'; wrap.setAttribute('aria-hidden', 'true');
+      wrap.style.left = e.clientX + 'px'; wrap.style.top = e.clientY + 'px';
+      var count = window.matchMedia('(pointer: coarse)').matches ? 9 : 18;
+      for (var i = 0; i < count; i++) {
+        var drop = document.createElement('span'), angle = Math.random() * Math.PI * 2;
+        var distance = 16 + Math.random() * 62, size = 6 + Math.random() * 17;
+        drop.className = 'luliy-ink-drop';
+        drop.style.setProperty('--dx', Math.cos(angle) * distance + 'px');
+        drop.style.setProperty('--dy', Math.sin(angle) * distance + 'px');
+        drop.style.setProperty('--ink-opacity', 0.18 + Math.random() * 0.45);
+        drop.style.width = drop.style.height = size + 'px';
+        drop.style.marginLeft = drop.style.marginTop = -size / 2 + 'px';
+        drop.style.animationDelay = Math.random() * 0.1 + 's'; wrap.appendChild(drop);
+      }
+      document.body.appendChild(wrap);
+      setTimeout(function () { wrap.remove(); active--; }, 850);
+    }, { passive: true });
+  }
+
 
   /* ════════════════════════════════════════════════════════
      SITE OPTIONS — edit these to customise
@@ -130,21 +213,13 @@
      Resolve the system immediately, before any self-starting module runs. */
   var SYSTEM_KEY = 'luliy-system';
   function getSystem() {
-    try { return localStorage.getItem(SYSTEM_KEY) === 'minimal' ? 'minimal' : 'cyber'; }
+    try { return _lsGet(SYSTEM_KEY) === 'minimal' ? 'minimal' : 'cyber'; }
     catch (e) { return 'cyber'; }
   }
   document.documentElement.setAttribute('data-luliy-system', getSystem());
 
-  /* Kept separate from enhance.css so the minimal system can evolve without
-     adding another end-of-file override block to the cyber stylesheet. */
-  function loadMinimalStyles() {
-    if (document.getElementById('luliy-minimal-styles')) return;
-    var link = document.createElement('link');
-    link.id = 'luliy-minimal-styles';
-    link.rel = 'stylesheet';
-    link.href = '/minimal.css';
-    (document.head || document.documentElement).appendChild(link);
-  }
+  /* 极简样式统一包含于 enhance.css，无额外样式文件依赖。 */
+  
 
   /* ---- Utilities ------------------------------------------ */
   function ready(fn) {
@@ -198,7 +273,7 @@
     if (_luliyResolveMode() === mode) return;
     /* Directly flip the attribute + Gmeek's storage key — no reload. */
     htmlEl.setAttribute('data-color-mode', mode);
-    try { localStorage.setItem('meek_theme', mode); } catch (e) {}
+    try { _lsSet('meek_theme', mode); } catch (e) {}
     /* Keep Gmeek's own <body> class in sync if it uses one. */
     try {
       document.body.setAttribute('data-color-mode', mode);
@@ -218,6 +293,7 @@
     return /(^|\/)archive(\.html)?$/i.test(location.pathname);
   }
   function fetchPosts() {
+    if (fetchPosts._pending) return fetchPosts._pending;
     function norm(data) {
       if (Array.isArray(data)) return data;
       if (data && typeof data === 'object') {
@@ -260,7 +336,11 @@
         .then(function (r) { if (!r.ok) throw 0; return r.json(); })
         .catch(function () { return tryNext(urls.slice(1)); });
     }
-    return tryNext(tryUrls).then(norm);
+    fetchPosts._pending = tryNext(tryUrls).then(norm).then(function (posts) {
+      if (!posts.length) fetchPosts._pending = null;
+      return posts;
+    }).catch(function (error) { fetchPosts._pending = null; throw error; });
+    return fetchPosts._pending;
   }
 
   /* Relative time: 今天 / 3天前 / 2个月前 / 1年前 */
@@ -294,10 +374,10 @@
 
     /* Position: restored from localStorage or default top-left */
     function loadPos() {
-      try { return JSON.parse(localStorage.getItem(APOS) || 'null'); } catch(e){ return null; }
+      try { return JSON.parse(_lsGet(APOS) || 'null'); } catch(e){ return null; }
     }
     function savePos(x, y) {
-      try { localStorage.setItem(APOS, JSON.stringify({x:x, y:y})); } catch(e){}
+      try { _lsSet(APOS, JSON.stringify({x:x, y:y})); } catch(e){}
     }
 
     /* Track list (default + user-added) */
@@ -308,13 +388,13 @@
         { name: '1 to 2', artist: 'Luliy', url: 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/music/1%20to%202%20.mp3', cover: cfg.cover||'' }
       ];
       try {
-        var extra = JSON.parse(localStorage.getItem(ALIST) || '[]');
+        var extra = JSON.parse(_lsGet(ALIST) || '[]');
         if (Array.isArray(extra)) return base.concat(extra);
       } catch(e) {}
       return base;
     }
     function saveTracks(extraList) {
-      try { localStorage.setItem(ALIST, JSON.stringify(extraList)); } catch(e) {}
+      try { _lsSet(ALIST, JSON.stringify(extraList)); } catch(e) {}
     }
 
     /* Wrapper that takes full position control */
@@ -404,7 +484,7 @@
       try {
         var tracks = loadTracks();
         var saved = null;
-        try { saved = JSON.parse(localStorage.getItem(AKEY) || 'null'); } catch(e){}
+        try { saved = JSON.parse(_lsGet(AKEY) || 'null'); } catch(e){}
         var isDark = document.documentElement.getAttribute('data-color-mode') === 'dark';
 
         var ap = new window.APlayer({
@@ -428,7 +508,7 @@
         /* ── Cross-page resume ────────────────────────────── */
         var au = ap.audio;
         function persist() {
-          try { localStorage.setItem(AKEY, JSON.stringify({
+          try { _lsSet(AKEY, JSON.stringify({
             pos: au && au.currentTime || 0,
             playing: au ? !au.paused : false, t: Date.now()
           })); } catch(e){}
@@ -478,7 +558,7 @@
             url = url.trim(); if (!url) return;
             var name = window.prompt('歌曲名称（可选）：') || '自定义';
             try {
-              var list = JSON.parse(localStorage.getItem(ALIST) || '[]');
+              var list = JSON.parse(_lsGet(ALIST) || '[]');
               if (!Array.isArray(list)) list = [];
               var track = { name: name, artist: 'Luliy', url: url, cover: cfg.cover || '' };
               list.push(track);
@@ -500,7 +580,7 @@
               var idx = ap.list.index;
               if (idx < BASE_COUNT) { window.alert('默认曲目不可删除'); return; }
               ap.list.remove(idx);
-              var list = JSON.parse(localStorage.getItem(ALIST) || '[]');
+              var list = JSON.parse(_lsGet(ALIST) || '[]');
               var extraIdx = idx - BASE_COUNT;
               if (extraIdx >= 0 && extraIdx < list.length) {
                 list.splice(extraIdx, 1);
@@ -632,7 +712,7 @@
                比按钮大得多，按钮原地不隐藏的话会糊在展开后面板的
                左上角。展开时把按钮隐藏，收起后再让它重新出现。 */
             apFab.classList.toggle('is-hidden-while-open', apOpen);
-            try { localStorage.setItem(APOPEN, apOpen ? '1' : '0'); } catch (e) {}
+            try { _lsSet(APOPEN, apOpen ? '1' : '0'); } catch (e) {}
           }
           apFab.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -653,7 +733,7 @@
 
           /* 默认收起；只有用户上次主动展开过才恢复展开状态 */
           var wasOpen = false;
-          try { wasOpen = localStorage.getItem(APOPEN) === '1'; } catch (e) {}
+          try { wasOpen = _lsGet(APOPEN) === '1'; } catch (e) {}
           setApOpen(wasOpen);
         }
 
@@ -755,13 +835,11 @@
       'luliy-cyber':     (('ontouchstart' in window) || window.innerWidth < 768) ? '0' : '1',
       'luliy-cyber-speed': '1',      /* 0.2 ~ 3 */
       'luliy-cyber-dir':   'converge', /* converge | diverge | free */
-      'luliy-cyber-style': 'classic',  /* 城市风格已退役，只保留经典粒子 */
       'luliy-glass-blur':    '22',     /* px，0~50 */
       'luliy-glass-opacity': '0.5',    /* 0~1 */
       'luliy-glass-hue':     '250',    /* 0~360 */
       'luliy-cat-w':        '1700',    /* 主页卡片宽度 px，900~2000，★默认再加宽 */
       'luliy-cat-h':         '338',    /* 主页卡片高度 px，220~500 */
-      'luliy-article-opacity': _luliyResolveMode() === 'dark' ? '0' : '0.95',
       'luliy-fontsize':  '18',
       'luliy-sans':      '0',
       'luliy-cardview':  'grid',   /* grid | list */
@@ -769,7 +847,7 @@
       'luliy-pbwidth':   '400'     /* postBody width delta px (default = 最大) */
     };
     Object.keys(defs).forEach(function (k) {
-      if (localStorage.getItem(k) === null) localStorage.setItem(k, defs[k]);
+      if (_lsGet(k) === null) _lsSet(k, defs[k]);
     });
   }
 
@@ -903,7 +981,7 @@
     return _actx;
   }
   function playSfx(type) {
-    if (localStorage.getItem('luliy-sfx') === '0') return;
+    if (_lsGet('luliy-sfx') === '0') return;
     var ctx = getACtx(); if (!ctx) return;
     try {
       if (type === 'click') {
@@ -958,7 +1036,7 @@
      08b  Cyberpunk particles — 全站背景粒子系统
      改编自用户上传的独立 HTML（赛博朋克粒子页）。原版逻辑保留：
      背景粒子向标题汇聚 + 连线 + 鼠标拖尾 + 点击爆炸/扩散环/故障文字
-     + 极光色块 + 城市剪影。这里做的改动：
+     + 极光色块（城市剪影已删除）。这里做的改动：
        · 汇聚目标从"屏幕顶部居中的独立标题"改成本站左上角 #luliy-brand
          的实际位置——不再新建一个标题，避免出现两个博客名字；
        · 加入开关 / 速度 / 方向三个设置项（存 localStorage，设置面板里调）；
@@ -970,17 +1048,14 @@
   var _cyberCanvas = null;
 
   function getCyberSpeed() {
-    var v = parseFloat(localStorage.getItem('luliy-cyber-speed'));
+    var v = parseFloat(_lsGet('luliy-cyber-speed'));
     return (isNaN(v) || v <= 0) ? 1 : Math.min(3, Math.max(0.2, v));
   }
   function getCyberDir() {
-    var v = localStorage.getItem('luliy-cyber-dir');
+    var v = _lsGet('luliy-cyber-dir');
     return (v === 'diverge' || v === 'free') ? v : 'converge';   /* converge | diverge | free */
   }
-  function getCyberStyle() {
-    /* 城市天际线会覆盖首页卡片与阅读面板，已永久停用。 */
-    return 'classic';
-  }
+  
 
   function stopCyberParticles() {
     if (_cyberRAF) { cancelAnimationFrame(_cyberRAF); _cyberRAF = null; }
@@ -990,7 +1065,8 @@
   }
 
   function initCyberParticles() {
-    if (localStorage.getItem('luliy-cyber') === '0') return;
+    if (getSystem() === 'minimal') return;
+    if (_lsGet('luliy-cyber') === '0') return;
     if (prefersReduce && prefersReduce()) return;
     if (document.getElementById('luliy-cyber-canvas')) return;
 
@@ -1073,65 +1149,12 @@
       ctx.shadowBlur = 0; ctx.globalAlpha = 1;
     };
 
-    /* ── 「城市」风格粒子：真实引力物理（取自用户上传的新版页面）。
-       和经典风格的区别：不是简单地朝目标点平移，而是用 G/dist 的
-       引力加速度 + 切向角动量（绕转）模拟轨道运动，越靠近核心转得
-       越快，进入"捕获半径"就被吞噬重生——更接近黑洞吸积盘的观感。
-       方向设置（汇聚/发散/自由）对这套物理不自然，城市风格固定走
-       原生的引力汇聚效果，不受方向设置影响。 */
-    function CityBgParticle() { this.reset(); }
-    CityBgParticle.prototype.reset = function () {
-      var edge = Math.floor(rand(0, 4));
-      if (edge === 0) { this.x = rand(0, W); this.y = -20; }
-      else if (edge === 1) { this.x = W + 20; this.y = rand(0, H); }
-      else if (edge === 2) { this.x = rand(0, W); this.y = H + 20; }
-      else { this.x = -20; this.y = rand(0, H); }
-      this.r = rand(0.6, 2.2) * 0.2;
-      this.color = pick(NEON);
-      this.alpha = rand(0.2, 0.9);
-      this.pulse = rand(0, Math.PI * 2);
-      this.swirl = rand(0.015, 0.04) * (Math.random() < 0.5 ? 1 : -1);
-      this.vx = rand(-0.2, 0.2);
-      this.vy = rand(-0.2, 0.2);
-    };
-    CityBgParticle.prototype.update = function (speedMul) {
-      var dx = target.x - this.x, dy = target.y - this.y;
-      var dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
-      var CAPTURE_RADIUS = 46;
-      if (dist < CAPTURE_RADIUS) { this.reset(); return; }
-      var G = 150 * speedMul;
-      var accel = G / dist;
-      this.vx += (dx / dist) * accel * 0.016;
-      this.vy += (dy / dist) * accel * 0.016;
-      var perpX = -dy / dist, perpY = dx / dist;
-      this.vx += perpX * this.swirl * speedMul;
-      this.vy += perpY * this.swirl * speedMul;
-      this.vx *= 0.95; this.vy *= 0.95;
-      this.x += this.vx; this.y += this.vy;
-      this.pulse += 0.02;
-    };
-    CityBgParticle.prototype.draw = function () {
-      var a = this.alpha * (0.6 + 0.4 * Math.sin(this.pulse));
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-      ctx.fillStyle = this.color;
-      ctx.globalAlpha = a;
-      ctx.shadowBlur = 1.6; ctx.shadowColor = this.color;
-      ctx.fill();
-      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-    };
-
-    var cyberStyle = getCyberStyle();
     var bgParticles = [];
-    var BG_COUNT = (cyberStyle === 'city')
-      ? Math.min(350, Math.floor((W * H) / 5000))   /* 城市风格粒子更小更密 */
-      : Math.min(70, Math.floor((W * H) / 25000));
-    for (var i = 0; i < BG_COUNT; i++) {
-      bgParticles.push(cyberStyle === 'city' ? new CityBgParticle() : new BgParticle());
-    }
+    var BG_COUNT = Math.min(70, Math.floor((W * H) / 25000));
+    for (var i = 0; i < BG_COUNT; i++) bgParticles.push(new BgParticle());
 
     /* ── 连接线 ── */
-    var CONNECT_DIST = (cyberStyle === 'city') ? 20 : 100;   /* 100 * 0.2 = 20，城市风格粒子尺度缩小 */
+    var CONNECT_DIST = 100;   
     function drawConnections() {
       ctx.lineWidth = 0.4; ctx.strokeStyle = '#6ec7ff';
       for (var i = 0; i < bgParticles.length; i++) {
@@ -1277,169 +1300,6 @@
     }
 
     /* ── 城市天际线剪影 ── */
-    var cityBuildings = [];
-    function rebuildCity() {
-      var buildings = [], x = 0;
-      while (x < W + 60) {
-        var bw = rand(28, 70), bh = rand(H * 0.12, H * 0.42);
-        buildings.push({ x: x, w: bw, h: bh, win: Math.random() < 0.5 });
-        x += bw + rand(2, 10);
-      }
-      cityBuildings = buildings;
-    }
-    rebuildCity();
-    function drawCityLayer(offsetX, offsetY, color, alpha) {
-      ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = color;
-      ctx.beginPath(); ctx.moveTo(offsetX, H + offsetY);
-      cityBuildings.forEach(function (b) {
-        ctx.lineTo(b.x + offsetX, H - b.h + offsetY);
-        ctx.lineTo(b.x + b.w + offsetX, H - b.h + offsetY);
-      });
-      ctx.lineTo(W + offsetX, H + offsetY); ctx.closePath(); ctx.fill(); ctx.restore();
-    }
-    var cityGlitchTime = 0;
-    function drawCityGhost(speedMul) {
-      cityGlitchTime += 0.02 * speedMul;
-      var jitter = Math.sin(cityGlitchTime * 3) * 1.2;
-      drawCityLayer(-4 + jitter, 0, 'rgba(110,199,255,0.22)', 1);
-      drawCityLayer(4 - jitter, 0, 'rgba(255,110,199,0.20)', 1);
-      drawCityLayer(0, 0, 'rgba(10,8,24,0.85)', 1);
-      ctx.save(); ctx.fillStyle = 'rgba(180,200,255,0.5)';
-      cityBuildings.forEach(function (b) {
-        if (!b.win) return;
-        var flicker = 0.3 + 0.7 * Math.abs(Math.sin(cityGlitchTime + b.x));
-        ctx.globalAlpha = flicker * 0.4;
-        ctx.fillRect(b.x + b.w * 0.3, H - b.h + 14, 2, 2);
-        ctx.fillRect(b.x + b.w * 0.6, H - b.h + 26, 2, 2);
-      });
-      ctx.restore();
-    }
-
-    /* ── 「城市」风格：多层视差天际线（远/中/近三层）+ 鼠标视差 +
-       建筑窗户微光 + 霓虹招牌闪烁。取自用户上传的新版页面。 ── */
-    var cityLayers = [];
-    function makeBuildingLayer(opts) {
-      var buildings = [], x = -40;
-      while (x < W + 60) {
-        var bw = rand(opts.minW, opts.maxW);
-        var bh = rand(H * opts.minH, H * opts.maxH);
-        var hasSpire = Math.random() < opts.spireChance;
-        var hasNeonSign = Math.random() < opts.neonChance;
-        var neonColor = pick(opts.neonColors);
-        var windowRows = Math.max(2, Math.floor(bh / 22));
-        var windowCols = Math.max(1, Math.floor(bw / 14));
-        buildings.push({
-          x: x, w: bw, h: bh, hasSpire: hasSpire, hasNeonSign: hasNeonSign,
-          neonColor: neonColor, neonY: rand(0.2, 0.7), neonW: bw * rand(0.4, 0.85),
-          windowRows: windowRows, windowCols: windowCols, seed: Math.random() * 100
-        });
-        x += bw + rand(opts.gapMin, opts.gapMax);
-      }
-      return buildings;
-    }
-    function rebuildCityLayers() {
-      /* ★ 重新设计：原版用 yOffset 把整层建筑往下平移，数值算下来会把
-         矮楼直接推到画布外面（translate 之后 top 坐标超过 H），只是
-         恰好被原版"每帧叠加半透明黑"的拖尾 bug 顺带"补"出一点残影，
-         才勉强看到一丝痕迹——而那个拖尾 bug 正是我们之前专门修掉的
-         "屏幕变黑"问题的根源，不能再加回来。
-         这里改成：不做整层下移，建筑高度直接按屏幕高度的合理比例
-         生成、自然"长在"画布底部（H 为基准线），三层靠"建筑高度本身
-         的差异 + 描边纵深感"区分远中近，确保不管哪一层都在可见区域
-         内。整体尺度也显著放大，呈现真正成片的多层建筑群，
-         而不是原版那种几乎看不见的细线。 */
-      cityLayers = [
-        { buildings: makeBuildingLayer({
-            minW: 26, maxW: 52, minH: 0.10, maxH: 0.19,
-            spireChance: 0.15, neonChance: 0.25, gapMin: 3, gapMax: 14,
-            neonColors: ['#3a4a8c', '#4a6a9c'] }),
-          baseColor: '20,24,48', alpha: 0.55, yOffset: 0, parallax: 6 },
-        { buildings: makeBuildingLayer({
-            minW: 38, maxW: 78, minH: 0.16, maxH: 0.30,
-            spireChance: 0.3, neonChance: 0.45, gapMin: 4, gapMax: 18,
-            neonColors: ['#ff6ec7', '#6ec7ff', '#b48cff'] }),
-          baseColor: '14,16,34', alpha: 0.80, yOffset: 0, parallax: 16 },
-        { buildings: makeBuildingLayer({
-            minW: 56, maxW: 130, minH: 0.22, maxH: 0.40,
-            spireChance: 0.45, neonChance: 0.7, gapMin: 5, gapMax: 24,
-            neonColors: ['#ff6ec7', '#7fdbff', '#c77dff', '#ff9eda'] }),
-          baseColor: '6,6,16', alpha: 0.95, yOffset: 0, parallax: 32 }
-      ];
-    }
-    function drawBuildingLayerSilhouette(layer, offsetX, colorOverride, alphaOverride) {
-      var buildings = layer.buildings;
-      ctx.save();
-      ctx.globalAlpha = (alphaOverride !== undefined) ? alphaOverride : layer.alpha;
-      ctx.fillStyle = colorOverride || ('rgba(' + layer.baseColor + ',1)');
-      ctx.beginPath();
-      ctx.moveTo(offsetX, H);
-      buildings.forEach(function (b) {
-        var top = H - b.h;
-        ctx.lineTo(b.x + offsetX, top);
-        if (b.hasSpire) {
-          var spireX = b.x + offsetX + b.w * 0.5;
-          ctx.lineTo(spireX - 2, top - rand(10, 28));
-          ctx.lineTo(spireX + 2, top);
-        }
-        ctx.lineTo(b.x + b.w + offsetX, top);
-      });
-      ctx.lineTo(W + offsetX, H);
-      ctx.closePath(); ctx.fill(); ctx.restore();
-    }
-    function drawBuildingWindowsAndNeon(layer, offsetX, t) {
-      var buildings = layer.buildings;
-      ctx.save();
-      buildings.forEach(function (b) {
-        var top = H - b.h;
-        for (var r = 0; r < b.windowRows; r++) {
-          for (var c = 0; c < b.windowCols; c++) {
-            var flickerSeed = b.seed + r * 3.1 + c * 1.7;
-            var on = (Math.sin(flickerSeed * 12.9898) * 43758.5453) % 1;
-            if (Math.abs(on) > 0.45) continue;
-            var flicker = 0.4 + 0.6 * Math.abs(Math.sin(t * 0.6 + flickerSeed));
-            ctx.globalAlpha = flicker * 0.5 * layer.alpha;
-            ctx.fillStyle = 'rgba(190,210,255,0.9)';
-            var wx = b.x + offsetX + 6 + c * 13, wy = top + 10 + r * 20;
-            if (wx < b.x + offsetX + b.w - 4) ctx.fillRect(wx, wy, 3, 5);
-          }
-        }
-        if (b.hasNeonSign) {
-          var ny = top + b.h * b.neonY;
-          var nflicker = 0.6 + 0.4 * Math.sin(t * 1.5 + b.seed);
-          ctx.globalAlpha = nflicker * layer.alpha;
-          ctx.shadowBlur = 10; ctx.shadowColor = b.neonColor;
-          ctx.fillStyle = b.neonColor;
-          ctx.fillRect(b.x + offsetX + (b.w - b.neonW) / 2, ny, b.neonW, 3);
-          ctx.shadowBlur = 0;
-        }
-      });
-      ctx.restore();
-    }
-    var cityGlitchTimeV2 = 0;
-    function drawCityGhostV2(speedMul) {
-      cityGlitchTimeV2 += 0.02 * speedMul;
-      var t = cityGlitchTimeV2;
-      var glitchSpike = Math.random() < 0.02 ? rand(4, 10) : 0;
-      var jitter = Math.sin(t * 3) * 1.0 + glitchSpike;
-      cityLayers.forEach(function (layer, i) {
-        ctx.save();
-        var parallaxX = ((mouse.x / W) - 0.5) * (layer.parallax || 0);
-        var parallaxY = ((mouse.y / H) - 0.5) * (layer.parallax || 0) * 0.3;
-        ctx.translate(parallaxX, layer.yOffset + parallaxY);
-        drawBuildingLayerSilhouette(layer, -3 + jitter * (i + 1) * 0.4, 'rgba(110,199,255,0.18)');
-        drawBuildingLayerSilhouette(layer, 3 - jitter * (i + 1) * 0.4, 'rgba(255,110,199,0.16)');
-        drawBuildingLayerSilhouette(layer, 0);
-        if (i > 0) drawBuildingWindowsAndNeon(layer, 0, t);
-        ctx.restore();
-      });
-      var fog = ctx.createLinearGradient(0, H * 0.75, 0, H);
-      fog.addColorStop(0, 'rgba(20,16,40,0)');
-      fog.addColorStop(1, 'rgba(20,16,40,0.55)');
-      ctx.fillStyle = fog;
-      ctx.fillRect(0, H * 0.75, W, H * 0.25);
-    }
-    if (cyberStyle === 'city') rebuildCityLayers();
-
     /* ── 主循环 ── */
     function tick() {
       if (!document.getElementById('luliy-cyber-canvas')) { _cyberRAF = null; return; }
@@ -1455,14 +1315,11 @@
       ctx.clearRect(0, 0, W, H);
 
       drawAurora(speedMul);
-      if (cyberStyle === 'city') drawCityGhostV2(speedMul);
-      else drawCityGhost(speedMul);
+
 
       drawConnections();
-      if (cyberStyle === 'city') {
-        for (var i = 0; i < bgParticles.length; i++) { bgParticles[i].update(speedMul); bgParticles[i].draw(); }
-      } else {
-        for (var i = 0; i < bgParticles.length; i++) { bgParticles[i].update(speedMul, dir); bgParticles[i].draw(); }
+      for (var i = 0; i < bgParticles.length; i++) {
+        bgParticles[i].update(speedMul, dir); bgParticles[i].draw();
       }
 
       /* ★ 鼠标跟随的炫光光晕已删除（用户反馈太晃眼）。
@@ -1496,8 +1353,7 @@
       if (_resizeTimer) clearTimeout(_resizeTimer);
       _resizeTimer = setTimeout(function () {
         updateTarget();
-        if (cyberStyle === 'city') rebuildCityLayers();
-        else rebuildCity();
+
       }, 150);
     }
     window.addEventListener('resize', onResize, { passive: true });
@@ -1898,11 +1754,11 @@
   function applyReadingPrefs() {
     var pbody = document.getElementById('postBody');
     if (!pbody) return;
-    var px = parseInt(localStorage.getItem('luliy-fontsize') || '18', 10) || 18;
+    var px = parseInt(_lsGet('luliy-fontsize') || '18', 10) || 18;
     px = Math.min(24, Math.max(14, px));
     pbody.style.setProperty('font-size', px + 'px', 'important');
     /* Font mode: '0'=default(楷体), '1'=黑体, '2'=苍耳今楷 */
-    var fm = localStorage.getItem('luliy-sans') || '0';
+    var fm = _lsGet('luliy-sans') || '0';
     document.body.classList.toggle('luliy-sans',   fm === '1');
     document.body.classList.toggle('luliy-canger', fm === '2');
   }
@@ -1913,7 +1769,7 @@
   function applyBgBlur() { /* no-op: background blur feature removed */ }
   function applyPbWidth() {
     /* 默认最大宽度 400；用户若手动调过则用其值 */
-    var raw = localStorage.getItem('luliy-pbwidth');
+    var raw = _lsGet('luliy-pbwidth');
     var d = (raw === null) ? 400 : (parseInt(raw, 10) || 0);
     d = Math.min(400, Math.max(0, d));   /* 0..400px extra width, each side */
     document.documentElement.style.setProperty('--luliy-pb-extra', d + 'px');
@@ -1925,44 +1781,59 @@
      写入 CSS 变量 --luliy-glass-blur / -opacity / -hue，
      .luliy-card、文章面板、标签云容器都读这三个变量。 */
   function applyGlassVars() {
-    var blur = parseFloat(localStorage.getItem('luliy-glass-blur'));
-    if (isNaN(blur)) blur = 22;
-    blur = Math.min(50, Math.max(0, blur));
-
-    var op = parseFloat(localStorage.getItem('luliy-glass-opacity'));
-    if (isNaN(op)) op = 0.5;
-    op = Math.min(0.95, Math.max(0.1, op));
-
-    var hue = parseFloat(localStorage.getItem('luliy-glass-hue'));
-    if (isNaN(hue)) hue = 250;
-    hue = ((hue % 360) + 360) % 360;
-
-    var artOp = parseFloat(localStorage.getItem('luliy-article-opacity'));
-    /* 首次使用：日间为接近实底的 95%，夜间为完全透明。 */
-    if (isNaN(artOp)) artOp = _luliyResolveMode() === 'dark' ? 0 : 0.95;
-    artOp = Math.min(0.95, Math.max(0, artOp));
-
-    var root2 = document.documentElement.style;
-    root2.setProperty('--luliy-glass-blur', blur + 'px');
-    root2.setProperty('--luliy-glass-opacity', String(op));
-    root2.setProperty('--luliy-glass-hue', String(hue));
-    root2.setProperty('--luliy-article-opacity', String(artOp));
+    var style = document.documentElement.style;
+    style.setProperty('--luliy-glass-blur', readNumber('luliy-glass-blur', 22, 0, 50) + 'px');
+    style.setProperty('--luliy-glass-opacity', readNumber('luliy-glass-opacity', 0.5, 0.1, 0.95));
+    style.setProperty('--luliy-glass-hue', readNumber('luliy-glass-hue', 250, 0, 360));
+    style.setProperty('--luliy-article-opacity', getArticleOpacitySetting());
+    if (root._luliySyncArticleOpacity) root._luliySyncArticleOpacity();
+    if (!applyGlassVars._observer) {
+      applyGlassVars._observer = new MutationObserver(function () { applyGlassVars(); });
+      applyGlassVars._observer.observe(document.documentElement, {
+        attributes: true, attributeFilter: ['data-color-mode']
+      });
+    }
   }
+
   root._luliyApplyGlassVars = applyGlassVars;
 
   /* ---- 主页卡片宽 / 高（可调节） -------------------------- */
   function applyCatSize() {
-    var w = parseFloat(localStorage.getItem('luliy-cat-w'));
+    var w = parseFloat(_lsGet('luliy-cat-w'));
     if (isNaN(w)) w = 1700;
     w = Math.min(2000, Math.max(900, w));
 
-    var h = parseFloat(localStorage.getItem('luliy-cat-h'));
+    var h = parseFloat(_lsGet('luliy-cat-h'));
     if (isNaN(h)) h = 338;
     h = Math.min(500, Math.max(220, h));
 
     var root2 = document.documentElement.style;
     root2.setProperty('--luliy-cat-w', w + 'px');
     root2.setProperty('--luliy-cat-h', h + 'px');
+
+    /* ★ 修复：卡片宽度滑块无响应。
+       Gmeek 的 body 是居中的 max-width 容器，原 CSS 用
+       min(var(--luliy-cat-w), 100%)，一旦滑块值超过容器宽就
+       被封顶（默认 1700 早已超过，所以调大无反应）。
+       这里把卡片区拉成通栏（突破 body 容器），并用实测视口宽度
+       算出真正可用的最大宽度（考虑 html 的 zoom），写入
+       --luliy-cat-max 供 CSS 封顶：滑块 900~2000 全程有响应，
+       只受屏幕实际宽度约束。 */
+    try {
+      var z = getZoomFactor();
+      var vwLayout = window.innerWidth / z;   /* 视口在布局坐标系的宽度 */
+      var wrap = document.getElementById('luliy-cats-wrap');
+      if (wrap) {
+        wrap.style.width = vwLayout + 'px';
+        wrap.style.maxWidth = 'none';
+        wrap.style.marginLeft = 'calc(50% - ' + (vwLayout / 2) + 'px)';
+      }
+      root2.setProperty('--luliy-cat-max', Math.max(320, vwLayout - 48) + 'px');
+      if (!applyCatSize._resizeBound) {
+        applyCatSize._resizeBound = true;
+        _luliyOnResize(applyCatSize);
+      }
+    } catch (e) {}
   }
   root._luliyApplyCatSize = applyCatSize;
 
@@ -2036,8 +1907,10 @@
     var s = null;
     for (var i = 0; i < SINKS.length; i++) { if (SINKS[i].id === id) { s = SINKS[i]; break; } }
     if (!s) s = SINKS[0];   /* 找不到就回退到默认（赛博朋克） */
-    localStorage.setItem('luliy-sink', s.id);
+    _lsSet('luliy-sink', s.id);
+    if (getSystem() === 'minimal') return;
     document.body.setAttribute('data-luliy-theme', s.theme);
+    document.documentElement.setAttribute('data-luliy-theme', s.theme);
     document.documentElement.style.setProperty('--card-c1', s.cardPalette[0]);
     document.documentElement.style.setProperty('--card-c2', s.cardPalette[1]);
     document.documentElement.style.setProperty('--card-c3', s.cardPalette[2]);
@@ -2064,7 +1937,7 @@
      若日后想恢复双模式，把下面这行删掉、解开注释即可。） */
   function getNavMode() {
     return 'drawer';
-    /* var saved = localStorage.getItem(NAV_MODE_KEY);
+    /* var saved = _lsGet(NAV_MODE_KEY);
     if (saved === 'hero' || saved === 'drawer') return saved;
     return (window.innerWidth <= 768) ? 'drawer' : 'hero'; */
   }
@@ -2301,7 +2174,7 @@
     var sinks = root._luliySINKS || [];
     var grid = document.createElement('div');
     grid.className = 'lds-theme-grid';
-    var curSink = localStorage.getItem('luliy-sink') || 'cyberpunk';
+    var curSink = _lsGet('luliy-sink') || 'cyberpunk';
     sinks.forEach(function (s) {
       var cell = document.createElement('button');
       cell.type = 'button';
@@ -2501,7 +2374,7 @@
     /* ── 双导航模式切换实现 ── */
     root._luliyToggleNavMode = function () {
       var next = (getNavMode() === 'hero') ? 'drawer' : 'hero';
-      localStorage.setItem(NAV_MODE_KEY, next);
+      _lsSet(NAV_MODE_KEY, next);
       applyNavMode(next);
       refreshModeBtn();
       if (next === 'hero') {
@@ -2517,7 +2390,7 @@
 
     /* 窗口缩放跨过 768 断点时，若用户从未手动选择，则跟随宽度更新默认 */
     window.addEventListener('resize', function () {
-      if (localStorage.getItem(NAV_MODE_KEY)) return;   /* 用户已手选，不自动改 */
+      if (_lsGet(NAV_MODE_KEY)) return;   /* 用户已手选，不自动改 */
       applyNavMode(getNavMode());
     }, { passive: true });
   }
@@ -2537,8 +2410,8 @@
     ctrlBtn.id = 'luliy-ctrl-btn';
     ctrlBtn.type = 'button';
     function refreshBtnLabel() {
-      var sfx    = localStorage.getItem('luliy-sfx')    !== '0';
-      var sakura = localStorage.getItem('luliy-sakura') !== '0';
+      var sfx    = _lsGet('luliy-sfx')    !== '0';
+      var sakura = _lsGet('luliy-sakura') !== '0';
       ctrlBtn.textContent = (sfx ? '\uD83D\uDD0A' : '\uD83D\uDD07') + ' \u2728 ' + (sakura ? '\uD83C\uDF38' : '\u00D7');
     }
     refreshBtnLabel();
@@ -2578,6 +2451,7 @@
       top.appendChild(lbl); top.appendChild(bdg);
       var rng = document.createElement('input');
       rng.type = 'range';
+      rng.setAttribute('aria-label', opts.label);
       rng.className = 'luliy-range';
       rng.min = String(opts.min); rng.max = String(opts.max);
       rng.step = String(opts.step || 1); rng.value = String(opts.value);
@@ -2588,12 +2462,16 @@
         rng.style.setProperty('--luliy-range-pct', pct + '%');
       }
       fill();
-      rng.addEventListener('input', function (e) {
-        e.stopPropagation();
-        var v = parseFloat(rng.value);
+      /* 供外部设置值：silent=true 只改视觉，不触发 onInput（不写存储） */
+      row.setValue = function (v, silent) {
+        rng.value = String(v);
         bdg.textContent = fmt(v);
         fill();
-        if (opts.onInput) opts.onInput(v);
+        if (!silent && opts.onInput) opts.onInput(v);
+      };
+      rng.addEventListener('input', function (e) {
+        e.stopPropagation();
+        row.setValue(parseFloat(rng.value), false);
       });
       rng.addEventListener('click', function (e) { e.stopPropagation(); });
       row.appendChild(top); row.appendChild(rng);
@@ -2602,12 +2480,12 @@
     }
 
     /* SFX */
-    var sfxOn  = localStorage.getItem('luliy-sfx') !== '0';
+    var sfxOn  = _lsGet('luliy-sfx') !== '0';
     var sfxRow = mkRow(sfxOn ? '\uD83D\uDD0A' : '\uD83D\uDD07', '\u97f3\u6548', sfxOn ? '\u5f00\u542f' : '\u5173\u95ed');
     sfxRow.addEventListener('click', function (e) {
       e.stopPropagation();
-      var on = localStorage.getItem('luliy-sfx') !== '0';
-      localStorage.setItem('luliy-sfx', on ? '0' : '1');
+      var on = _lsGet('luliy-sfx') !== '0';
+      _lsSet('luliy-sfx', on ? '0' : '1');
       sfxRow._ico.textContent = !on ? '\uD83D\uDD0A' : '\uD83D\uDD07';
       sfxRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
       refreshBtnLabel();
@@ -2643,10 +2521,10 @@
        状态存 localStorage('luliy-nav-fade')，默认开启('1')。
        关闭后 initHeroScrollFade 不再绑定透明度，导航栏始终完全不透明。 */
     var FADE_KEY = 'luliy-nav-fade';
-    function isFadeEnabled() { return localStorage.getItem(FADE_KEY) !== '0'; }
+    function isFadeEnabled() { return _lsGet(FADE_KEY) !== '0'; }
     /* 切换函数——供按钮点击和初始化共用 */
     function applyFadeState(enabled) {
-      localStorage.setItem(FADE_KEY, enabled ? '1' : '0');
+      _lsSet(FADE_KEY, enabled ? '1' : '0');
       var shell = document.getElementById('luliy-nav-rebuilt');
       if (shell) {
         if (enabled) {
@@ -2683,7 +2561,7 @@
     refreshFadeRow();
     fadeRow.addEventListener('click', function () {
       var next = !isFadeEnabled();
-      localStorage.setItem(FADE_KEY, next ? '1' : '0');
+      _lsSet(FADE_KEY, next ? '1' : '0');
       refreshFadeRow();
       playSfx && playSfx('click');
     });
@@ -2741,7 +2619,7 @@
       var after = htmlEl.getAttribute('data-color-mode') || '';
       if (after !== mode) {
         htmlEl.setAttribute('data-color-mode', mode);
-        try { localStorage.setItem('meek_theme', mode); } catch (e) {}
+        try { _lsSet('meek_theme', mode); } catch (e) {}
       }
       /* Ripple from viewport centre */
       if (root._luliyThemeRipple) root._luliyThemeRipple(
@@ -2776,7 +2654,7 @@
     } catch (e) {}
 
     function syncThemeRows() {
-      var cur = localStorage.getItem('luliy-sink') || 'cyberpunk';
+      var cur = _lsGet('luliy-sink') || 'cyberpunk';
       panel.querySelectorAll('[data-sink]').forEach(function (r) {
         var active = r.getAttribute('data-sink') === cur;
         r.classList.toggle('is-active', active);
@@ -2799,12 +2677,12 @@
     panel.appendChild(mkSep());
 
     /* Sakura */
-    var sakuraOn  = localStorage.getItem('luliy-sakura') !== '0';
+    var sakuraOn  = _lsGet('luliy-sakura') !== '0';
     var sakuraRow = mkRow('\uD83C\uDF38', '\u6a31\u82b1\u6548\u679c', sakuraOn ? '\u5f00\u542f' : '\u5173\u95ed');
     sakuraRow.addEventListener('click', function (e) {
       e.stopPropagation();
-      var on = localStorage.getItem('luliy-sakura') !== '0';
-      localStorage.setItem('luliy-sakura', on ? '0' : '1');
+      var on = _lsGet('luliy-sakura') !== '0';
+      _lsSet('luliy-sakura', on ? '0' : '1');
       sakuraRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
       refreshBtnLabel();
       if (on) stopSakura();
@@ -2814,12 +2692,12 @@
     panel.appendChild(sakuraRow);
 
     /* Cyberpunk particles — 总开关 */
-    var cyberOn  = localStorage.getItem('luliy-cyber') !== '0';
+    var cyberOn  = _lsGet('luliy-cyber') !== '0';
     var cyberRow = mkRow('\u2728', '\u8d5b\u535a\u7c92\u5b50', cyberOn ? '\u5f00\u542f' : '\u5173\u95ed');
     cyberRow.addEventListener('click', function (e) {
       e.stopPropagation();
-      var on = localStorage.getItem('luliy-cyber') !== '0';
-      localStorage.setItem('luliy-cyber', on ? '0' : '1');
+      var on = _lsGet('luliy-cyber') !== '0';
+      _lsSet('luliy-cyber', on ? '0' : '1');
       cyberRow._bdg.textContent = !on ? '\u5f00\u542f' : '\u5173\u95ed';
       if (on) { if (root._luliyStopCyberParticles) root._luliyStopCyberParticles(); }
       else { if (root._luliyInitCyberParticles) root._luliyInitCyberParticles(); }
@@ -2831,16 +2709,16 @@
     var cyberSpeedSlider = mkSlider({
       emoji: '\u26a1', label: '\u7c92\u5b50\u901f\u5ea6',
       min: 0.2, max: 3, step: 0.2,
-      value: parseFloat(localStorage.getItem('luliy-cyber-speed')) || 1,
+      value: parseFloat(_lsGet('luliy-cyber-speed')) || 1,
       format: function (v) { return v.toFixed(1) + 'x'; },
-      onInput: function (v) { localStorage.setItem('luliy-cyber-speed', String(v)); }
+      onInput: function (v) { _lsSet('luliy-cyber-speed', String(v)); }
     });
     panel.appendChild(cyberSpeedSlider);
 
     /* Cyberpunk particles — 方向（汇聚 / 发散 / 自由漂浮，循环切换） */
     var _dirLabels = { converge: '\u6c47\u805a\u6807\u9898', diverge: '\u53d1\u6563\u6269\u6563', free: '\u81ea\u7531\u98d8\u6d6e' };
     function curDir() {
-      var v = localStorage.getItem('luliy-cyber-dir');
+      var v = _lsGet('luliy-cyber-dir');
       return (v === 'diverge' || v === 'free') ? v : 'converge';
     }
     var cyberDirRow = mkRow('\uD83E\uDDED', '\u7c92\u5b50\u65b9\u5411', _dirLabels[curDir()]);
@@ -2848,31 +2726,11 @@
       e.stopPropagation();
       var order = ['converge', 'diverge', 'free'];
       var next = order[(order.indexOf(curDir()) + 1) % order.length];
-      localStorage.setItem('luliy-cyber-dir', next);
+      _lsSet('luliy-cyber-dir', next);
       cyberDirRow._bdg.textContent = _dirLabels[next];
       playSfx('click');
     });
     panel.appendChild(cyberDirRow);
-
-    /* 粒子风格：经典（汇聚标题，单层城市剪影）/ 城市（引力物理 +
-       多层视差天际线 + 鼠标视差 + 霓虹招牌，取自用户新上传的版本）。
-       两套风格内部结构差异较大，切换时直接停止重启整个粒子系统，
-       不做"实时融合"，更稳妥也更简单。 */
-    var _styleLabels = { classic: '\u7ecf\u5178', city: '\u57ce\u5e02\uff08\u65b0\uff09' };
-    function curCyberStyle() {
-      return localStorage.getItem('luliy-cyber-style') === 'city' ? 'city' : 'classic';
-    }
-    var cyberStyleRow = mkRow('\uD83C\uDFD9\uFE0F', '\u7c92\u5b50\u98ce\u683c', _styleLabels[curCyberStyle()]);
-    cyberStyleRow.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var next = curCyberStyle() === 'city' ? 'classic' : 'city';
-      localStorage.setItem('luliy-cyber-style', next);
-      cyberStyleRow._bdg.textContent = _styleLabels[next];
-      if (root._luliyStopCyberParticles) root._luliyStopCyberParticles();
-      if (root._luliyInitCyberParticles) root._luliyInitCyberParticles();
-      playSfx('click');
-    });
-    panel.appendChild(cyberStyleRow);
 
     /* ── 液态玻璃三个可调参数 ───────────────────────────── */
     panel.appendChild(mkSep());
@@ -2881,10 +2739,10 @@
     var glassBlurSlider = mkSlider({
       emoji: '\uD83C\uDF2B\uFE0F', label: '\u6a21\u7cca\u7a0b\u5ea6',   /* 🌫️ 模糊程度 */
       min: 0, max: 50, step: 2,
-      value: parseFloat(localStorage.getItem('luliy-glass-blur')) || 22,
+      value: readNumber('luliy-glass-blur', 22, 0, 50),
       format: function (v) { return v + 'px'; },
       onInput: function (v) {
-        localStorage.setItem('luliy-glass-blur', String(v));
+        _lsSet('luliy-glass-blur', String(v));
         applyGlassVars();
       }
     });
@@ -2893,10 +2751,10 @@
     var glassOpacitySlider = mkSlider({
       emoji: '\uD83D\uDD73\uFE0F', label: '\u900f\u660e\u5ea6',   /* 🕳️ 透明度（这里指不透明度，数值越大越实） */
       min: 0.1, max: 0.95, step: 0.05,
-      value: parseFloat(localStorage.getItem('luliy-glass-opacity')) || 0.5,
+      value: parseFloat(_lsGet('luliy-glass-opacity')) || 0.5,
       format: function (v) { return Math.round(v * 100) + '%'; },
       onInput: function (v) {
-        localStorage.setItem('luliy-glass-opacity', String(v));
+        _lsSet('luliy-glass-opacity', String(v));
         applyGlassVars();
       }
     });
@@ -2905,10 +2763,10 @@
     var glassHueSlider = mkSlider({
       emoji: '\uD83C\uDFA8', label: '\u8272\u8c03',   /* 🎨 色调 */
       min: 0, max: 360, step: 10,
-      value: parseFloat(localStorage.getItem('luliy-glass-hue')) || 250,
+      value: readNumber('luliy-glass-hue', 250, 0, 360),
       format: function (v) { return v + '\u00b0'; },
       onInput: function (v) {
-        localStorage.setItem('luliy-glass-hue', String(v));
+        _lsSet('luliy-glass-hue', String(v));
         applyGlassVars();
       }
     });
@@ -2917,17 +2775,35 @@
     var articleOpacitySlider = mkSlider({
       emoji: '\uD83D\uDCC4', label: '\u6587\u7ae0\u9762\u677f\u900f\u660e\u5ea6',   /* 📄 文章面板透明度（独立于上面的玻璃透明度，单独控制阅读面板） */
       min: 0, max: 0.95, step: 0.05,
-      value: (function () {
-        var v = parseFloat(localStorage.getItem('luliy-article-opacity'));
-        return isNaN(v) ? (_luliyResolveMode() === 'dark' ? 0 : 0.95) : v;
-      })(),
+      value: getArticleOpacitySetting(),
       format: function (v) { return Math.round(v * 100) + '%'; },
       onInput: function (v) {
-        localStorage.setItem('luliy-article-opacity', String(v));
+        _lsSet('luliy-article-opacity-mode', 'manual');
+        _lsSet('luliy-article-opacity', String(v));
         applyGlassVars();
       }
     });
     panel.appendChild(articleOpacitySlider);
+    var autoOpacityRow = mkRow('◐', '正文不透明度跟随日夜', '');
+    autoOpacityRow.setAttribute('role', 'button'); autoOpacityRow.tabIndex = 0;
+    function syncArticleOpacity() {
+      articleOpacitySlider.setValue(getArticleOpacitySetting(), true);
+      var auto = isArticleOpacityAuto();
+      autoOpacityRow._bdg.textContent = auto ? '自动' : '手动';
+      autoOpacityRow.setAttribute('aria-pressed', String(auto));
+    }
+    autoOpacityRow.addEventListener('click', function () {
+      if (isArticleOpacityAuto()) {
+        _lsSet('luliy-article-opacity', String(getArticleOpacitySetting()));
+        _lsSet('luliy-article-opacity-mode', 'manual');
+      } else { _lsSet('luliy-article-opacity-mode', 'auto'); }
+      applyGlassVars();
+    });
+    autoOpacityRow.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); autoOpacityRow.click(); }
+    });
+    root._luliySyncArticleOpacity = syncArticleOpacity;
+    syncArticleOpacity(); panel.appendChild(autoOpacityRow);
 
     /* ── 主页卡片尺寸（宽 / 高可调） ───────────────────── */
     panel.appendChild(mkSep());
@@ -2936,10 +2812,10 @@
     var catWSlider = mkSlider({
       emoji: '\u2194\uFE0F', label: '\u5361\u7247\u5bbd\u5ea6',   /* ↔️ 卡片宽度 */
       min: 900, max: 2000, step: 50,
-      value: parseFloat(localStorage.getItem('luliy-cat-w')) || 1700,
+      value: parseFloat(_lsGet('luliy-cat-w')) || 1700,
       format: function (v) { return v + 'px'; },
       onInput: function (v) {
-        localStorage.setItem('luliy-cat-w', String(v));
+        _lsSet('luliy-cat-w', String(v));
         applyCatSize();
       }
     });
@@ -2948,10 +2824,10 @@
     var catHSlider = mkSlider({
       emoji: '\u2195\uFE0F', label: '\u5361\u7247\u9ad8\u5ea6',   /* ↕️ 卡片高度 */
       min: 220, max: 500, step: 10,
-      value: parseFloat(localStorage.getItem('luliy-cat-h')) || 338,
+      value: parseFloat(_lsGet('luliy-cat-h')) || 338,
       format: function (v) { return v + 'px'; },
       onInput: function (v) {
-        localStorage.setItem('luliy-cat-h', String(v));
+        _lsSet('luliy-cat-h', String(v));
         applyCatSize();
       }
     });
@@ -2963,11 +2839,9 @@
     var APPEARANCE_DEFAULTS = {
       'luliy-cyber-speed':    '1',
       'luliy-cyber-dir':      'converge',
-      'luliy-cyber-style':    'classic',
       'luliy-glass-blur':     '22',
       'luliy-glass-opacity':  '0.5',
       'luliy-glass-hue':      '250',
-      'luliy-article-opacity': _luliyResolveMode() === 'dark' ? '0' : '0.95',
       'luliy-cat-w':          '1700',
       'luliy-cat-h':          '338'
     };
@@ -2975,32 +2849,27 @@
     resetRow._bdg.style.opacity = '0';
     resetRow.addEventListener('click', function (e) {
       e.stopPropagation();
-      var styleChanged = curCyberStyle() !== 'classic';
       Object.keys(APPEARANCE_DEFAULTS).forEach(function (k) {
-        localStorage.setItem(k, APPEARANCE_DEFAULTS[k]);
+        _lsSet(k, APPEARANCE_DEFAULTS[k]);
       });
       /* 同步滑块的视觉显示：改 value 再派发 input 事件，
          会自动触发各自的 onInput（写 localStorage + 实时生效），
          不用逐个手写重复逻辑。 */
       [cyberSpeedSlider, glassBlurSlider, glassOpacitySlider,
-       glassHueSlider, articleOpacitySlider, catWSlider, catHSlider].forEach(function (s) {
+       glassHueSlider, catWSlider, catHSlider].forEach(function (s) {
         s._range.value = APPEARANCE_DEFAULTS[
           s === cyberSpeedSlider ? 'luliy-cyber-speed' :
           s === glassBlurSlider ? 'luliy-glass-blur' :
           s === glassOpacitySlider ? 'luliy-glass-opacity' :
           s === glassHueSlider ? 'luliy-glass-hue' :
-          s === articleOpacitySlider ? 'luliy-article-opacity' :
           s === catWSlider ? 'luliy-cat-w' : 'luliy-cat-h'
         ];
         s._range.dispatchEvent(new Event('input', { bubbles: false }));
       });
+      _lsRemove('luliy-article-opacity');
+      _lsSet('luliy-article-opacity-mode', 'auto');
+      applyGlassVars();
       cyberDirRow._bdg.textContent = _dirLabels['converge'];
-      cyberStyleRow._bdg.textContent = _styleLabels['classic'];
-      if (styleChanged) {
-        /* 风格变了（城市→经典），需要整套重启才能生效 */
-        if (root._luliyStopCyberParticles) root._luliyStopCyberParticles();
-        if (root._luliyInitCyberParticles) root._luliyInitCyberParticles();
-      }
       playSfx('click');
     });
     panel.appendChild(resetRow);
@@ -3034,10 +2903,10 @@
       fsRow.appendChild(fsLbl); fsRow.appendChild(fsCtrls);
       panel.appendChild(fsRow);
 
-      function curFs() { return parseInt(localStorage.getItem('luliy-fontsize') || '18', 10) || 18; }
+      function curFs() { return parseInt(_lsGet('luliy-fontsize') || '18', 10) || 18; }
       function setFs(px) {
         px = Math.min(24, Math.max(14, px));
-        localStorage.setItem('luliy-fontsize', String(px));
+        _lsSet('luliy-fontsize', String(px));
         applyReadingPrefs();
         fsVal.textContent = px + 'px';
       }
@@ -3047,12 +2916,12 @@
 
       /* Font style: cycle default → 黑体 → 苍耳今楷 */
       var _fontLabels = {'0':'\u9ed8\u8ba4','1':'\u9ed1\u4f53','2':'\u82cd\u8033\u6977'};
-      var sansRow = mkRow('\u270d', '\u5b57\u4f53', _fontLabels[localStorage.getItem('luliy-sans')||'0']);
+      var sansRow = mkRow('\u270d', '\u5b57\u4f53', _fontLabels[_lsGet('luliy-sans')||'0']);
       sansRow.addEventListener('click', function (e) {
         e.stopPropagation();
-        var cur = localStorage.getItem('luliy-sans') || '0';
+        var cur = _lsGet('luliy-sans') || '0';
         var next = cur === '0' ? '1' : cur === '1' ? '2' : '0';
-        localStorage.setItem('luliy-sans', next);
+        _lsSet('luliy-sans', next);
         sansRow._bdg.textContent = _fontLabels[next];
         applyReadingPrefs();
         playSfx('click');
@@ -3063,10 +2932,10 @@
       var pwSlider = mkSlider({
         emoji: '\u2194\uFE0F', label: '\u9605\u8bfb\u5bbd\u5ea6',   /* ↔️ 阅读宽度 */
         min: 0, max: 400, step: 20,
-        value: parseInt(localStorage.getItem('luliy-pbwidth') || '0', 10) || 0,
+        value: parseInt(_lsGet('luliy-pbwidth') || '0', 10) || 0,
         format: function (v) { return '+' + v; },
         onInput: function (v) {
-          localStorage.setItem('luliy-pbwidth', String(v));
+          _lsSet('luliy-pbwidth', String(v));
           if (root._luliyApplyPbWidth) root._luliyApplyPbWidth();
         }
       });
@@ -3085,7 +2954,7 @@
       var order = ['grid', 'list', 'timeline'];
       var cur = order.indexOf(getCardView());
       var next = order[(cur + 1) % order.length];
-      localStorage.setItem('luliy-cardview', next);
+      _lsSet('luliy-cardview', next);
       cardViewRow._bdg.textContent = _cvLabels[next];
       if (root._luliyRerenderCards) root._luliyRerenderCards();
       else applyCardView();
@@ -3095,12 +2964,12 @@
 
     /* Reduce-motion override */
     var reduceRow = mkRow('\uD83C\uDF00', '\u51cf\u5f31\u52a8\u6548',
-      localStorage.getItem('luliy-reduce') === '1' ? '\u5f00\u542f' : '\u5173\u95ed');
+      _lsGet('luliy-reduce') === '1' ? '\u5f00\u542f' : '\u5173\u95ed');
     reduceRow.addEventListener('click', function (e) {
       e.stopPropagation();
-      var on = localStorage.getItem('luliy-reduce') === '1';
+      var on = _lsGet('luliy-reduce') === '1';
       var turningOn = !on;
-      localStorage.setItem('luliy-reduce', turningOn ? '1' : '0');
+      _lsSet('luliy-reduce', turningOn ? '1' : '0');
       reduceRow._bdg.textContent = turningOn ? '\u5f00\u542f' : '\u5173\u95ed';
       applyReduceMotion();
       /* ★ 不只是切 CSS class（那只能停掉 CSS 动画），
@@ -3138,19 +3007,19 @@
     ctrlWrap.appendChild(panel);
     bar.appendChild(ctrlWrap);
     document.body.appendChild(bar);
-    applySink(localStorage.getItem('luliy-sink') || 'cyberpunk');
+    applySink(_lsGet('luliy-sink') || 'cyberpunk');
   }
 
   /* ---- 14  Home card rebuild ------------------------------ */
   function buildPostLink(rawLink) {
-    var lnk = rawLink || '#';
-    if (lnk !== '#') {
-      lnk = lnk.replace(/^\//, '');
-      lnk = lnk.replace(/^post\/post\//, 'post/');
-      if (!/^post\//.test(lnk) && !/^https?:\/\//.test(lnk)) lnk = 'post/' + lnk;
-      lnk = '/' + lnk;
-    }
-    return lnk;
+    var link = String(rawLink || '#').trim();
+    if (!link || link.charAt(0) === '#') return link || '#';
+    if (/^https?:\/\//i.test(link)) return link;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(link) || /^\/\//.test(link)) return '#';
+    if (link.charAt(0) === '/') return link.replace(/^\/post\/post\//, '/post/');
+    link = link.replace(/^post\/post\//, 'post/');
+    if (!/^post\//.test(link)) link = 'post/' + link;
+    return '/' + link;
   }
 
   /* ============================================================
@@ -3201,7 +3070,7 @@
     var PER_PAGE = 10;
     var TAB_KEY = 'luliy-archive-tab';
     var state = {
-      tab: (localStorage.getItem(TAB_KEY) === 'other') ? 'other' : 'weekly',
+      tab: (_lsGet(TAB_KEY) === 'other') ? 'other' : 'weekly',
       pageWeekly: 1,
       pageOther: 1,
       weekly: [],
@@ -3245,7 +3114,7 @@
           var t = btn.getAttribute('data-tab');
           if (t === state.tab) return;
           state.tab = t;
-          localStorage.setItem(TAB_KEY, t);
+          _lsSet(TAB_KEY, t);
           renderArchiveBody();
         });
       });
@@ -3391,8 +3260,8 @@
       var years = data.years;
       var cats = data.categories || [];
 
-      var savedYear = localStorage.getItem(YEAR_KEY);
-      var savedCat = localStorage.getItem(CAT_KEY);
+      var savedYear = _lsGet(YEAR_KEY);
+      var savedCat = _lsGet(CAT_KEY);
       var curYear = (years.indexOf(savedYear) !== -1) ? savedYear : years[0];
       var catKeys = cats.map(function (c) { return c.key; });
       var curCat = (catKeys.indexOf(savedCat) !== -1) ? savedCat : (cats[0] && cats[0].key);
@@ -3415,7 +3284,7 @@
         b.addEventListener('click', function () {
           if (y === curYear) return;
           curYear = y;
-          localStorage.setItem(YEAR_KEY, y);
+          _lsSet(YEAR_KEY, y);
           syncTabs(); renderBody();
         });
         yearsBox.appendChild(b);
@@ -3431,7 +3300,7 @@
         b.addEventListener('click', function () {
           if (c.key === curCat) return;
           curCat = c.key;
-          localStorage.setItem(CAT_KEY, c.key);
+          _lsSet(CAT_KEY, c.key);
           syncTabs(); renderBody();
         });
         catsBox.appendChild(b);
@@ -4129,15 +3998,17 @@
           bR.setAttribute('data-tip', '\u5df2\u590d\u5236 \u2713');
           setTimeout(function () { bR.setAttribute('data-tip', '\u590d\u5236\u4ee3\u7801'); }, 1500);
         }
-        if (navigator.clipboard && location.protocol === 'https:') {
-          navigator.clipboard.writeText(txt).then(done).catch(done);
-        } else {
+        function failed() { bR.setAttribute('data-tip', '复制失败，请手动选择代码'); }
+        function fallbackCopy() {
           var ta = document.createElement('textarea');
           ta.value = txt; ta.style.cssText = 'position:fixed;left:-9999px';
           document.body.appendChild(ta); ta.select();
-          try { document.execCommand('copy'); } catch (_) {}
-          ta.remove(); done();
+          var copied = false;
+          try { copied = document.execCommand('copy'); } catch (_) {}
+          ta.remove(); if (copied) done(); else failed();
         }
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done).catch(fallbackCopy);
+        else fallbackCopy();
       });
 
       /* YELLOW = Collapse */
@@ -4241,7 +4112,8 @@
   };
 
   function initSakura() {
-    if (localStorage.getItem('luliy-sakura') === '0') return;
+    if (getSystem() === 'minimal' || prefersReduce()) return;
+    if (_lsGet('luliy-sakura') === '0') return;
     if (document.getElementById('luliy-sakura-canvas')) return;
     var canvas = document.createElement('canvas');
     canvas.id = 'luliy-sakura-canvas';
@@ -4325,7 +4197,7 @@
 
     /* Particles — gated by the toggle; right-heavy distribution.
        Meteors stay on regardless (they're the global "流星" effect). */
-    var particlesEnabled = (localStorage.getItem('luliy-particles') !== '0');
+    var particlesEnabled = (_lsGet('luliy-particles') !== '0');
     var particles = [];
     var pCount = particlesEnabled ? cfg.pCount : 0;
     for (var i = 0; i < pCount; i++) {
@@ -4467,6 +4339,26 @@
        the TOC button, highlights the current section, and jumps on
        click. Fully theme-styled, high contrast in both modes.       */
     buildLuliyTOC(pbody);
+
+    /* 部分内容（如异步渲染的 Markdown/代码高亮）可能在首次调用时标题
+       还没插入 DOM，buildLuliyTOC 会因标题不足直接跳过。此前用两次
+       setTimeout(600/2000ms) 盲猜时机重试；改用 MutationObserver 监听
+       pbody 子树变化，标题真正出现后立即重建一次目录。buildLuliyTOC
+       本身对"已存在 #luliy-toc-panel"是幂等的，面板建成后立刻断开
+       观察，避免长期监听造成不必要开销。 */
+    if (!pbody._luliyTocObs && !document.getElementById('luliy-toc-panel')) {
+      pbody._luliyTocObs = true;
+      try {
+        var tocObs = new MutationObserver(function () {
+          buildLuliyTOC(pbody);
+          if (document.getElementById('luliy-toc-panel')) tocObs.disconnect();
+        });
+        tocObs.observe(pbody, { childList: true, subtree: true });
+        /* 保险丝：10 秒后无论如何断开，防止长期未出现标题的页面上
+           观察器一直挂着（例如极短文章从未满足"≥2 个标题"的条件）。 */
+        setTimeout(function () { try { tocObs.disconnect(); } catch (e) {} }, 10000);
+      } catch (e) {}
+    }
   }
 
   function buildLuliyTOC(pbody) {
@@ -4609,7 +4501,7 @@
      the public HTML source. Do not store true secrets here.      */
   function initFavoritesLock() {
     if (!LULIY_OPTS.favoritesPathMatch.test(location.pathname)) return;
-    if (sessionStorage.getItem('luliy-fav-unlocked') === '1') return;
+    if (_ssGet('luliy-fav-unlocked') === '1') return;
     if (document.getElementById('luliy-fav-gate')) return;
 
     var pbody = document.getElementById('postBody');
@@ -4649,7 +4541,7 @@
     }
 
     function unlock() {
-      sessionStorage.setItem('luliy-fav-unlocked', '1');
+      _ssSet('luliy-fav-unlocked', '1');
       playSfx('sci');
       /* Progressive reveal: blur dissolves + content slides up section by section */
       pbody.classList.remove('luliy-locked');
@@ -4751,6 +4643,8 @@
 
   /* ---- 21  Post page init --------------------------------- */
   root._luliyInitPost = function () {
+    if (getSystem() === 'minimal') { safe(initMinimalSystem, 'minimalSystem'); return; }
+    if (isChroniclePage() || isBookPage() || isArchivePage()) return;
     if (root._luliyPostInited) return;
     root._luliyPostInited = true;
 
@@ -4759,10 +4653,13 @@
 
     var pbody = document.getElementById('postBody');
 
-    /* External links → new tab */
     document.querySelectorAll('a[href^="http"]').forEach(function (a) {
-      if (!a.href.includes('luliy6.github.io') && !a.href.includes('luliy.me'))
-        a.target = '_blank';
+      try {
+        var host = new URL(a.href).hostname;
+        if (host !== location.hostname && host !== 'luliy6.github.io' && host !== 'luliy.me') {
+          a.target = '_blank'; a.rel = 'noopener noreferrer';
+        }
+      } catch (_) {}
     });
 
     if (pbody) pbody.querySelectorAll('img').forEach(function (img) { img.loading = 'lazy'; });
@@ -4853,13 +4750,9 @@
 
     /* macOS code blocks */
     initCodeBlocks(pbody);
-    setTimeout(function () { initCodeBlocks(pbody); }, 800);
-    setTimeout(function () { initCodeBlocks(pbody); }, 2200);
 
     /* TOC scroll-spy */
     initArticleTocSpy();
-    setTimeout(function () { initArticleTocSpy(); }, 600);
-    setTimeout(function () { initArticleTocSpy(); }, 2000);
 
     /* Prev / Next navigation */
     fetchPosts().then(function (posts) {
@@ -4953,6 +4846,7 @@
 
   /* ---- 22  Index page init -------------------------------- */
   root._luliyInitIndex = function () {
+    if (getSystem() === 'minimal') { safe(initMinimalSystem, 'minimalSystem'); return; }
     /* ★ 大改后：
        - 首页（homepage）只要「Hero + 六张分类卡片」，不调用本函数渲染文章。
        - 分类页（tag.html#标签）→ initCards() 内部按标签过滤，焊死网格视图。
@@ -4978,7 +4872,7 @@
   /* ---- Card view (grid / list) ---------------------------- */
   var CARD_VIEWS = ['grid', 'list', 'timeline'];
   function getCardView() {
-    var v = localStorage.getItem('luliy-cardview');
+    var v = _lsGet('luliy-cardview');
     return CARD_VIEWS.indexOf(v) >= 0 ? v : 'grid';
   }
   function applyCardView(forcedView) {
@@ -4999,7 +4893,7 @@
 
   /* ---- Reduce motion ------------------------------------- */
   function prefersReduce() {
-    if (localStorage.getItem('luliy-reduce') === '1') return true;
+    if (_lsGet('luliy-reduce') === '1') return true;
     try {
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) { return false; }
@@ -5136,7 +5030,7 @@
     var key = 'luliy-scroll:' + location.pathname;
 
     /* Restore prompt */
-    var saved = parseFloat(sessionStorage.getItem(key) || '0');
+    var saved = parseFloat(_ssGet(key) || '0');
     if (saved > 0.05 && saved < 0.95) {
       var dh = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       var targetY = Math.round(saved * dh);
@@ -5161,7 +5055,7 @@
         t = null;
         var st = window.scrollY || document.documentElement.scrollTop;
         var dh = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        if (dh > 0) sessionStorage.setItem(key, String(st / dh));
+        if (dh > 0) _ssSet(key, String(st / dh));
       }, 500);
     }, { passive: true });
   }
@@ -5421,7 +5315,7 @@
       else {
         var next = cur === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-color-mode', next);
-        try { localStorage.setItem('meek_theme', next); } catch(e) {}
+        try { _lsSet('meek_theme', next); } catch(e) {}
       }
       if (playSfx) playSfx('theme');
     }
@@ -5469,7 +5363,7 @@
     });
 
     /* 在页面上显示一个快捷键提示（仅首次访问，3 秒后自动消失） */
-    if (!localStorage.getItem('luliy-kb-hint')) {
+    if (!_lsGet('luliy-kb-hint')) {
       setTimeout(function () {
         var toast = document.createElement('div');
         toast.id = 'luliy-kb-toast';
@@ -5486,53 +5380,41 @@
           toast.classList.remove('is-visible');
           setTimeout(function () { toast.remove(); }, 400);
         }, 3500);
-        localStorage.setItem('luliy-kb-hint', '1');
+        _lsSet('luliy-kb-hint', '1');
       }, 2000);
     }
   }
 
   /* ---- 26  View Transitions (cross-page fade) ------------- */
   function initViewTransitions() {
-    if (!document.startViewTransition) return;
-    if (prefersReduce()) return;
+    if (initViewTransitions._bound) return;
+    initViewTransitions._bound = true;
     document.addEventListener('click', function (e) {
-      /* Don't intercept navigation during black-hole animation */
-      if (_bhActive) return;
-      var a = e.target.closest('a');
-      if (!a) return;
-      var href = a.getAttribute('href');
-      if (!href || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      if (a.hasAttribute('download')) return;
-      /* Skip pure hash / in-page anchor links entirely */
-      if (href.charAt(0) === '#') return;
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a || a.hasAttribute('download') || (a.target && a.target !== '_self')) return;
       var url;
       try { url = new URL(a.href, location.href); } catch (_) { return; }
-      if (url.origin !== location.origin) return;
-      /* Skip same-page navigation (hash jumps, TOC) */
-      if (url.pathname === location.pathname) return;
+      if (url.origin !== location.origin || !/^https?:$/.test(url.protocol)) return;
+      if (url.pathname === location.pathname && url.search === location.search) return;
+      if (!document.startViewTransition || prefersReduce()) return;
       e.preventDefault();
-      var dest = url.href;
-      /* Tag direction for CSS animation */
-      var dir = (url.pathname === '/' || url.pathname === '/index.html') ? 'home'
-              : (location.pathname === '/' || location.pathname === '/index.html') ? 'post'
-              : (url.pathname > location.pathname) ? 'next' : 'prev';
-      document.documentElement.setAttribute('data-vt-dir', dir);
-      try {
-        var vt = document.startViewTransition(function () {
-          /* Cleanup infinite-scroll observers before navigation */
-          if (root._luliyTeardownTimeline) root._luliyTeardownTimeline();
-          location.href = dest;
-          return new Promise(function () {});
-        });
-        setTimeout(function () {
-          document.documentElement.removeAttribute('data-vt-dir');
-          location.href = dest;
-        }, 1000);
-      } catch (err) {
-        document.documentElement.removeAttribute('data-vt-dir');
-        location.href = dest;
+      if (initViewTransitions._leaving) return;
+      initViewTransitions._leaving = true;
+      var navigated = false, timer;
+      function go() {
+        if (navigated) return;
+        navigated = true; clearTimeout(timer);
+        if (root._luliyTeardownTimeline) root._luliyTeardownTimeline();
+        location.assign(url.href);
       }
+      timer = setTimeout(go, 1000);
+      try {
+        var transition = document.startViewTransition(go);
+        if (transition && transition.finished) transition.finished.catch(function () {});
+      } catch (_) { go(); }
     });
+    window.addEventListener('pageshow', function () { initViewTransitions._leaving = false; });
   }
 
   /* ---- 14b  Card skeleton placeholders -------------------- */
@@ -5605,7 +5487,7 @@
       /* 极简系统不需要赛博主题变量。此前这里总会先 applySink()，
          随后再由极简分支撤销属性，造成首屏闪烁和不必要的样式竞争。 */
       if (getSystem() === 'minimal') return;
-      applySink(localStorage.getItem('luliy-sink') || 'cyberpunk');
+      applySink(_lsGet('luliy-sink') || 'cyberpunk');
     }
     if (document.body) boot();
     else document.addEventListener('DOMContentLoaded', boot);
@@ -5675,7 +5557,7 @@
 
   /* Sakura petals */
   if (getSystem() !== 'minimal' &&
-      localStorage.getItem('luliy-sakura') !== '0') {
+      _lsGet('luliy-sakura') !== '0') {
     if (document.body) initSakura();
     else document.addEventListener('DOMContentLoaded', initSakura);
   }
@@ -5696,7 +5578,7 @@
   var MINIMAL_HOME_IMG = 'https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/happy.png';
   function setSystem(sys) {
     sys = sys === 'minimal' ? 'minimal' : 'cyber';
-    try { localStorage.setItem(SYSTEM_KEY, sys); } catch (e) {}
+    try { _lsSet(SYSTEM_KEY, sys); } catch (e) {}
     document.documentElement.setAttribute('data-luliy-system', sys);
     location.reload();
   }
@@ -5704,31 +5586,34 @@
   root._luliyGetSystem = getSystem;
 
   function initMinimalSystem() {
-    document.documentElement.setAttribute('data-luliy-system', 'minimal');
+    if (!document.body || initMinimalSystem._inited) return;
+    initMinimalSystem._inited = true;
+    var html = document.documentElement;
+    html.setAttribute('data-luliy-system', 'minimal');
     document.body.classList.add('luliy-minimal');
-    /* ★ 移除赛博主题属性，切断所有 body[data-luliy-theme=...] 规则，
-       否则赛博的表格青色表头/粉色标题等会继续泄漏进极简页。 */
-    try {
-      document.body.removeAttribute('data-luliy-theme');
-      document.documentElement.removeAttribute('data-luliy-theme');
-      document.documentElement.style.zoom = '1';
-    } catch (e) {}
-
+    html.removeAttribute('data-luliy-theme'); document.body.removeAttribute('data-luliy-theme');
+    html.style.zoom = '1';
+    // config.json's historical first-paint gradient must not override this system.
+    var firstPaint = document.getElementById('luliy-fouc');
+    if (firstPaint) firstPaint.remove();
+    safe(initMinimalInkClick, 'inkClick');
+    safe(initFavoritesLock, 'favLock');
     if (!isIndexPage()) buildMinimalNav();
     buildSystemToggle();
-
-    if (isIndexPage()) {
-      renderMinimalHome();
-    } else if (isChroniclePage()) {
-      safe(initChroniclePage, 'chronicle');
-    } else if (isBookPage()) {
-      safe(initBookPage, 'book');
-    } else if (isArchivePage()) {
-      safe(initArchivesPage, 'archives');
-    } else {
+    if (isIndexPage()) renderMinimalHome();
+    else if (isChroniclePage()) safe(initChroniclePage, 'chronicle');
+    else if (isBookPage()) safe(initBookPage, 'book');
+    else if (isArchivePage()) safe(initArchivesPage, 'archives');
+    else if (document.getElementById('postBody')) {
       renderMinimalArticle();
+      safe(initLightbox, 'lightbox');
+      safe(function () { initCodeBlocks(document.getElementById('postBody')); }, 'codeBlocks');
+    } else {
+      // Tag/search pages still need their post list in the minimal system.
+      safe(initTagEnhance, 'tagEnhance'); safe(initCards, 'cards');
     }
   }
+
 
   function buildMinimalNav() {
     if (document.getElementById('luliy-min-nav')) return;
@@ -5738,6 +5623,7 @@
       { label: 'Home', href: '/' },
       { label: 'Archives', href: '/archive.html' },
       { label: 'Chronicle', href: '/chronicle.html' },
+      { label: 'Book', href: '/book.html' },
       { label: 'About', href: '/about.html' }
     ];
     nav.innerHTML = links.map(function (l) {
@@ -5751,61 +5637,100 @@
     var btn = document.createElement('button');
     btn.id = 'luliy-system-toggle';
     btn.type = 'button';
-    btn.title = '\u5207\u6362\u5230\u8d5b\u535a\u670b\u514b\u7cfb\u7edf';
+    btn.title = '切换到赛博朋克系统';
+    btn.setAttribute('aria-label', btn.title);
     btn.textContent = '\u25C8';
     btn.addEventListener('click', function () { setSystem('cyber'); });
     document.body.appendChild(btn);
   }
 
   function renderMinimalHome() {
-    /* 主页：背景铺满 + 楼梯图居中 + 顶部一排文字导航（在切换按钮左边） */
-    var nav = document.createElement('nav');
-    nav.id = 'luliy-min-home-nav';
-    var links = [
-      { href: '/archive.html',   label: 'Archives' },
-      { href: '/chronicle.html', label: 'Chronicle' },
-      { href: '/book.html',      label: 'Book' },
-      { href: '/about.html',     label: 'About' }
-    ];
-    nav.innerHTML = links.map(function (l) {
-      return '<a href="' + l.href + '">' + l.label + '</a>';
-    }).join('<span class="luliy-min-nav-sep">/</span>');
-    document.body.appendChild(nav);
-
-    var wrap = document.createElement('div');
-    wrap.id = 'luliy-min-home';
-    wrap.innerHTML =
-      '<div class="luliy-min-home-stage">' +
-        '<img class="luliy-min-home-img" src="' + MINIMAL_HOME_IMG + '" alt="" draggable="false">' +
-      '</div>';
-    document.body.appendChild(wrap);
+    if (document.getElementById('luliy-min-home')) return;
+    document.body.classList.add('luliy-min-home-page');
+    var wrap = document.createElement('main'); wrap.id = 'luliy-min-home';
+    var stage = document.createElement('div'); stage.className = 'luliy-min-home-stage';
+    var img = document.createElement('img'); img.className = 'luliy-min-home-img';
+    img.src = MINIMAL_HOME_IMG; img.alt = ''; img.draggable = false;
+    img.fetchPriority = 'high'; stage.appendChild(img);
+    var nav = document.createElement('nav'); nav.className = 'luliy-min-home-nav';
+    nav.setAttribute('aria-label', '首页导航');
+    [{href:'/about.html',label:'About'}, {href:'/book.html',label:'Book'},
+      {href:'/archive.html',label:'Archives'}, {href:'/chronicle.html',label:'Chronicle'}].forEach(function (item) {
+      var a = document.createElement('a'); a.href = item.href; a.textContent = item.label; nav.appendChild(a);
+    });
+    stage.appendChild(nav); wrap.appendChild(stage); document.body.appendChild(wrap);
   }
+
 
   function renderMinimalArticle() {
     document.body.classList.add('luliy-min-article');
     var pb = document.getElementById('postBody');
-    if (!pb) return;
-    var heads = pb.querySelectorAll('h1, h2, h3');
-    if (heads.length >= 2) {
-      var toc = document.createElement('nav');
-      toc.id = 'luliy-min-toc';
-      var html = '';
-      heads.forEach(function (h, i) {
-        if (!h.id) h.id = 'luliy-min-h-' + i;
-        var lvl = h.tagName === 'H1' ? 'h1' : (h.tagName === 'H2' ? 'h2' : 'h3');
-        var prefix = lvl === 'h1' ? '#' : '\u2022';
-        html += '<a class="luliy-min-toc-' + lvl + '" href="#' + h.id + '">' +
-          prefix + ' ' + esc(h.textContent) + '</a>';
+    if (!pb || pb._minimalToc) return;
+    pb._minimalToc = true;
+    var heads = [], links = [], toc = null, signature = '', scheduled = false;
+    function updateActive() {
+      scheduled = false;
+      if (!heads.length || !toc) return;
+      var index = 0;
+      heads.forEach(function (h, i) { if (h.getBoundingClientRect().top <= 132) index = i; });
+      links.forEach(function (a, i) {
+        a.classList.toggle('is-current', i === index);
+        if (i === index) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
       });
-      toc.innerHTML = html;
-      document.body.appendChild(toc);
+      // Keep the active item inside a long sidebar without scrolling the article itself.
+      var active = links[index];
+      if (active && toc.getClientRects().length) {
+        var ar = active.getBoundingClientRect(), tr = toc.getBoundingClientRect();
+        if (ar.bottom > tr.bottom) toc.scrollTop += ar.bottom - tr.bottom + 12;
+        else if (ar.top < tr.top) toc.scrollTop -= tr.top - ar.top + 12;
+      }
     }
+    function schedule() {
+      if (!scheduled) { scheduled = true; requestAnimationFrame(updateActive); }
+    }
+    function build() {
+      var next = Array.from(pb.querySelectorAll('h1,h2,h3'));
+      var sig = next.map(function (h) { return h.tagName + ':' + h.id + ':' + h.textContent; }).join('|');
+      if (sig === signature) return;
+      heads = next;
+      if (heads.length < 2) { if (toc) toc.remove(); toc = null; signature = sig; return; }
+      if (!toc) {
+        toc = document.createElement('nav'); toc.id = 'luliy-min-toc';
+        toc.setAttribute('aria-label', '文章目录'); document.body.appendChild(toc);
+      }
+      toc.replaceChildren(); links = [];
+      heads.forEach(function (h, i) {
+        if (!h.id) {
+          var id = 'luliy-min-h-' + i;
+          while (document.getElementById(id)) id += '-1';
+          h.id = id;
+        }
+        var a = document.createElement('a'); a.className = 'luliy-min-toc-' + h.tagName.toLowerCase();
+        a.href = '#' + encodeURIComponent(h.id); a.textContent = h.textContent;
+        a.addEventListener('click', function (e) {
+          e.preventDefault(); h.scrollIntoView({behavior: prefersReduce() ? 'auto' : 'smooth', block:'start'});
+          try { history.replaceState(null, '', '#' + encodeURIComponent(h.id)); } catch (_) {}
+        });
+        toc.appendChild(a); links.push(a);
+      });
+      signature = heads.map(function (h) { return h.tagName + ':' + h.id + ':' + h.textContent; }).join('|');
+      updateActive();
+    }
+    build();
+    window.addEventListener('scroll', schedule, {passive:true}); _luliyOnResize(schedule);
+    // Observe asynchronous Markdown headings; code decoration does not cause duplicate listeners.
+    var buildRAF = null;
+    new MutationObserver(function () {
+      if (buildRAF !== null) return;
+      buildRAF = requestAnimationFrame(function () { buildRAF = null; build(); });
+    }).observe(pb, {childList:true, subtree:true, characterData:true});
+    pb.querySelectorAll('img').forEach(function (img) { img.loading = 'lazy'; img.decoding = 'async'; });
   }
+
 
   ready(function () {
     /* ★ 极简系统拦截：在任何赛博初始化之前判断。命中则走极简分支并 return。 */
     if (getSystem() === 'minimal') {
-      loadMinimalStyles();
       safe(initMinimalSystem, 'minimalSystem');
       return;
     }
@@ -5859,6 +5784,7 @@
 
     /* ★ 编年史 Chronicle 单页：优先识别（它也有 #postBody，但要走自己的
        渲染，不能当普通文章页）。识别后直接接管，不再往下走文章页逻辑。 */
+    if (isArchivePage()) { safe(initArchivesPage, 'archives'); return; }
     if (isChroniclePage()) {
       safe(initChroniclePage, 'chronicle');
       return;
