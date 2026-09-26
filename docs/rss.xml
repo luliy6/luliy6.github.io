@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://blog.luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://blog.luliy.me</link></image><lastBuildDate>Sun, 20 Sep 2026 04:38:30 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>汽车构造</title><link>https://blog.luliy.me/post/qi-che-gou-zao.html</link><description># 汽车构造
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>ΔιάΝους</title><link>https://blog.luliy.me</link><description>已有的事，后必再有。已行的事，后必再行</description><copyright>ΔιάΝους</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&amp;v=4&amp;size=64</url><title>avatar</title><link>https://blog.luliy.me</link></image><lastBuildDate>Sat, 26 Sep 2026 17:11:11 +0000</lastBuildDate><managingEditor>ΔιάΝους</managingEditor><ttl>60</ttl><webMaster>ΔιάΝους</webMaster><item><title>汽车构造</title><link>https://blog.luliy.me/post/qi-che-gou-zao.html</link><description># 汽车构造
 
 ## 一、名词解释汇总
 
@@ -79,7 +79,8 @@
      | **离合器**                       | 1. **保证汽车平稳起步**：起步时主从动部分通过滑磨，转速逐渐接近，确保起步平稳；&lt;br&gt;2. **保证变速器换挡工作平顺**：换挡时分离切断动力传递，减轻齿轮齿间冲击；&lt;br&gt;3. **防止传动系统过载**：转矩超过最大传递转矩时主从动部分滑磨，防止过载 |
      | **变速器**                       | 1. 改变传动比，扩大驱动轮转矩和转速的变化范围，适应行驶条件变化；&lt;br&gt;2. 在发动机旋转方向不变前提下，使汽车能倒退行驶；&lt;br&gt;3. 利用空挡，中断动力传递，便于启动怠速、换挡或动力输出 |
      | **同步器**                       | 使接合套与待啮合齿圈迅速同步，缩短换挡时间，防止啮合时产生结合齿之间的冲击 |
-     | **液力变矩器**                   | 起到离合器的作用，传递或切断发动机与自动变速器传动机构之间的动力。</description><guid isPermaLink="true">https://blog.luliy.me/post/qi-che-gou-zao.html</guid><pubDate>Wed, 24 Jun 2026 15:28:48 +0000</pubDate></item><item><title>恶习-烟，熬夜。迷失</title><link>https://blog.luliy.me/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</link><description>## 烟
+     | **液力变矩器**                   | 起到离合器的作用，传递或切断发动机与自动变速器传动机构之间的动力。</description><guid isPermaLink="true">https://blog.luliy.me/post/qi-che-gou-zao.html</guid><pubDate>Wed, 24 Jun 2026 15:28:48 +0000</pubDate></item><item><title>恶习-烟，熬夜。迷失</title><link>https://blog.luliy.me/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</link><description>![封面](https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/bg.png)
+## 烟
 说句不敞亮的话，我花费烟的钱，可以让我不再这么颓废了。</description><guid isPermaLink="true">https://blog.luliy.me/post/e-xi---yan-%EF%BC%8C-ao-ye-%E3%80%82-mi-shi.html</guid><pubDate>Wed, 24 Jun 2026 02:31:08 +0000</pubDate></item><item><title>博客完整说明指南</title><link>https://blog.luliy.me/post/bo-ke-wan-zheng-shuo-ming-zhi-nan.html</link><description>&lt;html&gt;
 &lt;body&gt;
 &lt;!--StartFragment--&gt;&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;ΔιάΝους 博客完整说明指南&lt;/h1&gt;
