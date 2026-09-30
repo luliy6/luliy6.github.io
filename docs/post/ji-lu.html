@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark_colorblind" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <script>(function(){var d=document.documentElement;var s='cyber';try{if(localStorage.getItem('luliy-system')==='minimal')s='minimal';}catch(e){}d.setAttribute('data-luliy-system',s);})();</script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js'></script><script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js' onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js'></script><script src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js'></script><script src='https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js'></script><script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script><meta name='theme-color' content='#0d2149'><link rel='apple-touch-icon' href='https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=180'><script>window.addEventListener('load',function(){if(window.Prism){Prism.plugins.autoloader.languages_path='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/';Prism.highlightAll();}if(window.mermaid){mermaid.initialize({startOnLoad:false,securityLevel:'loose',theme:document.documentElement.getAttribute('data-color-mode')==='dark'?'dark':'default'});document.querySelectorAll('pre>code.language-mermaid,code.language-mermaid').forEach(function(code){var block=document.createElement('div');block.className='mermaid';block.textContent=code.textContent.trim();(code.parentElement&&code.parentElement.tagName==='PRE'?code.parentElement:code).replaceWith(block);});if(mermaid.run){mermaid.run({querySelector:'.mermaid'});}else if(mermaid.init){mermaid.init(undefined,document.querySelectorAll('.mermaid'));}}if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}});</script><script src='https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js'></script><script src='https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.13.2/jquery-ui.min.js'></script><script src='https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/dplayer/dist/DPlayer.min.css'><script src='https://cdn.jsdelivr.net/npm/dplayer/dist/DPlayer.min.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css'><script src='https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js'></script><link rel='stylesheet' href='/enhance.css'><script defer src='/enhance.js'></script>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="<html>
+<body>
+<!--StartFragment--><html><head></head><body><h1><span>从 Gmeek 到我的个人博客：一次不断推翻自己的建站记录</span></h1><blockquote><p><span>最开始，我只是想拥有一个能写东西的个人博客。">
+<meta property="og:title" content="记录">
+<meta property="og:description" content="<html>
+<body>
+<!--StartFragment--><html><head></head><body><h1><span>从 Gmeek 到我的个人博客：一次不断推翻自己的建站记录</span></h1><blockquote><p><span>最开始，我只是想拥有一个能写东西的个人博客。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.luliy.me/post/ji-lu.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/177055996?u=cb497e1edb10d059b285288c93ff32dab53af1c3&v=4&size=64">
+<title>记录</title>
+
+<script>
+(function(){
+  try{
+    var d=document.documentElement;
+    if(d.getAttribute('data-luliy-system')==='minimal')return;
+    /* ★ 恢复手动选主题：读取用户上次手动选的主题，没选过就用新默认
+       主题「赛博朋克」(cyberpunk)。不再跟随深浅模式自动切换。 */
+    var th=localStorage.getItem('luliy-sink')||'cyberpunk';
+    d.setAttribute('data-luliy-theme',th);
+    /* 阅读宽度默认拉到最大(400) */
+    var pw=parseInt(localStorage.getItem('luliy-pbwidth')||'400',10);
+    if(isNaN(pw))pw=400;
+    d.style.setProperty('--luliy-pb-extra',pw+'px');
+    var sans=localStorage.getItem('luliy-sans')||'0';
+    /* 液态玻璃三个参数也提前写入，首屏即生效 */
+    var gb=localStorage.getItem('luliy-glass-blur')||'22';
+    var go=localStorage.getItem('luliy-glass-opacity')||'0.5';
+    var gh=localStorage.getItem('luliy-glass-hue')||'250';
+    d.style.setProperty('--luliy-glass-blur',gb+'px');
+    d.style.setProperty('--luliy-glass-opacity',go);
+    d.style.setProperty('--luliy-glass-hue',gh);
+    /* 赛博朋克渐变背景兜底，首屏即生效，杜绝白底/纯黑闪烁 */
+    var css='html{background:linear-gradient(160deg,#0a0e2a 0%,#1a1140 30%,#3d1a5c 55%,#5c1a4a 75%,#1a0e2e 100%)!important;background-attachment:fixed!important;}body{background:transparent!important;background-image:none!important;}';
+    var st=document.createElement('style');st.id='luliy-fouc';st.textContent=css;
+    (d.head||d).appendChild(st);
+    document.addEventListener('DOMContentLoaded',function(){
+      if(document.body){
+        document.body.setAttribute('data-luliy-theme',th);
+        if(sans==='1')document.body.classList.add('luliy-sans');
+        if(sans==='2')document.body.classList.add('luliy-canger');
+      }
+    });
+  }catch(e){}
+})();
+</script>
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">记录</h1>
+<div class="title-right">
+    <a href="https://blog.luliy.me" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/luliy6/luliy6.github.io/issues/53" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody">
+
+<h1><span>从 Gmeek 到我的个人博客：一次不断推翻自己的建站记录</span></h1><blockquote><p><span>最开始，我只是想拥有一个能写东西的个人博客。</span><br><span>后来，我开始改颜色、改布局、加动画、加页面、加交互。</span><br><span>再后来，我发现自己已经不是在“改博客”，而是在重新做一个网站。</span></p></blockquote><hr><h2><span>一、起点：我只是想快速拥有一个博客</span></h2><p><span>最开始，我使用 </span><strong><span>Gmeek</span></strong><span> 搭建个人博客。</span></p><p><span>我选择它的原因很简单：足够轻量。</span></p><p><span>Gmeek 把 GitHub Issues 当成文章管理后台，我不需要数据库，也不需要单独部署 CMS。</span></p><p><span>写一篇文章，本质上就是新建一个 Issue。</span></p><p><span>修改文章，就是修改 Issue。</span></p><p><span>GitHub Actions 会自动完成后续构建。</span></p><p><span>对于当时的我来说，这已经很好用了。</span></p><p><span>但问题也很快出现。</span></p><p><strong><span>我不满意默认的外观。</span></strong></p><p><span>不是 Gmeek 不好，而是它更像一个“可以直接使用的博客框架”，而我想要的是一个真正属于自己的个人网站。</span></p><p><span>于是，我开始折腾。</span></p><hr><h1><span>Part Ⅰ · 博客演化史</span></h1><h2><span>二、第一次改造：从研究别人的 Gmeek 开始</span></h2><p><span>一开始，我其实并不知道应该怎么改。</span></p><p><span>所以我开始在 Gmeek 社区、GitHub Issues 和其他个人博客里寻找创意。</span></p><p><span>我看过很多别人对 Gmeek 的改造，包括：</span></p><ul><li><span>Apple 风格界面</span></li><li><span>卡片式文章列表</span></li><li><span>毛玻璃效果</span></li><li><span>深色 / 浅色主题</span></li><li><span>动态渐变背景</span></li><li><span>标签颜色</span></li><li><span>卡片悬浮动画</span></li></ul><p><span>我也参考了飞鱼等个人博客的布局和功能设计。</span></p><p><span>这个阶段，我主要做的事情其实是：</span></p><p><strong><span>看别人是怎么改的，然后想办法把我喜欢的部分组合到自己的博客里。</span></strong></p><p><span>那时候的修改还比较克制。</span></p><hr><h2><span>三、JSON 阶段：什么东西都往 </span><code dir="ltr" class="notranslate">config.json</code><span> 里塞</span></h2><p><span>最初我的修改几乎全部集中在：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">config.json</code></pre></div><p><span>比如：</span></p><ul><li><span>站点名称</span></li><li><span>副标题</span></li><li><span>头像</span></li><li><span>页面</span></li><li><span>主题</span></li><li><span>自定义 CSS</span></li><li><span>自定义 JavaScript</span></li><li><span>第三方资源</span></li><li><span>导航入口</span></li></ul><p><span>Gmeek 本身提供了不少可以注入样式和脚本的位置，所以一开始这种方式非常方便。</span></p><p><span>问题是：</span></p><p><strong><span>功能越多，JSON 就越难维护。</span></strong></p><p><span>一段 CSS 塞进去。</span></p><p><span>一段 JavaScript 塞进去。</span></p><p><span>再加一个库。</span></p><p><span>再加一个动画。</span></p><p><span>再加一个功能。</span></p><p><span>慢慢地，配置文件已经不再只是“配置文件”。</span></p><p><span>它开始承担页面逻辑。</span></p><p><span>这也是第一次让我意识到：</span></p><blockquote><p><span>配置和程序逻辑不是一回事。</span></p></blockquote><hr><h2><span>四、第一次重要重构：</span><code dir="ltr" class="notranslate">config.json</code><span> → </span><code dir="ltr" class="notranslate">CSS + JS</code></h2><p><span>于是，我开始把真正的样式和功能拆出去。</span></p><p><span>后来整个博客逐渐形成了：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">config.json
+enhance.css
+enhance.js
+static/
+docs/
+backup/</code></pre></div><p><span>这样的结构。</span></p><p><span>后面还加入了：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">manifest.webmanifest
+sw.js</code></pre></div><p><span>以及单独的静态资源目录。</span></p><p><span>这应该算是我建站过程中第一次真正意义上的“架构变化”。</span></p><p><span>以前是：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Gmeek
+  ↓
+config.json
+  ↓
+改一点样式</code></pre></div><p><span>后来变成：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Gmeek
+   │
+   ├── 内容系统
+   │
+   ├── config.json
+   │
+   ├── enhance.css
+   │
+   ├── enhance.js
+   │
+   └── static</code></pre></div><p><span>从这一刻开始，我已经不仅是在使用 Gmeek。</span></p><p><span>我是在 </span><strong><span>Gmeek 上面再构建一个自己的前端系统</span></strong><span>。</span></p><hr><h2><span>五、功能开始膨胀</span></h2><p><span>然后事情开始逐渐失控。</span></p><p><span>我开始觉得：</span></p><blockquote><p><span>既然 CSS 和 JS 都拆出来了，那是不是可以再多做一点？</span></p></blockquote><p><span>于是，一个功能接着一个功能出现。</span></p><p><span>我曾经做过的东西包括：</span></p><div><div><div>
+模块 | 功能
+-- | --
+Hero | 首次进入网站的全屏欢迎页
+Progress Bar | 页面滚动进度
+Dynamic Title | 动态网页标题
+Uptime | 网站运行时间
+Dark Ripple | 深浅模式切换涟漪
+Audio | 网站交互音效
+Click Sparks | 鼠标点击火花
+Hero Cluster | 头像、名称、时钟组合
+Banner | 首页大图
+Search | 标签 / 文章搜索
+Lightbox | 图片灯箱
+Theme | 多主题切换
+Card System | 首页文章卡片重构
+Code Block | macOS 风格代码块
+Sakura | 樱花动画
+TOC | 文章目录
+Reading Progress | 阅读进度
+Mobile Nav | 手机端汉堡导航
+Favorites | 收藏页面
+Gallery | 图库
+Archive | 归档
+Tag Cloud | 标签云
+Mouse Trail | 鼠标轨迹
+Fireflies | 萤火虫
+View Transition | 页面切换动画
+</div></div></div><p><span>现在回头看，非常有意思。</span></p><p><span>当时几乎每隔一段时间，我都会想：</span></p><blockquote><p><span>“这里还能不能再加点什么？”</span></p></blockquote><hr><h2><span>六、文章列表也被我反复推翻</span></h2><p><span>首页文章列表应该是我修改次数最多的地方之一。</span></p><p><span>Gmeek 原本的文章列表比较简单。</span></p><p><span>我先尝试：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">普通列表</code></pre></div><p><span>后来改：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">矩形卡片</code></pre></div><p><span>后来又觉得普通矩形太无聊。</span></p><p><span>于是继续尝试：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">网格
+多列
+卡片
+年份分组
+骨架屏
+不同尺寸
+悬浮动画</code></pre></div><p><span>我还尝试过更加明显的视觉透视，让中间卡片保持矩形，两侧卡片采用平行四边形或者倾斜布局，让整体看起来更像一个有纵深感的展览空间。</span></p><p><span>到最后甚至做了：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Grid / List</code></pre></div><p><span>两种显示方式切换。</span></p><p><span>有时候改完觉得很好。</span></p><p><span>第二天又觉得不对。</span></p><p><span>继续推翻。</span></p><hr><h2><span>七、我开始研究“网站的感觉”</span></h2><p><span>到了后面，我关注的已经不只是：</span></p><blockquote><p><span>这个按钮好不好看？</span></p></blockquote><p><span>而是：</span></p><blockquote><p><span>整个网站应该给人什么感觉？</span></p></blockquote><p><span>这个时候我开始大量参考其他网站。</span></p><p><span>其中一个比较明显的方向就是：</span></p><p><strong><span>GTA 6 官网一类的高视觉冲击页面。</span></strong></p><p><span>我很喜欢那种：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">强配色
+大面积背景
+强动画
+沉浸式视觉</code></pre></div><p><span>所以我的博客开始往：</span></p><h1><span>Cyberpunk</span></h1><p><span>方向发展。</span></p><hr><h2><span>八、赛博朋克阶段</span></h2><p><span>这个时期应该是博客视觉最复杂的时候。</span></p><p><span>我加入了：</span></p><ul><li><span>赛博背景</span></li><li><span>粒子</span></li><li><span>星空</span></li><li><span>动态颜色</span></li><li><span>城市</span></li><li><span>光效</span></li><li><span>鼠标互动</span></li><li><span>音效</span></li><li><span>多主题</span></li></ul><p><span>后来粒子系统甚至分成了两种：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Classic
+Cyber City</code></pre></div><p><span>其中 Cyber City 不是简单的背景图片。</span></p><p><span>我曾经尝试做：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">多层城市建筑
+3D 天际线
+粒子引力
+动态光效</code></pre></div><p><span>我开始把网站当成一个视觉实验场。</span></p><p><span>不是单纯换颜色，而是尝试让整个网站拥有自己的世界观。</span></p><hr><h2><span>九、博客开始变得太“满”</span></h2><p><span>当你只有三个功能的时候：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">导航非常简单。</code></pre></div><p><span>当你有十几个功能的时候：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">导航开始成为问题。</code></pre></div><p><span>我当时有：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Home
+About
+Book
+Favorites
+Gallery
+Archive
+Chronicle
+Stock
+Link
+Music
+Search
+Theme
+Settings
+...</code></pre></div><p><span>全部摆出来显然不现实。</span></p><p><span>于是我开始不断修改导航。</span></p><hr><h2><span>十、导航演化：顶部 → 折叠 → 抽屉</span></h2><p><span>最开始：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">顶部导航</code></pre></div><p><span>后来：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">顶部 + 快捷按钮</code></pre></div><p><span>后来：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">折叠菜单</code></pre></div><p><span>再后来：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Drawer 抽屉</code></pre></div><p><span>但是抽屉里面又开始塞很多东西。</span></p><p><span>到后面我甚至开始考虑：</span></p><blockquote><p><span>某些入口其实没有必要重复出现。</span></p></blockquote><p><span>比如 Chronicle、Book、Favorites 这些页面，如果在其他位置已经有入口，就没必要再次全部放进导航。</span></p><p><span>这其实是我后来才慢慢意识到的一件事：</span></p><blockquote><p><span>导航不是入口越多越好。</span></p></blockquote><hr><h2><span>十一、从“博客”变成“个人数字空间”</span></h2><p><span>另外一个变化是：</span></p><p><span>最开始网站只有文章。</span></p><p><span>后来出现了越来越多独立页面。</span></p><p><span>包括：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">about
+gallery
+book
+favorites
+archive
+stock
+link
+chronicle</code></pre></div><p><span>这时候，它已经不太像传统意义上的博客了。</span></p><p><span>它开始更像：</span></p><h1><span>Personal Digital Space</span></h1><p><span>一个属于自己的数字空间。</span></p><hr><h2><span>十二、Archive 与 Chronicle</span></h2><p><span>其中我很喜欢两个页面。</span></p><h3><span>Archive</span></h3><p><span>Archive 是文章归档。</span></p><p><span>它负责解决：</span></p><blockquote><p><span>我以前到底写过什么？</span></p></blockquote><p><span>所以后来我给它加入了：</span></p><ul><li><span>时间轴</span></li><li><span>年份</span></li><li><span>日期</span></li><li><span>Calendar</span></li><li><span>分类</span></li></ul><h3><span>Chronicle</span></h3><p><span>Chronicle 则不太一样。</span></p><p><span>它不是传统博客文章。</span></p><p><span>我想让它记录：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">今年去了哪里
+看了什么
+读了什么
+发生了什么</code></pre></div><p><span>最后我甚至为它建立了独立的数据结构。</span></p><p><span>它更像是我的个人编年史。</span></p><p><span>这其实代表我的博客开始从：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">写文章</code></pre></div><p><span>逐渐变成：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">记录生活</code></pre></div><hr><h2><span>十三、文章阅读体验也被我重做了一遍</span></h2><p><span>我后来发现，首页再漂亮，如果文章阅读体验很差，博客依然不好用。</span></p><p><span>所以我又开始改文章页面。</span></p><p><span>包括：</span></p><ul><li><span>文章目录</span></li><li><span>TOC 滚动监听</span></li><li><span>阅读进度环</span></li><li><span>返回顶部</span></li><li><span>图片灯箱</span></li><li><span>macOS 风格代码块</span></li><li><span>代码行号</span></li><li><span>上一篇 / 下一篇</span></li><li><span>系列文章导航</span></li><li><span>页面滚动记忆</span></li><li><span>页内搜索</span></li><li><span>阅读偏好</span></li><li><span>字体和透明度调整</span></li><li><span>深浅模式适配</span></li></ul><p><span>这时候，我已经开始从“首页设计”转向“完整阅读体验”。</span></p><hr><h2><span>十四、移动端也开始成为问题</span></h2><p><span>一开始我几乎只看电脑。</span></p><p><span>后来才发现：</span></p><p><span>电脑上看起来不错的导航和布局，到了手机上可能完全不能用。</span></p><p><span>所以后来又加入：</span></p><ul><li><span>手机端汉堡菜单</span></li><li><span>响应式布局</span></li><li><span>不同屏幕宽度断点</span></li><li><span>移动端导航</span></li><li><span>卡片重排</span></li><li><span>触摸交互</span></li><li><span>文章宽度适配</span></li><li><span>工具栏位置调整</span></li></ul><p><span>这也让我意识到：</span></p><blockquote><p><span>一个网页不是只设计一次，而是要在不同设备上重新考虑一次。</span></p></blockquote><hr><h2><span>十五、功能越多，我越不满意</span></h2><p><span>这是一个有点讽刺的地方。</span></p><p><span>最开始：</span></p><blockquote><p><span>我觉得 Gmeek 太简单。</span></p></blockquote><p><span>所以不断加东西。</span></p><p><span>后来：</span></p><blockquote><p><span>我觉得自己的博客太复杂。</span></p></blockquote><p><span>于是又不断删东西。</span></p><p><span>赛博城市。</span></p><p><span>粒子。</span></p><p><span>动画。</span></p><p><span>主题。</span></p><p><span>设置面板。</span></p><p><span>导航。</span></p><p><span>文章样式。</span></p><p><span>鼠标效果。</span></p><p><span>背景。</span></p><p><span>音乐。</span></p><p><span>越来越多。</span></p><p><span>直到有一天我发现：</span></p><blockquote><p><span>我打开自己的博客，需要先理解自己的博客。</span></p></blockquote><p><span>这显然有问题。</span></p><hr><h2><span>十六、于是我做了 Minimal</span></h2><p><span>我不想完全删除 Cyber。</span></p><p><span>因为它代表了我很长一段时间的折腾。</span></p><p><span>但是我也确实越来越喜欢：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">简单
+安静
+克制
+留白
+内容优先</code></pre></div><p><span>所以最后我没有强迫自己做选择。</span></p><p><span>而是做了两套系统：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Cyber
+Minimal</code></pre></div><p><span>也就是说：</span></p><p><strong><span>Minimal 已经不是一套皮肤。</span></strong></p><p><span>而是一套独立的视觉系统。</span></p><p><span>Cyber 可以继续保留视觉冲击。</span></p><p><span>Minimal 则负责安静阅读。</span></p><p><span>最后我干脆让两个系统共存。</span></p><hr><h2><span>十七、设置页开始变成一个“系统控制中心”</span></h2><p><span>随着功能越来越多，我又遇到了一个问题：</span></p><p><span>这些功能总要有地方控制。</span></p><p><span>于是设置页也越来越复杂。</span></p><p><span>包括：</span></p><ul><li><span>深浅模式</span></li><li><span>主题切换</span></li><li><span>Cyber / Minimal</span></li><li><span>粒子开关</span></li><li><span>音效</span></li><li><span>背景</span></li><li><span>动画</span></li><li><span>阅读设置</span></li><li><span>页面透明度</span></li><li><span>文章样式</span></li><li><span>鼠标效果</span></li><li><span>音乐</span></li><li><span>特效</span></li></ul><p><span>设置页面逐渐从一个简单的主题按钮，变成了网站的控制中心。</span></p><p><span>但这也进一步加重了复杂度。</span></p><hr><h2><span>十八、一次意外：GitHub 出现问题</span></h2><p><span>因为长期频繁修改：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Issue
+Config
+CSS
+JS
+Actions</code></pre></div><p><span>站点会不断触发 GitHub Actions。</span></p><p><span>后来 GitHub 账号或者 Actions 出现了限制。</span></p><p><span>对于当时的我来说，结果很简单：</span></p><p><strong><span>原来的工作流被打断了。</span></strong></p><p><span>我只能开始考虑迁移。</span></p><hr><h2><span>十九、迁移</span></h2><p><span>我当然不想就这样停下来。</span></p><p><span>所以我开始迁移。</span></p><p><span>新的 GitHub。</span></p><p><span>新的仓库。</span></p><p><span>新的 Pages。</span></p><p><span>重新部署。</span></p><p><span>重新同步文章。</span></p><p><span>重新调整 Actions。</span></p><p><span>再把旧博客的数据一点一点搬过去。</span></p><p><span>本来以为迁移结束就是终点。</span></p><p><span>结果它反而变成了另一次重构的开始。</span></p><hr><h2><span>二十、我遇到了 ungetsu.net</span></h2><p><span>后来我看到了：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">ungetsu.net</code></pre></div><p><span>它的页面让我重新开始思考：</span></p><blockquote><p><span>一个个人博客一定要有这么多“UI 组件”吗？</span></p></blockquote><p><span>我开始研究它的：</span></p><ul><li><span>页面结构</span></li><li><span>留白</span></li><li><span>导航</span></li><li><span>信息层级</span></li><li><span>字体</span></li><li><span>阅读区域</span></li><li><span>页面节奏</span></li><li><span>内容组织</span></li></ul><p><span>然后尝试重新实现。</span></p><p><span>我分析它的页面结构、视觉语言、信息架构和交互逻辑，再一点一点改造成适合自己内容体系的版本。</span></p><p><span>这个过程和以前不太一样。</span></p><p><span>以前我更多是在：</span></p><blockquote><p><span>加功能。</span></p></blockquote><p><span>这一次我开始思考：</span></p><blockquote><p><span>哪些东西可以不要。</span></p></blockquote><hr><h2><span>二十一、一个非常重要的决定：保留 Gmeek</span></h2><p><span>虽然前端发生了很大变化，但是我最后并没有放弃 Gmeek。</span></p><p><span>因为我发现：</span></p><p><span>Gmeek 最有价值的部分，其实不是默认界面。</span></p><p><span>而是：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">GitHub Issue
+        ↓
+内容管理
+        ↓
+Action
+        ↓
+静态页面</code></pre></div><p><span>这一套内容生产流程。</span></p><p><span>所以最后我的思路变成：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Gmeek = 内容层
+</code><p><code class="notranslate">自己的 CSS / JS / UI = 表现层</code></p></pre></div><p><span>文章依然可以通过 Issue 更新。</span></p><p><span>但是用户看到的前端，可以完全是另一套东西。</span></p><hr><h2><span>二十二、从“改主题”到“重做前端”</span></h2><p><span>如果回头看整个过程，其实有一个非常明显的变化。</span></p><p><span>最开始我做的是：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">修改主题</code></pre></div><p><span>后来变成：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">修改 Gmeek</code></pre></div><p><span>再后来变成：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">在 Gmeek 上搭建自己的增强系统</code></pre></div><p><span>最后则逐渐接近：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">让 Gmeek 只负责内容<br>
+自己负责整个前端</code></pre></div><p><span>这也是整个博客演化里最重要的一条线。</span></p><hr><h2><span>二十三、我逐渐开始保留“备份”和“版本”</span></h2><p><span>因为推翻次数太多，我后来开始保留：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">backup/</code></pre></div><p><span>以及不同阶段的说明文档。</span></p><p><span>这些文件现在看起来有点乱。</span></p><p><span>但它们实际上已经变成了博客发展的考古记录。</span></p><p><span>里面记录着：</span></p><ul><li><span>曾经存在的功能</span></li><li><span>曾经使用过的布局</span></li><li><span>被删除的粒子系统</span></li><li><span>以前的主题</span></li><li><span>不同版本的 CSS</span></li><li><span>不同版本的 JS</span></li><li><span>不同阶段的设计思路</span></li></ul><p><span>很多我现在已经忘掉的东西，反而还能从这些文件里重新找到。</span></p><hr><h2><span>二十四、个人博客永远不会真正“完成”</span></h2><p><span>以前我总觉得：</span></p><blockquote><p><span>把这个功能做好，博客应该就完成了。</span></p></blockquote><p><span>后来发现并不会。</span></p><p><span>你会继续看到新的设计。</span></p><p><span>继续发现新的问题。</span></p><p><span>继续改变自己的审美。</span></p><p><span>甚至你自己也会改变。</span></p><p><span>所以现在我不再认为它是一个“完成品”。</span></p><p><span>它更像：</span></p><h1><span>一个长期实验。</span></h1><hr><h1><span>Part Ⅱ · 现在这个博客怎么工作</span></h1><h2><span>二十五、整体结构</span></h2><p><span>如果只看现在的结构，大概可以分成四层：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Gmeek<br>
+│<br>
+├── 内容层<br>
+│   └── GitHub Issues<br>
+│<br>
+├── 配置层<br>
+│   └── config.json<br>
+│<br>
+├── 表现层<br>
+│   ├── enhance.css<br>
+│   └── enhance.js<br>
+│<br>
+└── 资源层<br>
+└── static</code></pre></div><hr><h2><span>二十六、内容系统</span></h2><p><span>普通文章使用：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">GitHub Issue</code></pre></div><p><span>创建 Issue：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">标题 = 文章标题<br>
+正文 = Markdown<br>
+Label = 分类</code></pre></div><p><span>之后交给 GitHub Actions 构建。</span></p><p><span>这也是我一直没有放弃 Gmeek 的原因。</span></p><p><span>因为对于个人博客来说：</span></p><p><strong><span>用 GitHub Issues 写文章真的很方便。</span></strong></p><hr><h2><span>二十七、</span><code dir="ltr" class="notranslate">config.json</code></h2><p><code dir="ltr" class="notranslate">config.json</code><span> 现在主要负责：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">网站基本信息<br>
+域名<br>
+单页<br>
+图标<br>
+主题<br>
+外链<br>
+Gmeek 设置<br>
+脚本加载<br>
+CSS 加载</code></pre></div><p><span>比如：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">about<br>
+gallery<br>
+book<br>
+favorites<br>
+archive<br>
+stock<br>
+link<br>
+chronicle</code></pre></div><p><span>这些页面入口都可以从配置层进行管理。</span></p><p><span>相比最开始把所有逻辑都写进 JSON，现在它更接近真正的“配置文件”。</span></p><hr><h2><span>二十八、</span><code dir="ltr" class="notranslate">enhance.css</code></h2><p><code dir="ltr" class="notranslate">enhance.css</code><span> 主要负责：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">Typography<br>
+Layout<br>
+Navbar<br>
+Cards<br>
+Article<br>
+Code<br>
+Table<br>
+Theme<br>
+Responsive<br>
+Animation</code></pre></div><p><span>简单理解：</span></p><blockquote><p><span>所有“看起来是什么样”的东西，大部分都在这里。</span></p></blockquote><p><span>包括：</span></p><ul><li><span>字体</span></li><li><span>页面宽度</span></li><li><span>文章排版</span></li><li><span>卡片</span></li><li><span>导航</span></li><li><span>抽屉</span></li><li><span>深浅模式</span></li><li><span>Cyber</span></li><li><span>Minimal</span></li><li><span>响应式</span></li><li><span>动画</span></li><li><span>表格</span></li><li><span>代码块</span></li></ul><hr><h2><span>二十九、</span><code dir="ltr" class="notranslate">enhance.js</code></h2><p><code dir="ltr" class="notranslate">enhance.js</code><span> 主要负责交互。</span></p><p><span>例如：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">主题<br>
+菜单<br>
+搜索<br>
+文章目录<br>
+滚动进度<br>
+图片灯箱<br>
+页面切换<br>
+Archive<br>
+Chronicle<br>
+Favorites<br>
+鼠标效果<br>
+音乐<br>
+文章记忆<br>
+移动端导航<br>
+页面初始化</code></pre></div><p><span>它现在已经不只是一个简单的增强脚本。</span></p><p><span>它更像整个博客前端系统的核心控制层。</span></p><hr><h2><span>三十、</span><code dir="ltr" class="notranslate">static</code></h2><p><code dir="ltr" class="notranslate">static</code><span> 负责存放静态资源。</span></p><p><span>比如：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">背景图<br>
+首页图<br>
+卡片图<br>
+图标<br>
+照片<br>
+音乐<br>
+其他资源</code></pre></div><p><span>相比把图片散落在各种外链中，我后来越来越倾向于自己统一管理。</span></p><p><span>这样以后修改、迁移和备份都会方便很多。</span></p><hr><h2><span>三十一、Archive</span></h2><p><span>Archive 主要用于整理文章。</span></p><p><span>它解决的是：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">文章太多以后怎么找</code></pre></div><p><span>我希望它更像一个真正的档案页，而不是单纯的一列标题。</span></p><p><span>所以后面加入过：</span></p><ul><li><span>时间线</span></li><li><span>年份</span></li><li><span>月份</span></li><li><span>日期</span></li><li><span>日历</span></li><li><span>分类</span></li><li><span>搜索</span></li></ul><p><span>Archive 负责整理过去。</span></p><hr><h2><span>三十二、Chronicle</span></h2><p><span>Chronicle 负责记录生活。</span></p><p><span>它和普通文章不同。</span></p><p><span>它更强调：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">时间<br>
+事件<br>
+经历<br>
+书影音<br>
+地点<br>
+人生记录</code></pre></div><p><span>它更像一个个人时间数据库。</span></p><p><span>Archive 是：</span></p><blockquote><p><span>我写过什么。</span></p></blockquote><p><span>Chronicle 是：</span></p><blockquote><p><span>我经历过什么。</span></p></blockquote><hr><h2><span>三十三、Book</span></h2><p><span>Book 页面最开始只是想做一个书单。</span></p><p><span>后来我希望它更接近一个真正的个人书架。</span></p><p><span>不仅可以展示书，还可以把书和我的文章、笔记、读后感连接起来。</span></p><p><span>它不只是：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">书名列表</code></pre></div><p><span>而应该慢慢变成：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">个人阅读记录</code></pre></div><hr><h2><span>三十四、Gallery</span></h2><p><span>Gallery 负责照片和视觉内容。</span></p><p><span>我不希望所有东西都必须写成长文章。</span></p><p><span>有些东西其实只需要：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">一张照片<br>
+一个时间<br>
+一个地点<br>
+一句话</code></pre></div><p><span>就够了。</span></p><p><span>所以 Gallery 也是我想长期保留的页面。</span></p><hr><h2><span>三十五、Favorites</span></h2><p><span>Favorites 用来保存：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">喜欢的网站<br>
+文章<br>
+工具<br>
+作品<br>
+资料<br>
+链接</code></pre></div><p><span>它更像一个私人收藏夹。</span></p><p><span>相比浏览器收藏夹，我更希望这些东西能成为自己网站的一部分。</span></p><hr><h2><span>三十六、Stock</span></h2><p><span>Stock 是我后来加入的一个独立页面。</span></p><p><span>因为我本身也会关注投资、市场和个人财务。</span></p><p><span>所以我想把这部分内容从普通博客文章里独立出来。</span></p><p><span>未来它可以承载：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">投资记录<br>
+市场观察<br>
+资产记录<br>
+复盘<br>
+数据</code></pre></div><hr><h2><span>三十七、Link</span></h2><p><span>Link 用来整理：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">友情链接<br>
+个人项目<br>
+其他网站<br>
+外部页面<br>
+自己的子站</code></pre></div><p><span>随着网站越来越多，Link 其实也承担了一个“入口中心”的作用。</span></p><hr><h2><span>三十八、Cyber 与 Minimal</span></h2><p><span>现在我最希望保留下来的，是这两个系统。</span></p><h3><span>Cyber</span></h3><p><span>Cyber 更偏：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">视觉<br>
+动画<br>
+氛围<br>
+实验<br>
+交互</code></pre></div><h3><span>Minimal</span></h3><p><span>Minimal 更偏：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">内容<br>
+阅读<br>
+留白<br>
+安静<br>
+效率</code></pre></div><p><span>它们不是互相替代。</span></p><p><span>而是满足两个完全不同的使用状态。</span></p><p><span>有时候我想：</span></p><blockquote><p><span>看一个很有氛围的网站。</span></p></blockquote><p><span>有时候我只想：</span></p><blockquote><p><span>安静地读文章。</span></p></blockquote><p><span>所以我选择都保留。</span></p><hr><h2><span>三十九、我最后留下的一个原则</span></h2><p><span>折腾这么久以后，我现在反而越来越重视一件事情：</span></p><h1><span>内容应该比界面重要。</span></h1><p><span>动画很好。</span></p><p><span>粒子很好。</span></p><p><span>3D 很好。</span></p><p><span>赛博朋克很好。</span></p><p><span>Minimal 也很好。</span></p><p><span>但如果有一天：</span></p><blockquote><p><span>用户只记得网站很酷，却完全不知道我写了什么。</span></p></blockquote><p><span>那博客其实失败了。</span></p><p><span>所以现在我希望我的网站最终能做到：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">远看有风格<br>
+近看有细节<br>
+使用时不打扰<br>
+阅读时只剩内容</code></pre></div><hr><h1><span>四十、整个博客的演化</span></h1><p><span>如果把整个过程压缩成一条线，大概就是：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">使用 Gmeek<br>
+↓<br>
+不满意默认外观<br>
+↓<br>
+研究其他 Gmeek 博客<br>
+↓<br>
+修改 JSON<br>
+↓<br>
+加入 CSS<br>
+↓<br>
+加入 JS<br>
+↓<br>
+重做文章卡片<br>
+↓<br>
+加入主题<br>
+↓<br>
+加入动画<br>
+↓<br>
+加入粒子<br>
+↓<br>
+加入赛博城市<br>
+↓<br>
+重做导航<br>
+↓<br>
+顶部导航<br>
+↓<br>
+折叠导航<br>
+↓<br>
+抽屉<br>
+↓<br>
+加入大量单页<br>
+↓<br>
+重做文章阅读<br>
+↓<br>
+加入 Archive<br>
+↓<br>
+加入 Chronicle<br>
+↓<br>
+功能越来越多<br>
+↓<br>
+设置越来越复杂<br>
+↓<br>
+感觉网站太杂<br>
+↓<br>
+制作 Minimal<br>
+↓<br>
+Cyber / Minimal 双系统<br>
+↓<br>
+GitHub 出现限制<br>
+↓<br>
+迁移仓库<br>
+↓<br>
+重新部署<br>
+↓<br>
+研究 ungetsu.net<br>
+↓<br>
+重新思考布局<br>
+↓<br>
+减少不必要的功能<br>
+↓<br>
+保留 Gmeek 内容系统<br>
+↓<br>
+重新构建前端</code></pre></div><hr><h1><span>写在最后</span></h1><p><span>最开始，我只是 Fork 了一个 Gmeek。</span></p><p><span>后来：</span></p><div><pre dir="ltr" class="notranslate"><code class="notranslate">改 JSON<br>
+↓<br>
+改 CSS<br>
+↓<br>
+改 JS<br>
+↓<br>
+改布局<br>
+↓<br>
+改导航<br>
+↓<br>
+改文章<br>
+↓<br>
+做粒子<br>
+↓<br>
+做城市<br>
+↓<br>
+做主题<br>
+↓<br>
+做页面<br>
+↓<br>
+觉得太复杂<br>
+↓<br>
+做 Minimal<br>
+↓<br>
+迁移 GitHub<br>
+↓<br>
+重新研究别的网站<br>
+↓<br>
+重新设计</code></pre></div><p><span>绕了一大圈以后，我反而又回到了最开始那个问题：</span></p><blockquote><p><strong><span>一个博客究竟需要什么？</span></strong></p></blockquote><p><span>我现在的答案是：</span></p><blockquote><p><span>一个让我愿意一直写下去的地方。</span></p></blockquote><p><span>技术只是手段。</span></p><p><span>设计也是手段。</span></p><p><span>真正重要的，大概还是那些我想留下来的东西。</span></p><p></p>
+
+</div>
+<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://blog.luliy.me">ΔιάΝους</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if("05/30/2026"!=""){
+    var startSite=new Date("05/30/2026");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行 "+diffDay+" 天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","luliy6/luliy6.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+<script>function luliyWaitPost(){if(window._luliyInitPost){window._luliyInitPost();}else{setTimeout(luliyWaitPost,50);}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',luliyWaitPost);}else{luliyWaitPost();}</script>
+
+</html>
