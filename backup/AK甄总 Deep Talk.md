@@ -1,4 +1,4 @@
-![封面]()
+![封面](https://raw.githubusercontent.com/luliy6/luliy6.github.io/refs/heads/main/static/img/111.png)
 
 AK播客文章合集
 
