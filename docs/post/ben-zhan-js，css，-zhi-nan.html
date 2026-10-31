@@ -753,16 +753,16 @@ enhance.css  →  样式层（主题变量 / 布局 / 过渡动画）
 <h2>5. CSS 主题系统</h2>
 <p><code class="notranslate">enhance.css</code> 通过 CSS 变量 + <code class="notranslate">[data-luliy-theme]</code> 属性选择器实现 6 套主题：</p>
 <div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-c">/* 每个主题定义自己的颜色组 */</span>
-[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"sakura"</span>] {
-  <span class="pl-s1">--accent</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>e05c8a</span>;
-  <span class="pl-s1">--accent-light</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f9a8c9</span>;
-  <span class="pl-s1">--card-border</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span>(<span class="pl-c1">224</span><span class="pl-kos">,</span> <span class="pl-c1">92</span><span class="pl-kos">,</span> <span class="pl-c1">138</span><span class="pl-kos">,</span> <span class="pl-c1">0.18</span>);
+[<span class="pl-c1">data-luliy-theme</span><span class="pl-c1">=</span><span class="pl-s">"sakura"</span>] <span class="pl-kos">{</span>
+  <span class="pl-c1">--accent</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>e05c8a</span><span class="pl-kos">;</span>
+  <span class="pl-c1">--accent-light</span><span class="pl-kos">:</span> <span class="pl-pds"><span class="pl-kos">#</span>f9a8c9</span><span class="pl-kos">;</span>
+  <span class="pl-c1">--card-border</span><span class="pl-kos">:</span> <span class="pl-en">rgba</span><span class="pl-kos">(</span><span class="pl-c1">224</span><span class="pl-kos">,</span> <span class="pl-c1">92</span><span class="pl-kos">,</span> <span class="pl-c1">138</span><span class="pl-kos">,</span> <span class="pl-c1">0.18</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
   <span class="pl-c">/* ... */</span>
-}</pre></div>
+<span class="pl-kos">}</span></pre></div>
 <p>同时 JS 更新 4 个卡片渐变变量：</p>
 <div class="highlight highlight-source-css"><pre class="notranslate">--card-c1 <span class="pl-c1">/</span> <span class="pl-c1">-</span><span class="pl-c1">-</span>card<span class="pl-c1">-</span>c2 <span class="pl-c1">/</span> <span class="pl-c1">-</span><span class="pl-c1">-</span>card<span class="pl-c1">-</span>c3 <span class="pl-c1">/</span> <span class="pl-c1">-</span><span class="pl-c1">-</span>card<span class="pl-c1">-</span>c4</pre></div>
 <p>卡片渐变写法：</p>
-<div class="highlight highlight-source-css"><pre class="notranslate">.<span class="pl-c1">luliy-card</span><span class="pl-kos">:</span><span class="pl-c1">nth-child</span>(4n+1) { <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">linear-gradient</span>(<span class="pl-c1">135<span class="pl-smi">deg</span></span><span class="pl-kos">,</span> <span class="pl-en">var</span>(<span class="pl-s1">--card-c1</span>)<span class="pl-kos">,</span> <span class="pl-en">var</span>(<span class="pl-s1">--card-c2</span>)); }</pre></div>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">.</span><span class="pl-c1">luliy-card</span><span class="pl-kos">:</span><span class="pl-c1">nth-child</span><span class="pl-kos">(</span>4n+1<span class="pl-kos">)</span> <span class="pl-kos">{</span> <span class="pl-c1">background</span><span class="pl-kos">:</span> <span class="pl-en">linear-gradient</span><span class="pl-kos">(</span><span class="pl-c1">135<span class="pl-smi">deg</span></span><span class="pl-kos">,</span> <span class="pl-en">var</span><span class="pl-kos">(</span><span class="pl-s1">--card-c1</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-en">var</span><span class="pl-kos">(</span><span class="pl-s1">--card-c2</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span> <span class="pl-kos">}</span></pre></div>
 <hr>
 <h2>6. 性能设计说明</h2>
 <markdown-accessiblity-table><table role="table">
