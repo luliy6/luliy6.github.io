@@ -1,4 +1,4 @@
-![封面](https://github.com/luliy6/luliy6.github.io/blob/main/static/img/%E4%BA%91%E7%AB%AF%E9%80%9A%E5%BE%80%E5%85%89%E7%9A%84%E9%98%B6%E6%A2%AF.png)
+![封面](https://cloud.luliy.me/api/image?path=shared%2F%E7%85%A7%E7%89%87%E5%A2%99%2Fweekly.png)
 
 > 杀不死的我的终究使我更强大
 
